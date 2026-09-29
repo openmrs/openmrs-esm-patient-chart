@@ -3,21 +3,34 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { singleSpaAngular, getSingleSpaExtraProviders } from 'single-spa-angular';
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
-import { singleSpaPropsSubject, SingleSpaProps } from './single-spa-props';
+import { enqueueContainerElement, enqueueInstanceSubject, SingleSpaProps } from './single-spa-props';
 
 if (environment.production) {
   enableProdMode();
 }
 
-const lifecycles = singleSpaAngular({
-  bootstrapFunction: (singleSpaProps) => {
-    singleSpaPropsSubject.next(singleSpaProps as SingleSpaProps);
-    return platformBrowserDynamic(getSingleSpaExtraProviders()).bootstrapModule(AppModule);
-  },
-  template: '<my-app-root />',
-  NgZone,
-});
+/**
+ * Creates a fresh set of single-spa lifecycle functions for one parcel instance.
+ *
+ * Each call produces its own `options` object inside single-spa-angular, so
+ * `options.bootstrappedNgModuleRefOrAppRef` is never shared between instances.
+ * Without this, a second mount would overwrite the first mount's module ref and
+ * unmounting either parcel would destroy the wrong Angular application.
+ */
+export function createLifecycles() {
+  return singleSpaAngular({
+    bootstrapFunction: async (singleSpaProps) => {
+      // Enqueue props and container element before Angular starts instantiating
+      // services. ngDoBootstrap dequeues the element and calls appRef.bootstrap
+      // synchronously during module initialisation, guaranteeing that
+      // AppComponent is always attached to the correct DOM element.
+      enqueueInstanceSubject(singleSpaProps as SingleSpaProps);
+      const containerElement = (singleSpaProps as any).domElement as HTMLElement | undefined;
+      enqueueContainerElement(containerElement ?? null);
 
-export const bootstrap = lifecycles.bootstrap;
-export const mount = lifecycles.mount;
-export const unmount = lifecycles.unmount;
+      return await platformBrowserDynamic(getSingleSpaExtraProviders()).bootstrapModule(AppModule);
+    },
+    template: '<my-app-root />',
+    NgZone,
+  });
+}

@@ -9,13 +9,20 @@ import { OpenmrsApiModule } from './openmrs-api/openmrs-api.module';
 import { LocalStorageService } from './local-storage/local-storage.service';
 import { FormDataSourceService } from './form-data-source/form-data-source.service';
 import { FormSubmissionService } from './form-submission/form-submission.service';
+import { SingleSpaPropsService } from './single-spa-props/single-spa-props.service';
 
 describe('AppComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule, FormEntryModule, ReactiveFormsModule, OpenmrsApiModule],
       declarations: [AppComponent, FeWrapperComponent],
-      providers: [FormSchemaService, LocalStorageService, FormDataSourceService, FormSubmissionService],
+      providers: [
+        FormSchemaService,
+        LocalStorageService,
+        FormDataSourceService,
+        FormSubmissionService,
+        SingleSpaPropsService,
+      ],
     }).compileComponents();
   }));
 
