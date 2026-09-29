@@ -16,7 +16,7 @@ import {
   TableRow,
 } from '@carbon/react';
 import { ErrorState, isDesktop, useLayoutType } from '@openmrs/esm-framework';
-import { EmptyState } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, invalidateVisitByUuid } from '@openmrs/esm-patient-common-lib';
 import { usePaginatedVisits } from '../visits-widget/visit.resource';
 import VisitActionsCell from './visit-actions-cell.component';
 import VisitDateCell from './visit-date-cell.component';
@@ -24,6 +24,7 @@ import VisitDiagnosisCell from './visit-diagnoses-cell.component';
 import VisitSummary from '../visits-widget/past-visits-components/visit-summary.component';
 import VisitTypeCell from './visit-type-cell.component';
 import styles from './visit-history-table.scss';
+import { useSWRConfig } from 'swr';
 
 interface VisitHistoryTableProps {
   patientUuid: string;
@@ -41,6 +42,7 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, pati
   const { data: visits, currentPage, error, isLoading, totalCount, goTo } = usePaginatedVisits(patientUuid, pageSize);
   const { t } = useTranslation();
   const desktopLayout = isDesktop(useLayoutType());
+  const {mutate: globalMutate} = useSWRConfig();
 
   // TODO: make this configurable
   const columns = [
@@ -110,7 +112,9 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, pati
                         </TableExpandRow>
                         {row.isExpanded ? (
                           <TableExpandedRow {...getExpandedRowProps({ row })} colSpan={headers.length + 2}>
-                            <VisitSummary visit={visit} patientUuid={patientUuid} />
+                            <VisitSummary visit={visit} patientUuid={patientUuid} patient={patient} mutateVisitContext={() => {
+                              invalidateVisitByUuid(globalMutate, visit.uuid)
+                            }} />
                           </TableExpandedRow>
                         ) : (
                           <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />

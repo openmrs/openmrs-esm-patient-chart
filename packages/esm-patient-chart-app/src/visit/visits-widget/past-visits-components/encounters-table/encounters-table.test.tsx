@@ -10,7 +10,6 @@ import {
   useFeatureFlag,
   userHasAccess,
 } from '@openmrs/esm-framework';
-import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockEncountersAlice, mockEncounterTypes, mockFhirPatient, mockPatientAlice } from '__mocks__';
@@ -33,6 +32,8 @@ const testProps: EncountersTableProps = {
   setPageSize: vi.fn(),
   isSelectable: true,
   canPrintEncounters: true,
+  onEncounterSaved: vi.fn(),
+  patient: mockFhirPatient,
 };
 
 const mockShowModal = vi.mocked(showModal);
@@ -40,7 +41,6 @@ const mockLaunchWorkspace = vi.mocked(launchWorkspace2);
 const mockUserHasAccess = vi.mocked(userHasAccess).mockReturnValue(true);
 const mockUseFeatureFlag = vi.mocked(useFeatureFlag);
 const mockExtensionSlot = vi.mocked(ExtensionSlot);
-const mockUsePatientChartStore = vi.mocked(usePatientChartStore);
 
 const mockUseEncounterTypes = vi.fn(useEncounterTypes).mockReturnValue({
   data: mockEncounterTypes,
@@ -64,21 +64,8 @@ vi.mock('./encounters-table.resource', async () => ({
   deleteEncounter: (...args: Array<unknown>) => mockDeleteEncounter(...args),
 }));
 
-vi.mock('@openmrs/esm-patient-common-lib', async () => ({
-  ...((await vi.importActual('@openmrs/esm-patient-common-lib')) as object),
-  usePatientChartStore: vi.fn(),
-}));
-
 beforeEach(() => {
   mockUseFeatureFlag.mockReturnValue(true);
-  mockUsePatientChartStore.mockReturnValue({
-    patientUuid: mockPatientAlice.uuid,
-    patient: mockFhirPatient,
-    visitContext: null,
-    mutateVisitContext: vi.fn(),
-    setPatient: vi.fn(),
-    setVisitContext: vi.fn(),
-  } as any);
 });
 
 describe('EncountersTable', () => {
@@ -341,76 +328,42 @@ describe('Encounter editability', () => {
     expect(screen.getByRole('button', { name: /danger\s*Delete this encounter/i })).toBeInTheDocument();
   });
 
-  it('calls onEditEncounter instead of launching a workspace when the prop is provided', async () => {
-    const onEditEncounter = vi.fn();
+  it('launches the encounter workspace when editing an encounter from the overflow menu', async () => {
+    const onEncounterSaved = vi.fn();
 
-    renderEncountersTable({ onEditEncounter });
+    renderEncountersTable({ onEncounterSaved });
 
     await clickEditEncounterViaOverflowMenu(admissionRowName);
 
-    expect(onEditEncounter).toHaveBeenCalledTimes(1);
-    expect(onEditEncounter).toHaveBeenCalledWith(expect.objectContaining(mockAdmissionEncounter), false);
-    expect(mockLaunchWorkspace).not.toHaveBeenCalled();
-  });
-
-  it('flags formless visit note encounters as visit notes when calling onEditEncounter', async () => {
-    const onEditEncounter = vi.fn();
-
-    renderEncountersTable({ onEditEncounter });
-
-    await clickEditEncounter(visitNoteRowName);
-
-    expect(onEditEncounter).toHaveBeenCalledTimes(1);
-    expect(onEditEncounter).toHaveBeenCalledWith(expect.objectContaining(mockVisitNoteEncounter), true);
-    expect(mockLaunchWorkspace).not.toHaveBeenCalled();
-  });
-
-  it('does not flag form-backed visit note encounters as visit notes when calling onEditEncounter', async () => {
-    const onEditEncounter = vi.fn();
-
-    const visitNoteEncounterWithAdmissionForm: Encounter = {
-      ...mockVisitNoteEncounter,
-      form: mockAdmissionEncounter.form,
-    };
-    renderEncountersTable({
-      onEditEncounter,
-      paginatedEncounters: [visitNoteEncounterWithAdmissionForm],
-      totalCount: 1,
-    });
-
-    await clickEditEncounter(
-      /Select row 03-Aug-2021, 12:47 AM Facility Visit Visit Note POC Consent Form User One Encounter table actions menu/i,
-    );
-
-    expect(onEditEncounter).toHaveBeenCalledTimes(1);
-    expect(onEditEncounter).toHaveBeenCalledWith(expect.objectContaining(visitNoteEncounterWithAdmissionForm), false);
-    expect(mockLaunchWorkspace).not.toHaveBeenCalled();
-  });
-
-  it('launches the form entry workspace when no onEditEncounter prop is provided', async () => {
-    renderEncountersTable();
-
-    await clickEditEncounter(admissionRowName);
-
     expect(mockLaunchWorkspace).toHaveBeenCalledTimes(1);
-    expect(mockLaunchWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
-      form: mockAdmissionEncounter.form,
-      encounterUuid: mockAdmissionEncounter.uuid,
-    });
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith(
+      'encounter-workspace',
+      {},
+      expect.objectContaining({
+        patient: mockFhirPatient,
+        visitContext: mockAdmissionEncounter.visit,
+        encounter: expect.objectContaining({ uuid: mockAdmissionEncounter.uuid }),
+        onEncounterSaved,
+      }),
+    );
   });
 
-  it('launches the visit notes workspace for visit notes when no onEditEncounter prop is provided', async () => {
-    renderEncountersTable();
+  it('launches the encounter workspace when editing an encounter from the expanded row', async () => {
+    const onEncounterSaved = vi.fn();
+
+    renderEncountersTable({ onEncounterSaved });
 
     await clickEditEncounter(visitNoteRowName);
 
     expect(mockLaunchWorkspace).toHaveBeenCalledTimes(1);
     expect(mockLaunchWorkspace).toHaveBeenCalledWith(
-      'visit-notes-form-workspace',
+      'encounter-workspace',
+      {},
       expect.objectContaining({
+        patient: mockFhirPatient,
+        visitContext: mockVisitNoteEncounter.visit,
         encounter: expect.objectContaining(mockVisitNoteEncounter),
-        formContext: 'editing',
-        patientUuid: mockPatientAlice.uuid,
+        onEncounterSaved,
       }),
     );
   });
@@ -451,23 +404,14 @@ describe('Delete Encounter', () => {
     );
   });
 
-  it('revalidates through the mutateVisitContext prop rather than the chart store when one is supplied', async () => {
+  it('calls onEncounterSaved with the deleted encounter once the deletion succeeds', async () => {
     const user = userEvent.setup();
-    const mutateVisitContext = vi.fn();
-    const chartMutateVisitContext = vi.fn();
-    mockUsePatientChartStore.mockReturnValue({
-      patientUuid: mockPatientAlice.uuid,
-      patient: mockFhirPatient,
-      visitContext: null,
-      mutateVisitContext: chartMutateVisitContext,
-      setPatient: vi.fn(),
-      setVisitContext: vi.fn(),
-    } as any);
+    const onEncounterSaved = vi.fn();
     mockDeleteEncounter.mockResolvedValue({});
     // confirmAndDeleteEncounter calls the disposer showModal hands back.
     mockShowModal.mockReturnValue(vi.fn());
 
-    renderEncountersTable({ mutateVisitContext });
+    renderEncountersTable({ onEncounterSaved });
 
     const row = screen.getByRole('row', {
       name: /Select row 18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Encounter table actions menu/i,
@@ -478,36 +422,8 @@ describe('Delete Encounter', () => {
     const [, modalProps] = mockShowModal.mock.calls[0];
     (modalProps as { onConfirmation: () => void }).onConfirmation();
 
-    await waitFor(() => expect(mutateVisitContext).toHaveBeenCalledTimes(1));
-    expect(chartMutateVisitContext).not.toHaveBeenCalled();
-  });
-
-  it('falls back to the chart store when no mutateVisitContext prop is supplied', async () => {
-    const user = userEvent.setup();
-    const chartMutateVisitContext = vi.fn();
-    mockUsePatientChartStore.mockReturnValue({
-      patientUuid: mockPatientAlice.uuid,
-      patient: mockFhirPatient,
-      visitContext: null,
-      mutateVisitContext: chartMutateVisitContext,
-      setPatient: vi.fn(),
-      setVisitContext: vi.fn(),
-    } as any);
-    mockDeleteEncounter.mockResolvedValue({});
-    mockShowModal.mockReturnValue(vi.fn());
-
-    renderEncountersTable();
-
-    const row = screen.getByRole('row', {
-      name: /Select row 18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Encounter table actions menu/i,
-    });
-    await user.click(within(row).getByRole('button', { name: /expand current row/i }));
-    await user.click(screen.getByRole('button', { name: /danger\s*Delete this encounter/i }));
-
-    const [, modalProps] = mockShowModal.mock.calls[0];
-    (modalProps as { onConfirmation: () => void }).onConfirmation();
-
-    await waitFor(() => expect(chartMutateVisitContext).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(onEncounterSaved).toHaveBeenCalledTimes(1));
+    expect(onEncounterSaved).toHaveBeenCalledWith({ uuid: mockEncountersAlice[0].uuid });
   });
 });
 

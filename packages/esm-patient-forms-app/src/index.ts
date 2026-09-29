@@ -32,3 +32,8 @@ export const clinicalFormActionButton = getAsyncLifecycle(
   () => import('./clinical-form-action-button.component'),
   options,
 );
+
+export const encounterClinicalForm = getAsyncLifecycle(
+  () => import('./forms/encounter-clinical-form.extension'),
+  options,
+);

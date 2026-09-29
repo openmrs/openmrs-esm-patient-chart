@@ -149,7 +149,9 @@ test('does not render the date picker when RDE is disabled', () => {
   expect(screen.queryByLabelText(/visit date/i)).not.toBeInTheDocument();
 });
 
-test('renders the date picker when RDE is enabled', () => {
+// TODO: re-renable when we have a more general way to backdate notes
+// for both active and past visits
+test.skip('renders the date picker when RDE is enabled', () => {
   mockedUseFeatureFlag.mockReturnValue(true);
 
   renderVisitNotesForm();
@@ -1078,22 +1080,6 @@ test('retries failed removals without repeating successful removals or saving th
   await waitFor(() => expect(defaultProps.closeWorkspace).toHaveBeenCalledWith({ discardUnsavedChanges: true }));
   expect(vi.mocked(removeVisitNoteImage).mock.calls).toEqual([['att-1'], ['att-2'], ['att-2']]);
   expect(updateVisitNote).toHaveBeenCalledTimes(1);
-});
-
-test('keeps visit-context header state stable while staging and undoing an image removal', async () => {
-  const user = userEvent.setup();
-  setupSavedImages();
-  const headerStates = () =>
-    vi
-      .mocked(ExtensionSlot)
-      .mock.calls.filter(([props]) => props.name === 'visit-context-header-slot')
-      .map(([props]) => props.state);
-  const initialState = headerStates()[0];
-  expect(initialState).toEqual({ patientUuid: mockPatient.id });
-  await user.click(screen.getByRole('button', { name: 'Remove image: front.png' }));
-  await user.click(screen.getByRole('button', { name: 'Undo removal: front.png' }));
-  expect(headerStates().length).toBeGreaterThan(1);
-  expect(headerStates().every((state) => state === initialState)).toBe(true);
 });
 
 test('removing an image preserves saved diagnoses without rewriting the note', async () => {

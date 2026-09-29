@@ -23,7 +23,6 @@ import {
   canModifyEncounter,
   confirmAndDeleteEncounter,
   editEncounter,
-  isVisitNoteEncounter,
 } from '../../past-visits-components/encounters-table/encounter-actions';
 import {
   downloadPdf,
@@ -36,25 +35,16 @@ import styles from './visit-timeline.scss';
 
 interface VisitTimelineProps {
   patientUuid: string;
-  onEditEncounter?: EncountersTableProps['onEditEncounter'];
-  mutateVisitContext?: EncountersTableProps['mutateVisitContext'];
-  patient?: EncountersTableProps['patient'];
-  /**
-   * Rendered straight from `visit.encounters`, so the visit must be fetched with the fields
-   * the visits widget's `customRepresentation` (in `visit.resource.tsx`) asks for. The framework's
-   * `defaultVisitCustomRepresentation` is not enough: it omits `obs`, `form.resources`, and
-   * `encounterType.editPrivilege`, leaving expanded panels empty and the edit and delete actions
-   * offered regardless of privilege.
-   */
+  mutateVisitContext: () => void;
+  patient: fhir.Patient;
   visit: Visit;
 }
 
-function VisitTimeline({ onEditEncounter, mutateVisitContext, patient, patientUuid, visit }: VisitTimelineProps) {
+function VisitTimeline({ mutateVisitContext, patient, patientUuid, visit }: VisitTimelineProps) {
   const { t } = useTranslation();
   const session = useSession();
   const responsiveSize = isDesktop(useLayoutType()) ? 'sm' : 'lg';
   const { mutate } = useSWRConfig();
-  const { mutateVisitContext: chartMutateVisitContext, patient: chartPatient } = usePatientChartStore(patientUuid);
   const config = useConfig<ChartConfig>();
   const enableEmbeddedFormView = useFeatureFlag('enable-embedded-form-view');
   const canPrintEncounters = userHasAccess('App: Print encounter forms', session?.user);
@@ -72,7 +62,7 @@ function VisitTimeline({ onEditEncounter, mutateVisitContext, patient, patientUu
 
           return {
             canDeleteEncounter,
-            canEditEncounter: canDeleteEncounter && Boolean(encounter.form?.uuid || isVisitNoteEncounter(encounter)),
+            canEditEncounter: canDeleteEncounter,
             canPrintEncounter: canPrintEncounters && hasJsonSchemaForm,
             encounter,
             hasJsonSchemaForm,
@@ -114,10 +104,10 @@ function VisitTimeline({ onEditEncounter, mutateVisitContext, patient, patientUu
         patientUuid,
         t,
         mutate,
-        mutateVisitContext: mutateVisitContext ?? chartMutateVisitContext,
+        onEncounterDeleted: mutateVisitContext,
       });
     },
-    [chartMutateVisitContext, mutate, mutateVisitContext, patientUuid, t],
+    [mutate, mutateVisitContext, patientUuid, t],
   );
 
   if (timelineEntries.length === 0) {
@@ -197,7 +187,12 @@ function VisitTimeline({ onEditEncounter, mutateVisitContext, patient, patientUu
                           <OverflowMenuItem
                             className={styles.menuItem}
                             itemText={t('editThisEncounter', 'Edit this encounter')}
-                            onClick={() => editEncounter(mappedEncounter.encounter, patientUuid, onEditEncounter)}
+                            onClick={() => editEncounter({
+                              patient,
+                              encounter: encounter,
+                              visitContext: visit,
+                              onEncounterSaved: mutateVisitContext
+                            })}
                           />
                         )}
                         {canPrintEncounter && (
@@ -236,7 +231,7 @@ function VisitTimeline({ onEditEncounter, mutateVisitContext, patient, patientUu
                           visitStartDatetime: visit.startDatetime ?? null,
                           visitStopDatetime: visit.stopDatetime ?? null,
                           patientUuid,
-                          patient: patient ?? chartPatient,
+                          patient: patient,
                           formUuid: encounter.form.uuid,
                           encounterUuid: encounter.uuid,
                           promptBeforeClosing: () => {},

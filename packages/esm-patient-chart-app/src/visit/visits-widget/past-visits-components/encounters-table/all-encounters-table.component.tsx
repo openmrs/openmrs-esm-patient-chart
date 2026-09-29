@@ -2,17 +2,20 @@ import React, { useState } from 'react';
 import { userHasAccess, useSession, type EncounterType } from '@openmrs/esm-framework';
 import { type EncountersTableProps, usePaginatedEncounters } from './encounters-table.resource';
 import EncountersTable from './encounters-table.component';
+import { invalidateVisitAndEncounterData } from '@openmrs/esm-patient-common-lib';
+import { useSWRConfig } from 'swr';
 
 interface AllEncountersTableProps {
-  patientUuid: string;
+  patient: fhir.Patient;
 }
 
 /**
  * This component shows a table of all encounters (across all visits) of a patient
  */
-const AllEncountersTable: React.FC<AllEncountersTableProps> = ({ patientUuid }) => {
+const AllEncountersTable: React.FC<AllEncountersTableProps> = ({ patient }) => {
   const [encounterTypeToFilter, setEncounterTypeToFilter] = useState<EncounterType>(null);
   const [pageSize, setPageSize] = useState(20);
+  const patientUuid = patient.id;
 
   const {
     data: paginatedEncounters,
@@ -20,15 +23,15 @@ const AllEncountersTable: React.FC<AllEncountersTableProps> = ({ patientUuid }) 
     isLoading,
     totalCount,
     goTo,
-    mutate,
   } = usePaginatedEncounters(patientUuid, encounterTypeToFilter?.uuid, pageSize);
 
   const session = useSession();
   const canPrintEncounters = userHasAccess('App: Print encounter forms', session?.user);
+  const {mutate: globalMutate} = useSWRConfig();
 
   const encountersTableProps: EncountersTableProps = {
     currentPage,
-    encounterTypeToFilter,
+  encounterTypeToFilter,
     goTo,
     isLoading,
     pageSize,
@@ -41,6 +44,10 @@ const AllEncountersTable: React.FC<AllEncountersTableProps> = ({ patientUuid }) 
     totalCount,
     isSelectable: false,
     canPrintEncounters,
+    onEncounterSaved: () => {
+      invalidateVisitAndEncounterData(globalMutate, patientUuid)
+    },
+    patient
   };
 
   return <EncountersTable {...encountersTableProps} />;

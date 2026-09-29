@@ -67,11 +67,10 @@ function buildEncounters(count: number): Array<Encounter> {
 
 function renderVisitTimeline(
   encounters: Array<Encounter> = mockEncountersAlice,
-  onEditEncounter?: (encounter: Encounter, isVisitNote: boolean) => void,
 ) {
   const visit = { ...mockVisit, encounters } as Visit;
   return renderWithSwr(
-    <VisitTimeline visit={visit} patientUuid={mockPatientAlice.uuid} onEditEncounter={onEditEncounter} />,
+    <VisitTimeline visit={visit} patientUuid={mockPatientAlice.uuid} mutateVisitContext={vi.fn()} patient={mockFhirPatient} />
   );
 }
 
@@ -176,26 +175,21 @@ describe('VisitTimeline', () => {
     expect(menuItems[1]).toHaveTextContent(/delete this encounter/i);
   });
 
-  it('calls onEditEncounter instead of launching a workspace when the prop is provided', async () => {
-    const onEditEncounter = vi.fn();
-
-    renderVisitTimeline([admissionEncounter], onEditEncounter);
-    await clickEditEncounter();
-
-    expect(onEditEncounter).toHaveBeenCalledTimes(1);
-    expect(onEditEncounter).toHaveBeenCalledWith(expect.objectContaining(admissionEncounter), false);
-    expect(mockLaunchWorkspace).not.toHaveBeenCalled();
-  });
-
-  it('launches the form entry workspace when no onEditEncounter prop is provided', async () => {
+  it('launches the encounter workspace when editing an encounter', async () => {
     renderVisitTimeline([admissionEncounter]);
     await clickEditEncounter();
 
     expect(mockLaunchWorkspace).toHaveBeenCalledTimes(1);
-    expect(mockLaunchWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
-      form: admissionEncounter.form,
-      encounterUuid: admissionEncounter.uuid,
-    });
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith(
+      'encounter-workspace',
+      {},
+      expect.objectContaining({
+        patient: mockFhirPatient,
+        encounter: expect.objectContaining({ uuid: admissionEncounter.uuid }),
+        visitContext: expect.objectContaining({ uuid: mockVisit.uuid }),
+        onEncounterSaved: expect.any(Function),
+      }),
+    );
   });
 
   it('hides the actions menu when the user lacks the privilege to edit the encounter', () => {

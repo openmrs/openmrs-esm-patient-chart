@@ -30,7 +30,6 @@ const FormsDashboardWorkspace: React.FC<PatientWorkspace2DefinitionProps<object,
   return (
     <Workspace2 title={t('clinicalForms', 'Clinical forms')} hasUnsavedChanges={false}>
       <div className={styles.container}>
-        <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
         <FormsDashboard {...{ patient, visitContext, handleFormOpen }} />
       </div>
     </Workspace2>

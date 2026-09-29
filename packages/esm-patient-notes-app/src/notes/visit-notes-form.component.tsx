@@ -35,7 +35,6 @@ import {
   showModal,
   showSnackbar,
   useConfig,
-  useFeatureFlag,
   useLayoutType,
   useSession,
   Workspace2,
@@ -84,9 +83,9 @@ interface DiagnosisSearchProps {
   setIsSearching: (isSearching: boolean) => void;
 }
 
-const createSchema = (t: TFunction, isRetrospectiveDataEntryEnabled: boolean) => {
+const createSchema = (t: TFunction, isEditing: boolean) => {
   return z.object({
-    noteDate: isRetrospectiveDataEntryEnabled ? z.date() : z.date().optional(),
+    noteDate: isEditing ? z.date() : z.date().optional(),
     primaryDiagnosisSearch: z.string(),
     secondaryDiagnosisSearch: z.string().optional(),
     clinicalNote: z.string().optional(),
@@ -126,7 +125,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const { isPrimaryDiagnosisRequired, ...config } = useConfig<ConfigObject>();
-  const visitContextHeaderState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const memoizedState = useMemo(() => ({ patientUuid, patient }), [patientUuid, patient]);
   const { clinicianEncounterRole, encounterNoteTextConceptUuid, encounterTypeUuid, formConceptUuid } =
     config.visitNoteConfig;
@@ -153,12 +151,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   }, [allowedFileExtensions]);
   const isImageCaptureDisabled =
     isLoadingAllowedFileExtensions || Boolean(allowedFileExtensionsError) || allowedImageExtensions.length === 0;
-  const isRetrospectiveDataEntryEnabled = useFeatureFlag('rde');
 
-  const visitNoteFormSchema = useMemo(
-    () => createSchema(t, isRetrospectiveDataEntryEnabled),
-    [t, isRetrospectiveDataEntryEnabled],
-  );
+  const visitNoteFormSchema = useMemo(() => createSchema(t, isEditing), [t, isEditing]);
 
   const customResolver = useCallback(
     async (data, context, options) => {
@@ -628,7 +622,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     ],
   );
 
-  const onError = (errors) => console.error(errors);
+  const onError = (errors) => console.error('Form error:', errors);
 
   const hasUserUnsavedChanges = Object.keys(dirtyFields).length > 0;
 
@@ -638,8 +632,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       hasUnsavedChanges={hasUserUnsavedChanges}
     >
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
-        <ExtensionSlot name="visit-context-header-slot" state={visitContextHeaderState} />
-
         {isTablet && (
           <Row className={styles.headerGridRow}>
             <ExtensionSlot name="visit-form-header-slot" className={styles.dataGridRow} state={memoizedState} />
@@ -653,7 +645,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                 {isEditing ? t('editVisitNote', 'Edit visit note') : t('addVisitNote', 'Add visit note')}
               </h2>
             ) : null}
-            {isRetrospectiveDataEntryEnabled && (
+            {isEditing && (
               <Row className={styles.row}>
                 <Column sm={1}>
                   <span className={styles.columnLabel}>{t('date', 'Date')}</span>
@@ -662,20 +654,22 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                   <Controller
                     name="noteDate"
                     control={control}
-                    render={({ field, fieldState }) => (
-                      <ResponsiveWrapper>
-                        <OpenmrsDatePicker
-                          {...field}
-                          data-testid="visitDateTimePicker"
-                          id="visitDateTimePicker"
-                          invalid={Boolean(fieldState?.error?.message)}
-                          invalidText={fieldState?.error?.message}
-                          isDisabled={isEditing}
-                          labelText={t('visitDate', 'Visit date')}
-                          maxDate={new Date()}
-                        />
-                      </ResponsiveWrapper>
-                    )}
+                    render={({ field, fieldState }) => {
+                      return (
+                        <ResponsiveWrapper>
+                          <OpenmrsDatePicker
+                            {...field}
+                            data-testid="visitDateTimePicker"
+                            id="visitDateTimePicker"
+                            invalid={Boolean(fieldState?.error?.message)}
+                            invalidText={fieldState?.error?.message}
+                            isDisabled={isEditing}
+                            labelText={t('visitDate', 'Visit date')}
+                            maxDate={new Date()}
+                          />
+                        </ResponsiveWrapper>
+                      );
+                    }}
                   />
                 </Column>
               </Row>

@@ -172,7 +172,9 @@ describe('LabResultsForm', () => {
   });
 
   test('hides the add tests basket in exported context without a launch callback', () => {
-    render(<ExportedLabResultsForm {...exportedTestProps} />);
+    render(<ExportedLabResultsForm
+      {...exportedTestProps}
+    />);
 
     expect(screen.queryByText('Add Tests to this order')).not.toBeInTheDocument();
   });

@@ -44,11 +44,11 @@ function VisitDetailOverviewComponent({ patientUuid, patient }: VisitOverviewCom
           </TabPanel>
           {showAllEncountersTab && (
             <TabPanel>
-              <AllEncountersTable patientUuid={patientUuid} />
+              <AllEncountersTable patient={patient} />
             </TabPanel>
           )}
           <TabPanel>
-            <CompletedFormsTable patientUuid={patientUuid} isTabActive={tabIndex === completedFormsTabIndex} />
+            <CompletedFormsTable patient={patient} isTabActive={tabIndex === completedFormsTabIndex} />
           </TabPanel>
         </TabPanels>
       </Tabs>

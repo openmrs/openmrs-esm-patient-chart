@@ -164,7 +164,6 @@ const FormEntry: React.FC<FormEntryProps> = ({
   return (
     <Workspace2 title={form.display ?? t('clinicalForm', 'Clinical form')} hasUnsavedChanges={hasUnsavedChanges}>
       <div>
-        <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
         {showFormAndLoadedData &&
           (isHtmlForm ? (
             <HtmlFormEntryWrapper

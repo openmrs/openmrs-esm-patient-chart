@@ -1,0 +1,19 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.header {
+  flex: 0 0 auto;
+}
+
+.content {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: auto;
+  // Exported workspaces (ex: form engine) use these variables for their height instead of 100%,
+  // so shrink them by the height of the visit context header
+  --desktop-workspace-window-height: calc(100vh - var(--omrs-navbar-height) - var(--workspace-header-height) - var(--encounter-workspace-header-height, 0px));
+  --tablet-workspace-window-height: calc(100vh - var(--omrs-navbar-height) - var(--bottom-nav-height) - var(--encounter-workspace-header-height, 0px));
+}

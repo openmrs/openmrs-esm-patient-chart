@@ -28,6 +28,7 @@ const OrderBasketActionButton: React.FC<PatientChartWorkspaceActionButtonProps> 
         windowProps: { encounterUuid: '' },
       }}
       onBeforeWorkspaceLaunch={startVisitIfNeeded}
+      // disabled={(openwindows) => openwindows.some(w => w.windowName === 'encounter-window')}
     />
   );
 };
