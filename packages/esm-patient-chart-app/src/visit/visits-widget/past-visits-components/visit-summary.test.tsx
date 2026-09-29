@@ -6,6 +6,7 @@ import {
   ExtensionSlot,
   getConfig,
   getDefaultsFromConfigSchema,
+  launchWorkspace2,
   showModal,
   useConfig,
   userHasAccess,
@@ -28,6 +29,7 @@ const mockUseConfig = vi.mocked(useConfig<ChartConfig>);
 const mockUserHasAccess = vi.mocked(userHasAccess);
 const mockUsePatientChartStore = vi.mocked(usePatientChartStore);
 const mockShowModal = vi.mocked(showModal);
+const mockLaunchWorkspace2 = vi.mocked(launchWorkspace2);
 const mockVisit = visitOverviewDetailMockData.data.results[0];
 
 const mockDeleteEncounter = vi.fn();
@@ -69,7 +71,7 @@ describe('VisitSummary', () => {
     const user = userEvent.setup();
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
 
-    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} />);
+    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} mutateVisitContext={vi.fn()} />);
 
     expect(screen.getByText(/^Diagnoses$/i)).toBeInTheDocument();
     expect(screen.getByText(/^No diagnoses found$/)).toBeInTheDocument();
@@ -101,8 +103,9 @@ describe('VisitSummary', () => {
 
   it('renders diagnoses tags when there are diagnoses', () => {
     const mockVisit = visitOverviewDetailMockDataNotEmpty.data.results[0];
-
-    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} />);
+    renderWithSwr(
+      <VisitSummary patientUuid={mockPatient.id} visit={mockVisit} patient={mockPatient} mutateVisitContext={vi.fn()} />,
+    );
 
     const malariaTag = screen.getByText(/^malaria, confirmed$/i);
     const hivTag = screen.getByText(/human immunodeficiency virus \(hiv\)/i);
@@ -116,8 +119,10 @@ describe('VisitSummary', () => {
     const user = userEvent.setup();
 
     const mockVisit = visitOverviewDetailMockDataNotEmpty.data.results[0];
-
-    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} />);
+    renderWithSwr(
+      <VisitSummary patientUuid={mockPatient.id} visit={mockVisit} patient={mockPatient} mutateVisitContext={vi.fn()} />,
+    );
+    
 
     expect(screen.getByText(/^Diagnoses$/i)).toBeInTheDocument();
     expect(screen.getByText(/^Malaria, confirmed$/)).toBeInTheDocument();
@@ -155,14 +160,19 @@ describe('VisitSummary encounter editing', () => {
     mockUserHasAccess.mockReturnValue(true);
   });
 
-  it('passes onEditEncounter down to the timeline', async () => {
+  it('launches the encounter workspace when editing an encounter from the timeline', async () => {
     const user = userEvent.setup();
-    const onEditEncounter = vi.fn();
+    const mutateVisitContext = vi.fn();
     // The timeline offers one actions menu per encounter, so keep the visit to the one being edited
     const visitWithVisitNoteOnly = { ...mockVisitWithEncounters, encounters: [mockVisitNoteEncounter] };
 
     renderWithSwr(
-      <VisitSummary patientUuid={mockPatient.id} visit={visitWithVisitNoteOnly} onEditEncounter={onEditEncounter} />,
+      <VisitSummary
+        patientUuid={mockPatient.id}
+        visit={visitWithVisitNoteOnly}
+        patient={mockPatient}
+        mutateVisitContext={mutateVisitContext}
+      />,
     );
 
     // The timeline is the tab the visit summary opens on
@@ -174,13 +184,21 @@ describe('VisitSummary encounter editing', () => {
       .find((menuItem) => /edit this encounter/i.test(menuItem.textContent));
     await user.click(editItem);
 
-    expect(onEditEncounter).toHaveBeenCalledTimes(1);
-    expect(onEditEncounter).toHaveBeenCalledWith(expect.objectContaining({ uuid: mockVisitNoteEncounter.uuid }), true);
+    expect(mockLaunchWorkspace2).toHaveBeenCalledTimes(1);
+    expect(mockLaunchWorkspace2).toHaveBeenCalledWith(
+      'encounter-workspace',
+      {},
+      expect.objectContaining({
+        patient: mockPatient,
+        visitContext: visitWithVisitNoteOnly,
+        encounter: expect.objectContaining({ uuid: mockVisitNoteEncounter.uuid }),
+        onEncounterUpdated: mutateVisitContext,
+      }),
+    );
   });
 
-  it('passes onEditEncounter down to the completed forms tab', async () => {
+  it('launches the encounter workspace when editing an encounter from the completed forms tab', async () => {
     const user = userEvent.setup();
-    const onEditEncounter = vi.fn();
     const mockCompletedFormEncounter = {
       ...mockAdmissionEncounter,
       uuid: 'enc-with-schema',
@@ -195,15 +213,31 @@ describe('VisitSummary encounter editing', () => {
       encounters: [...mockVisitWithEncounters.encounters, mockCompletedFormEncounter],
     };
 
+    const mutateVisitContext = vi.fn();
+
     renderWithSwr(
-      <VisitSummary patientUuid={mockPatient.id} visit={visitWithCompletedForm} onEditEncounter={onEditEncounter} />,
+      <VisitSummary
+        patientUuid={mockPatient.id}
+        visit={visitWithCompletedForm}
+        patient={mockPatient}
+        mutateVisitContext={mutateVisitContext}
+      />,
     );
 
     await user.click(screen.getByRole('tab', { name: /completed forms/i }));
     await clickEditEncounter(/poc consent form/i);
 
-    expect(onEditEncounter).toHaveBeenCalledTimes(1);
-    expect(onEditEncounter).toHaveBeenCalledWith(expect.objectContaining(mockCompletedFormEncounter), false);
+    expect(mockLaunchWorkspace2).toHaveBeenCalledTimes(1);
+    expect(mockLaunchWorkspace2).toHaveBeenCalledWith(
+      'encounter-workspace',
+      {},
+      expect.objectContaining({
+        patient: mockPatient,
+        visitContext: visitWithCompletedForm,
+        encounter: expect.objectContaining(mockCompletedFormEncounter),
+        onEncounterUpdated: mutateVisitContext,
+      }),
+    );
   });
 });
 

@@ -6063,9 +6063,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openmrs/esm-styleguide@npm:10.0.1-pre.5675":
-  version: 10.0.1-pre.5675
-  resolution: "@openmrs/esm-styleguide@npm:10.0.1-pre.5675"
+"@openmrs/esm-styleguide@portal:/home/cbho/workspace/openmrs-esm-core/packages/framework/esm-styleguide::locator=%40openmrs%2Fesm-patient-chart%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "@openmrs/esm-styleguide@portal:/home/cbho/workspace/openmrs-esm-core/packages/framework/esm-styleguide::locator=%40openmrs%2Fesm-patient-chart%40workspace%3A."
   dependencies:
     "@carbon/charts": "npm:^1.27.0"
     "@carbon/react": "npm:^1.92.1"
@@ -6077,27 +6077,26 @@ __metadata:
     react-aria-components: "npm:^1.7.1"
     uuid: "npm:^11.1.1"
   peerDependencies:
-    "@openmrs/esm-api": ^10.0.1-pre.5675
-    "@openmrs/esm-config": ^10.0.1-pre.5675
-    "@openmrs/esm-emr-api": ^10.0.1-pre.5675
-    "@openmrs/esm-error-handling": ^10.0.1-pre.5675
-    "@openmrs/esm-extensions": ^10.0.1-pre.5675
-    "@openmrs/esm-globals": ^10.0.1-pre.5675
-    "@openmrs/esm-navigation": ^10.0.1-pre.5675
-    "@openmrs/esm-react-utils": ^10.0.1-pre.5675
-    "@openmrs/esm-routes": ^10.0.1-pre.5675
-    "@openmrs/esm-state": ^10.0.1-pre.5675
-    "@openmrs/esm-translations": ^10.0.1-pre.5675
-    "@openmrs/esm-utils": ^10.0.1-pre.5675
+    "@openmrs/esm-api": "workspace:^"
+    "@openmrs/esm-config": "workspace:^"
+    "@openmrs/esm-emr-api": "workspace:^"
+    "@openmrs/esm-error-handling": "workspace:^"
+    "@openmrs/esm-extensions": "workspace:^"
+    "@openmrs/esm-globals": "workspace:^"
+    "@openmrs/esm-navigation": "workspace:^"
+    "@openmrs/esm-react-utils": "workspace:^"
+    "@openmrs/esm-routes": "workspace:^"
+    "@openmrs/esm-state": "workspace:^"
+    "@openmrs/esm-translations": "workspace:^"
+    "@openmrs/esm-utils": "workspace:^"
     dayjs: 1.x
     i18next: 25.x
     react: 18.x
     react-dom: 18.x
     react-i18next: 16.x
     swr: 2.x
-  checksum: 10/aac04446cdfe7e861a66cc031c00326d9d79cafd5cc681ddf82138766ece3204b75493218603cf39238c313425a2957711abb7b6ead057de2f5a3943f4b15ddc
   languageName: node
-  linkType: hard
+  linkType: soft
 
 "@openmrs/esm-translations@npm:10.0.1-pre.5675":
   version: 10.0.1-pre.5675

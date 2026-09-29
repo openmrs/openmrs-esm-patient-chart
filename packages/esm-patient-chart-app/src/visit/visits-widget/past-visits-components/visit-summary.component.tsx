@@ -27,8 +27,7 @@ import styles from './visit-summary.scss';
 interface VisitSummaryProps {
   visit: Visit;
   patientUuid: string;
-  onEditEncounter?: EncountersTableProps['onEditEncounter'];
-  mutateVisitContext?: EncountersTableProps['mutateVisitContext'];
+  mutateVisitContext: () => void;
   patient?: EncountersTableProps['patient'];
 }
 
@@ -37,7 +36,6 @@ const visitSummaryPanelSlot = 'visit-summary-panels';
 const VisitSummary: React.FC<VisitSummaryProps> = ({
   visit,
   patientUuid,
-  onEditEncounter,
   mutateVisitContext,
   patient,
 }) => {
@@ -157,7 +155,6 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({
             <VisitTimeline
               visit={visit}
               patientUuid={patientUuid}
-              onEditEncounter={onEditEncounter}
               mutateVisitContext={mutateVisitContext}
               patient={patient}
             />
@@ -175,7 +172,6 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({
             <VisitCompletedFormsTable
               visit={visit}
               patientUuid={patientUuid}
-              onEditEncounter={onEditEncounter}
               mutateVisitContext={mutateVisitContext}
               patient={patient}
             />

@@ -36,6 +36,8 @@ const defaultProps: PatientWorkspace2DefinitionProps<VitalsAndBiometricsFormProp
   windowName: '',
   isRootWorkspace: false,
   showActionMenu: true,
+  setWorkspaceTitle: vi.fn(),
+  setHasUnsavedChanges: vi.fn(),
 };
 
 const mockShowSnackbar = vi.mocked(showSnackbar);

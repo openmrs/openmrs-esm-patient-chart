@@ -68,6 +68,8 @@ const defaultProps: PatientWorkspace2DefinitionProps<VisitNotesFormWorkspaceProp
   windowName: '',
   isRootWorkspace: false,
   showActionMenu: true,
+  setWorkspaceTitle: vi.fn(),
+  setHasUnsavedChanges: vi.fn(),
 };
 
 function renderVisitNotesForm(

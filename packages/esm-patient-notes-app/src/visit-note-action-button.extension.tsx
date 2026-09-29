@@ -21,6 +21,7 @@ const VisitNoteActionButton: React.FC<PatientChartWorkspaceActionButtonProps> = 
         workspaceProps: {},
       }}
       onBeforeWorkspaceLaunch={startVisitIfNeeded}
+      disabled={(openwindows) => openwindows.some(w => w.windowName === 'encounter-window')}
     />
   );
 };
