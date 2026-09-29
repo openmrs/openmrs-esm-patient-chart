@@ -136,11 +136,17 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     this.translateService.use(locale);
 
     import(
-      /* webpackInclude: /\.mjs$/ */
+      /* webpackInclude: /locales[\/\\][a-z]{2}\.js$/ */
       /* webpackChunkName: "./assets/l10n/locales/[request]"*/
       /* webpackMode: "lazy" */
-      `../../../node_modules/@angular/common/locales/${locale}.mjs`
-    ).then((module) => registerLocaleData(module.default));
+      `../../../node_modules/@angular/common/locales/${locale}.js`
+    )
+      .then((module) => registerLocaleData(module.default))
+      .catch((err) => {
+        // Unsupported locale — Angular falls back to en-US automatically.
+        // Log the error so network/deployment failures are not silently swallowed.
+        console.warn(`Could not load Angular locale data for "${locale}":`, err);
+      });
 
     return forkJoin({
       formSchema: this.fetchCompiledFormSchema(this.formUuid, locale).pipe(take(1)),
