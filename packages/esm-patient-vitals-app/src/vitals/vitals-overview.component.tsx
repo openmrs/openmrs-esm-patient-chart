@@ -1,4 +1,4 @@
-import React, { type ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
+import React, { type ChangeEvent, Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
 import { Button, ContentSwitcher, DataTableSkeleton, IconSwitch, InlineLoading } from '@carbon/react';
@@ -20,8 +20,9 @@ import { useLaunchVitalsAndBiometricsForm } from '../utils';
 import { useVitalsAndBiometrics, useConceptUnits, withUnit } from '../common';
 import PaginatedVitals from './paginated-vitals.component';
 import PrintComponent from './print/print.component';
-import VitalsChart from './vitals-chart.component';
 import styles from './vitals-overview.scss';
+
+const VitalsChart = lazy(() => import('./vitals-chart.component'));
 
 interface VitalsOverviewProps {
   patientUuid: string;
@@ -236,7 +237,11 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
                 </div>
               </CardHeader>
               {chartView ? (
-                <VitalsChart patientVitals={vitals} conceptUnits={conceptUnits} config={config} />
+                <Suspense
+                  fallback={<InlineLoading role="progressbar" description={`${t('loading', 'Loading')} ...`} />}
+                >
+                  <VitalsChart patientVitals={vitals} conceptUnits={conceptUnits} config={config} />
+                </Suspense>
               ) : (
                 <div ref={contentToPrintRef}>
                   <PrintComponent subheader={headerTitle} patientDetails={patientDetails} />
