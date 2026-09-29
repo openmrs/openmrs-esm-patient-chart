@@ -97,6 +97,9 @@ const createSchema = (t: TFunction, isRetrospectiveDataEntryEnabled: boolean) =>
 
 const SEARCH_TIMEOUT_MS = 500;
 
+/** Image formats browsers render, so a staged file always has a real thumbnail. */
+const imageExtensions = new Set(['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp']);
+
 export interface VisitNotesFormProps {
   encounter?: Encounter;
   formContext: 'creating' | 'editing';
@@ -139,7 +142,17 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   const [removedImages, setRemovedImages] = useState<string[]>([]);
   const [saveError, setSaveError] = useState<string>();
   const [error, setError] = useState<Error>(null);
-  const { allowedFileExtensions } = useAllowedFileExtensions();
+  const {
+    allowedFileExtensions,
+    error: allowedFileExtensionsError,
+    isLoading: isLoadingAllowedFileExtensions,
+  } = useAllowedFileExtensions();
+  const allowedImageExtensions = useMemo(() => {
+    const extensions = allowedFileExtensions?.map((extension) => extension.trim().toLowerCase()).filter(Boolean);
+    return extensions?.length ? extensions.filter((extension) => imageExtensions.has(extension)) : [...imageExtensions];
+  }, [allowedFileExtensions]);
+  const isImageCaptureDisabled =
+    isLoadingAllowedFileExtensions || Boolean(allowedFileExtensionsError) || allowedImageExtensions.length === 0;
   const isRetrospectiveDataEntryEnabled = useFeatureFlag('rde');
 
   const visitNoteFormSchema = useMemo(
@@ -343,6 +356,10 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   };
 
   const showImageCaptureModal = useCallback(() => {
+    if (isImageCaptureDisabled) {
+      return;
+    }
+
     const close = showModal('capture-photo-modal', {
       saveFile: (file: UploadedFile) => {
         if (file.capturedFromWebcam && !file.fileName.includes('.')) {
@@ -356,14 +373,13 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       closeModal: () => {
         close();
       },
-      allowedExtensions:
-        allowedFileExtensions && Array.isArray(allowedFileExtensions)
-          ? allowedFileExtensions.filter((ext) => !/pdf/i.test(ext))
-          : [],
+      allowedExtensions: allowedImageExtensions,
       collectDescription: true,
       multipleFiles: true,
+      // Files are only staged here; they upload when the note is saved.
+      showUploadSnackbar: false,
     });
-  }, [allowedFileExtensions, getValues, setValue]);
+  }, [allowedImageExtensions, getValues, isImageCaptureDisabled, setValue]);
 
   const handleRemoveImage = (index: number) => {
     const updatedImages = [...currentImages];
@@ -804,12 +820,23 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                   </p>
                   <Button
                     className={styles.uploadButton}
+                    disabled={isImageCaptureDisabled}
                     kind={isTablet ? 'ghost' : 'tertiary'}
                     onClick={showImageCaptureModal}
                     renderIcon={(props) => <Add size={16} {...props} />}
                   >
                     {t('addImage', 'Add image')}
                   </Button>
+                  {allowedFileExtensionsError && (
+                    <InlineNotification
+                      className={styles.savedImagesLoading}
+                      kind="error"
+                      lowContrast
+                      hideCloseButton
+                      title={t('allowedFileExtensionsLoadError', "Couldn't load the allowed image formats")}
+                      subtitle={t('allowedFileExtensionsLoadErrorHint', 'Reload the page to add images to this note.')}
+                    />
+                  )}
                   {isLoadingSavedImages && (
                     <InlineLoading
                       className={styles.savedImagesLoading}
@@ -881,7 +908,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                           <img
                             className={styles.imgThumbnail}
                             src={image.base64Content}
-                            alt={image.fileDescription ?? image.fileName}
+                            alt={image.fileDescription || image.fileName}
                           />
                         </div>
                         <Button

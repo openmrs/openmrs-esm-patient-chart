@@ -12,7 +12,7 @@
   "attachmentsInProperFormat": "附件",
   "cameraAccessErrorMessage": "请在您的浏览器设置中启用摄像头访问，然后再试一次。",
   "cameraError": "相机错误",
-  "chooseAnAllowedFileType": "文件 \"{{fileName}}\" 无法上传。请上传一个具有以下扩展名之一的文件: {{supportedExtensions}}，或 {{ lastExtension }}。",
+  "chooseSupportedFileType": "The file \"{{fileName}}\" cannot be uploaded. Please upload a file with one of the following extensions: {{supportedExtensions}}.",
   "closeModal": "关闭",
   "closePreview": "关闭预览",
   "dateUploaded": "上传日期",
