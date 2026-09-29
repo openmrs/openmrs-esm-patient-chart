@@ -125,5 +125,5 @@ export function invalidateVisitAndEncounterData(mutate: KeyedMutator<unknown>, p
  * @param visitUuid
  */
 export function invalidateVisitByUuid(mutate: KeyedMutator<unknown>, visitUuid: string) {
-  mutate(new RegExp(`${restBaseUrl}/visit/${visitUuid}`));
+  mutate((key) => typeof key === 'string' && key.includes(`${restBaseUrl}/visit/${visitUuid}`));
 }

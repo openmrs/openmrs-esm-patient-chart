@@ -4,6 +4,7 @@ import {
   invalidatePatientEncounters,
   invalidateVisitAndEncounterData,
   invalidateCurrentVisit,
+  invalidateVisitByUuid,
 } from './revalidation-utils';
 
 const mockMutate = vi.fn();
@@ -121,6 +122,31 @@ describe('revalidation-utils', () => {
 
       // Should not match encounter keys
       expect(matcherFn('/ws/rest/v1/encounter?patient=test-patient-123&v=custom')).toBe(false);
+    });
+  });
+
+  describe('invalidateVisitByUuid', () => {
+    it('should invalidate only keys for the specified visit', () => {
+      const visitUuid = 'test-visit-123';
+
+      invalidateVisitByUuid(mockMutate, visitUuid);
+
+      expect(mockMutate).toHaveBeenCalledTimes(1);
+      expect(mockMutate).toHaveBeenCalledWith(expect.any(Function));
+
+      const matcherFn = mockMutate.mock.calls[0][0];
+
+      // Should match the visit fetched by UUID
+      expect(matcherFn('/ws/rest/v1/visit/test-visit-123?v=custom:(uuid,display)')).toBe(true);
+
+      // Should not match other visits
+      expect(matcherFn('/ws/rest/v1/visit/other-visit?v=custom:(uuid,display)')).toBe(false);
+
+      // Should not match visit list keys
+      expect(matcherFn('/ws/rest/v1/visit?patient=test-patient-123&v=custom&includeInactive=false')).toBe(false);
+
+      // Should not match non-string keys
+      expect(matcherFn({ url: '/ws/rest/v1/visit/test-visit-123' })).toBe(false);
     });
   });
 });
