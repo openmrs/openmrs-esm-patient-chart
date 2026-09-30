@@ -55,9 +55,18 @@ export function markPatientDeceased(
   selectedCauseOfDeathValue: string | undefined,
   nonCodedCauseOfDeath?: string | undefined,
 ) {
+  // The server reads a plain date as midnight in its own timezone, so a past date compares correctly with the
+  // birthdate. Today is sent as the current time instead, because a plain date for today is still in the future on
+  // a server behind the browser's timezone and gets rejected.
+  const deathDate = !deceasedDate
+    ? null
+    : dayjs(deceasedDate).isSame(dayjs(), 'day')
+      ? new Date().toISOString()
+      : dayjs(deceasedDate).format('YYYY-MM-DD');
+
   const payload: CauseOfDeathPayload = {
     dead: true,
-    deathDate: deceasedDate ? dayjs(deceasedDate).format('YYYY-MM-DD') : null,
+    deathDate,
     ...(nonCodedCauseOfDeath
       ? { causeOfDeathNonCoded: nonCodedCauseOfDeath }
       : {
