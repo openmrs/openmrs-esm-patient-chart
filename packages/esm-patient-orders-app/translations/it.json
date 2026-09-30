@@ -15,6 +15,7 @@
   "chooseAnOption": "Scegli un'opzione",
   "clearSearchResults": "Cancella risultati",
   "collapsePinnedOrders": "Collapse pinned orders",
+  "couldNotSaveResultsFor": "Could not save results for {{tests}}",
   "dateOfOrder": "Data dell'ordine",
   "dateRange": "Intervallo di date",
   "directlyAddToBasket": "Aggiungi al carrello",

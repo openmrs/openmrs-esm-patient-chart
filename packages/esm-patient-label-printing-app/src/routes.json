@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.openmrs.org/routes.schema.json",
   "backendDependencies": {
-    "patientdocuments": "^1.0.0-SNAPSHOT"
+    "patientdocuments": "^1.2.0"
   },
   "extensions": [
     {

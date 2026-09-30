@@ -23,7 +23,7 @@ import {
   TextArea,
   Tile,
 } from '@carbon/react';
-import { Add, CloseFilled, WarningAltFilled, WarningFilled } from '@carbon/react/icons';
+import { Add, Close, WarningAltFilled, WarningFilled } from '@carbon/react/icons';
 import {
   createAttachment,
   createErrorHandler,
@@ -49,10 +49,12 @@ import type { Concept, DiagnosisCertainty, DiagnosisPayload, VisitNotePayload } 
 import {
   deletePatientDiagnosis,
   fetchDiagnosisConceptsByName,
+  removeVisitNoteImage,
   savePatientDiagnosis,
   saveVisitNote,
   updateVisitNote,
   useDiagnosisConceptClasses,
+  useVisitNoteImages,
   useVisitNotes,
 } from './visit-notes.resource';
 import SelectedDiagnosisCard, {
@@ -100,6 +102,7 @@ const createSchema = (t: TFunction, isRetrospectiveDataEntryEnabled: boolean, is
       }),
     clinicalNote: z.string().optional(),
     images: z.array(z.any()).optional(),
+    removedImageIds: z.array(z.string()),
   });
 };
 
@@ -121,6 +124,9 @@ const toDiagnosisDrafts = (encounter: Encounter | undefined, patientUuid: string
       display: d.display,
     }),
   );
+
+/** Image formats browsers render, so a staged file always has a real thumbnail. */
+const imageExtensions = new Set(['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp']);
 
 export interface VisitNotesFormProps {
   encounter?: Encounter;
@@ -148,6 +154,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const { isPrimaryDiagnosisRequired, ...config } = useConfig<ConfigObject>();
+  const visitContextHeaderState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const memoizedState = useMemo(() => ({ patientUuid, patient }), [patientUuid, patient]);
   const { clinicianEncounterRole, encounterNoteTextConceptUuid, encounterTypeUuid, formConceptUuid } =
     config.visitNoteConfig;
@@ -155,8 +162,20 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<Array<Concept>>(null);
   const [rows, setRows] = useState<number>();
+  const [removedImages, setRemovedImages] = useState<string[]>([]);
+  const [saveError, setSaveError] = useState<string>();
   const [error, setError] = useState<Error>(null);
-  const { allowedFileExtensions } = useAllowedFileExtensions();
+  const {
+    allowedFileExtensions,
+    error: allowedFileExtensionsError,
+    isLoading: isLoadingAllowedFileExtensions,
+  } = useAllowedFileExtensions();
+  const allowedImageExtensions = useMemo(() => {
+    const extensions = allowedFileExtensions?.map((extension) => extension.trim().toLowerCase()).filter(Boolean);
+    return extensions?.length ? extensions.filter((extension) => imageExtensions.has(extension)) : [...imageExtensions];
+  }, [allowedFileExtensions]);
+  const isImageCaptureDisabled =
+    isLoadingAllowedFileExtensions || Boolean(allowedFileExtensionsError) || allowedImageExtensions.length === 0;
   const isRetrospectiveDataEntryEnabled = useFeatureFlag('rde');
 
   const visitNoteFormSchema = useMemo(
@@ -177,6 +196,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     mode: 'onSubmit',
     resolver: zodResolver(visitNoteFormSchema),
     defaultValues: {
+      images: [],
+      removedImageIds: [],
       diagnosisSearch: '',
       diagnoses: initialDiagnoses,
       noteDate: isEditing ? new Date(encounter.rawDatetime) : new Date(),
@@ -191,6 +212,12 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   } = useController({ name: 'diagnoses', control });
 
   const currentImages = watch('images');
+  const removedImageIds = watch('removedImageIds');
+  const {
+    images: savedImages,
+    isLoading: isLoadingSavedImages,
+    error: savedImagesError,
+  } = useVisitNoteImages(patientUuid, isEditing ? encounter.id : undefined);
 
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
   const { mutate: globalMutate } = useSWRConfig();
@@ -321,32 +348,35 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     !selectedDiagnoses.some((selectedDiagnosis) => diagnosis.uuid === selectedDiagnosis.diagnosis.coded);
 
   const showImageCaptureModal = useCallback(() => {
+    if (isImageCaptureDisabled) {
+      return;
+    }
+
     const close = showModal('capture-photo-modal', {
       saveFile: (file: UploadedFile) => {
         if (file.capturedFromWebcam && !file.fileName.includes('.')) {
           file.fileName = `${file.fileName}.png`;
         }
 
-        setValue('images', currentImages ? [...currentImages, file] : [file]);
+        setValue('images', [...getValues('images'), file], { shouldDirty: true });
         close();
         return Promise.resolve();
       },
       closeModal: () => {
         close();
       },
-      allowedExtensions:
-        allowedFileExtensions && Array.isArray(allowedFileExtensions)
-          ? allowedFileExtensions.filter((ext) => !/pdf/i.test(ext))
-          : [],
+      allowedExtensions: allowedImageExtensions,
       collectDescription: true,
       multipleFiles: true,
+      // Files are only staged here; they upload when the note is saved.
+      showUploadSnackbar: false,
     });
-  }, [allowedFileExtensions, currentImages, setValue]);
+  }, [allowedImageExtensions, getValues, isImageCaptureDisabled, setValue]);
 
   const handleRemoveImage = (index: number) => {
     const updatedImages = [...currentImages];
     updatedImages.splice(index, 1);
-    setValue('images', updatedImages);
+    setValue('images', updatedImages, { shouldDirty: true });
 
     showSnackbar({
       title: t('imageRemoved', 'Image removed'),
@@ -357,7 +387,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
   const onSubmit = useCallback(
     (data: VisitNotesFormData) => {
-      const { noteDate, clinicalNote, images, diagnoses } = data;
+      const { noteDate, clinicalNote, images, removedImageIds, diagnoses } = data;
+      setSaveError(undefined);
 
       let finalNoteDate = dayjs(noteDate);
       const now = new Date();
@@ -399,43 +430,50 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
       const abortController = new AbortController();
 
-      const savePromise = isEditing
-        ? updateVisitNote(abortController, encounter.id, visitNotePayload)
-        : saveVisitNote(abortController, visitNotePayload);
+      const saveNote = () => {
+        const savePromise = isEditing
+          ? updateVisitNote(abortController, encounter.id, visitNotePayload)
+          : saveVisitNote(abortController, visitNotePayload);
 
-      return savePromise
-        .then((response) => {
-          if (response.status === 201 || response.status === 200) {
-            const encounterUuid = encounter?.id || response.data.uuid;
+        return savePromise
+          .then((response) => {
+            if (response.status === 201 || response.status === 200) {
+              const encounterUuid = encounter?.id || response.data.uuid;
 
-            // If editing, first delete existing diagnoses
-            if (isEditing && encounter?.diagnoses?.length) {
-              return Promise.all(
-                encounter.diagnoses.map((diagnosis) => deletePatientDiagnosis(abortController, diagnosis.uuid)),
-              ).then(() => encounterUuid);
+              // If editing, first delete existing diagnoses
+              if (isEditing && encounter?.diagnoses?.length) {
+                return Promise.all(
+                  encounter.diagnoses.map((diagnosis) => deletePatientDiagnosis(abortController, diagnosis.uuid)),
+                ).then(() => encounterUuid);
+              }
+
+              return encounterUuid;
             }
-
-            return encounterUuid;
-          }
-        })
-        .then((encounterUuid) => {
-          return Promise.all(
-            diagnoses.map((diagnosis) => {
-              const diagnosesPayload: DiagnosisPayload = {
-                encounter: encounterUuid,
-                patient: patientUuid,
-                condition: null,
-                diagnosis: diagnosis.diagnosis,
-                certainty: diagnosis.certainty,
-                rank: diagnosis.rank,
-              };
-              return savePatientDiagnosis(abortController, diagnosesPayload);
-            }),
-          );
-        })
-        .then(() => {
-          if (images?.length) {
-            return Promise.all(
+          })
+          .then((encounterUuid) =>
+            Promise.all(
+              diagnoses.map((diagnosis) => {
+                const diagnosesPayload: DiagnosisPayload = {
+                  encounter: encounterUuid,
+                  patient: patientUuid,
+                  condition: null,
+                  diagnosis: diagnosis.diagnosis,
+                  certainty: diagnosis.certainty,
+                  rank: diagnosis.rank,
+                };
+                return savePatientDiagnosis(abortController, diagnosesPayload);
+              }),
+            ).then(() => encounterUuid),
+          )
+          .then((encounterUuid) => {
+            // Only images added in this session are in the form state. Images already saved on the
+            // note are shown from the server and never re-uploaded.
+            if (!images?.length) {
+              return [];
+            }
+            // The note and its diagnoses are already saved by now, so one rejected image must not
+            // fail the whole save: every image that can upload does, and the rest are reported.
+            return Promise.allSettled(
               images.map((image) => {
                 const imageToUpload: UploadedFile = {
                   base64Content: image.base64Content,
@@ -444,24 +482,72 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                   fileType: image.fileType,
                   fileDescription: image.fileDescription || '',
                 };
-                return createAttachment(patientUuid, imageToUpload);
+                return createAttachment(patientUuid, imageToUpload, encounterUuid);
               }),
+            ).then((results) =>
+              results.flatMap((result, index) =>
+                result.status === 'rejected' ? [{ image: images[index], reason: result.reason }] : [],
+              ),
             );
-          } else {
-            return Promise.resolve([]);
+          });
+      };
+      return Promise.resolve()
+        .then(async () => {
+          let removedAny = false;
+          let noteSaveAttempted = false;
+          try {
+            for (const imageId of removedImageIds) {
+              await removeVisitNoteImage(imageId);
+              removedAny = true;
+              setRemovedImages((removed) => [...removed, imageId]);
+              setValue(
+                'removedImageIds',
+                getValues('removedImageIds').filter((id) => id !== imageId),
+                {
+                  shouldDirty: true,
+                },
+              );
+            }
+            // Diagnoses live in the form state, so any change to them already shows up in dirtyFields
+            if (!isEditing || Object.keys(dirtyFields).some((field) => field !== 'removedImageIds')) {
+              noteSaveAttempted = true;
+              return await saveNote();
+            }
+          } finally {
+            if (removedAny || noteSaveAttempted) {
+              invalidateVisitAndEncounterData(globalMutate, patientUuid);
+              mutateVisitNotes();
+              if (removedAny || (noteSaveAttempted && images?.length)) {
+                mutateAttachments();
+              }
+            }
           }
         })
-        .then(() => {
-          // Invalidate encounter and notes data since we created a new encounter with notes
-          // Also invalidate visit history table since the visit now has new encounters
-          invalidateVisitAndEncounterData(globalMutate, patientUuid);
-          mutateVisitNotes();
-
-          if (images?.length) {
-            mutateAttachments();
-          }
-
+        .then((failedUploads = []) => {
           closeWorkspace({ discardUnsavedChanges: true });
+
+          if (failedUploads.length) {
+            const [{ reason }] = failedUploads;
+            const names = failedUploads
+              .map(({ image }) => image.fileDescription?.trim() || image.fileName?.trim())
+              .filter(Boolean)
+              .join(', ');
+            showSnackbar({
+              isLowContrast: false,
+              kind: 'warning',
+              title: t('visitNoteSavedImagesFailed', 'Visit note saved, but {{count}} image was not uploaded', {
+                count: failedUploads.length,
+              }),
+              subtitle: [names, reason?.responseBody?.error?.message ?? reason?.message]
+                .filter(Boolean)
+                .join(': ')
+                .concat(
+                  ' ',
+                  t('reAddImagesFromNote', 'Open the note to add it again.', { count: failedUploads.length }),
+                ),
+            });
+            return;
+          }
 
           showSnackbar({
             isLowContrast: true,
@@ -471,6 +557,12 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
           });
         })
         .catch((err) => {
+          setSaveError(
+            t(
+              'visitNotePartialSaveError',
+              'Could not save all changes. Some changes may already be saved. Try saving again.',
+            ),
+          );
           createErrorHandler();
 
           showSnackbar({
@@ -482,6 +574,9 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
         });
     },
     [
+      dirtyFields,
+      getValues,
+      setValue,
       visitContext?.uuid,
       clinicianEncounterRole,
       closeWorkspace,
@@ -544,7 +639,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       hasUnsavedChanges={hasUserUnsavedChanges}
     >
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
-        <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
+        <ExtensionSlot name="visit-context-header-slot" state={visitContextHeaderState} />
 
         {isTablet && (
           <Row className={styles.headerGridRow}>
@@ -701,33 +796,130 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                   </p>
                   <Button
                     className={styles.uploadButton}
+                    disabled={isImageCaptureDisabled}
                     kind={isTablet ? 'ghost' : 'tertiary'}
                     onClick={showImageCaptureModal}
                     renderIcon={(props) => <Add size={16} {...props} />}
                   >
                     {t('addImage', 'Add image')}
                   </Button>
+                  {allowedFileExtensionsError && (
+                    <InlineNotification
+                      className={styles.savedImagesLoading}
+                      kind="error"
+                      lowContrast
+                      hideCloseButton
+                      title={t('allowedFileExtensionsLoadError', "Couldn't load the allowed image formats")}
+                      subtitle={t('allowedFileExtensionsLoadErrorHint', 'Reload the page to add images to this note.')}
+                    />
+                  )}
+                  {isLoadingSavedImages && (
+                    <InlineLoading
+                      className={styles.savedImagesLoading}
+                      description={t('loadingSavedImages', 'Loading saved images') + '...'}
+                    />
+                  )}
+                  {savedImagesError && (
+                    <InlineNotification
+                      className={styles.savedImagesLoading}
+                      kind="error"
+                      lowContrast
+                      hideCloseButton
+                      title={t('savedImagesLoadError', "Couldn't load the images saved on this note")}
+                      subtitle={t('savedImagesLoadErrorHint', 'Check the Attachments page before adding them again.')}
+                    />
+                  )}
                   <div className={styles.imgThumbnailGrid}>
+                    {savedImages
+                      .filter((image) => !removedImages.includes(image.id))
+                      .map((image) => {
+                        const isMarkedForRemoval = removedImageIds.includes(image.id);
+                        const name = image.description || image.filename || t('savedImage', 'Saved image');
+                        return (
+                          <div key={image.id} className={styles.imgThumbnailItem}>
+                            <div className={styles.imgThumbnailContainer}>
+                              <img
+                                className={classnames(styles.imgThumbnail, {
+                                  [styles.pendingImage]: isMarkedForRemoval,
+                                })}
+                                src={image.src}
+                                alt={name}
+                              />
+                            </div>
+                            {isMarkedForRemoval && (
+                              <p className={styles.removalStatus}>{t('imageMarkedForRemoval', 'Marked for removal')}</p>
+                            )}
+                            <Button
+                              kind={isMarkedForRemoval ? 'ghost' : 'secondary'}
+                              size="sm"
+                              disabled={isSubmitting}
+                              aria-label={
+                                isMarkedForRemoval
+                                  ? t('undoRemoveImage', 'Undo removal: {{name}}', {
+                                      name: name,
+                                    })
+                                  : t('removeImage', 'Remove image: {{name}}', {
+                                      name: name,
+                                    })
+                              }
+                              className={isMarkedForRemoval ? styles.undoButton : styles.removeButton}
+                              onClick={() =>
+                                setValue(
+                                  'removedImageIds',
+                                  isMarkedForRemoval
+                                    ? removedImageIds.filter((id) => id !== image.id)
+                                    : [...removedImageIds, image.id],
+                                  { shouldDirty: true },
+                                )
+                              }
+                            >
+                              {isMarkedForRemoval ? t('undo', 'Undo') : <Close size={16} />}
+                            </Button>
+                          </div>
+                        );
+                      })}
                     {currentImages?.map((image, index) => (
                       <div key={index} className={styles.imgThumbnailItem}>
                         <div className={styles.imgThumbnailContainer}>
                           <img
                             className={styles.imgThumbnail}
                             src={image.base64Content}
-                            alt={image.fileDescription ?? image.fileName}
+                            alt={image.fileDescription || image.fileName}
                           />
                         </div>
-                        <Button kind="ghost" className={styles.removeButton} onClick={() => handleRemoveImage(index)}>
-                          <CloseFilled size={16} className={styles.closeIcon} />
+                        <Button
+                          kind="secondary"
+                          size="sm"
+                          aria-label={t('removeImage', 'Remove image: {{name}}', {
+                            name: image.fileDescription?.trim() || image.fileName?.trim() || index + 1,
+                          })}
+                          className={styles.removeButton}
+                          onClick={() => handleRemoveImage(index)}
+                        >
+                          <Close size={16} />
                         </Button>
                       </div>
                     ))}
                   </div>
+                  {removedImageIds.length > 0 && (
+                    <p className={styles.removalHint}>
+                      {t('imageRemovalSaveHint', 'Images marked for removal will be deleted when you save.')}
+                    </p>
+                  )}
                 </FormGroup>
               </Column>
             </Row>
           </Stack>
         </div>
+        {saveError && (
+          <InlineNotification
+            kind="error"
+            lowContrast
+            hideCloseButton
+            title={t('visitNoteSaveError', 'Error saving visit note')}
+            subtitle={saveError}
+          />
+        )}
         <ButtonSet className={classnames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
           <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
             {t('discard', 'Discard')}

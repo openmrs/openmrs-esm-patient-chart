@@ -244,7 +244,7 @@ describe('Biometrics Overview', () => {
     await user.click(chartViewButton);
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByText(/biometric displayed/i)).toBeInTheDocument();
+    expect(await screen.findByText(/biometric displayed/i)).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /weight/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /height/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /bmi/i })).toBeInTheDocument();

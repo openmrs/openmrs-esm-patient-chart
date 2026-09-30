@@ -6,11 +6,15 @@
  * fails the cross-realm equality check used here.
  */
 import React from 'react';
-import { vi, expect, test, beforeEach } from 'vitest';
+import { vi, expect, test, beforeEach, afterEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { screen, render, waitFor, within } from '@testing-library/react';
+import { screen, render, waitFor, within, act } from '@testing-library/react';
 import {
   type Encounter,
+  type UploadedFile,
+  createAttachment,
+  ExtensionSlot,
+  showModal,
   getDefaultsFromConfigSchema,
   showSnackbar,
   useConfig,
@@ -23,14 +27,18 @@ import {
 import {
   type PatientWorkspace2DefinitionProps,
   type PatientWorkspaceGroupProps,
+  useAllowedFileExtensions,
 } from '@openmrs/esm-patient-common-lib';
 import {
   deletePatientDiagnosis,
   fetchDiagnosisConceptsByName,
+  removeVisitNoteImage,
   savePatientDiagnosis,
   saveVisitNote,
   updateVisitNote,
   useDiagnosisConceptClasses,
+  useVisitNoteImages,
+  useVisitNotes,
 } from './visit-notes.resource';
 import {
   ConfigMock,
@@ -74,7 +82,7 @@ function renderVisitNotesForm(
     workspaceProps: { ...defaultProps.workspaceProps, ...workspaceProps },
     groupProps: { ...defaultProps.groupProps, ...groupProps },
   };
-  render(<VisitNotesFormWorkspace {...props} />);
+  return render(<VisitNotesFormWorkspace {...props} />);
 }
 
 function renderExportedVisitNotesForm(workspaceProps: Partial<ExportedVisitNotesFormWorkspaceProps> = {}) {
@@ -159,10 +167,19 @@ const mockedUseFeatureFlag = vi.mocked(useFeatureFlag);
 
 vi.mock('lodash-es/debounce', () => vi.fn((fn) => fn));
 
+vi.mock('@openmrs/esm-patient-common-lib', async () => {
+  const actual = await vi.importActual<Record<string, unknown>>('@openmrs/esm-patient-common-lib');
+  return {
+    ...actual,
+    useAllowedFileExtensions: vi.fn(() => ({ allowedFileExtensions: ['png'], error: undefined, isLoading: false })),
+  };
+});
+
 vi.mock('./visit-notes.resource', () => ({
   deletePatientDiagnosis: vi.fn(),
   fetchDiagnosisConceptsByName: vi.fn(),
   savePatientDiagnosis: vi.fn(),
+  removeVisitNoteImage: vi.fn(),
   updateVisitNote: vi.fn(),
   useLocationUuid: vi.fn().mockImplementation(() => ({
     data: mockFetchLocationByUuidResponse.data.uuid,
@@ -172,6 +189,7 @@ vi.mock('./visit-notes.resource', () => ({
   })),
   saveVisitNote: vi.fn(),
   useDiagnosisConceptClasses: vi.fn(),
+  useVisitNoteImages: vi.fn(() => ({ images: [], isLoading: false, error: null })),
   useVisitNotes: vi.fn().mockImplementation(() => ({
     mutateVisitNotes: vi.fn(),
   })),
@@ -808,6 +826,592 @@ test('requires primary diagnosis when isPrimaryDiagnosisRequired is true', async
     ...getDefaultsFromConfigSchema(configSchema),
     ...ConfigMock,
   });
+});
+
+test.each(['result', 'outside', 'body'])(
+  'allows continued typing after diagnosis results refresh when the user chooses %s',
+  async (target) => {
+    mockFetchDiagnosisConceptsByName.mockImplementation((query) =>
+      query.endsWith('x') ? new Promise(() => {}) : Promise.resolve(diagnosisSearchResponse.results),
+    );
+    renderVisitNotesForm();
+    const user = userEvent.setup();
+    const input = screen.getByPlaceholderText('Search for a diagnosis');
+    await user.type(input, 'Diabetes');
+    const result = await screen.findByRole('button', { name: 'Diabetes Mellitus' });
+    await user.type(input, 'x');
+    await user.keyboard('{ArrowDown}');
+    expect(result).toHaveFocus();
+    const outside = screen.getByRole('textbox', { name: /Write your notes/i });
+    if (target === 'outside') await user.click(outside);
+    if (target === 'body') await user.click(screen.getByText('Diagnosis', { exact: true }));
+    await waitFor(() => expect(result).not.toBeInTheDocument());
+    expect(target === 'outside' ? outside : target === 'body' ? document.body : input).toHaveFocus();
+    await user.keyboard('yz');
+    expect(input).toHaveValue(target === 'result' ? 'Diabetesxyz' : 'Diabetesx');
+    expect(outside).toHaveValue(target === 'outside' ? 'yz' : '');
+  },
+);
+
+test.each([false, true])(
+  'tracks image-only edits and preserves other changes when removing the image (note edited: %s)',
+  async (editNote) => {
+    const user = userEvent.setup();
+    const closeModal = vi.fn();
+    vi.mocked(showModal).mockReturnValue(closeModal);
+    const encounter: Encounter = {
+      uuid: 'existing-note',
+      id: 'existing-note',
+      rawDatetime: '2024-03-20T10:00:00.000Z',
+      obs: [],
+      diagnoses: [],
+    };
+    renderVisitNotesForm({ formContext: 'editing', encounter });
+
+    const saveButton = screen.getByRole('button', { name: /save and close/i });
+    expect(saveButton).toBeDisabled();
+
+    await user.click(screen.getByRole('button', { name: /add image/i }));
+    const [, modalProps] = vi.mocked(showModal).mock.calls.find(([name]) => name === 'capture-photo-modal');
+    const { saveFile } = modalProps as { saveFile: (file: UploadedFile) => Promise<void> };
+    await act(async () => {
+      await saveFile({
+        fileName: 'visit-note.png',
+        fileType: 'image/png',
+        file: new File(['image'], 'visit-note.png', { type: 'image/png' }),
+        base64Content: 'data:image/png;base64,aW1hZ2U=',
+        fileDescription: 'Visit note image',
+      });
+    });
+
+    expect(closeModal).toHaveBeenCalled();
+    expect(screen.getByRole('img', { name: 'Visit note image' })).toBeInTheDocument();
+    expect(saveButton).toBeEnabled();
+
+    if (editNote) {
+      await user.type(screen.getByRole('textbox', { name: /write your notes/i }), 'Updated note');
+    }
+    await user.click(screen.getByRole('button', { name: 'Remove image: Visit note image' }));
+
+    expect(screen.queryByRole('img', { name: 'Visit note image' })).not.toBeInTheDocument();
+    if (editNote) {
+      expect(saveButton).toBeEnabled();
+    } else {
+      expect(saveButton).toBeDisabled();
+    }
+  },
+);
+
+test.each(['creating', 'editing'] as const)(
+  'retains every image from a batch and subsequent uploads when %s',
+  async (formContext) => {
+    const user = userEvent.setup();
+    vi.mocked(showModal).mockReturnValue(vi.fn());
+    renderVisitNotesForm({
+      formContext,
+      ...(formContext === 'editing' && {
+        encounter: {
+          uuid: 'existing-note',
+          id: 'existing-note',
+          rawDatetime: '2024-03-20T10:00:00.000Z',
+          obs: [],
+          diagnoses: [],
+        },
+      }),
+    });
+    const files: UploadedFile[] = ['red.png', 'blue.png', 'camera'].map((fileName) => ({
+      fileName,
+      fileType: 'image/png',
+      fileDescription: fileName,
+      base64Content: 'data:image/png;base64,aW1hZ2U=',
+      capturedFromWebcam: fileName === 'camera',
+    }));
+    await user.click(screen.getByRole('button', { name: /add image/i }));
+    const firstModal = vi.mocked(showModal).mock.lastCall[1] as { saveFile: (file: UploadedFile) => Promise<void> };
+    await act(async () => {
+      await Promise.all(files.slice(0, 2).map(firstModal.saveFile));
+    });
+    expect(screen.getByRole('img', { name: 'red.png' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'blue.png' })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /add image/i }));
+    const nextModal = vi.mocked(showModal).mock.lastCall[1] as { saveFile: (file: UploadedFile) => Promise<void> };
+    await act(async () => {
+      await nextModal.saveFile(files[2]);
+    });
+    expect(files[2].fileName).toBe('camera.png');
+    expect(screen.getAllByRole('img')).toHaveLength(3);
+    expect(screen.getByRole('button', { name: /save and close/i })).toBeEnabled();
+
+    await user.click(screen.getByRole('button', { name: 'Remove image: blue.png' }));
+    expect(screen.queryByRole('img', { name: 'blue.png' })).not.toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'red.png' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'camera' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /save and close/i })).toBeEnabled();
+  },
+);
+
+test('labels image removal with the description, filename or image number', async () => {
+  const user = userEvent.setup();
+  vi.mocked(showModal).mockReturnValue(vi.fn());
+  renderVisitNotesForm();
+  await user.click(screen.getByRole('button', { name: /add image/i }));
+  const modal = vi.mocked(showModal).mock.lastCall[1] as { saveFile: (file: UploadedFile) => Promise<void> };
+  const files: UploadedFile[] = [
+    { fileName: 'first.png', fileDescription: 'Front view' },
+    { fileName: 'second.png', fileDescription: ' ' },
+    { fileName: '', fileDescription: '' },
+  ].map((file) => ({ ...file, fileType: 'image/png', base64Content: 'data:image/png;base64,aW1hZ2U=' }));
+
+  await act(async () => {
+    await Promise.all(files.map(modal.saveFile));
+  });
+
+  expect(screen.getByRole('button', { name: 'Remove image: Front view' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Remove image: second.png' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Remove image: 3' })).toBeInTheDocument();
+});
+
+const existingNote: Encounter = {
+  uuid: 'existing-note',
+  id: 'existing-note',
+  rawDatetime: '2024-03-20T10:00:00.000Z',
+  obs: [{ concept: { uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }, value: 'Existing clinical note' }],
+  diagnoses: [],
+} as unknown as Encounter;
+
+const newImage: UploadedFile = {
+  fileName: 'wound.png',
+  fileType: 'image/png',
+  file: new File(['image'], 'wound.png', { type: 'image/png' }),
+  base64Content: 'data:image/png;base64,aW1hZ2U=',
+  fileDescription: 'Wound photo',
+};
+
+const defaultConfig: ConfigObject = { ...getDefaultsFromConfigSchema(configSchema), ...ConfigMock };
+const noSavedImages = { images: [], isLoading: false, error: null };
+
+afterEach(() => {
+  mockUseConfig.mockReturnValue(defaultConfig);
+  vi.mocked(useVisitNoteImages).mockReturnValue(noSavedImages);
+  vi.mocked(useAllowedFileExtensions).mockReturnValue({
+    allowedFileExtensions: ['png'],
+    error: undefined,
+    isLoading: false,
+  });
+});
+
+// The image tests save notes without a diagnosis, so the config must not require one.
+function allowNotesWithoutDiagnosis() {
+  mockUseConfig.mockReturnValue({
+    ...getDefaultsFromConfigSchema(configSchema),
+    ...ConfigMock,
+    isPrimaryDiagnosisRequired: false,
+  });
+}
+
+async function addImage(user: ReturnType<typeof userEvent.setup>, file: UploadedFile) {
+  await user.click(screen.getByRole('button', { name: /add image/i }));
+  const modal = vi.mocked(showModal).mock.lastCall[1] as { saveFile: (file: UploadedFile) => Promise<void> };
+  await act(async () => {
+    await modal.saveFile(file);
+  });
+}
+
+test('records images added while editing on the note encounter', async () => {
+  const user = userEvent.setup();
+  vi.mocked(showModal).mockReturnValue(vi.fn());
+  allowNotesWithoutDiagnosis();
+  mockUpdateVisitNote.mockResolvedValueOnce({ status: 200 } as unknown as Awaited<ReturnType<typeof updateVisitNote>>);
+  renderVisitNotesForm({ formContext: 'editing', encounter: existingNote });
+
+  await addImage(user, newImage);
+  await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+  await waitFor(() => expect(createAttachment).toHaveBeenCalledTimes(1));
+  expect(createAttachment).toHaveBeenCalledWith(
+    mockPatient.id,
+    expect.objectContaining({ fileName: 'wound.png', fileDescription: 'Wound photo' }),
+    'existing-note',
+  );
+});
+
+test('records images added to a new note on the encounter it just created', async () => {
+  const user = userEvent.setup();
+  vi.mocked(showModal).mockReturnValue(vi.fn());
+  allowNotesWithoutDiagnosis();
+  mockSaveVisitNote.mockResolvedValueOnce({ status: 201, data: { uuid: 'new-note' } } as unknown as Awaited<
+    ReturnType<typeof saveVisitNote>
+  >);
+  renderVisitNotesForm();
+
+  await addImage(user, newImage);
+  await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+  await waitFor(() => expect(createAttachment).toHaveBeenCalledTimes(1));
+  expect(createAttachment).toHaveBeenCalledWith(
+    mockPatient.id,
+    expect.objectContaining({ fileName: 'wound.png' }),
+    'new-note',
+  );
+});
+
+test('shows the images already saved on the note with remove controls and never re-uploads them', async () => {
+  const user = userEvent.setup();
+  vi.mocked(useVisitNoteImages).mockReturnValue({
+    images: [
+      {
+        id: 'att-1',
+        src: '/openmrs/ws/rest/v1/attachment/att-1/bytes',
+        description: 'Front view',
+        filename: 'front.png',
+      },
+      { id: 'att-2', src: '/openmrs/ws/rest/v1/attachment/att-2/bytes', description: '', filename: 'side.png' },
+    ],
+    isLoading: false,
+    error: null,
+  });
+  allowNotesWithoutDiagnosis();
+  mockUpdateVisitNote.mockResolvedValueOnce({ status: 200 } as unknown as Awaited<ReturnType<typeof updateVisitNote>>);
+  renderVisitNotesForm({ formContext: 'editing', encounter: existingNote });
+
+  expect(vi.mocked(useVisitNoteImages)).toHaveBeenCalledWith(mockPatient.id, 'existing-note');
+  expect(screen.getByRole('img', { name: 'Front view' })).toHaveAttribute(
+    'src',
+    '/openmrs/ws/rest/v1/attachment/att-1/bytes',
+  );
+  expect(screen.getByRole('img', { name: 'side.png' })).toBeInTheDocument();
+  expect(screen.getAllByRole('button', { name: /remove image/i })).toHaveLength(2);
+  await user.click(screen.getByRole('button', { name: /remove image: front view/i }));
+  expect(removeVisitNoteImage).not.toHaveBeenCalled();
+  expect(screen.getByText('Marked for removal')).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /save and close/i })).toBeEnabled();
+  await user.click(screen.getByRole('button', { name: /undo removal: front view/i }));
+  expect(screen.getByRole('button', { name: /save and close/i })).toBeDisabled();
+
+  await user.type(screen.getByRole('textbox', { name: /write your notes/i }), ' with more detail');
+  await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+  await waitFor(() => expect(mockUpdateVisitNote).toHaveBeenCalledTimes(1));
+  expect(createAttachment).not.toHaveBeenCalled();
+});
+
+test('does not request saved images while creating a note', () => {
+  renderVisitNotesForm();
+  expect(vi.mocked(useVisitNoteImages)).toHaveBeenCalledWith(mockPatient.id, undefined);
+});
+
+test('shows a loading indicator while the saved images load', () => {
+  vi.mocked(useVisitNoteImages).mockReturnValue({ images: [], isLoading: true, error: null });
+  renderVisitNotesForm({ formContext: 'editing', encounter: existingNote });
+  expect(screen.getByText(/loading saved images/i)).toBeInTheDocument();
+});
+
+test('tells the user when the saved images could not be loaded', () => {
+  vi.mocked(useVisitNoteImages).mockReturnValue({ images: [], isLoading: false, error: new Error('boom') });
+  renderVisitNotesForm({ formContext: 'editing', encounter: existingNote });
+  expect(screen.getByText(/couldn't load the images saved on this note/i)).toBeInTheDocument();
+  expect(screen.queryByText(/loading saved images/i)).not.toBeInTheDocument();
+});
+
+test('saves the note and reports the images the server rejected instead of failing the whole save', async () => {
+  const user = userEvent.setup();
+  vi.mocked(showModal).mockReturnValue(vi.fn());
+  allowNotesWithoutDiagnosis();
+  mockSaveVisitNote.mockResolvedValueOnce({ status: 201, data: { uuid: 'new-note' } } as unknown as Awaited<
+    ReturnType<typeof saveVisitNote>
+  >);
+  vi.mocked(createAttachment)
+    .mockResolvedValueOnce({} as Awaited<ReturnType<typeof createAttachment>>)
+    .mockRejectedValueOnce({ responseBody: { error: { message: 'The file content type text/plain is not allowed' } } });
+  renderVisitNotesForm();
+
+  await addImage(user, newImage);
+  await addImage(user, { ...newImage, fileName: 'notes.png', fileDescription: 'Scanned notes' });
+  await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+  await waitFor(() => expect(defaultProps.closeWorkspace).toHaveBeenCalled());
+  expect(mockSaveVisitNote).toHaveBeenCalledTimes(1);
+  expect(createAttachment).toHaveBeenCalledTimes(2);
+  expect(mockShowSnackbar).toHaveBeenCalledWith(
+    expect.objectContaining({
+      kind: 'warning',
+      title: 'Visit note saved, but 1 image was not uploaded',
+      subtitle: 'Scanned notes: The file content type text/plain is not allowed Open the note to add it again.',
+    }),
+  );
+  expect(mockShowSnackbar).not.toHaveBeenCalledWith(expect.objectContaining({ title: 'Error saving visit note' }));
+});
+
+test('still reports a failure to save the note itself as an error and keeps the form open', async () => {
+  const user = userEvent.setup();
+  allowNotesWithoutDiagnosis();
+  mockSaveVisitNote.mockRejectedValueOnce({ responseBody: { error: { message: 'Encounter datetime is invalid' } } });
+  renderVisitNotesForm();
+
+  await user.type(screen.getByRole('textbox', { name: /write your notes/i }), 'Some note');
+  await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+  await waitFor(() =>
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'error',
+        title: 'Error saving visit note',
+        subtitle: 'Encounter datetime is invalid',
+      }),
+    ),
+  );
+  expect(defaultProps.closeWorkspace).not.toHaveBeenCalled();
+  expect(createAttachment).not.toHaveBeenCalled();
+});
+
+function setupSavedImages() {
+  allowNotesWithoutDiagnosis();
+  vi.mocked(useVisitNoteImages).mockReturnValue({
+    images: [
+      { id: 'att-1', src: '/front.png', filename: 'front.png' },
+      { id: 'att-2', src: '/side.png', filename: 'side.png' },
+    ],
+    isLoading: false,
+    error: null,
+  });
+  renderVisitNotesForm({ formContext: 'editing', encounter: existingNote });
+}
+
+test('discarding a staged image removal makes no delete request', async () => {
+  const user = userEvent.setup();
+  setupSavedImages();
+  await user.click(screen.getByRole('button', { name: 'Remove image: front.png' }));
+  await user.click(screen.getByRole('button', { name: 'Discard' }));
+  expect(removeVisitNoteImage).not.toHaveBeenCalled();
+  expect(defaultProps.closeWorkspace).toHaveBeenCalledWith();
+});
+
+test('saving only image removals does not rewrite the note or upload images', async () => {
+  const user = userEvent.setup();
+  setupSavedImages();
+  await user.click(screen.getByRole('button', { name: 'Remove image: front.png' }));
+  await user.click(screen.getByRole('button', { name: /save and close/i }));
+  await waitFor(() => expect(defaultProps.closeWorkspace).toHaveBeenCalledWith({ discardUnsavedChanges: true }));
+  expect(removeVisitNoteImage).toHaveBeenCalledExactlyOnceWith('att-1');
+  expect(updateVisitNote).not.toHaveBeenCalled();
+  expect(createAttachment).not.toHaveBeenCalled();
+});
+
+test('retries failed removals without repeating successful removals or saving the note early', async () => {
+  const user = userEvent.setup();
+  setupSavedImages();
+  vi.mocked(removeVisitNoteImage).mockResolvedValueOnce(undefined).mockRejectedValueOnce(new Error('Offline'));
+  mockUpdateVisitNote.mockResolvedValueOnce({ status: 200 } as unknown as Awaited<ReturnType<typeof updateVisitNote>>);
+  await user.type(screen.getByRole('textbox', { name: /write your notes/i }), ' updated');
+  await user.click(screen.getByRole('button', { name: 'Remove image: front.png' }));
+  await user.click(screen.getByRole('button', { name: 'Remove image: side.png' }));
+  await user.click(screen.getByRole('button', { name: /save and close/i }));
+  expect(await screen.findByText(/could not save all changes/i)).toBeInTheDocument();
+  expect(defaultProps.closeWorkspace).not.toHaveBeenCalled();
+  expect(updateVisitNote).not.toHaveBeenCalled();
+  expect(screen.queryByRole('button', { name: 'Undo removal: front.png' })).not.toBeInTheDocument();
+  await user.click(screen.getByRole('button', { name: /save and close/i }));
+  await waitFor(() => expect(defaultProps.closeWorkspace).toHaveBeenCalledWith({ discardUnsavedChanges: true }));
+  expect(vi.mocked(removeVisitNoteImage).mock.calls).toEqual([['att-1'], ['att-2'], ['att-2']]);
+  expect(updateVisitNote).toHaveBeenCalledTimes(1);
+});
+
+test('keeps visit-context header state stable while staging and undoing an image removal', async () => {
+  const user = userEvent.setup();
+  setupSavedImages();
+  const headerStates = () =>
+    vi
+      .mocked(ExtensionSlot)
+      .mock.calls.filter(([props]) => props.name === 'visit-context-header-slot')
+      .map(([props]) => props.state);
+  const initialState = headerStates()[0];
+  expect(initialState).toEqual({ patientUuid: mockPatient.id });
+  await user.click(screen.getByRole('button', { name: 'Remove image: front.png' }));
+  await user.click(screen.getByRole('button', { name: 'Undo removal: front.png' }));
+  expect(headerStates().length).toBeGreaterThan(1);
+  expect(headerStates().every((state) => state === initialState)).toBe(true);
+});
+
+test('removing an image preserves saved diagnoses without rewriting the note', async () => {
+  const user = userEvent.setup();
+  vi.mocked(useVisitNoteImages).mockReturnValue({
+    images: [{ id: 'att-1', src: '/front.png', filename: 'front.png' }],
+    isLoading: false,
+    error: null,
+  });
+  const noteWithDiagnoses = {
+    ...existingNote,
+    diagnoses: [
+      {
+        uuid: 'dx-1',
+        display: 'Malaria',
+        rank: 1,
+        certainty: 'CONFIRMED',
+        diagnosis: { coded: { uuid: 'concept-1' } },
+      },
+      {
+        uuid: 'dx-2',
+        display: 'Anemia',
+        rank: 2,
+        certainty: 'PROVISIONAL',
+        diagnosis: { coded: { uuid: 'concept-2' } },
+      },
+    ],
+  } as unknown as Encounter;
+  renderVisitNotesForm({ formContext: 'editing', encounter: noteWithDiagnoses });
+  await user.click(screen.getByRole('button', { name: 'Remove image: front.png' }));
+  await user.click(screen.getByRole('button', { name: /save and close/i }));
+  await waitFor(() => expect(defaultProps.closeWorkspace).toHaveBeenCalledWith({ discardUnsavedChanges: true }));
+  expect(removeVisitNoteImage).toHaveBeenCalledExactlyOnceWith('att-1');
+  expect(updateVisitNote).not.toHaveBeenCalled();
+});
+
+test.each([false, true])(
+  'refreshes notes once after a batch of removals, including partial failure: %s',
+  async (fails) => {
+    const user = userEvent.setup();
+    const refreshNotes = vi.fn();
+    vi.mocked(useVisitNotes).mockReturnValue({
+      mutateVisitNotes: refreshNotes,
+      visitNotes: [],
+      error: null,
+      isLoading: false,
+    });
+    setupSavedImages();
+    vi.mocked(removeVisitNoteImage).mockResolvedValueOnce(undefined);
+    if (fails) vi.mocked(removeVisitNoteImage).mockRejectedValueOnce(new Error('Offline'));
+    await user.click(screen.getByRole('button', { name: 'Remove image: front.png' }));
+    await user.click(screen.getByRole('button', { name: 'Remove image: side.png' }));
+    await user.click(screen.getByRole('button', { name: /save and close/i }));
+    if (fails) await screen.findByText(/could not save all changes/i);
+    else await waitFor(() => expect(defaultProps.closeWorkspace).toHaveBeenCalled());
+    expect(refreshNotes).toHaveBeenCalledTimes(1);
+  },
+);
+test('only offers image formats to the picker and stages files without an upload toast', async () => {
+  const user = userEvent.setup();
+  vi.mocked(useAllowedFileExtensions).mockReturnValue({
+    allowedFileExtensions: ['jpeg', 'png', 'pdf', 'docx'],
+    error: undefined,
+    isLoading: false,
+  });
+  vi.mocked(showModal).mockReturnValue(vi.fn());
+  renderVisitNotesForm();
+
+  await user.click(screen.getByRole('button', { name: /add image/i }));
+
+  expect(showModal).toHaveBeenCalledWith(
+    'capture-photo-modal',
+    expect.objectContaining({ allowedExtensions: ['jpeg', 'png'], showUploadSnackbar: false }),
+  );
+});
+
+test('waits for the extension list before opening an image-only picker', async () => {
+  const user = userEvent.setup();
+  vi.mocked(useAllowedFileExtensions).mockReturnValue({
+    allowedFileExtensions: undefined,
+    error: undefined,
+    isLoading: true,
+  });
+  vi.mocked(showModal).mockReturnValue(vi.fn());
+  const { rerender } = renderVisitNotesForm();
+
+  const addImage = screen.getByRole('button', { name: /add image/i });
+  expect(addImage).toBeDisabled();
+  await user.click(addImage);
+  expect(showModal).not.toHaveBeenCalled();
+
+  vi.mocked(useAllowedFileExtensions).mockReturnValue({
+    allowedFileExtensions: ['png', 'pdf', 'docx'],
+    error: undefined,
+    isLoading: false,
+  });
+  rerender(<VisitNotesFormWorkspace {...defaultProps} />);
+
+  expect(addImage).toBeEnabled();
+  await user.click(addImage);
+  expect(showModal).toHaveBeenCalledExactlyOnceWith(
+    'capture-photo-modal',
+    expect.objectContaining({ allowedExtensions: ['png'], showUploadSnackbar: false }),
+  );
+});
+
+test.each([
+  { allowedFileExtensions: undefined, error: new Error('Offline') },
+  { allowedFileExtensions: ['png', 'pdf'], error: new Error('Offline') },
+])('does not open the picker when restrictions are unavailable: %o', async (result) => {
+  const user = userEvent.setup();
+  vi.mocked(useAllowedFileExtensions).mockReturnValue({ ...result, isLoading: false });
+  renderVisitNotesForm();
+
+  const addImage = screen.getByRole('button', { name: /add image/i });
+  expect(addImage).toBeDisabled();
+  await user.click(addImage);
+  expect(showModal).not.toHaveBeenCalled();
+});
+
+test.each([undefined, [], [''], ['  ']].map((allowedFileExtensions) => ({ allowedFileExtensions })))(
+  'offers supported images when the backend has no extension restrictions: %j',
+  async ({ allowedFileExtensions }) => {
+    const user = userEvent.setup();
+    vi.mocked(useAllowedFileExtensions).mockReturnValue({ allowedFileExtensions, error: undefined, isLoading: false });
+    vi.mocked(showModal).mockReturnValue(vi.fn());
+    renderVisitNotesForm();
+
+    const addImage = screen.getByRole('button', { name: /add image/i });
+    expect(addImage).toBeEnabled();
+    await user.click(addImage);
+    expect(showModal).toHaveBeenCalledWith(
+      'capture-photo-modal',
+      expect.objectContaining({ allowedExtensions: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'] }),
+    );
+  },
+);
+
+test('disables image capture when the backend only allows documents', async () => {
+  const user = userEvent.setup();
+  vi.mocked(useAllowedFileExtensions).mockReturnValue({
+    allowedFileExtensions: ['pdf', 'docx'],
+    error: undefined,
+    isLoading: false,
+  });
+  renderVisitNotesForm();
+
+  const addImage = screen.getByRole('button', { name: /add image/i });
+  expect(addImage).toBeDisabled();
+  await user.click(addImage);
+  expect(showModal).not.toHaveBeenCalled();
+});
+
+test('explains why image capture is disabled when loading restrictions fails', () => {
+  vi.mocked(useAllowedFileExtensions).mockReturnValue({
+    allowedFileExtensions: undefined,
+    error: new Error('Offline'),
+    isLoading: false,
+  });
+  renderVisitNotesForm();
+
+  expect(screen.getByRole('button', { name: /add image/i })).toBeDisabled();
+  expect(screen.getByText("Couldn't load the allowed image formats")).toBeInTheDocument();
+  expect(screen.getByText('Reload the page to add images to this note.')).toBeInTheDocument();
+});
+
+test('keeps a saved image removal when a replacement upload fails and closes with a warning', async () => {
+  const user = userEvent.setup();
+  vi.mocked(showModal).mockReturnValue(vi.fn());
+  setupSavedImages();
+  mockUpdateVisitNote.mockResolvedValueOnce({ status: 200 } as Awaited<ReturnType<typeof updateVisitNote>>);
+  vi.mocked(createAttachment).mockRejectedValueOnce(new Error('Upload rejected'));
+  await user.click(screen.getByRole('button', { name: 'Remove image: front.png' }));
+  await addImage(user, newImage);
+  await user.click(screen.getByRole('button', { name: /save and close/i }));
+  await waitFor(() => expect(defaultProps.closeWorkspace).toHaveBeenCalledWith({ discardUnsavedChanges: true }));
+  expect(removeVisitNoteImage).toHaveBeenCalledExactlyOnceWith('att-1');
+  expect(mockUpdateVisitNote).toHaveBeenCalledTimes(1);
+  expect(createAttachment).toHaveBeenCalledTimes(1);
+  expect(mockShowSnackbar).toHaveBeenCalledWith(expect.objectContaining({ kind: 'warning' }));
+  expect(mockShowSnackbar).not.toHaveBeenCalledWith(expect.objectContaining({ kind: 'error' }));
 });
 
 test('presumes secondary and confirmed for out-of-enum rank and certainty from other writers', async () => {

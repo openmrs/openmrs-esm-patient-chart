@@ -61,8 +61,7 @@ The fields displayed and payloads produced depend on the form definition.
 
 This package is the O3 integration layer for the Angular Form Engine. It
 connects the engine to the patient chart, OpenMRS REST APIs, patient and visit
-context, workspace lifecycle, configuration, localization, and offline
-framework.
+context, workspace lifecycle, configuration, and localization.
 
 It registers the `form-widget` extension in `form-widget-slot`. The surrounding
 patient form workspace supplies the patient, form UUID, visit, and optional
