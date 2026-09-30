@@ -37,8 +37,8 @@ export function DiagnosisListHeader() {
 
   return (
     <div aria-hidden="true" className={styles.diagnosisListHeader}>
-      <span />
       <span>{t('primary', 'Primary')}</span>
+      <span />
       <span />
       <span />
     </div>
@@ -57,6 +57,13 @@ export default function SelectedDiagnosisCard({ diagnosis, onRemove, onUpdate }:
 
   return (
     <div className={styles.diagnosisRow} role="group" aria-label={diagnosis.display}>
+      <Checkbox
+        checked={diagnosis.rank === 1}
+        hideLabel
+        id={`diagnosis-${diagnosis.draftId}-primary`}
+        labelText={t('primary', 'Primary')}
+        onChange={(_, { checked }) => onUpdate(diagnosis, { rank: checked ? 1 : 2 })}
+      />
       <span className={styles.diagnosisName}>
         {isPreliminary && (
           <>
@@ -68,13 +75,6 @@ export default function SelectedDiagnosisCard({ diagnosis, onRemove, onUpdate }:
         )}
         {diagnosis.display}
       </span>
-      <Checkbox
-        checked={diagnosis.rank === 1}
-        hideLabel
-        id={`diagnosis-${diagnosis.draftId}-primary`}
-        labelText={t('primary', 'Primary')}
-        onChange={(_, { checked }) => onUpdate(diagnosis, { rank: checked ? 1 : 2 })}
-      />
       {/* The diagnosis search is restricted to the configured diagnosis concept class, so
           every row here is a true diagnosis and may be marked preliminary; symptoms and
           findings never reach this list. */}
