@@ -189,6 +189,15 @@
   }
 }
 
+// Once a save has been blocked by the missing primary, the same line reads as an error
+.primaryRequiredError {
+  color: colors.$red-60;
+
+  svg {
+    fill: colors.$red-60;
+  }
+}
+
 .errorMessage {
   @include type.type-style('label-02');
   color: colors.$red-60;

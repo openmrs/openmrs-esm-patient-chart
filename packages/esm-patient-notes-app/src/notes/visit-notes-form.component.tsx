@@ -497,11 +497,13 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
   // The primary requirement is shown live: as soon as there are diagnoses but none is
   // primary (or after a save attempt with nothing selected), and it clears the moment a
-  // primary is ticked. The schema still blocks the save.
+  // primary is ticked. Until a save is attempted it reads as a warning; once a save has
+  // been blocked by it, the same line turns into an error. The schema still blocks the save.
   const showPrimaryRequiredWarning =
     isPrimaryDiagnosisRequired &&
     !hasPrimaryDiagnosis(selectedDiagnoses) &&
     (selectedDiagnoses.length > 0 || isSubmitted);
+  const primaryRequiredBlockedSave = showPrimaryRequiredWarning && isSubmitted;
 
   return (
     <Workspace2
@@ -607,7 +609,12 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                     </p>
                   )}
                   {showPrimaryRequiredWarning && (
-                    <p className={styles.primaryRequiredWarning} role="status">
+                    <p
+                      className={classnames(styles.primaryRequiredWarning, {
+                        [styles.primaryRequiredError]: primaryRequiredBlockedSave,
+                      })}
+                      role={primaryRequiredBlockedSave ? 'alert' : 'status'}
+                    >
                       <WarningFilled aria-hidden="true" size={16} />
                       {t('atLeastOnePrimaryDiagnosis', 'At least one diagnosis must be selected as primary')}
                     </p>

@@ -309,8 +309,9 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
   const submitButton = screen.getByRole('button', { name: /Save and close/i });
   await user.click(submitButton);
 
-  // With nothing selected yet, the failed save reports the requirement and focuses the search input
-  expect(screen.getByText(/at least one diagnosis must be selected as primary/i)).toBeInTheDocument();
+  // With nothing selected yet, the failed save reports the requirement as an error and focuses the search input
+  expect(screen.getByText(/at least one diagnosis must be selected as primary/i)).toHaveAttribute('role', 'alert');
+  expect(screen.getByText(/at least one diagnosis must be selected as primary/i)).toHaveClass('primaryRequiredError');
   expect(screen.getByPlaceholderText('Search for a diagnosis')).toHaveFocus();
 
   // A newly added diagnosis is never auto-ticked primary — the choice stays explicit
@@ -322,6 +323,9 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
   expect(screen.getAllByText(/at least one diagnosis must be selected as primary/i)).toHaveLength(1);
   await user.click(submitButton);
   expect(screen.getAllByText(/at least one diagnosis must be selected as primary/i)).toHaveLength(1);
+  // ...and, now that a save has been blocked by it, the line is announced and styled as an error
+  expect(screen.getByText(/at least one diagnosis must be selected as primary/i)).toHaveAttribute('role', 'alert');
+  expect(screen.getByText(/at least one diagnosis must be selected as primary/i)).toHaveClass('primaryRequiredError');
   expect(within(card).getByRole('checkbox', { name: 'Primary' })).not.toHaveAttribute('data-invalid');
   expect(within(card).getByRole('checkbox', { name: 'Primary' })).toHaveFocus();
   expect(mockSaveVisitNote).not.toHaveBeenCalled();
@@ -776,6 +780,8 @@ test('requires primary diagnosis when isPrimaryDiagnosisRequired is true', async
   await user.click(submitButton);
 
   expect(screen.getAllByText(/at least one diagnosis must be selected as primary/i)).toHaveLength(1);
+  expect(screen.getByText(/at least one diagnosis must be selected as primary/i)).toHaveAttribute('role', 'alert');
+  expect(screen.getByText(/at least one diagnosis must be selected as primary/i)).toHaveClass('primaryRequiredError');
   expect(within(firstCard).getByRole('checkbox', { name: 'Primary' })).not.toHaveAttribute('data-invalid');
   expect(within(topCard).getByRole('checkbox', { name: 'Primary' })).not.toHaveAttribute('data-invalid');
   expect(within(topCard).getByRole('checkbox', { name: 'Primary' })).toHaveFocus();
