@@ -1,7 +1,14 @@
 import React, { type ChangeEvent, Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
-import { Button, ContentSwitcher, DataTableSkeleton, IconSwitch, InlineLoading } from '@carbon/react';
+import {
+  Button,
+  ContentSwitcher,
+  DataTableSkeleton,
+  IconSwitch,
+  InlineLoading,
+  SkeletonPlaceholder,
+} from '@carbon/react';
 import { Analytics, Table } from '@carbon/react/icons';
 import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import {
@@ -22,7 +29,8 @@ import PaginatedVitals from './paginated-vitals.component';
 import PrintComponent from './print/print.component';
 import styles from './vitals-overview.scss';
 
-const VitalsChart = lazy(() => import('./vitals-chart.component'));
+const loadVitalsChart = () => import('./vitals-chart.component');
+const VitalsChart = lazy(loadVitalsChart);
 
 interface VitalsOverviewProps {
   patientUuid: string;
@@ -202,6 +210,8 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
                     onChange={(evt: ChangeEvent<HTMLButtonElement> & { name: string }) =>
                       setChartView(evt.name === 'chartView')
                     }
+                    onFocus={loadVitalsChart}
+                    onMouseEnter={loadVitalsChart}
                     size={isTablet ? 'md' : 'sm'}
                     selectedIndex={chartView ? 1 : 0}
                   >
@@ -238,7 +248,13 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
               </CardHeader>
               {chartView ? (
                 <Suspense
-                  fallback={<InlineLoading role="progressbar" description={`${t('loading', 'Loading')} ...`} />}
+                  fallback={
+                    <SkeletonPlaceholder
+                      className={styles.chartSkeleton}
+                      role="progressbar"
+                      aria-label={t('loading', 'Loading')}
+                    />
+                  }
                 >
                   <VitalsChart patientVitals={vitals} conceptUnits={conceptUnits} config={config} />
                 </Suspense>
