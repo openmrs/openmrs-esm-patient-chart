@@ -32,6 +32,11 @@ import styles from './vitals-overview.scss';
 const loadVitalsChart = () => import('./vitals-chart.component');
 const VitalsChart = lazy(loadVitalsChart);
 
+// A failed prefetch is ignored. Opening the chart view retries the import through React.lazy.
+const prefetchVitalsChart = () => {
+  loadVitalsChart().catch(() => {});
+};
+
 interface VitalsOverviewProps {
   patientUuid: string;
   patient: fhir.Patient;
@@ -210,8 +215,8 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
                     onChange={(evt: ChangeEvent<HTMLButtonElement> & { name: string }) =>
                       setChartView(evt.name === 'chartView')
                     }
-                    onFocus={loadVitalsChart}
-                    onMouseEnter={loadVitalsChart}
+                    onFocus={prefetchVitalsChart}
+                    onMouseEnter={prefetchVitalsChart}
                     size={isTablet ? 'md' : 'sm'}
                     selectedIndex={chartView ? 1 : 0}
                   >

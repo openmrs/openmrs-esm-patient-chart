@@ -22,6 +22,11 @@ import styles from './biometrics-base.scss';
 const loadBiometricsChart = () => import('./biometrics-chart.component');
 const BiometricsChart = lazy(loadBiometricsChart);
 
+// A failed prefetch is ignored. Opening the chart view retries the import through React.lazy.
+const prefetchBiometricsChart = () => {
+  loadBiometricsChart().catch(() => {});
+};
+
 interface BiometricsBaseProps {
   pageSize: number;
   pageUrl: string;
@@ -118,8 +123,8 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, patient, p
           <div className={styles.biometricsHeaderActionItems}>
             <ContentSwitcher
               onChange={(evt) => setChartView(evt.name === 'chartView')}
-              onFocus={loadBiometricsChart}
-              onMouseEnter={loadBiometricsChart}
+              onFocus={prefetchBiometricsChart}
+              onMouseEnter={prefetchBiometricsChart}
               size={isTablet ? 'md' : 'sm'}
               selectedIndex={chartView ? 1 : 0}
             >
