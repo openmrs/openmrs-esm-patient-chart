@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import useSWR from 'swr';
+import dayjs from 'dayjs';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 
 interface CauseOfDeathFetchResponse {
@@ -21,7 +22,7 @@ interface CauseOfDeathPayload {
   causeOfDeath?: string;
   causeOfDeathNonCoded?: string;
   dead: boolean;
-  deathDate?: Date;
+  deathDate?: string;
 }
 
 export function useCausesOfDeath() {
@@ -56,7 +57,7 @@ export function markPatientDeceased(
 ) {
   const payload: CauseOfDeathPayload = {
     dead: true,
-    deathDate: deceasedDate || null,
+    deathDate: deceasedDate ? dayjs(deceasedDate).format('YYYY-MM-DD') : null,
     ...(nonCodedCauseOfDeath
       ? { causeOfDeathNonCoded: nonCodedCauseOfDeath }
       : {
