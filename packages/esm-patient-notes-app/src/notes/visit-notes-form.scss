@@ -173,6 +173,11 @@
   height: layout.$spacing-07;
 }
 
+.primaryRequiredWarning {
+  margin-top: layout.$spacing-03;
+  max-width: none;
+}
+
 .errorMessage {
   @include type.type-style('label-02');
   color: colors.$red-60;

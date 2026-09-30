@@ -3,10 +3,10 @@
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
-// One compact row per diagnosis: the name, the Primary/Confirmed checkboxes, and the remove
-// button sit on a single grid aligned to the column headers rendered once above the list.
-// The checkbox columns are kept tight so long names get as much width as possible.
-$diagnosis-columns: minmax(0, 1fr) 3rem 4.5rem 2rem;
+// One compact row per diagnosis: the name, the Primary checkbox, the actions menu and the
+// remove button sit on a single grid aligned to the column header rendered once above the
+// list. The fixed columns are kept tight so long names get as much width as possible.
+$diagnosis-columns: minmax(0, 1fr) 3rem 2rem 2rem;
 
 .diagnosisListHeader {
   display: grid;
@@ -26,7 +26,7 @@ $diagnosis-columns: minmax(0, 1fr) 3rem 4.5rem 2rem;
 .diagnosisRow {
   display: grid;
   grid-template-columns: $diagnosis-columns;
-  // Vertically centre the name and checkboxes within the row
+  // Vertically centre the name and checkbox within the row
   align-items: center;
   column-gap: layout.$spacing-02;
   padding: layout.$spacing-03;
@@ -36,7 +36,7 @@ $diagnosis-columns: minmax(0, 1fr) 3rem 4.5rem 2rem;
   // A subtle shaded background sets each selected diagnosis apart from the form around it
   background-color: colors.$gray-10;
 
-  // Center each checkbox under its column header and strip Carbon's stacked-form margins
+  // Center the checkbox under its column header and strip Carbon's stacked-form margins
   :global(.cds--form-item) {
     flex: 0 0 auto;
     margin: 0;
@@ -50,8 +50,20 @@ $diagnosis-columns: minmax(0, 1fr) 3rem 4.5rem 2rem;
   }
 }
 
+.actionsCell {
+  display: flex;
+  justify-content: center;
+}
+
 .diagnosisName {
   @include type.type-style('body-compact-01');
   min-width: 0;
   overflow-wrap: anywhere;
+}
+
+// Leading "?" marks a preliminary (provisional) diagnosis
+.preliminaryMark {
+  @include type.type-style('heading-compact-01');
+  margin-inline-end: layout.$spacing-02;
+  color: $text-02;
 }

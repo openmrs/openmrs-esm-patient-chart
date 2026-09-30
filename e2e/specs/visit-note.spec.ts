@@ -35,21 +35,24 @@ test('Add, edit, and delete a visit note', async ({ page, patient }) => {
     await expect(page.getByRole('button', { name: 'Asthma', exact: true })).toBeFocused();
     await page.keyboard.press('Enter');
     const asthmaCard = page.getByRole('group', { name: 'Asthma' });
-    // Primary starts unticked (secondary); certainty defaults to confirmed (Confirmed ticked).
+    // Nothing is auto-ticked: a diagnosis with no primary shows the live warning until
+    // Primary is ticked, and certainty is confirmed by default.
     await expect(asthmaCard.getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
-    await expect(asthmaCard.getByRole('checkbox', { name: 'Confirmed' })).toBeChecked();
+    await expect(page.getByText(/choose at least one primary diagnosis/i)).toBeVisible();
     await toggleCheckbox(asthmaCard, 'Primary');
     await expect(asthmaCard.getByRole('checkbox', { name: 'Primary' })).toBeChecked();
+    await expect(page.getByText(/choose at least one primary diagnosis/i)).toBeHidden();
   });
 
-  await test.step('And I add `GI upset` and mark it provisional', async () => {
+  await test.step('And I add `GI upset` and mark it preliminary', async () => {
     await page.getByPlaceholder('Search for a diagnosis').fill('GI upset');
     await page.getByRole('button', { name: /gi upset/i }).click();
     const giCard = page.getByRole('group', { name: /gi upset/i });
     await expect(giCard).toBeVisible();
-    // Leaving Primary unticked keeps it secondary; untick Confirmed to mark it provisional.
-    await toggleCheckbox(giCard, 'Confirmed');
-    await expect(giCard.getByRole('checkbox', { name: 'Confirmed' })).not.toBeChecked();
+    // Leaving Primary unticked keeps it secondary; the row's actions menu marks it preliminary.
+    await giCard.getByRole('button', { name: /actions for gi upset/i }).click();
+    await page.getByRole('menuitem', { name: /mark as preliminary/i }).click();
+    await expect(giCard.getByText('?', { exact: true })).toBeVisible();
   });
 
   await test.step('And I add a visit note', async () => {

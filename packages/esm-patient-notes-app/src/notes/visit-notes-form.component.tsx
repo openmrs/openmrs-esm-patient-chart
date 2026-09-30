@@ -167,7 +167,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
   const {
     control,
-    formState: { dirtyFields, isSubmitting },
+    formState: { dirtyFields, isSubmitted, isSubmitting },
     getValues,
     handleSubmit,
     setValue,
@@ -187,7 +187,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
   const {
     field: { value: selectedDiagnoses, onChange: setSelectedDiagnoses },
-    fieldState: { error: diagnosesError },
   } = useController({ name: 'diagnoses', control });
 
   const currentImages = watch('images');
@@ -489,6 +488,21 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
   const hasUserUnsavedChanges = Object.keys(dirtyFields).length > 0;
 
+  // Primary diagnoses list first; within each group the most recently added stays on top
+  // (the stored order is newest-first). The sort is stable, so only rank moves rows.
+  const orderedDiagnoses = useMemo(
+    () => [...selectedDiagnoses].sort((a, b) => Number(b.rank === 1) - Number(a.rank === 1)),
+    [selectedDiagnoses],
+  );
+
+  // The primary requirement is shown live: as soon as there are diagnoses but none is
+  // primary (or after a save attempt with nothing selected), and it clears the moment a
+  // primary is ticked. The schema still blocks the save.
+  const showPrimaryRequiredWarning =
+    isPrimaryDiagnosisRequired &&
+    !hasPrimaryDiagnosis(selectedDiagnoses) &&
+    (selectedDiagnoses.length > 0 || isSubmitted);
+
   return (
     <Workspace2
       title={isEditing ? t('editVisitNote', 'Edit visit note') : t('addVisitNote', 'Add visit note')}
@@ -569,13 +583,25 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                     t={t}
                     value={watch('diagnosisSearch')}
                   />
+                  {showPrimaryRequiredWarning && (
+                    <InlineNotification
+                      className={styles.primaryRequiredWarning}
+                      hideCloseButton
+                      kind="warning"
+                      lowContrast
+                      title={t('primaryDiagnosisRequired', 'Choose at least one primary diagnosis')}
+                    />
+                  )}
                   {selectedDiagnoses.length > 0 ? (
                     <>
                       <p className={styles.diagnosisHelperText}>
-                        {t('untickedDiagnosesHelperText', 'Unticked diagnoses are saved as secondary and provisional.')}
+                        {t(
+                          'diagnosisCertaintyHelperText',
+                          'Diagnoses are recorded as confirmed unless marked preliminary.',
+                        )}
                       </p>
                       <DiagnosisListHeader />
-                      {selectedDiagnoses.map((diagnosis) => (
+                      {orderedDiagnoses.map((diagnosis) => (
                         <SelectedDiagnosisCard
                           key={diagnosis.draftId}
                           diagnosis={diagnosis}
@@ -587,11 +613,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                   ) : (
                     <p className={styles.diagnosesText}>
                       {t('noDiagnosisSelectedText', 'No diagnosis selected — Enter a diagnosis above')}
-                    </p>
-                  )}
-                  {diagnosesError?.message && (
-                    <p className={styles.errorMessage} role="alert">
-                      {diagnosesError.message}
                     </p>
                   )}
                 </FormGroup>
