@@ -52,6 +52,7 @@ import {
   savePatientDiagnosis,
   saveVisitNote,
   updateVisitNote,
+  useDiagnosisConceptClasses,
   useVisitNotes,
 } from './visit-notes.resource';
 import SelectedDiagnosisCard, {
@@ -106,8 +107,8 @@ const SEARCH_TIMEOUT_MS = 500;
 
 /**
  * The diagnoses already recorded on the note being edited. Values outside the known enums
- * (possible from other REST writers) fall back to the same presumption the checkboxes express:
- * secondary and confirmed. Only an explicit PROVISIONAL ticks the Provisional box.
+ * (possible from other REST writers) fall back to the form's presumption: secondary and
+ * confirmed. Only an explicit PROVISIONAL shows the preliminary mark.
  */
 const toDiagnosisDrafts = (encounter: Encounter | undefined, patientUuid: string): Array<DiagnosisDraft> =>
   (encounter?.diagnoses ?? []).map(
@@ -231,9 +232,10 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   }, [debouncedSearch, watch]);
 
   const createDiagnosis = useCallback(
-    // Secondary and confirmed are the presumed defaults; the row's Primary and Provisional
-    // checkboxes record the exceptions, always as an explicit choice — nothing is
-    // auto-ticked on the clinician's behalf (O3-5823).
+    // Secondary and confirmed are the presumed defaults; the row's Primary checkbox and
+    // "Mark as preliminary" action record the exceptions, always as an explicit choice —
+    // nothing is auto-ticked on the clinician's behalf (O3-5823). The search only returns
+    // concepts of the configured diagnosis class, so the class is known without a lookup.
     (concept: Concept): DiagnosisDraft => ({
       draftId: nextDraftId(),
       display: concept.display,
@@ -243,8 +245,39 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       patient: patientUuid,
       rank: 2,
       certainty: 'CONFIRMED',
+      conceptClassUuid: config.diagnosisConceptClass,
     }),
-    [patientUuid],
+    [config.diagnosisConceptClass, patientUuid],
+  );
+
+  // Certainty is a property of diagnoses only (O3-5823 design discussion): the certainty action
+  // is offered when a row's concept is of the configured diagnosis class. Rows prefilled from the
+  // encounter being edited carry just a concept uuid, so their class is looked up once.
+  const prefilledCodedConceptUuids = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          initialDiagnoses.flatMap((diagnosis) => (diagnosis.diagnosis.coded ? [diagnosis.diagnosis.coded] : [])),
+        ),
+      ),
+    [initialDiagnoses],
+  );
+  const { conceptClassByUuid, error: conceptClassLookupError } = useDiagnosisConceptClasses(prefilledCodedConceptUuids);
+  const canMarkPreliminary = useCallback(
+    (diagnosis: DiagnosisDraft) => {
+      // A free-text diagnosis has no concept class; it is a diagnosis by the clinician's intent
+      if (!diagnosis.diagnosis.coded) {
+        return true;
+      }
+      const conceptClassUuid = diagnosis.conceptClassUuid ?? conceptClassByUuid[diagnosis.diagnosis.coded];
+      if (conceptClassUuid === undefined) {
+        // Unknown while the lookup is pending; if it failed, keep the action rather than
+        // stranding a stored preliminary diagnosis with no way to confirm it
+        return Boolean(conceptClassLookupError);
+      }
+      return conceptClassUuid === config.diagnosisConceptClass;
+    },
+    [conceptClassByUuid, conceptClassLookupError, config.diagnosisConceptClass],
   );
 
   const handleAddDiagnosis = useCallback(
@@ -597,6 +630,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                       {orderedDiagnoses.map((diagnosis) => (
                         <SelectedDiagnosisCard
                           key={diagnosis.draftId}
+                          canMarkPreliminary={canMarkPreliminary(diagnosis)}
                           diagnosis={diagnosis}
                           onRemove={handleRemoveDiagnosis}
                           onUpdate={handleUpdateDiagnosis}

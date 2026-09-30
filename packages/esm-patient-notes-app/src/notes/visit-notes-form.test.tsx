@@ -30,6 +30,7 @@ import {
   savePatientDiagnosis,
   saveVisitNote,
   updateVisitNote,
+  useDiagnosisConceptClasses,
 } from './visit-notes.resource';
 import {
   ConfigMock,
@@ -148,7 +149,11 @@ const mockSavePatientDiagnosis = vi.mocked(savePatientDiagnosis);
 const mockSaveVisitNote = vi.mocked(saveVisitNote);
 const mockShowSnackbar = vi.mocked(showSnackbar);
 const mockUpdateVisitNote = vi.mocked(updateVisitNote);
+const mockUseDiagnosisConceptClasses = vi.mocked(useDiagnosisConceptClasses);
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+
+const { diagnosisConceptClass } = getDefaultsFromConfigSchema(configSchema) as ConfigObject;
+const symptomConceptClass = 'symptom-concept-class-uuid';
 const mockUseSession = vi.mocked(useSession);
 const mockedUseFeatureFlag = vi.mocked(useFeatureFlag);
 
@@ -166,6 +171,7 @@ vi.mock('./visit-notes.resource', () => ({
     data: mockFetchProviderByUuidResponse.data.uuid,
   })),
   saveVisitNote: vi.fn(),
+  useDiagnosisConceptClasses: vi.fn(),
   useVisitNotes: vi.fn().mockImplementation(() => ({
     mutateVisitNotes: vi.fn(),
   })),
@@ -179,6 +185,12 @@ mockUseConfig.mockReturnValue({
 
 beforeEach(() => {
   mockedUseFeatureFlag.mockReturnValue(false);
+  // The edit-mode tests prefill concept '789' (Diabetes Mellitus); treat it as a true diagnosis
+  mockUseDiagnosisConceptClasses.mockReturnValue({
+    conceptClassByUuid: { '789': diagnosisConceptClass },
+    error: undefined,
+    isLoading: false,
+  });
 });
 
 test('does not render the date picker when RDE is disabled', () => {
@@ -1010,4 +1022,91 @@ test('supports selecting a diagnosis search result with the keyboard', async () 
 
   expect(screen.getByRole('group', { name: 'Diabetes Mellitus' })).toBeInTheDocument();
   expect(searchBox).toHaveFocus();
+});
+
+const mixedClassEncounter = {
+  id: '123',
+  uuid: '123',
+  datetime: '20/03/2024',
+  rawDatetime: '2024-03-20T10:00:00.000Z',
+  diagnoses: [
+    {
+      uuid: '456',
+      diagnosis: { coded: { uuid: '789', display: 'Diabetes Mellitus' } },
+      certainty: 'CONFIRMED',
+      rank: 1,
+      display: 'Diabetes Mellitus',
+    },
+    {
+      uuid: '457',
+      diagnosis: { coded: { uuid: '790', display: 'Fever' } },
+      certainty: 'PROVISIONAL',
+      rank: 2,
+      display: 'Fever',
+    },
+    {
+      uuid: '458',
+      diagnosis: { nonCoded: 'Possible dengue' },
+      certainty: 'PROVISIONAL',
+      rank: 2,
+      display: 'Possible dengue',
+    },
+  ],
+} as unknown as Encounter;
+
+test('offers the certainty action only for diagnosis-class concepts when editing', async () => {
+  const user = userEvent.setup();
+  mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
+  mockUseDiagnosisConceptClasses.mockReturnValue({
+    conceptClassByUuid: { '789': diagnosisConceptClass, '790': symptomConceptClass },
+    error: undefined,
+    isLoading: false,
+  });
+
+  renderVisitNotesForm({ formContext: 'editing', encounter: mixedClassEncounter });
+
+  // Only the coded concepts are looked up; free text has no concept class
+  expect(mockUseDiagnosisConceptClasses).toHaveBeenLastCalledWith(['789', '790']);
+
+  const diabetes = screen.getByRole('group', { name: 'Diabetes Mellitus' });
+  const fever = screen.getByRole('group', { name: 'Fever' });
+  const freeText = screen.getByRole('group', { name: 'Possible dengue' });
+  expect(actionsMenuFor(diabetes)).toBeInTheDocument();
+  // A symptom recorded as an encounter diagnosis by another form keeps its stored certainty
+  // (the preliminary mark still shows) but cannot have it changed here
+  expect(within(fever).queryByRole('button', { name: /^actions for /i })).not.toBeInTheDocument();
+  expect(isMarkedPreliminary(fever)).toBe(true);
+  // A free-text diagnosis is a diagnosis by the clinician's intent
+  expect(actionsMenuFor(freeText)).toBeInTheDocument();
+
+  // Concepts picked from the search are already of the diagnosis class: no extra lookup
+  const added = await addDiagnosis(user, 'Diabetes Mellitus, Type II');
+  expect(actionsMenuFor(added)).toBeInTheDocument();
+  expect(mockUseDiagnosisConceptClasses).toHaveBeenLastCalledWith(['789', '790']);
+});
+
+test('withholds the certainty action for prefilled concepts until their class is known', () => {
+  mockUseDiagnosisConceptClasses.mockReturnValue({ conceptClassByUuid: {}, error: undefined, isLoading: true });
+
+  renderVisitNotesForm({ formContext: 'editing', encounter: mixedClassEncounter });
+
+  expect(
+    within(screen.getByRole('group', { name: 'Diabetes Mellitus' })).queryByRole('button', { name: /^actions for /i }),
+  ).not.toBeInTheDocument();
+  // Free text never needs the lookup
+  expect(actionsMenuFor(screen.getByRole('group', { name: 'Possible dengue' }))).toBeInTheDocument();
+});
+
+test('keeps the certainty action for prefilled concepts when the class lookup fails', () => {
+  mockUseDiagnosisConceptClasses.mockReturnValue({
+    conceptClassByUuid: {},
+    error: new Error('Internal Server Error'),
+    isLoading: false,
+  });
+
+  renderVisitNotesForm({ formContext: 'editing', encounter: mixedClassEncounter });
+
+  // Better to offer the action to a symptom than to strand a stored preliminary diagnosis
+  expect(actionsMenuFor(screen.getByRole('group', { name: 'Diabetes Mellitus' }))).toBeInTheDocument();
+  expect(actionsMenuFor(screen.getByRole('group', { name: 'Fever' }))).toBeInTheDocument();
 });

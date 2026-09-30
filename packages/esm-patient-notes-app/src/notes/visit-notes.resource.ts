@@ -1,4 +1,5 @@
 import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 import useSWRInfinite from 'swr/infinite';
 import { openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
@@ -70,6 +71,30 @@ export function fetchDiagnosisConceptsByName(searchTerm: string, diagnosisConcep
   const url = `${restBaseUrl}/concept?name=${searchTerm}&searchType=fuzzy&class=${diagnosisConceptClass}&v=${customRepresentation}`;
 
   return openmrsFetch<Array<Concept>>(url).then(({ data }) => Promise.resolve(data['results']));
+}
+
+/**
+ * Concept class of each coded diagnosis already on the note being edited. The encounter handed
+ * to the form carries only each diagnosis's concept uuid and display, but the certainty action
+ * is offered for true diagnoses (the configured diagnosis concept class) only, so the class is
+ * looked up once per concept and kept for the session.
+ */
+export function useDiagnosisConceptClasses(conceptUuids: Array<string>) {
+  const { data, error, isLoading } = useSWRImmutable<Record<string, string | undefined>, Error>(
+    conceptUuids.length > 0 ? ['diagnosisConceptClasses', ...conceptUuids] : null,
+    async () => {
+      const responses = await Promise.all(
+        conceptUuids.map((uuid) =>
+          openmrsFetch<{ uuid: string; conceptClass: { uuid: string } | null }>(
+            `${restBaseUrl}/concept/${uuid}?v=custom:(uuid,conceptClass:(uuid))`,
+          ),
+        ),
+      );
+      return Object.fromEntries(responses.map(({ data }) => [data.uuid, data.conceptClass?.uuid]));
+    },
+  );
+
+  return { conceptClassByUuid: data ?? {}, error, isLoading };
 }
 
 export function saveVisitNote(abortController: AbortController, payload: VisitNotePayload) {

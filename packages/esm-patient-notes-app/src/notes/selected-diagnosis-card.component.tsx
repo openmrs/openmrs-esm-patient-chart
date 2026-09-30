@@ -15,11 +15,15 @@ import styles from './selected-diagnosis-card.scss';
  * `draftId` is a client-side identity: coded concept uuids are not unique within an
  * encounter (other writers can record the same concept twice) and non-coded diagnoses
  * have no uuid at all, so cards must not be keyed or matched by concept.
+ * `conceptClassUuid` is known up front for concepts picked from the search (which is
+ * restricted to the diagnosis class); diagnoses prefilled from an encounter leave it unset
+ * and the form looks the class up.
  */
 export type DiagnosisDraft = Omit<Diagnosis, 'rank' | 'certainty'> & {
   draftId: number;
   rank: 1 | 2;
   certainty: DiagnosisCertainty;
+  conceptClassUuid?: string;
 };
 
 let lastDraftId = 0;
@@ -46,12 +50,19 @@ export function DiagnosisListHeader() {
 }
 
 interface SelectedDiagnosisCardProps {
+  /** Only true diagnoses (by concept class) get the certainty action; symptoms and findings do not */
+  canMarkPreliminary: boolean;
   diagnosis: DiagnosisDraft;
   onRemove: (diagnosis: DiagnosisDraft) => void;
   onUpdate: (diagnosis: DiagnosisDraft, patch: Partial<Pick<DiagnosisDraft, 'rank' | 'certainty'>>) => void;
 }
 
-export default function SelectedDiagnosisCard({ diagnosis, onRemove, onUpdate }: SelectedDiagnosisCardProps) {
+export default function SelectedDiagnosisCard({
+  canMarkPreliminary,
+  diagnosis,
+  onRemove,
+  onUpdate,
+}: SelectedDiagnosisCardProps) {
   const { t } = useTranslation();
   const isPreliminary = diagnosis.certainty === 'PROVISIONAL';
 
@@ -75,24 +86,28 @@ export default function SelectedDiagnosisCard({ diagnosis, onRemove, onUpdate }:
         )}
         {diagnosis.display}
       </span>
-      {/* The diagnosis search is restricted to the configured diagnosis concept class, so
-          every row here is a true diagnosis and may be marked preliminary; symptoms and
-          findings never reach this list. */}
+      {/* Certainty belongs to diagnoses. Symptoms and findings recorded as encounter diagnoses
+          by other forms keep their stored certainty but get no action; the cell stays so the
+          grid keeps its columns. */}
       <div className={styles.actionsCell}>
-        <OverflowMenu
-          align="left"
-          aria-label={t('diagnosisActions', 'Actions for {{diagnosis}}', { diagnosis: diagnosis.display })}
-          flipped
-          iconDescription={t('diagnosisActions', 'Actions for {{diagnosis}}', { diagnosis: diagnosis.display })}
-          size="sm"
-        >
-          <OverflowMenuItem
-            itemText={
-              isPreliminary ? t('markAsConfirmed', 'Mark as confirmed') : t('markAsPreliminary', 'Mark as preliminary')
-            }
-            onClick={() => onUpdate(diagnosis, { certainty: isPreliminary ? 'CONFIRMED' : 'PROVISIONAL' })}
-          />
-        </OverflowMenu>
+        {canMarkPreliminary && (
+          <OverflowMenu
+            align="left"
+            aria-label={t('diagnosisActions', 'Actions for {{diagnosis}}', { diagnosis: diagnosis.display })}
+            flipped
+            iconDescription={t('diagnosisActions', 'Actions for {{diagnosis}}', { diagnosis: diagnosis.display })}
+            size="sm"
+          >
+            <OverflowMenuItem
+              itemText={
+                isPreliminary
+                  ? t('markAsConfirmed', 'Mark as confirmed')
+                  : t('markAsPreliminary', 'Mark as preliminary')
+              }
+              onClick={() => onUpdate(diagnosis, { certainty: isPreliminary ? 'CONFIRMED' : 'PROVISIONAL' })}
+            />
+          </OverflowMenu>
+        )}
       </div>
       <Button
         hasIconOnly
