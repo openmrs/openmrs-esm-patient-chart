@@ -38,10 +38,10 @@ test('Add, edit, and delete a visit note', async ({ page, patient }) => {
     // Nothing is auto-ticked: a diagnosis with no primary shows the live warning until
     // Primary is ticked, and certainty is confirmed by default.
     await expect(asthmaCard.getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
-    await expect(page.getByText(/choose at least one primary diagnosis/i)).toBeVisible();
+    await expect(page.getByText(/at least one diagnosis must be selected as primary/i)).toBeVisible();
     await toggleCheckbox(asthmaCard, 'Primary');
     await expect(asthmaCard.getByRole('checkbox', { name: 'Primary' })).toBeChecked();
-    await expect(page.getByText(/choose at least one primary diagnosis/i)).toBeHidden();
+    await expect(page.getByText(/at least one diagnosis must be selected as primary/i)).toBeHidden();
   });
 
   await test.step('And I add `GI upset` and mark it preliminary', async () => {

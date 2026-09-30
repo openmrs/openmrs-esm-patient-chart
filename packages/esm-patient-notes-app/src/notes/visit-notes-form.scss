@@ -173,9 +173,20 @@
   height: layout.$spacing-07;
 }
 
+// Compact warning line beneath the diagnosis list: icon + italic text (per the Talk mock)
 .primaryRequiredWarning {
+  @include type.type-style('body-compact-01');
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-02;
   margin-top: layout.$spacing-03;
-  max-width: none;
+  font-style: italic;
+  color: colors.$gray-100;
+
+  svg {
+    flex-shrink: 0;
+    fill: colors.$yellow-30;
+  }
 }
 
 .errorMessage {

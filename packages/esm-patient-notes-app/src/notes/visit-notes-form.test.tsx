@@ -310,7 +310,7 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
   await user.click(submitButton);
 
   // With nothing selected yet, the failed save reports the requirement and focuses the search input
-  expect(screen.getByText(/choose at least one primary diagnosis/i)).toBeInTheDocument();
+  expect(screen.getByText(/at least one diagnosis must be selected as primary/i)).toBeInTheDocument();
   expect(screen.getByPlaceholderText('Search for a diagnosis')).toHaveFocus();
 
   // A newly added diagnosis is never auto-ticked primary — the choice stays explicit
@@ -319,16 +319,16 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
 
   // The requirement is already showing live (a diagnosis exists, none primary); submitting
   // keeps that single warning, leaves the Primary checkbox neutral and focuses it for the fix
-  expect(screen.getAllByText(/choose at least one primary diagnosis/i)).toHaveLength(1);
+  expect(screen.getAllByText(/at least one diagnosis must be selected as primary/i)).toHaveLength(1);
   await user.click(submitButton);
-  expect(screen.getAllByText(/choose at least one primary diagnosis/i)).toHaveLength(1);
+  expect(screen.getAllByText(/at least one diagnosis must be selected as primary/i)).toHaveLength(1);
   expect(within(card).getByRole('checkbox', { name: 'Primary' })).not.toHaveAttribute('data-invalid');
   expect(within(card).getByRole('checkbox', { name: 'Primary' })).toHaveFocus();
   expect(mockSaveVisitNote).not.toHaveBeenCalled();
 
   // Ticking Primary clears the error without another submit; certainty stays confirmed
   await user.click(within(card).getByRole('checkbox', { name: 'Primary' }));
-  expect(screen.queryByText(/choose at least one primary diagnosis/i)).not.toBeInTheDocument();
+  expect(screen.queryByText(/at least one diagnosis must be selected as primary/i)).not.toBeInTheDocument();
 
   await user.clear(clinicalNote);
   await user.type(clinicalNote, 'Sample clinical note');
@@ -729,7 +729,7 @@ test('allows saving visit note without primary diagnosis when isPrimaryDiagnosis
   await user.click(submitButton);
 
   // Should not show validation error for missing primary diagnosis
-  expect(screen.queryByText(/choose at least one primary diagnosis/i)).not.toBeInTheDocument();
+  expect(screen.queryByText(/at least one diagnosis must be selected as primary/i)).not.toBeInTheDocument();
 
   // Should successfully save the visit note
   expect(mockSaveVisitNote).toHaveBeenCalledTimes(1);
@@ -763,7 +763,7 @@ test('requires primary diagnosis when isPrimaryDiagnosisRequired is true', async
   await user.click(submitButton);
 
   // Should show validation error for missing primary diagnosis
-  expect(screen.getByText(/choose at least one primary diagnosis/i)).toBeInTheDocument();
+  expect(screen.getByText(/at least one diagnosis must be selected as primary/i)).toBeInTheDocument();
 
   // Should not attempt to save
   expect(mockSaveVisitNote).not.toHaveBeenCalled();
@@ -775,7 +775,7 @@ test('requires primary diagnosis when isPrimaryDiagnosisRequired is true', async
   const topCard = await addDiagnosis(user, 'Diabetes Mellitus, Type II', { primary: false });
   await user.click(submitButton);
 
-  expect(screen.getAllByText(/choose at least one primary diagnosis/i)).toHaveLength(1);
+  expect(screen.getAllByText(/at least one diagnosis must be selected as primary/i)).toHaveLength(1);
   expect(within(firstCard).getByRole('checkbox', { name: 'Primary' })).not.toHaveAttribute('data-invalid');
   expect(within(topCard).getByRole('checkbox', { name: 'Primary' })).not.toHaveAttribute('data-invalid');
   expect(within(topCard).getByRole('checkbox', { name: 'Primary' })).toHaveFocus();
@@ -783,7 +783,7 @@ test('requires primary diagnosis when isPrimaryDiagnosisRequired is true', async
 
   // Ticking any primary clears the group message without another submit
   await user.click(within(firstCard).getByRole('checkbox', { name: 'Primary' }));
-  expect(screen.queryByText(/choose at least one primary diagnosis/i)).not.toBeInTheDocument();
+  expect(screen.queryByText(/at least one diagnosis must be selected as primary/i)).not.toBeInTheDocument();
 
   // Reset mock for other tests
   mockUseConfig.mockReturnValue({
@@ -920,13 +920,13 @@ test('shows the primary-required warning live and keeps saving blocked until a p
   renderVisitNotesForm();
 
   // Nothing to warn about before any diagnosis is added
-  expect(screen.queryByText(/choose at least one primary diagnosis/i)).not.toBeInTheDocument();
+  expect(screen.queryByText(/at least one diagnosis must be selected as primary/i)).not.toBeInTheDocument();
 
   // The warning appears as soon as diagnoses exist with none primary — before any save attempt
   const firstCard = await addDiagnosis(user, 'Diabetes Mellitus', { primary: false });
-  expect(screen.getAllByText(/choose at least one primary diagnosis/i)).toHaveLength(1);
+  expect(screen.getAllByText(/at least one diagnosis must be selected as primary/i)).toHaveLength(1);
   const topCard = await addDiagnosis(user, 'Diabetes Mellitus, Type II', { primary: false });
-  expect(screen.getAllByText(/choose at least one primary diagnosis/i)).toHaveLength(1);
+  expect(screen.getAllByText(/at least one diagnosis must be selected as primary/i)).toHaveLength(1);
 
   // Saving is still blocked; the failed save focuses the topmost card's Primary
   await user.click(screen.getByRole('button', { name: /save and close/i }));
@@ -935,9 +935,11 @@ test('shows the primary-required warning live and keeps saving blocked until a p
 
   // Ticking any primary clears it; unticking the last primary brings it straight back
   await user.click(within(firstCard).getByRole('checkbox', { name: 'Primary' }));
-  await waitFor(() => expect(screen.queryByText(/choose at least one primary diagnosis/i)).not.toBeInTheDocument());
+  await waitFor(() =>
+    expect(screen.queryByText(/at least one diagnosis must be selected as primary/i)).not.toBeInTheDocument(),
+  );
   await user.click(within(firstCard).getByRole('checkbox', { name: 'Primary' }));
-  expect(await screen.findByText(/choose at least one primary diagnosis/i)).toBeInTheDocument();
+  expect(await screen.findByText(/at least one diagnosis must be selected as primary/i)).toBeInTheDocument();
 });
 
 test('lists primary diagnoses first and the newest of the rest on top', async () => {

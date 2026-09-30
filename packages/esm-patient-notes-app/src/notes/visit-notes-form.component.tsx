@@ -23,7 +23,7 @@ import {
   TextArea,
   Tile,
 } from '@carbon/react';
-import { Add, CloseFilled } from '@carbon/react/icons';
+import { Add, CloseFilled, WarningFilled } from '@carbon/react/icons';
 import {
   createAttachment,
   createErrorHandler,
@@ -95,7 +95,7 @@ const createSchema = (t: TFunction, isRetrospectiveDataEntryEnabled: boolean, is
     diagnoses: z
       .array(z.custom<DiagnosisDraft>())
       .refine((diagnoses) => !isPrimaryDiagnosisRequired || hasPrimaryDiagnosis(diagnoses), {
-        message: t('primaryDiagnosisRequired', 'Choose at least one primary diagnosis'),
+        message: t('atLeastOnePrimaryDiagnosis', 'At least one diagnosis must be selected as primary'),
       }),
     clinicalNote: z.string().optional(),
     images: z.array(z.any()).optional(),
@@ -583,15 +583,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                     t={t}
                     value={watch('diagnosisSearch')}
                   />
-                  {showPrimaryRequiredWarning && (
-                    <InlineNotification
-                      className={styles.primaryRequiredWarning}
-                      hideCloseButton
-                      kind="warning"
-                      lowContrast
-                      title={t('primaryDiagnosisRequired', 'Choose at least one primary diagnosis')}
-                    />
-                  )}
                   {selectedDiagnoses.length > 0 ? (
                     <>
                       <p className={styles.diagnosisHelperText}>
@@ -613,6 +604,12 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                   ) : (
                     <p className={styles.diagnosesText}>
                       {t('noDiagnosisSelectedText', 'No diagnosis selected — Enter a diagnosis above')}
+                    </p>
+                  )}
+                  {showPrimaryRequiredWarning && (
+                    <p className={styles.primaryRequiredWarning} role="status">
+                      <WarningFilled aria-hidden="true" size={16} />
+                      {t('atLeastOnePrimaryDiagnosis', 'At least one diagnosis must be selected as primary')}
                     </p>
                   )}
                 </FormGroup>
