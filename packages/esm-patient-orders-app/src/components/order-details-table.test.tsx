@@ -6,6 +6,7 @@ import userEvent from '@testing-library/user-event';
 import {
   type ConfigObject,
   getDefaultsFromConfigSchema,
+  launchWorkspace2,
   openmrsFetch,
   useConfig,
   useSession,
@@ -29,6 +30,7 @@ const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 const mockSession = vi.mocked(useSession);
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const mockUseReactToPrint = vi.mocked(useReactToPrint);
+const mockLaunchWorkspace2 = vi.mocked(launchWorkspace2);
 
 mockSession.mockReturnValue(mockSessionDataResponse.data);
 mockOpenmrsFetch.mockImplementation(vi.fn());
@@ -583,6 +585,33 @@ describe('OrderDetailsTable', () => {
     await screen.findByRole('table');
 
     expect(screen.getByRole('button', { name: /actions menu/i })).toBeInTheDocument();
+  });
+
+  it('passes a visit context refresh function to the order basket when cancelling an order', async () => {
+    mockUsePatientOrders.mockReturnValue({
+      data: [mockOrders[1]] as unknown as Array<Order>,
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+
+    renderOrderDetailsTable();
+
+    await screen.findByRole('table');
+    await user.click(screen.getByRole('button', { name: /actions menu/i }));
+    const menuItems = screen.getAllByRole('menuitem', { hidden: true });
+    await user.click(menuItems.find((item) => /cancel order/i.test(item.textContent)));
+
+    expect(mockLaunchWorkspace2).toHaveBeenCalledWith(
+      'order-basket',
+      {},
+      expect.anything(),
+      expect.objectContaining({
+        visitContext: mockOrders[1].encounter.visit,
+        mutateVisitContext: expect.any(Function),
+      }),
+    );
   });
 });
 
