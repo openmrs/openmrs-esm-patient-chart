@@ -55,6 +55,12 @@ $diagnosis-columns: 3rem minmax(0, 1fr) 2rem 2rem;
   justify-content: center;
 }
 
+// Carbon caps each menu item at 11.25rem, which leaves a gutter inside the wider O3 menu;
+// let the items span the whole menu instead
+.diagnosisActionsMenu :global(.cds--overflow-menu-options__btn) {
+  max-inline-size: none;
+}
+
 .diagnosisName {
   @include type.type-style('body-compact-01');
   min-width: 0;

@@ -233,6 +233,8 @@ test('renders the visit notes form with all the relevant fields and values', () 
   expect(screen.getByText('Add visit note', { exact: true })).toBeInTheDocument();
   expect(screen.getByRole('textbox', { name: /write your notes/i })).toBeInTheDocument();
   expect(screen.getByRole('searchbox', { name: /search for a diagnosis to add/i })).toBeInTheDocument();
+  // A primary diagnosis is required by default, so the field is marked required
+  expect(screen.getByTitle('Required')).toBeInTheDocument();
   // The defaults helper text only appears once a diagnosis has been added
   expect(screen.queryByText(/diagnoses are recorded as confirmed unless marked preliminary/i)).not.toBeInTheDocument();
   expect(screen.getByRole('button', { name: /add image/i })).toBeInTheDocument();
@@ -274,8 +276,9 @@ test('typing in the diagnosis search input triggers a search', async () => {
 
   // Clicking the remove button on the card removes the selected diagnosis
   await user.click(within(card).getByRole('button', { name: /remove diabetes mellitus/i }));
-  // no selected diagnoses left
-  expect(screen.getByText(/No diagnosis selected — Enter a diagnosis above/i)).toBeInTheDocument();
+  // no selected diagnoses left, and no placeholder line takes their place
+  expect(screen.queryByRole('group', { name: 'Diabetes Mellitus' })).not.toBeInTheDocument();
+  expect(screen.queryByText(/no diagnosis selected/i)).not.toBeInTheDocument();
 });
 
 test('renders an error message when no matching diagnoses are found', async () => {
@@ -642,7 +645,7 @@ test('handles existing diagnoses correctly when in edit mode', async () => {
   await user.click(screen.getByRole('button', { name: /remove diabetes mellitus/i }));
 
   // Verify no diagnoses are selected
-  expect(screen.getByText(/No diagnosis selected — Enter a diagnosis above/i)).toBeInTheDocument();
+  expect(screen.queryByRole('group', { name: 'Diabetes Mellitus' })).not.toBeInTheDocument();
 
   // Add new diagnosis
   await addDiagnosis(user, 'Diabetes Mellitus');
@@ -753,6 +756,8 @@ test('allows saving visit note without primary diagnosis when isPrimaryDiagnosis
   mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
 
   renderVisitNotesForm();
+  // With no primary requirement the diagnosis field is not marked required
+  expect(screen.queryByTitle('Required')).not.toBeInTheDocument();
 
   const clinicalNote = screen.getByRole('textbox', { name: /Write your notes/i });
   await user.clear(clinicalNote);

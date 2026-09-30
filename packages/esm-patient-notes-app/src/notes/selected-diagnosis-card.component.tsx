@@ -96,6 +96,7 @@ export default function SelectedDiagnosisCard({
             aria-label={t('diagnosisActions', 'Actions for {{diagnosis}}', { diagnosis: diagnosis.display })}
             flipped
             iconDescription={t('diagnosisActions', 'Actions for {{diagnosis}}', { diagnosis: diagnosis.display })}
+            menuOptionsClass={styles.diagnosisActionsMenu}
             size="sm"
           >
             <OverflowMenuItem

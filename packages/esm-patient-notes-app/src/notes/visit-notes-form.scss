@@ -12,6 +12,12 @@
   color: colors.$gray-70;
 }
 
+// Marks the diagnosis field as required when the distro demands a primary diagnosis
+.required {
+  color: colors.$red-60;
+  margin-left: layout.$spacing-01;
+}
+
 .diagnosis {
   border-top: 0.0625rem solid colors.$gray-20;
 }
@@ -49,12 +55,6 @@
 
 .diagnosisList li:hover {
   background-color: colors.$gray-20;
-}
-
-.diagnosesText {
-  @include type.type-style('body-compact-01');
-  color: colors.$gray-70;
-  margin: layout.$spacing-03 0 layout.$spacing-05;
 }
 
 .emptyResults {
@@ -208,7 +208,6 @@
   align-items: center;
   gap: layout.$spacing-02;
   margin-top: layout.$spacing-03;
-  font-style: italic;
   color: colors.$gray-100;
 
   svg {

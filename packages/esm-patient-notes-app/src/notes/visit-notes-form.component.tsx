@@ -683,7 +683,14 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
             )}
             <Row className={styles.row}>
               <Column sm={1}>
-                <span className={styles.columnLabel}>{t('diagnosis', 'Diagnosis')}</span>
+                <span className={styles.columnLabel}>
+                  {t('diagnosis', 'Diagnosis')}
+                  {isPrimaryDiagnosisRequired && (
+                    <span title={t('required', 'Required')} className={styles.required}>
+                      *
+                    </span>
+                  )}
+                </span>
               </Column>
               <Column sm={3}>
                 <FormGroup legendText="">
@@ -713,7 +720,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                     t={t}
                     value={watch('diagnosisSearch')}
                   />
-                  {selectedDiagnoses.length > 0 ? (
+                  {/* An empty list needs no placeholder line: the search prompt above already says what to do */}
+                  {selectedDiagnoses.length > 0 && (
                     <>
                       <p className={styles.diagnosisHelperText}>
                         {t(
@@ -732,10 +740,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                         />
                       ))}
                     </>
-                  ) : (
-                    <p className={styles.diagnosesText}>
-                      {t('noDiagnosisSelectedText', 'No diagnosis selected — Enter a diagnosis above')}
-                    </p>
                   )}
                   {showPrimaryRequiredWarning && (
                     <p
