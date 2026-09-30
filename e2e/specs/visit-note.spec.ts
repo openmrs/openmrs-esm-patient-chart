@@ -44,14 +44,14 @@ test('Add, edit, and delete a visit note', async ({ page, patient }) => {
     await expect(page.getByText(/at least one diagnosis must be selected as primary/i)).toBeHidden();
   });
 
-  await test.step('And I add `GI upset` and mark it preliminary', async () => {
+  await test.step('And I add `GI upset` and mark it provisional', async () => {
     await page.getByPlaceholder('Search for a diagnosis').fill('GI upset');
     await page.getByRole('button', { name: /gi upset/i }).click();
     const giCard = page.getByRole('group', { name: /gi upset/i });
     await expect(giCard).toBeVisible();
-    // Leaving Primary unticked keeps it secondary; the row's actions menu marks it preliminary.
+    // Leaving Primary unticked keeps it secondary; the row's actions menu marks it provisional.
     await giCard.getByRole('button', { name: /actions for gi upset/i }).click();
-    await page.getByRole('menuitem', { name: /mark as preliminary/i }).click();
+    await page.getByRole('menuitem', { name: /mark as provisional/i }).click();
     await expect(giCard.getByText('?', { exact: true })).toBeVisible();
   });
 

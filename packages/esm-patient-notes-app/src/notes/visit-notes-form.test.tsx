@@ -104,9 +104,9 @@ function actionsMenuFor(card: HTMLElement) {
   return within(card).getByRole('button', { name: /^actions for /i });
 }
 
-/** A preliminary (provisional) row carries a visually hidden "Preliminary" label beside its "?" */
-function isMarkedPreliminary(card: HTMLElement) {
-  return within(card).queryByText('Preliminary') !== null;
+/** A provisional row carries a visually hidden "Provisional" label beside its "?" */
+function isMarkedProvisional(card: HTMLElement) {
+  return within(card).queryByText('Provisional') !== null;
 }
 
 /**
@@ -114,9 +114,9 @@ function isMarkedPreliminary(card: HTMLElement) {
  * stays visibility: hidden until it is positioned, which empties the menu item's computed
  * accessible name in the test DOM, so the item is targeted by its text.
  */
-async function setCertainty(user: ReturnType<typeof userEvent.setup>, card: HTMLElement, preliminary: boolean) {
+async function setCertainty(user: ReturnType<typeof userEvent.setup>, card: HTMLElement, provisional: boolean) {
   await user.click(actionsMenuFor(card));
-  await user.click(screen.getByText(preliminary ? /mark as preliminary/i : /mark as confirmed/i));
+  await user.click(screen.getByText(provisional ? /mark as provisional/i : /mark as confirmed/i));
 }
 
 /**
@@ -127,7 +127,7 @@ async function setCertainty(user: ReturnType<typeof userEvent.setup>, card: HTML
 async function addDiagnosis(
   user: ReturnType<typeof userEvent.setup>,
   name: string,
-  { primary, preliminary }: { primary?: boolean; preliminary?: boolean } = {},
+  { primary, provisional }: { primary?: boolean; provisional?: boolean } = {},
 ) {
   const searchBox = screen.getByPlaceholderText('Search for a diagnosis');
   await user.clear(searchBox);
@@ -145,8 +145,8 @@ async function addDiagnosis(
   if (primary != null) {
     await setCheckbox('Primary', primary);
   }
-  if (preliminary != null && preliminary !== isMarkedPreliminary(card)) {
-    await setCertainty(user, card, preliminary);
+  if (provisional != null && provisional !== isMarkedProvisional(card)) {
+    await setCertainty(user, card, provisional);
   }
   return card;
 }
@@ -236,7 +236,7 @@ test('renders the visit notes form with all the relevant fields and values', () 
   // A primary diagnosis is required by default, so the field is marked required
   expect(screen.getByTitle('Required')).toBeInTheDocument();
   // The defaults helper text only appears once a diagnosis has been added
-  expect(screen.queryByText(/diagnoses are recorded as confirmed unless marked preliminary/i)).not.toBeInTheDocument();
+  expect(screen.queryByText(/diagnoses are recorded as confirmed unless marked provisional/i)).not.toBeInTheDocument();
   expect(screen.getByRole('button', { name: /add image/i })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /discard/i })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /save and close/i })).toBeInTheDocument();
@@ -259,19 +259,19 @@ test('typing in the diagnosis search input triggers a search', async () => {
 
   // Clicking a search result displays the selected diagnosis as a card under the shared
   // Primary column header. Nothing is auto-marked primary and certainty is confirmed by
-  // default, so Primary starts unticked (secondary) and no preliminary mark is shown
+  // default, so Primary starts unticked (secondary) and no provisional mark is shown
   await user.click(targetSearchResult);
   const card = screen.getByRole('group', { name: 'Diabetes Mellitus' });
-  expect(screen.getByText(/diagnoses are recorded as confirmed unless marked preliminary/i)).toBeInTheDocument();
+  expect(screen.getByText(/diagnoses are recorded as confirmed unless marked provisional/i)).toBeInTheDocument();
   expect(within(card).getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
   expect(within(card).queryByRole('checkbox', { name: 'Confirmed' })).not.toBeInTheDocument();
-  expect(isMarkedPreliminary(card)).toBe(false);
+  expect(isMarkedProvisional(card)).toBe(false);
 
-  // Ticking Primary promotes it; the row's actions menu marks it preliminary (a leading "?")
+  // Ticking Primary promotes it; the row's actions menu marks it provisional (a leading "?")
   await user.click(within(card).getByRole('checkbox', { name: 'Primary' }));
   await setCertainty(user, card, true);
   expect(within(card).getByRole('checkbox', { name: 'Primary' })).toBeChecked();
-  expect(isMarkedPreliminary(card)).toBe(true);
+  expect(isMarkedProvisional(card)).toBe(true);
   expect(within(card).getByText('?')).toBeInTheDocument();
 
   // Clicking the remove button on the card removes the selected diagnosis
@@ -531,10 +531,10 @@ test('initializes form with existing encounter data when in edit mode', () => {
   expect(screen.getByRole('textbox', { name: /write your notes/i })).toHaveValue('Existing clinical note');
 
   // Verify diagnosis is pre-filled from its stored rank and certainty: rank 1 ticks
-  // Primary, and the stored PROVISIONAL shows the preliminary mark
+  // Primary, and the stored PROVISIONAL shows the provisional mark
   const card = screen.getByRole('group', { name: 'Diabetes Mellitus' });
   expect(within(card).getByRole('checkbox', { name: 'Primary' })).toBeChecked();
-  expect(isMarkedPreliminary(card)).toBe(true);
+  expect(isMarkedProvisional(card)).toBe(true);
 });
 
 test('updates existing visit note when in edit mode', async () => {
@@ -689,11 +689,11 @@ test('preserves CONFIRMED certainty on diagnoses when re-saving a visit note in 
     encounter: mockEncounter as unknown as Encounter,
   });
 
-  // A stored CONFIRMED diagnosis carries no preliminary mark
+  // A stored CONFIRMED diagnosis carries no provisional mark
   const card = screen.getByRole('group', { name: 'Diabetes Mellitus' });
-  expect(isMarkedPreliminary(card)).toBe(false);
+  expect(isMarkedProvisional(card)).toBe(false);
 
-  // Marking it preliminary and then confirmed again leaves the diagnoses unchanged, so Save
+  // Marking it provisional and then confirmed again leaves the diagnoses unchanged, so Save
   // stays disabled until a real edit is made; the original CONFIRMED value must still be sent
   await setCertainty(user, card, true);
   expect(screen.getByRole('button', { name: /Save and close/i })).toBeEnabled();
@@ -1456,10 +1456,10 @@ test('presumes secondary and confirmed for out-of-enum rank and certainty from o
   });
 
   // Out-of-enum values fall back to the presumed defaults: secondary (Primary unticked)
-  // and confirmed (no preliminary mark)
+  // and confirmed (no provisional mark)
   const card = screen.getByRole('group', { name: 'Diabetes Mellitus' });
   expect(within(card).getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
-  expect(isMarkedPreliminary(card)).toBe(false);
+  expect(isMarkedProvisional(card)).toBe(false);
 
   // Saving proceeds with the presumed values rather than blocking on a per-card choice
   const clinicalNote = screen.getByRole('textbox', { name: /Write your notes/i });
@@ -1483,7 +1483,7 @@ test('presumes secondary and confirmed for out-of-enum rank and certainty from o
   });
 });
 
-test('saves the confirmed default and records a diagnosis marked preliminary as provisional', async () => {
+test('saves the confirmed default and records a diagnosis marked provisional as PROVISIONAL', async () => {
   const user = userEvent.setup();
 
   mockSaveVisitNote.mockResolvedValueOnce({
@@ -1494,9 +1494,9 @@ test('saves the confirmed default and records a diagnosis marked preliminary as 
 
   renderVisitNotesForm();
 
-  // One primary diagnosis (confirmed by default), one secondary marked preliminary
+  // One primary diagnosis (confirmed by default), one secondary marked provisional
   await addDiagnosis(user, 'Diabetes Mellitus', { primary: true });
-  await addDiagnosis(user, 'Diabetes Mellitus, Type II', { preliminary: true });
+  await addDiagnosis(user, 'Diabetes Mellitus, Type II', { provisional: true });
 
   await user.type(screen.getByRole('textbox', { name: /Write your notes/i }), 'Sample clinical note');
   await user.click(screen.getByRole('button', { name: /save and close/i }));
@@ -1508,7 +1508,7 @@ test('saves the confirmed default and records a diagnosis marked preliminary as 
       expect.objectContaining({ certainty: 'CONFIRMED', rank: 1 }),
     ),
   );
-  // Marking the secondary preliminary transmits the PROVISIONAL certainty
+  // Marking the secondary provisional transmits the PROVISIONAL certainty
   expect(mockSavePatientDiagnosis).toHaveBeenCalledWith(
     expect.any(AbortController),
     expect.objectContaining({ certainty: 'PROVISIONAL', rank: 2 }),
@@ -1516,7 +1516,7 @@ test('saves the confirmed default and records a diagnosis marked preliminary as 
   expect(mockSavePatientDiagnosis).toHaveBeenCalledTimes(2);
 });
 
-test('marks Primary and preliminary independently across multiple diagnosis cards', async () => {
+test('marks Primary and provisional independently across multiple diagnosis cards', async () => {
   const user = userEvent.setup();
 
   mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
@@ -1527,13 +1527,13 @@ test('marks Primary and preliminary independently across multiple diagnosis card
   const firstCard = await addDiagnosis(user, 'Diabetes Mellitus', { primary: true });
   const secondCard = await addDiagnosis(user, 'Diabetes Mellitus, Type II');
 
-  // Marking the first card preliminary through its actions menu does not touch the second
+  // Marking the first card provisional through its actions menu does not touch the second
   await setCertainty(user, firstCard, true);
 
   expect(within(firstCard).getByRole('checkbox', { name: 'Primary' })).toBeChecked();
-  expect(isMarkedPreliminary(firstCard)).toBe(true);
+  expect(isMarkedProvisional(firstCard)).toBe(true);
   expect(within(secondCard).getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
-  expect(isMarkedPreliminary(secondCard)).toBe(false);
+  expect(isMarkedProvisional(secondCard)).toBe(false);
 
   // Unticking Primary returns the first to secondary, without affecting the other card
   await user.click(within(firstCard).getByRole('checkbox', { name: 'Primary' }));
@@ -1682,9 +1682,9 @@ test('offers the certainty action only for diagnosis-class concepts when editing
   const freeText = screen.getByRole('group', { name: 'Possible dengue' });
   expect(actionsMenuFor(diabetes)).toBeInTheDocument();
   // A symptom recorded as an encounter diagnosis by another form keeps its stored certainty
-  // (the preliminary mark still shows) but cannot have it changed here
+  // (the provisional mark still shows) but cannot have it changed here
   expect(within(fever).queryByRole('button', { name: /^actions for /i })).not.toBeInTheDocument();
-  expect(isMarkedPreliminary(fever)).toBe(true);
+  expect(isMarkedProvisional(fever)).toBe(true);
   // A free-text diagnosis is a diagnosis by the clinician's intent
   expect(actionsMenuFor(freeText)).toBeInTheDocument();
 
@@ -1715,7 +1715,7 @@ test('keeps the certainty action for prefilled concepts when the class lookup fa
 
   renderVisitNotesForm({ formContext: 'editing', encounter: mixedClassEncounter });
 
-  // Better to offer the action to a symptom than to strand a stored preliminary diagnosis
+  // Better to offer the action to a symptom than to strand a stored provisional diagnosis
   expect(actionsMenuFor(screen.getByRole('group', { name: 'Diabetes Mellitus' }))).toBeInTheDocument();
   expect(actionsMenuFor(screen.getByRole('group', { name: 'Fever' }))).toBeInTheDocument();
 });

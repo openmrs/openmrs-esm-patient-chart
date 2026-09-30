@@ -10,7 +10,7 @@ import styles from './selected-diagnosis-card.scss';
  * every diagnosis is confirmed and secondary until the clinician says otherwise, so an
  * untouched diagnosis is immediately saveable. Primary is a checkbox (at least one is
  * required when the distro says so); certainty is changed through the row's actions
- * menu ("Mark as preliminary" / "Mark as confirmed"), which is also where future
+ * menu ("Mark as provisional" / "Mark as confirmed"), which is also where future
  * per-diagnosis actions belong (O3-5823 design discussion on Talk).
  * `draftId` is a client-side identity: coded concept uuids are not unique within an
  * encounter (other writers can record the same concept twice) and non-coded diagnoses
@@ -51,20 +51,20 @@ export function DiagnosisListHeader() {
 
 interface SelectedDiagnosisCardProps {
   /** Only true diagnoses (by concept class) get the certainty action; symptoms and findings do not */
-  canMarkPreliminary: boolean;
+  canMarkProvisional: boolean;
   diagnosis: DiagnosisDraft;
   onRemove: (diagnosis: DiagnosisDraft) => void;
   onUpdate: (diagnosis: DiagnosisDraft, patch: Partial<Pick<DiagnosisDraft, 'rank' | 'certainty'>>) => void;
 }
 
 export default function SelectedDiagnosisCard({
-  canMarkPreliminary,
+  canMarkProvisional,
   diagnosis,
   onRemove,
   onUpdate,
 }: SelectedDiagnosisCardProps) {
   const { t } = useTranslation();
-  const isPreliminary = diagnosis.certainty === 'PROVISIONAL';
+  const isProvisional = diagnosis.certainty === 'PROVISIONAL';
 
   return (
     <div className={styles.diagnosisRow} role="group" aria-label={diagnosis.display}>
@@ -76,12 +76,12 @@ export default function SelectedDiagnosisCard({
         onChange={(_, { checked }) => onUpdate(diagnosis, { rank: checked ? 1 : 2 })}
       />
       <span className={styles.diagnosisName}>
-        {isPreliminary && (
+        {isProvisional && (
           <>
-            <span aria-hidden="true" className={styles.preliminaryMark}>
+            <span aria-hidden="true" className={styles.provisionalMark}>
               ?
             </span>
-            <span className="cds--visually-hidden">{t('preliminary', 'Preliminary')} </span>
+            <span className="cds--visually-hidden">{t('provisional', 'Provisional')} </span>
           </>
         )}
         {diagnosis.display}
@@ -90,7 +90,7 @@ export default function SelectedDiagnosisCard({
           by other forms keep their stored certainty but get no action; the cell stays so the
           grid keeps its columns. */}
       <div className={styles.actionsCell}>
-        {canMarkPreliminary && (
+        {canMarkProvisional && (
           <OverflowMenu
             align="left"
             aria-label={t('diagnosisActions', 'Actions for {{diagnosis}}', { diagnosis: diagnosis.display })}
@@ -101,11 +101,11 @@ export default function SelectedDiagnosisCard({
           >
             <OverflowMenuItem
               itemText={
-                isPreliminary
+                isProvisional
                   ? t('markAsConfirmed', 'Mark as confirmed')
-                  : t('markAsPreliminary', 'Mark as preliminary')
+                  : t('markAsProvisional', 'Mark as provisional')
               }
-              onClick={() => onUpdate(diagnosis, { certainty: isPreliminary ? 'CONFIRMED' : 'PROVISIONAL' })}
+              onClick={() => onUpdate(diagnosis, { certainty: isProvisional ? 'CONFIRMED' : 'PROVISIONAL' })}
             />
           </OverflowMenu>
         )}

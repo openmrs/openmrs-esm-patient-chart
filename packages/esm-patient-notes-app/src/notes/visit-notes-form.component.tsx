@@ -111,7 +111,7 @@ const SEARCH_TIMEOUT_MS = 500;
 /**
  * The diagnoses already recorded on the note being edited. Values outside the known enums
  * (possible from other REST writers) fall back to the form's presumption: secondary and
- * confirmed. Only an explicit PROVISIONAL shows the preliminary mark.
+ * confirmed. Only an explicit PROVISIONAL shows the provisional mark.
  */
 const toDiagnosisDrafts = (encounter: Encounter | undefined, patientUuid: string): Array<DiagnosisDraft> =>
   (encounter?.diagnoses ?? []).map(
@@ -260,7 +260,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
   const createDiagnosis = useCallback(
     // Secondary and confirmed are the presumed defaults; the row's Primary checkbox and
-    // "Mark as preliminary" action record the exceptions, always as an explicit choice —
+    // "Mark as provisional" action record the exceptions, always as an explicit choice —
     // nothing is auto-ticked on the clinician's behalf (O3-5823). The search only returns
     // concepts of the configured diagnosis class, so the class is known without a lookup.
     (concept: Concept): DiagnosisDraft => ({
@@ -290,7 +290,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     [initialDiagnoses],
   );
   const { conceptClassByUuid, error: conceptClassLookupError } = useDiagnosisConceptClasses(prefilledCodedConceptUuids);
-  const canMarkPreliminary = useCallback(
+  const canMarkProvisional = useCallback(
     (diagnosis: DiagnosisDraft) => {
       // A free-text diagnosis has no concept class; it is a diagnosis by the clinician's intent
       if (!diagnosis.diagnosis.coded) {
@@ -299,7 +299,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       const conceptClassUuid = diagnosis.conceptClassUuid ?? conceptClassByUuid[diagnosis.diagnosis.coded];
       if (conceptClassUuid === undefined) {
         // Unknown while the lookup is pending; if it failed, keep the action rather than
-        // stranding a stored preliminary diagnosis with no way to confirm it
+        // stranding a stored provisional diagnosis with no way to confirm it
         return Boolean(conceptClassLookupError);
       }
       return conceptClassUuid === config.diagnosisConceptClass;
@@ -726,14 +726,14 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                       <p className={styles.diagnosisHelperText}>
                         {t(
                           'diagnosisCertaintyHelperText',
-                          'Diagnoses are recorded as confirmed unless marked preliminary.',
+                          'Diagnoses are recorded as confirmed unless marked provisional.',
                         )}
                       </p>
                       <DiagnosisListHeader />
                       {orderedDiagnoses.map((diagnosis) => (
                         <SelectedDiagnosisCard
                           key={diagnosis.draftId}
-                          canMarkPreliminary={canMarkPreliminary(diagnosis)}
+                          canMarkProvisional={canMarkProvisional(diagnosis)}
                           diagnosis={diagnosis}
                           onRemove={handleRemoveDiagnosis}
                           onUpdate={handleUpdateDiagnosis}

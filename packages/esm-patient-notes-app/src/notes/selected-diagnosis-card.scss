@@ -67,8 +67,8 @@ $diagnosis-columns: 3rem minmax(0, 1fr) 2rem 2rem;
   overflow-wrap: anywhere;
 }
 
-// Leading "?" marks a preliminary (provisional) diagnosis
-.preliminaryMark {
+// Leading "?" marks a provisional diagnosis
+.provisionalMark {
   @include type.type-style('heading-compact-01');
   margin-inline-end: layout.$spacing-02;
   color: $text-02;
