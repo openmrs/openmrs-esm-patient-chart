@@ -80,6 +80,7 @@ export default function SelectedDiagnosisCard({ diagnosis, onRemove, onUpdate }:
           findings never reach this list. */}
       <div className={styles.actionsCell}>
         <OverflowMenu
+          align="left"
           aria-label={t('diagnosisActions', 'Actions for {{diagnosis}}', { diagnosis: diagnosis.display })}
           flipped
           iconDescription={t('diagnosisActions', 'Actions for {{diagnosis}}', { diagnosis: diagnosis.display })}
