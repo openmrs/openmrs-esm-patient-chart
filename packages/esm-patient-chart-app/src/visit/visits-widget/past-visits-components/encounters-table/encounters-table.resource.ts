@@ -109,19 +109,12 @@ export function useEncounterTypes() {
   });
 }
 
-/**
- * Maps an encounter to a MappedEncounter. This function includes a side-effect
- * onto the input encounter to sanitize its diagnoses.
- * TODO: move the sanitizing to server side
- */
 export function mapEncounter(encounter: Encounter): MappedEncounter {
-  encounter.diagnoses =
-    encounter.diagnoses
-      ?.filter((diagnosis) => !diagnosis.voided)
-      .map((diagnosis) => ({
-        ...diagnosis,
-        certainty: diagnosis.certainty || 'PROVISIONAL',
-      })) || [];
+  const diagnoses =
+    encounter?.diagnoses?.map((diagnosis) => ({
+      ...diagnosis,
+      certainty: diagnosis.certainty ?? 'CONFIRMED',
+    })) || [];
 
   return {
     id: encounter.uuid,
@@ -129,7 +122,7 @@ export function mapEncounter(encounter: Encounter): MappedEncounter {
       noToday: true,
     }),
     rawDatetime: encounter.encounterDatetime,
-    diagnoses: encounter.diagnoses,
+    diagnoses,
     encounterType: encounter.encounterType?.display,
     editPrivilege: encounter.encounterType?.editPrivilege?.display,
     form: encounter.form as Form,
@@ -142,7 +135,7 @@ export function mapEncounter(encounter: Encounter): MappedEncounter {
     visitType: encounter.visit?.visitType?.display ?? '--',
     visitTypeUuid: encounter.visit?.visitType?.uuid,
     visitUuid: encounter.visit?.uuid,
-    encounter,
+    encounter: { ...encounter, diagnoses },
   };
 }
 

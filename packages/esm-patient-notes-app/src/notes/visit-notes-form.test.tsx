@@ -443,7 +443,6 @@ test.each(['small-desktop', 'tablet'] as const)(
     mockedUseFeatureFlag.mockReturnValue(true);
 
     const mockEncounter = {
-      id: '123',
       uuid: '123',
       encounterDatetime: '2024-03-20T10:00:00.000Z',
       obs: [
@@ -487,7 +486,6 @@ test.each(['small-desktop', 'tablet'] as const)(
 test('updates existing visit note when in edit mode', async () => {
   const user = userEvent.setup();
   const mockEncounter = {
-    id: '123',
     uuid: '123',
     encounterDatetime: '2024-03-20T10:00:00.000Z',
     obs: [
@@ -552,7 +550,7 @@ test('updates existing visit note when in edit mode', async () => {
 
   expect(mockUpdateVisitNote).toHaveBeenCalledWith(
     expect.any(AbortController),
-    mockEncounter.id,
+    mockEncounter.uuid,
     expect.objectContaining(updatePayload),
   );
 });
@@ -560,7 +558,6 @@ test('updates existing visit note when in edit mode', async () => {
 test('handles existing diagnoses correctly when in edit mode', async () => {
   const user = userEvent.setup();
   const mockEncounter = {
-    id: '123',
     uuid: '123',
     encounterDatetime: '2024-03-20T10:00:00.000Z',
     diagnoses: [

@@ -175,7 +175,7 @@ describe('VisitSummary encounter editing', () => {
     await user.click(editItem);
 
     expect(onEditEncounter).toHaveBeenCalledTimes(1);
-    expect(onEditEncounter).toHaveBeenCalledWith(expect.objectContaining(mockVisitNoteEncounter), true);
+    expect(onEditEncounter).toHaveBeenCalledWith(expect.objectContaining({ uuid: mockVisitNoteEncounter.uuid }), true);
   });
 
   it('passes onEditEncounter down to the completed forms tab', async () => {
