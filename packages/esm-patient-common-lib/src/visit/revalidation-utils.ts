@@ -122,8 +122,12 @@ export function invalidateVisitAndEncounterData(mutate: KeyedMutator<unknown>, p
 /**
  * Invalidates a visit fetched by URL /visit/<uuid>
  * @param mutate - SWR mutate function from useSWRConfig()
- * @param visitUuid
+ * @param visitUuid - UUID of the visit to invalidate. Does nothing if undefined.
  */
-export function invalidateVisitByUuid(mutate: KeyedMutator<unknown>, visitUuid: string) {
-  mutate(new RegExp(`${restBaseUrl}/visit/${visitUuid}`));
+export function invalidateVisitByUuid(mutate: KeyedMutator<unknown>, visitUuid: string | undefined) {
+  if (!visitUuid) {
+    return;
+  }
+
+  mutate((key) => typeof key === 'string' && key.includes(`${restBaseUrl}/visit/${visitUuid}`));
 }

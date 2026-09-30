@@ -639,7 +639,7 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
       patient,
       patientUuid: patient.id,
       visitContext: orderItem.encounter.visit,
-      mutateVisitContext: invalidateVisitByUuid(globalMutate, orderItem.encounter.visit.uuid),
+      mutateVisitContext: () => invalidateVisitByUuid(globalMutate, orderItem.encounter.visit?.uuid),
     }),
     [patient, orderItem.encounter.visit, globalMutate],
   );
