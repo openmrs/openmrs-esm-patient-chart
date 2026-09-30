@@ -148,5 +148,11 @@ describe('revalidation-utils', () => {
       // Should not match non-string keys
       expect(matcherFn({ url: '/ws/rest/v1/visit/test-visit-123' })).toBe(false);
     });
+
+    it('should not invalidate anything when the visit UUID is undefined', () => {
+      invalidateVisitByUuid(mockMutate, undefined);
+
+      expect(mockMutate).not.toHaveBeenCalled();
+    });
   });
 });
