@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Checkbox, OverflowMenu, OverflowMenuItem } from '@carbon/react';
-import { Close } from '@carbon/react/icons';
+import { CloseFilled } from '@carbon/react/icons';
 import type { Diagnosis, DiagnosisCertainty } from '../types';
 import styles from './selected-diagnosis-card.scss';
 
@@ -99,7 +99,7 @@ export default function SelectedDiagnosisCard({ diagnosis, onRemove, onUpdate }:
         iconDescription={t('removeDiagnosisNamed', 'Remove {{diagnosis}}', { diagnosis: diagnosis.display })}
         kind="ghost"
         onClick={() => onRemove(diagnosis)}
-        renderIcon={(props) => <Close size={16} {...props} />}
+        renderIcon={(props) => <CloseFilled size={16} {...props} />}
         size="sm"
         tooltipAlignment="end"
       />

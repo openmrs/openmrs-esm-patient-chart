@@ -23,7 +23,7 @@ import {
   TextArea,
   Tile,
 } from '@carbon/react';
-import { Add, CloseFilled, WarningFilled } from '@carbon/react/icons';
+import { Add, CloseFilled, WarningAltFilled, WarningFilled } from '@carbon/react/icons';
 import {
   createAttachment,
   createErrorHandler,
@@ -615,7 +615,12 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                       })}
                       role={primaryRequiredBlockedSave ? 'alert' : 'status'}
                     >
-                      <WarningFilled aria-hidden="true" size={16} />
+                      {/* Carbon's form-field convention: triangle for a warning, round for an invalid state */}
+                      {primaryRequiredBlockedSave ? (
+                        <WarningFilled aria-hidden="true" size={16} />
+                      ) : (
+                        <WarningAltFilled aria-hidden="true" size={16} />
+                      )}
                       {t('atLeastOnePrimaryDiagnosis', 'At least one diagnosis must be selected as primary')}
                     </p>
                   )}

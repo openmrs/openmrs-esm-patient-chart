@@ -173,7 +173,9 @@
   height: layout.$spacing-07;
 }
 
-// Compact warning line beneath the diagnosis list: icon + italic text (per the Talk mock)
+// Compact warning line beneath the diagnosis list: icon + italic text (per the Talk mock).
+// The icon follows Carbon's form-field states: a yellow triangle with a dark "!" while it is
+// a warning, the round red icon once a save has been blocked by it.
 .primaryRequiredWarning {
   @include type.type-style('body-compact-01');
   display: flex;
@@ -186,15 +188,23 @@
   svg {
     flex-shrink: 0;
     fill: colors.$yellow-30;
+
+    [data-icon-path='inner-path'] {
+      fill: colors.$gray-100;
+      opacity: 1;
+    }
   }
 }
 
-// Once a save has been blocked by the missing primary, the same line reads as an error
 .primaryRequiredError {
   color: colors.$red-60;
 
   svg {
     fill: colors.$red-60;
+
+    [data-icon-path='inner-path'] {
+      opacity: 0;
+    }
   }
 }
 
