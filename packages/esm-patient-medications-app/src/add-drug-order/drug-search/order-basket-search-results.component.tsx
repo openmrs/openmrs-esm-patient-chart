@@ -8,13 +8,12 @@ import {
   ArrowRightIcon,
   ExtensionSlot,
   ShoppingCartArrowDownIcon,
-  useConfig,
   useLayoutType,
   UserHasAccess,
   type Visit,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
-import { type ConfigObject } from '../../config-schema';
+import { useOrderConfig } from '../../api/order-config';
 import { prepMedicationOrderPostData, useMedicationOrders } from '../../api';
 import { ordersEqual } from './helpers';
 import {
@@ -156,13 +155,14 @@ export const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
 
   const { templates, error: fetchingDrugOrderTemplatesError } = useDrugTemplate(drug?.uuid);
   const { t } = useTranslation();
-  const config = useConfig<ConfigObject>();
+  const { orderConfigObject, isLoading: isLoadingOrderConfig } = useOrderConfig();
+  const daysDurationUnit = orderConfigObject?.daysDurationUnit;
   const drugItemTemplateOptions: Array<DrugOrderBasketItem> = useMemo(
     () =>
       templates?.length
-        ? templates.map((template) => getTemplateOrderBasketItem(drug, visit, config?.daysDurationUnit, template))
-        : [getTemplateOrderBasketItem(drug, visit, config?.daysDurationUnit)],
-    [templates, drug, config?.daysDurationUnit, visit],
+        ? templates.map((template) => getTemplateOrderBasketItem(drug, visit, daysDurationUnit, template))
+        : [getTemplateOrderBasketItem(drug, visit, daysDurationUnit)],
+    [templates, drug, daysDurationUnit, visit],
   );
 
   const addToBasket = useCallback(
@@ -243,7 +243,7 @@ export const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
                   <ShoppingCartArrowDownIcon size={16} {...props} />
                 )}
                 onClick={() => addToBasket(orderItem)}
-                disabled={isLoadingOrders || drugAlreadyPrescribed}
+                disabled={isLoadingOrders || isLoadingOrderConfig || drugAlreadyPrescribed}
               >
                 {t('directlyAddToBasket', 'Add to basket')}
               </Button>
@@ -252,7 +252,7 @@ export const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
               kind="ghost"
               renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => <ArrowRightIcon size={16} {...props} />}
               onClick={() => openOrderForm(orderItem)}
-              disabled={isLoadingOrders || drugAlreadyPrescribed}
+              disabled={isLoadingOrders || isLoadingOrderConfig || drugAlreadyPrescribed}
             >
               {t('goToDrugOrderForm', 'Order form')}
             </Button>
