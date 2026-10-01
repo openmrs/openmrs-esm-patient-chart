@@ -33,6 +33,7 @@ import {
   ResponsiveWrapper,
   useConfig,
   OpenmrsDatePicker,
+  parseDate,
   Workspace2,
 } from '@openmrs/esm-framework';
 import { useSWRConfig } from 'swr';
@@ -51,7 +52,7 @@ const MarkPatientDeceasedForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>
   const { causesOfDeath, isLoading: isLoadingCausesOfDeath } = useCausesOfDeath();
   const { freeTextFieldConceptUuid } = useConfig<ChartConfig>();
   const { mutate: globalMutate } = useSWRConfig();
-  const patientBirthDate = useMemo(() => (patient?.birthDate ? new Date(patient.birthDate) : undefined), [patient]);
+  const patientBirthDate = useMemo(() => (patient?.birthDate ? parseDate(patient.birthDate) : undefined), [patient]);
 
   const filteredCausesOfDeath = useMemo(() => {
     if (!searchTerm) {
