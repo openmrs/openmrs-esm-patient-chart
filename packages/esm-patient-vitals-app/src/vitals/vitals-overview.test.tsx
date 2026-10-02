@@ -1,7 +1,7 @@
 import React from 'react';
-import { vi, describe, it, expect } from 'vitest';
+import { vi, describe, it, expect, afterEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject, configSchema } from '../config-schema';
@@ -268,5 +268,58 @@ describe('VitalsOverview', () => {
     expect(screen.getByRole('tab', { name: /spo2/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /temp/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /r\. rate/i })).toBeInTheDocument();
+  });
+
+  describe('chart loading', () => {
+    const loadChart = vi.fn();
+
+    // Fresh module instances give each test its own React.lazy state and chart import.
+    const renderWithMockedChart = async () => {
+      vi.resetModules();
+      vi.doMock('./vitals-chart.component', () => loadChart());
+      const { useConfig: freshUseConfig } = await import('@openmrs/esm-framework');
+      const { useVitalsAndBiometrics: freshUseVitalsAndBiometrics } = await import('../common');
+      const { default: FreshVitalsOverview } = await import('./vitals-overview.component');
+      vi.mocked(freshUseConfig<ConfigObject>).mockReturnValue({
+        ...getDefaultsFromConfigSchema(configSchema),
+        ...mockVitalsConfig,
+      } as ConfigObject);
+      vi.mocked(freshUseVitalsAndBiometrics).mockReturnValue({
+        data: formattedVitals,
+      } as ReturnType<typeof useVitalsAndBiometrics>);
+      renderWithSwr(<FreshVitalsOverview {...testProps} />);
+      await waitForLoadingToFinish();
+    };
+
+    afterEach(() => {
+      vi.doUnmock('./vitals-chart.component');
+      loadChart.mockReset();
+    });
+
+    it('starts loading the chart when the view switcher is hovered', async () => {
+      const user = userEvent.setup();
+      loadChart.mockReturnValue({ default: () => <p>Mock vitals chart</p> });
+
+      await renderWithMockedChart();
+      expect(loadChart).not.toHaveBeenCalled();
+
+      await user.hover(screen.getByRole('tab', { name: /chart view/i }));
+
+      await waitFor(() => expect(loadChart).toHaveBeenCalledTimes(1));
+      expect(screen.getByRole('table', { name: /vitals/i })).toBeInTheDocument();
+    });
+
+    it('ignores a failed prefetch', async () => {
+      const user = userEvent.setup();
+      loadChart.mockImplementation(() => {
+        throw new Error('Loading chunk failed');
+      });
+
+      await renderWithMockedChart();
+      await user.hover(screen.getByRole('tab', { name: /chart view/i }));
+
+      await waitFor(() => expect(loadChart).toHaveBeenCalledTimes(1));
+      expect(screen.getByRole('table', { name: /vitals/i })).toBeInTheDocument();
+    });
   });
 });
