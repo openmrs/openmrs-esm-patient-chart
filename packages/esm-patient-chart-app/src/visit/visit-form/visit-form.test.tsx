@@ -1,7 +1,7 @@
 import React from 'react';
-import { vi, describe, it, expect, test, beforeEach } from 'vitest';
+import { vi, describe, it, expect, test, beforeEach, afterEach } from 'vitest';
 import dayjs from 'dayjs';
-import { act, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
   type FetchResponse,
@@ -739,11 +739,30 @@ describe('Visit form', () => {
       });
     }
 
+    const defaultDatePickerMock = mockOpenmrsDatePicker.getMockImplementation();
+
     beforeEach(() => {
+      // Like the real picker, report a cleared input as null, so tests can clear the field with user.clear
+      mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange, invalid, invalidText }) => (
+        <>
+          <label htmlFor={id}>{labelText}</label>
+          <input
+            id={id}
+            type="text"
+            value={value ? dayjs(value as string).format('DD/MM/YYYY') : ''}
+            onChange={(evt) => onChange?.(evt.target.value ? dayjs(evt.target.value).toDate() : null)}
+          />
+          {invalid && <span>{invalidText}</span>}
+        </>
+      ));
       mockUpdateVisit.mockResolvedValue({
         status: 201,
         data: { uuid: visitUuid, visitType: { display: 'Facility Visit' } },
       } as unknown as FetchResponse<Visit>);
+    });
+
+    afterEach(() => {
+      mockOpenmrsDatePicker.mockImplementation(defaultDatePickerMock);
     });
 
     it('starts a new visit with the date attribute as a yyyy-MM-dd value', async () => {
@@ -753,7 +772,8 @@ describe('Visit form', () => {
       renderVisitForm();
 
       await user.click(screen.getByLabelText(/Outpatient visit/i));
-      fireEvent.change(screen.getByLabelText('Follow-up date (optional)'), { target: { value: '2026-10-20' } });
+      await user.click(screen.getByLabelText('Follow-up date (optional)'));
+      await user.paste('2026-10-20');
       await user.click(screen.getByRole('button', { name: /Start visit/i }));
 
       expect(mockSaveVisit).toHaveBeenCalledWith(
@@ -806,22 +826,13 @@ describe('Visit form', () => {
       renderVisitForm(visitWithDateAttribute);
 
       await user.click(screen.getByLabelText(/Outpatient visit/i));
-      fireEvent.change(screen.getByLabelText('Follow-up date (optional)'), { target: { value: '2026-10-20' } });
+      // Select the saved date so the pasted date replaces it
+      await user.tripleClick(screen.getByLabelText('Follow-up date (optional)'));
+      await user.paste('2026-10-20');
       await user.click(screen.getByRole('button', { name: /Update visit/i }));
 
       expect(mockUpdateVisitAttribute).toHaveBeenCalledWith(visitUuid, dateAttributeUuid, '2026-10-20');
     });
-
-    // The real date picker calls onChange with null when the user clears it
-    async function clearFollowUpDate() {
-      const followUpDatePickerProps = mockOpenmrsDatePicker.mock.calls
-        .map(([props]) => props)
-        .filter((props) => String(props?.labelText ?? '').startsWith('Follow-up date'))
-        .at(-1);
-      await act(async () => {
-        followUpDatePickerProps.onChange(null);
-      });
-    }
 
     it('keeps the required error when a required date attribute is cleared', async () => {
       const user = userEvent.setup();
@@ -830,8 +841,9 @@ describe('Visit form', () => {
       renderVisitForm();
 
       await user.click(screen.getByLabelText(/Outpatient visit/i));
-      fireEvent.change(screen.getByLabelText('Follow-up date'), { target: { value: '2026-10-20' } });
-      await clearFollowUpDate();
+      await user.click(screen.getByLabelText('Follow-up date'));
+      await user.paste('2026-10-20');
+      await user.clear(screen.getByLabelText('Follow-up date'));
       await user.click(screen.getByRole('button', { name: /Start visit/i }));
 
       expect(screen.getByText('This field is required')).toBeInTheDocument();
@@ -845,8 +857,7 @@ describe('Visit form', () => {
       renderVisitForm(visitWithDateAttribute);
 
       await user.click(screen.getByLabelText(/Outpatient visit/i));
-      await screen.findByLabelText('Follow-up date (optional)');
-      await clearFollowUpDate();
+      await user.clear(screen.getByLabelText('Follow-up date (optional)'));
       await user.click(screen.getByRole('button', { name: /Update visit/i }));
 
       expect(mockDeleteVisitAttribute).toHaveBeenCalledWith(visitUuid, dateAttributeUuid);
