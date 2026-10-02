@@ -1,11 +1,12 @@
 import React from 'react';
 import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import dayjs from 'dayjs';
-import { fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
   type FetchResponse,
   getDefaultsFromConfigSchema,
+  OpenmrsDatePicker,
   saveVisit,
   showSnackbar,
   updateVisit,
@@ -57,6 +58,16 @@ const visitAttributes = {
     preferredHandlerClassname: 'default',
     retired: false,
   },
+  followUpDate: {
+    uuid: 'f2e6c103-2d54-4645-b2bb-32f4f31d1710',
+    name: 'Follow-up date',
+    display: 'Follow-up date',
+    datatypeConfig: '',
+    datatypeClassname: 'org.openmrs.customdatatype.datatype.DateDatatype',
+    description: '',
+    preferredHandlerClassname: 'default',
+    retired: false,
+  },
 };
 
 const mockCloseWorkspace = vi.fn();
@@ -95,6 +106,7 @@ const mockUseVisit = vi.mocked(useVisit);
 const mockUseVisitTypes = vi.mocked(useVisitTypes);
 const mockUseLocations = vi.mocked(useLocations);
 const mockUseEmrConfiguration = vi.mocked(useEmrConfiguration);
+const mockOpenmrsDatePicker = vi.mocked(OpenmrsDatePicker);
 
 // from ./visit-form.resource
 const mockOnVisitCreatedOrUpdatedCallback = vi.fn();
@@ -128,6 +140,13 @@ vi.mock('../hooks/useVisitAttributeType', () => ({
         isLoading: false,
         error: null,
         data: visitAttributes.insurancePolicyNumber,
+      };
+    }
+    if (attributeUuid === visitAttributes.followUpDate.uuid) {
+      return {
+        isLoading: false,
+        error: null,
+        data: visitAttributes.followUpDate,
       };
     }
   }),
@@ -694,6 +713,143 @@ describe('Visit form', () => {
       subtitle: 'Facility Visit updated successfully',
       kind: 'success',
       title: 'Visit details updated',
+    });
+  });
+
+  describe('date visit attributes', () => {
+    const dateAttributeUuid = 'e1f2a3b4-0000-4000-8000-000000000001';
+    // A server east of UTC returns the saved date at its own midnight
+    const savedDateValue = '2026-10-15T00:00:00.000+0530';
+    const visitWithDateAttribute = {
+      ...mockVisitWithAttributes,
+      attributes: [
+        {
+          uuid: dateAttributeUuid,
+          display: 'Follow-up date: 2026-10-15',
+          attributeType: { uuid: visitAttributes.followUpDate.uuid, display: 'Follow-up date' },
+          value: savedDateValue,
+        },
+      ],
+    } as unknown as Visit;
+
+    function setDateAttributeConfig(required = false) {
+      mockUseConfig.mockReturnValue({
+        ...getDefaultsFromConfigSchema(esmPatientChartSchema),
+        visitAttributeTypes: [{ uuid: visitAttributes.followUpDate.uuid, required, displayInThePatientBanner: true }],
+      });
+    }
+
+    beforeEach(() => {
+      mockUpdateVisit.mockResolvedValue({
+        status: 201,
+        data: { uuid: visitUuid, visitType: { display: 'Facility Visit' } },
+      } as unknown as FetchResponse<Visit>);
+    });
+
+    it('starts a new visit with the date attribute as a yyyy-MM-dd value', async () => {
+      const user = userEvent.setup();
+      setDateAttributeConfig();
+
+      renderVisitForm();
+
+      await user.click(screen.getByLabelText(/Outpatient visit/i));
+      fireEvent.change(screen.getByLabelText('Follow-up date (optional)'), { target: { value: '2026-10-20' } });
+      await user.click(screen.getByRole('button', { name: /Start visit/i }));
+
+      expect(mockSaveVisit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          attributes: [{ attributeType: visitAttributes.followUpDate.uuid, value: '2026-10-20' }],
+        }),
+        expect.any(Object),
+      );
+    });
+
+    it('shows the validation error for a required date attribute', async () => {
+      const user = userEvent.setup();
+      setDateAttributeConfig(true);
+
+      renderVisitForm();
+
+      await user.click(screen.getByLabelText(/Outpatient visit/i));
+      await user.click(screen.getByRole('button', { name: /Start visit/i }));
+
+      expect(screen.getByText('This field is required')).toBeInTheDocument();
+      expect(mockSaveVisit).not.toHaveBeenCalled();
+    });
+
+    it('shows the saved date in the edit form without shifting the day', () => {
+      setDateAttributeConfig();
+
+      renderVisitForm(visitWithDateAttribute);
+
+      expect(screen.getByLabelText('Follow-up date (optional)')).toHaveValue('15/10/2026');
+    });
+
+    it('does not update an unchanged date attribute when editing a visit', async () => {
+      const user = userEvent.setup();
+      setDateAttributeConfig();
+
+      renderVisitForm(visitWithDateAttribute);
+
+      await user.click(screen.getByLabelText(/Outpatient visit/i));
+      await user.click(screen.getByRole('button', { name: /Update visit/i }));
+
+      expect(mockUpdateVisit).toHaveBeenCalled();
+      expect(mockUpdateVisitAttribute).not.toHaveBeenCalled();
+      expect(mockCreateVisitAttribute).not.toHaveBeenCalled();
+    });
+
+    it('updates a changed date attribute with a yyyy-MM-dd value when editing a visit', async () => {
+      const user = userEvent.setup();
+      setDateAttributeConfig();
+
+      renderVisitForm(visitWithDateAttribute);
+
+      await user.click(screen.getByLabelText(/Outpatient visit/i));
+      fireEvent.change(screen.getByLabelText('Follow-up date (optional)'), { target: { value: '2026-10-20' } });
+      await user.click(screen.getByRole('button', { name: /Update visit/i }));
+
+      expect(mockUpdateVisitAttribute).toHaveBeenCalledWith(visitUuid, dateAttributeUuid, '2026-10-20');
+    });
+
+    // The real date picker calls onChange with null when the user clears it
+    async function clearFollowUpDate() {
+      const followUpDatePickerProps = mockOpenmrsDatePicker.mock.calls
+        .map(([props]) => props)
+        .filter((props) => String(props?.labelText ?? '').startsWith('Follow-up date'))
+        .at(-1);
+      await act(async () => {
+        followUpDatePickerProps.onChange(null);
+      });
+    }
+
+    it('keeps the required error when a required date attribute is cleared', async () => {
+      const user = userEvent.setup();
+      setDateAttributeConfig(true);
+
+      renderVisitForm();
+
+      await user.click(screen.getByLabelText(/Outpatient visit/i));
+      fireEvent.change(screen.getByLabelText('Follow-up date'), { target: { value: '2026-10-20' } });
+      await clearFollowUpDate();
+      await user.click(screen.getByRole('button', { name: /Start visit/i }));
+
+      expect(screen.getByText('This field is required')).toBeInTheDocument();
+      expect(mockSaveVisit).not.toHaveBeenCalled();
+    });
+
+    it('deletes an optional date attribute that is cleared when editing a visit', async () => {
+      const user = userEvent.setup();
+      setDateAttributeConfig();
+
+      renderVisitForm(visitWithDateAttribute);
+
+      await user.click(screen.getByLabelText(/Outpatient visit/i));
+      await screen.findByLabelText('Follow-up date (optional)');
+      await clearFollowUpDate();
+      await user.click(screen.getByRole('button', { name: /Update visit/i }));
+
+      expect(mockDeleteVisitAttribute).toHaveBeenCalledWith(visitUuid, dateAttributeUuid);
     });
   });
 
