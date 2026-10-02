@@ -1,6 +1,13 @@
 import React, { Suspense, lazy, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, ContentSwitcher, DataTableSkeleton, IconSwitch, InlineLoading } from '@carbon/react';
+import {
+  Button,
+  ContentSwitcher,
+  DataTableSkeleton,
+  IconSwitch,
+  InlineLoading,
+  SkeletonPlaceholder,
+} from '@carbon/react';
 import { Add, Analytics, Table } from '@carbon/react/icons';
 import { formatDatetime, parseDate, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
@@ -12,7 +19,13 @@ import type { BiometricsTableHeader, BiometricsTableRow } from './types';
 import PaginatedBiometrics from './paginated-biometrics.component';
 import styles from './biometrics-base.scss';
 
-const BiometricsChart = lazy(() => import('./biometrics-chart.component'));
+const loadBiometricsChart = () => import('./biometrics-chart.component');
+const BiometricsChart = lazy(loadBiometricsChart);
+
+// A failed prefetch is ignored. Opening the chart view retries the import through React.lazy.
+const prefetchBiometricsChart = () => {
+  loadBiometricsChart().catch(() => {});
+};
 
 interface BiometricsBaseProps {
   pageSize: number;
@@ -110,6 +123,8 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, patient, p
           <div className={styles.biometricsHeaderActionItems}>
             <ContentSwitcher
               onChange={(evt) => setChartView(evt.name === 'chartView')}
+              onFocus={prefetchBiometricsChart}
+              onMouseEnter={prefetchBiometricsChart}
               size={isTablet ? 'md' : 'sm'}
               selectedIndex={chartView ? 1 : 0}
             >
@@ -134,7 +149,15 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, patient, p
           </div>
         </CardHeader>
         {chartView ? (
-          <Suspense fallback={<InlineLoading role="progressbar" description={`${t('loading', 'Loading')} ...`} />}>
+          <Suspense
+            fallback={
+              <SkeletonPlaceholder
+                className={styles.chartSkeleton}
+                role="progressbar"
+                aria-label={t('loading', 'Loading')}
+              />
+            }
+          >
             <BiometricsChart
               patientBiometrics={biometrics}
               conceptUnits={conceptUnits}
