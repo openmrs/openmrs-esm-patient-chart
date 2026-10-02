@@ -1,6 +1,13 @@
 import type { TFunction } from 'i18next';
 import type { useSWRConfig } from 'swr';
-import { launchWorkspace2, type LoggedInUser, showModal, showSnackbar, userHasAccess } from '@openmrs/esm-framework';
+import {
+  type Encounter,
+  launchWorkspace2,
+  type LoggedInUser,
+  showModal,
+  showSnackbar,
+  userHasAccess,
+} from '@openmrs/esm-framework';
 import { invalidateVisitAndEncounterData } from '@openmrs/esm-patient-common-lib';
 import { type ChartConfig } from '../../../../config-schema';
 import { deleteEncounter, type EncountersTableProps, type MappedEncounter } from './encounters-table.resource';
@@ -9,8 +16,8 @@ import { deleteEncounter, type EncountersTableProps, type MappedEncounter } from
  * A "Visit Note" encounter created outside of a form is edited through the visit notes workspace
  * rather than the generic form entry workspace.
  */
-export function isVisitNoteEncounter(encounter: MappedEncounter): boolean {
-  return encounter.encounterType === 'Visit Note' && !encounter.form;
+export function isVisitNoteEncounter(encounter: Encounter): boolean {
+  return encounter.encounterType?.display === 'Visit Note' && !encounter.form;
 }
 
 /**
@@ -46,7 +53,7 @@ export function canModifyEncounter(
  * chart's own edit workspace for it.
  */
 export function editEncounter(
-  encounter: MappedEncounter,
+  encounter: Encounter,
   patientUuid: string,
   onEditEncounter?: EncountersTableProps['onEditEncounter'],
 ) {
@@ -61,7 +68,7 @@ export function editEncounter(
   } else {
     launchWorkspace2('patient-form-entry-workspace', {
       form: encounter.form,
-      encounterUuid: encounter.id,
+      encounterUuid: encounter.uuid,
     });
   }
 }
