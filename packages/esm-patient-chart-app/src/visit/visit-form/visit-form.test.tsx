@@ -78,6 +78,8 @@ const defaultProps: PatientWorkspace2DefinitionProps<VisitFormProps, {}> = {
   windowName: '',
   isRootWorkspace: false,
   showActionMenu: true,
+  setWorkspaceTitle: vi.fn(),
+  setHasUnsavedChanges: vi.fn(),
 };
 
 const defaultVisitLocation = {

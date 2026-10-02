@@ -36,3 +36,5 @@ export const deleteStickyNoteModal = getAsyncLifecycle(
 );
 
 export const stickyNoteModal = getAsyncLifecycle(() => import('./sticky-notes/sticky-note.modal'), options);
+
+export const encounterVisitNote = getAsyncLifecycle(() => import('./notes/encounter-visit-note.extension'), options);

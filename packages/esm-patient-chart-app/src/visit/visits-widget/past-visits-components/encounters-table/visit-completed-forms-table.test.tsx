@@ -38,41 +38,41 @@ describe('VisitCompletedFormsTable', () => {
   } as Visit;
 
   it('renders the encounters table with empty array when visit has no encounters', () => {
-    renderWithSwr(<VisitCompletedFormsTable patientUuid={mockPatientAlice.uuid} visit={mockVisit} />);
+    renderWithSwr(<VisitCompletedFormsTable patientUuid={mockPatientAlice.uuid} visit={mockVisit} mutateVisitContext={vi.fn()} />);
 
     expect(screen.getByTestId('encounters-table')).toBeInTheDocument();
   });
 
   it('renders the encounters table with row selection disabled', () => {
-    renderWithSwr(<VisitCompletedFormsTable patientUuid={mockPatientAlice.uuid} visit={mockVisit} />);
+    renderWithSwr(<VisitCompletedFormsTable patientUuid={mockPatientAlice.uuid} visit={mockVisit} mutateVisitContext={vi.fn()} />);
 
     const table = screen.getByTestId('encounters-table');
     expect(table).toHaveAttribute('data-is-selectable', 'false');
   });
 
   it('renders the encounters table without the encounter type filter', () => {
-    renderWithSwr(<VisitCompletedFormsTable patientUuid={mockPatientAlice.uuid} visit={mockVisit} />);
+    renderWithSwr(<VisitCompletedFormsTable patientUuid={mockPatientAlice.uuid} visit={mockVisit} mutateVisitContext={vi.fn()} />);
 
     const table = screen.getByTestId('encounters-table');
     expect(table).toHaveAttribute('data-show-encounter-type-filter', 'false');
   });
 
   it('renders the encounters table without the visit type column', () => {
-    renderWithSwr(<VisitCompletedFormsTable patientUuid={mockPatientAlice.uuid} visit={mockVisit} />);
+    renderWithSwr(<VisitCompletedFormsTable patientUuid={mockPatientAlice.uuid} visit={mockVisit} mutateVisitContext={vi.fn()} />);
 
     const table = screen.getByTestId('encounters-table');
     expect(table).toHaveAttribute('data-show-visit-type', 'false');
   });
 
   it('renders the encounters table without a loading state', () => {
-    renderWithSwr(<VisitCompletedFormsTable patientUuid={mockPatientAlice.uuid} visit={mockVisit} />);
+    renderWithSwr(<VisitCompletedFormsTable patientUuid={mockPatientAlice.uuid} visit={mockVisit} mutateVisitContext={vi.fn()} />);
 
     const table = screen.getByTestId('encounters-table');
     expect(table).toHaveAttribute('data-is-loading', 'false');
   });
 
   it('handles null visit gracefully', () => {
-    renderWithSwr(<VisitCompletedFormsTable patientUuid={mockPatientAlice.uuid} visit={null as any} />);
+    renderWithSwr(<VisitCompletedFormsTable patientUuid={mockPatientAlice.uuid} visit={null as any} mutateVisitContext={vi.fn()} />);
 
     const table = screen.getByTestId('encounters-table');
     expect(table).toHaveAttribute('data-total-count', '0');
@@ -117,7 +117,7 @@ describe('VisitCompletedFormsTable', () => {
       ],
     } as Visit;
 
-    renderWithSwr(<VisitCompletedFormsTable patientUuid={mockPatientAlice.uuid} visit={visitWithMixedEncounters} />);
+    renderWithSwr(<VisitCompletedFormsTable patientUuid={mockPatientAlice.uuid} visit={visitWithMixedEncounters} mutateVisitContext={vi.fn()} />);
 
     const table = screen.getByTestId('encounters-table');
     expect(table).toHaveAttribute('data-total-count', '1');

@@ -303,7 +303,6 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
   } else if (isLoadingConceptUnits || isLoadingInitialValues) {
     formElement = (
       <Form className={styles.form}>
-        <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
         <div className={styles.grid}>
           <Stack>
             <Column>
@@ -334,7 +333,6 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
   } else {
     formElement = (
       <Form className={styles.form} data-openmrs-role="Vitals and Biometrics Form">
-        <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
         <div className={styles.grid}>
           <Stack>
             <Column>

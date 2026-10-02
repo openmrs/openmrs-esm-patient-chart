@@ -93,6 +93,8 @@ const testProps: PatientWorkspace2DefinitionProps<LabResultsFormProps, {}> = {
   windowName: '',
   isRootWorkspace: false,
   showActionMenu: true,
+  setWorkspaceTitle: vi.fn(),
+  setHasUnsavedChanges: vi.fn(),
 };
 
 const exportedTestProps = {
@@ -172,7 +174,11 @@ describe('LabResultsForm', () => {
   });
 
   test('hides the add tests basket in exported context without a launch callback', () => {
-    render(<ExportedLabResultsForm {...exportedTestProps} />);
+    render(<ExportedLabResultsForm 
+      {...exportedTestProps} 
+      setWorkspaceTitle={vi.fn()}
+      setHasUnsavedChanges={vi.fn()}
+    />);
 
     expect(screen.queryByText('Add Tests to this order')).not.toBeInTheDocument();
   });
@@ -196,6 +202,8 @@ describe('LabResultsForm', () => {
           ...exportedTestProps.workspaceProps,
           labOrderWorkspaceName: 'lab-app-test-results-add-lab-order-workspace',
         }}
+        setWorkspaceTitle={vi.fn()}
+        setHasUnsavedChanges={vi.fn()}
       />,
     );
 
@@ -215,6 +223,8 @@ describe('LabResultsForm', () => {
           ...exportedTestProps.workspaceProps,
           labOrderWorkspaceName: 'lab-app-test-results-add-lab-order-workspace',
         }}
+        setWorkspaceTitle={vi.fn()}
+        setHasUnsavedChanges={vi.fn()}
       />,
     );
 

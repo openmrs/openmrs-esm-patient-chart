@@ -7,6 +7,7 @@ import {
   showModal,
   showSnackbar,
   userHasAccess,
+  type Visit,
 } from '@openmrs/esm-framework';
 import { invalidateVisitAndEncounterData } from '@openmrs/esm-patient-common-lib';
 import { type ChartConfig } from '../../../../config-schema';
@@ -49,28 +50,16 @@ export function canModifyEncounter(
 }
 
 /**
- * Hands the encounter to the host's `onEditEncounter` if it supplied one, and otherwise launches the
- * chart's own edit workspace for it.
+ * Opens the encounter workspace to edit the specified encounter
  */
-export function editEncounter(
-  encounter: Encounter,
-  patientUuid: string,
-  onEditEncounter?: EncountersTableProps['onEditEncounter'],
-) {
-  if (onEditEncounter) {
-    onEditEncounter(encounter, isVisitNoteEncounter(encounter));
-  } else if (isVisitNoteEncounter(encounter)) {
-    launchWorkspace2('visit-notes-form-workspace', {
-      encounter,
-      formContext: 'editing',
-      patientUuid,
-    });
-  } else {
-    launchWorkspace2('patient-form-entry-workspace', {
-      form: encounter.form,
-      encounterUuid: encounter.uuid,
-    });
-  }
+export function editEncounter(windowProps: {
+  patient: fhir.Patient;
+  visitContext: Visit;
+  encounter: Encounter;
+  onEncounterUpdated?: (updatedEncounter: Encounter) => void;
+  additionalProps?: Record<string, unknown>;
+}) {
+  launchWorkspace2('encounter-workspace', {}, windowProps);
 }
 
 interface ConfirmAndDeleteEncounterArgs {
@@ -79,7 +68,7 @@ interface ConfirmAndDeleteEncounterArgs {
   patientUuid: string;
   t: TFunction;
   mutate: ReturnType<typeof useSWRConfig>['mutate'];
-  mutateVisitContext?: () => void;
+  onEncounterDeleted?: (encounter: Encounter) => void;
 }
 
 export function confirmAndDeleteEncounter({
@@ -88,7 +77,7 @@ export function confirmAndDeleteEncounter({
   patientUuid,
   t,
   mutate,
-  mutateVisitContext,
+  onEncounterDeleted,
 }: ConfirmAndDeleteEncounterArgs) {
   const dispose = showModal('delete-encounter-modal', {
     close: () => dispose(),
@@ -97,8 +86,8 @@ export function confirmAndDeleteEncounter({
       const abortController = new AbortController();
       deleteEncounter(encounterUuid, abortController)
         .then(() => {
-          // Update current visit data for critical components
-          mutateVisitContext?.();
+          // Update data for critical components
+          onEncounterDeleted?.({ uuid: encounterUuid });
 
           // Also invalidate visit history and encounter tables since the encounter was deleted
           invalidateVisitAndEncounterData(mutate, patientUuid);

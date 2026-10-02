@@ -31,25 +31,8 @@ export interface EncountersTableProps {
   setPageSize: React.Dispatch<React.SetStateAction<number>>;
   isSelectable: boolean;
   canPrintEncounters: boolean;
-  /**
-   * Called instead of launching the chart's own edit workspaces, with the encounter to edit and whether it is
-   * a visit note (as opposed to a form). Hosts embedding this table outside the chart need to supply this:
-   * the chart's edit workspaces belong to the `patient-chart` workspace group, which is scoped to chart URLs
-   * and whose group props only the chart populates.
-   */
-  onEditEncounter?: (encounter: Encounter, isVisitNote: boolean) => void;
-  /**
-   * Revalidates the host's copy of the visit once an encounter is deleted. Inside the chart this comes from
-   * the patient chart store, which `usePatientChartStore` only populates for the chart's own patient, so
-   * hosts embedding this table elsewhere need to supply it for deletions to show up.
-   */
-  mutateVisitContext?: () => void;
-  /**
-   * The patient these encounters belong to, handed to the embedded form view. Inside the chart this comes
-   * from the patient chart store, which `usePatientChartStore` only populates for the chart's own patient,
-   * so hosts embedding this table elsewhere need to supply it for embedded forms to render.
-   */
-  patient?: fhir.Patient;
+  onEncounterUpdated: (encounter: Encounter) => void;
+  patient: fhir.Patient;
 }
 
 export interface MappedEncounter {

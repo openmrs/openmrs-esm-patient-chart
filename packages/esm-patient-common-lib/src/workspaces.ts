@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import {
+  type Encounter,
+  type ExportedWorkspaceWindowInfo,
   launchWorkspace2,
   navigate,
   showModal,
@@ -16,6 +18,28 @@ export interface PatientWorkspaceGroupProps {
   visitContext: Visit;
   mutateVisitContext: () => void;
 }
+
+/**
+ * Name of the extension slot rendered by the encounter workspace. Each app contributes an extension
+ * to this slot that renders its own exported workspace when it recognizes the encounter.
+ */
+export const encounterWorkspaceSlotName = 'encounter-workspace-slot';
+
+/**
+ * State passed to extensions in the encounter workspace slot. An extension should render nothing
+ * unless the encounter (or the explicitly requested `workspaceType`) is one it handles.
+ */
+export type EncounterWorkspaceSlotState = {
+  /** When set, explicitly selects the kind of encounter workspace to show, overriding detection from `encounter` */
+  workspaceType?: string;
+  /** The encounter being edited; undefined when creating a new one */
+  encounter?: Encounter;
+  additionalProps?: Record<string, unknown>;
+  onEncounterUpdated?: (updatedEncounter?: Encounter) => void;
+  /** Must be referentially stable, since `ExportedWorkspace` re-seeds when it changes */
+  groupProps: PatientWorkspaceGroupProps;
+  onWindowChanged: (windowInfo: ExportedWorkspaceWindowInfo) => void;
+};
 
 export interface PatientChartWorkspaceActionButtonProps {
   groupProps: PatientWorkspaceGroupProps;

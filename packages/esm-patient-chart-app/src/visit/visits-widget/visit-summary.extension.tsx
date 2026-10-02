@@ -4,14 +4,10 @@ import VisitSummary from './past-visits-components/visit-summary.component';
 import { type EncountersTableProps } from './past-visits-components/encounters-table/encounters-table.resource';
 
 interface VisitSummaryExtensionProps {
-  visit?: Visit;
-  patientUuid?: string;
-  /** Hosts outside the chart should pass this — see `EncountersTableProps`. */
-  onEditEncounter?: EncountersTableProps['onEditEncounter'];
-  /** Hosts outside the chart should pass this — see `EncountersTableProps`. */
-  mutateVisitContext?: EncountersTableProps['mutateVisitContext'];
-  /** Hosts outside the chart should pass this — see `EncountersTableProps`. */
-  patient?: EncountersTableProps['patient'];
+  visit: Visit;
+  patientUuid: string;
+  mutateVisitContext?: () => void;
+  patient: fhir.Patient;
 }
 
 /**
@@ -21,7 +17,6 @@ interface VisitSummaryExtensionProps {
 const VisitSummaryExtension: React.FC<VisitSummaryExtensionProps> = ({
   visit,
   patientUuid,
-  onEditEncounter,
   mutateVisitContext,
   patient,
 }) => {
@@ -33,7 +28,6 @@ const VisitSummaryExtension: React.FC<VisitSummaryExtensionProps> = ({
     <VisitSummary
       visit={visit}
       patientUuid={patientUuid}
-      onEditEncounter={onEditEncounter}
       mutateVisitContext={mutateVisitContext}
       patient={patient}
     />

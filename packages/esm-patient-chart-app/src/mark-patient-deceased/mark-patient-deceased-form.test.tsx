@@ -38,6 +38,8 @@ describe('MarkPatientDeceasedForm', () => {
     windowName: '',
     isRootWorkspace: false,
     showActionMenu: true,
+    setWorkspaceTitle: vi.fn(),
+    setHasUnsavedChanges: vi.fn(),
   };
 
   const codedCausesOfDeath = [
