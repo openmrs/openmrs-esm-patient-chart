@@ -111,10 +111,12 @@ export function useEncounterTypes() {
 
 export function mapEncounter(encounter: Encounter): MappedEncounter {
   const diagnoses =
-    encounter?.diagnoses?.map((diagnosis) => ({
-      ...diagnosis,
-      certainty: diagnosis.certainty ?? 'CONFIRMED',
-    })) || [];
+    encounter?.diagnoses
+      ?.filter((diagnosis) => !diagnosis.voided)
+      .map((diagnosis) => ({
+        ...diagnosis,
+        certainty: diagnosis.certainty ?? 'CONFIRMED',
+      })) || [];
 
   return {
     id: encounter.uuid,

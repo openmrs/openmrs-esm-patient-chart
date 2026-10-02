@@ -1,6 +1,14 @@
-import { expect } from '@playwright/test';
+import { expect, type Locator } from '@playwright/test';
 import { test } from '../core';
 import { ChartPage, VisitsPage } from '../pages';
+
+// Carbon renders the checkbox input visually hidden behind its styled box, and the column
+// layout hides the per-card label text, so toggle the diagnosis checkboxes by clicking their
+// label (which carries the visible box) rather than the unactionable input.
+const toggleCheckbox = async (scope: Locator, name: string) => {
+  const id = await scope.getByRole('checkbox', { name }).getAttribute('id');
+  await scope.locator(`label[for="${id}"]`).click();
+};
 
 test('Add, edit, and delete a visit note', async ({ page, patient }) => {
   const chartPage = new ChartPage(page);
@@ -18,17 +26,33 @@ test('Add, edit, and delete a visit note', async ({ page, patient }) => {
     await expect(page.getByText('Add visit note', { exact: true })).toBeVisible();
   });
 
-  await test.step('When I select `Asthma` as the primary diagnosis', async () => {
-    await page.getByPlaceholder('Choose a primary diagnosis').fill('Asthma');
+  await test.step('When I add `Asthma` as a primary diagnosis (confirmed by default)', async () => {
+    await page.getByPlaceholder('Search for a diagnosis').fill('Asthma');
+    // Search results are keyboard-accessible buttons: ArrowDown focuses the first result,
+    // Enter selects it and returns focus to the input
     await expect(page.getByRole('button', { name: 'Asthma', exact: true })).toBeVisible();
-    await page.getByPlaceholder('Choose a primary diagnosis').press('ArrowDown');
+    await page.getByPlaceholder('Search for a diagnosis').press('ArrowDown');
     await expect(page.getByRole('button', { name: 'Asthma', exact: true })).toBeFocused();
     await page.keyboard.press('Enter');
+    const asthmaCard = page.getByRole('group', { name: 'Asthma' });
+    // Nothing is auto-ticked: a diagnosis with no primary shows the live warning until
+    // Primary is ticked, and certainty is confirmed by default.
+    await expect(asthmaCard.getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
+    await expect(page.getByText(/at least one diagnosis must be selected as primary/i)).toBeVisible();
+    await toggleCheckbox(asthmaCard, 'Primary');
+    await expect(asthmaCard.getByRole('checkbox', { name: 'Primary' })).toBeChecked();
+    await expect(page.getByText(/at least one diagnosis must be selected as primary/i)).toBeHidden();
   });
 
-  await test.step('And I select `GI upset` as the secondary diagnosis', async () => {
-    await page.getByPlaceholder('Choose a secondary diagnosis').fill('GI upset');
+  await test.step('And I add `GI upset` and mark it provisional', async () => {
+    await page.getByPlaceholder('Search for a diagnosis').fill('GI upset');
     await page.getByRole('button', { name: /gi upset/i }).click();
+    const giCard = page.getByRole('group', { name: /gi upset/i });
+    await expect(giCard).toBeVisible();
+    // Leaving Primary unticked keeps it secondary; the row's actions menu marks it provisional.
+    await giCard.getByRole('button', { name: /actions for gi upset/i }).click();
+    await page.getByRole('menuitem', { name: /mark as provisional/i }).click();
+    await expect(giCard.getByText('?', { exact: true })).toBeVisible();
   });
 
   await test.step('And I add a visit note', async () => {
@@ -91,6 +115,13 @@ test('Add, edit, and delete a visit note', async ({ page, patient }) => {
   await test.step('Then the visit note form should open in edit mode with the existing note prefilled', async () => {
     await expect(page.getByText('Edit visit note', { exact: true })).toBeVisible();
     await expect(page.getByPlaceholder('Write any notes here')).toHaveValue('This is a note');
+    // Rank and certainty must come back exactly as saved, not just the diagnosis names
+    const asthma = page.getByRole('group', { name: 'Asthma' });
+    const giUpset = page.getByRole('group', { name: /gi upset/i });
+    await expect(asthma.getByRole('checkbox', { name: 'Primary' })).toBeChecked();
+    await expect(asthma.getByText('?', { exact: true })).toBeHidden();
+    await expect(giUpset.getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
+    await expect(giUpset.getByText('?', { exact: true })).toBeVisible();
   });
 
   await test.step('When I change the note text and click `Save and close`', async () => {
@@ -111,6 +142,13 @@ test('Add, edit, and delete a visit note', async ({ page, patient }) => {
   await test.step('Then I should see the edited note and not the original note', async () => {
     await expect(page.getByText('This is an edited note')).toBeVisible();
     await expect(page.getByText('This is a note', { exact: true })).toBeHidden();
+  });
+
+  await test.step('And both diagnoses should have survived the edit round-trip', async () => {
+    // Editing a note deletes and recreates its diagnoses server-side; a silent failure
+    // in the recreate half would otherwise go unnoticed by this spec
+    await expect(page.getByText(/asthma/i).first()).toBeVisible();
+    await expect(page.getByText(/gi upset/i).first()).toBeVisible();
   });
 
   await test.step('When I click the `All encounters` tab', async () => {
