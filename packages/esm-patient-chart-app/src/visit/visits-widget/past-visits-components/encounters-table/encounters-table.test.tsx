@@ -1,6 +1,7 @@
 import { vi, describe, it, expect, test, beforeEach, afterEach } from 'vitest';
 import React from 'react';
 import {
+  type Encounter,
   ExtensionSlot,
   getDefaultsFromConfigSchema,
   launchWorkspace2,
@@ -348,10 +349,7 @@ describe('Encounter editability', () => {
     await clickEditEncounterViaOverflowMenu(admissionRowName);
 
     expect(onEditEncounter).toHaveBeenCalledTimes(1);
-    expect(onEditEncounter).toHaveBeenCalledWith(
-      expect.objectContaining({ id: mockAdmissionEncounter.uuid, encounterType: 'Admission' }),
-      false,
-    );
+    expect(onEditEncounter).toHaveBeenCalledWith(expect.objectContaining(mockAdmissionEncounter), false);
     expect(mockLaunchWorkspace).not.toHaveBeenCalled();
   });
 
@@ -363,19 +361,20 @@ describe('Encounter editability', () => {
     await clickEditEncounter(visitNoteRowName);
 
     expect(onEditEncounter).toHaveBeenCalledTimes(1);
-    expect(onEditEncounter).toHaveBeenCalledWith(
-      expect.objectContaining({ id: mockVisitNoteEncounter.uuid, encounterType: 'Visit Note', form: null }),
-      true,
-    );
+    expect(onEditEncounter).toHaveBeenCalledWith(expect.objectContaining(mockVisitNoteEncounter), true);
     expect(mockLaunchWorkspace).not.toHaveBeenCalled();
   });
 
   it('does not flag form-backed visit note encounters as visit notes when calling onEditEncounter', async () => {
     const onEditEncounter = vi.fn();
 
+    const visitNoteEncounterWithAdmissionForm: Encounter = {
+      ...mockVisitNoteEncounter,
+      form: mockAdmissionEncounter.form,
+    };
     renderEncountersTable({
       onEditEncounter,
-      paginatedEncounters: [{ ...mockVisitNoteEncounter, form: mockAdmissionEncounter.form }],
+      paginatedEncounters: [visitNoteEncounterWithAdmissionForm],
       totalCount: 1,
     });
 
@@ -384,14 +383,7 @@ describe('Encounter editability', () => {
     );
 
     expect(onEditEncounter).toHaveBeenCalledTimes(1);
-    expect(onEditEncounter).toHaveBeenCalledWith(
-      expect.objectContaining({
-        id: mockVisitNoteEncounter.uuid,
-        encounterType: 'Visit Note',
-        form: mockAdmissionEncounter.form,
-      }),
-      false,
-    );
+    expect(onEditEncounter).toHaveBeenCalledWith(expect.objectContaining(visitNoteEncounterWithAdmissionForm), false);
     expect(mockLaunchWorkspace).not.toHaveBeenCalled();
   });
 
@@ -416,7 +408,7 @@ describe('Encounter editability', () => {
     expect(mockLaunchWorkspace).toHaveBeenCalledWith(
       'visit-notes-form-workspace',
       expect.objectContaining({
-        encounter: expect.objectContaining({ id: mockVisitNoteEncounter.uuid }),
+        encounter: expect.objectContaining(mockVisitNoteEncounter),
         formContext: 'editing',
         patientUuid: mockPatientAlice.uuid,
       }),

@@ -237,7 +237,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                     const canDeleteEncounter = canModifyEncounter(encounter, session?.user, config);
 
                     const canEditEncounter =
-                      canDeleteEncounter && (encounter.form?.uuid || isVisitNoteEncounter(encounter));
+                      canDeleteEncounter && (encounter.form?.uuid || isVisitNoteEncounter(encounter.encounter));
 
                     const canPrintEncounter = canPrintEncounters && supportsEmbeddedFormView(encounter);
 
@@ -262,7 +262,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                     <OverflowMenuItem
                                       className={styles.menuItem}
                                       itemText={t('editThisEncounter', 'Edit this encounter')}
-                                      onClick={() => editEncounter(encounter, patientUuid, onEditEncounter)}
+                                      onClick={() => editEncounter(encounter.encounter, patientUuid, onEditEncounter)}
                                     />
                                   )}
                                   {canPrintEncounter && (
@@ -319,7 +319,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                 {canEditEncounter && (
                                   <Button
                                     kind="ghost"
-                                    onClick={() => editEncounter(encounter, patientUuid, onEditEncounter)}
+                                    onClick={() => editEncounter(encounter.encounter, patientUuid, onEditEncounter)}
                                     renderIcon={(props: ComponentProps<typeof EditIcon>) => (
                                       <EditIcon size={16} {...props} />
                                     )}

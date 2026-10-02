@@ -17,7 +17,6 @@ import { mockEncountersAlice, mockFhirPatient, mockPatientAlice, mockVisit } fro
 import { renderWithSwr } from 'tools';
 import { type ChartConfig, defaultVisitTimelinePageSize, esmPatientChartSchema } from '../../../../config-schema';
 import { jsonSchemaResourceName } from '../../../../constants';
-import { type MappedEncounter } from '../../past-visits-components/encounters-table/encounters-table.resource';
 import VisitTimeline from './visit-timeline.component';
 
 const mockExtensionSlot = vi.mocked(ExtensionSlot);
@@ -68,7 +67,7 @@ function buildEncounters(count: number): Array<Encounter> {
 
 function renderVisitTimeline(
   encounters: Array<Encounter> = mockEncountersAlice,
-  onEditEncounter?: (encounter: MappedEncounter, isVisitNote: boolean) => void,
+  onEditEncounter?: (encounter: Encounter, isVisitNote: boolean) => void,
 ) {
   const visit = { ...mockVisit, encounters } as Visit;
   return renderWithSwr(
@@ -184,10 +183,7 @@ describe('VisitTimeline', () => {
     await clickEditEncounter();
 
     expect(onEditEncounter).toHaveBeenCalledTimes(1);
-    expect(onEditEncounter).toHaveBeenCalledWith(
-      expect.objectContaining({ id: admissionEncounter.uuid, encounterType: 'Admission' }),
-      false,
-    );
+    expect(onEditEncounter).toHaveBeenCalledWith(expect.objectContaining(admissionEncounter), false);
     expect(mockLaunchWorkspace).not.toHaveBeenCalled();
   });
 
