@@ -153,7 +153,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   visitContext,
   closeWorkspace,
 }) => {
-  const isEditing: boolean = Boolean(formContext === 'editing' && encounter?.id);
+  const isEditing: boolean = Boolean(formContext === 'editing' && encounter?.uuid);
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
@@ -204,7 +204,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       removedImageIds: [],
       diagnosisSearch: '',
       diagnoses: initialDiagnoses,
-      noteDate: isEditing ? new Date(encounter.rawDatetime) : new Date(),
+      noteDate: isEditing ? new Date(encounter.encounterDatetime) : new Date(),
       clinicalNote: isEditing
         ? String(encounter?.obs?.find((obs) => obs.concept.uuid === encounterNoteTextConceptUuid)?.value || '')
         : '',
@@ -221,7 +221,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     images: savedImages,
     isLoading: isLoadingSavedImages,
     error: savedImagesError,
-  } = useVisitNoteImages(patientUuid, isEditing ? encounter.id : undefined);
+  } = useVisitNoteImages(patientUuid, isEditing ? encounter.uuid : undefined);
 
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
   const { mutate: globalMutate } = useSWRConfig();
@@ -440,13 +440,13 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
       const saveNote = () => {
         const savePromise = isEditing
-          ? updateVisitNote(abortController, encounter.id, visitNotePayload)
+          ? updateVisitNote(abortController, encounter.uuid, visitNotePayload)
           : saveVisitNote(abortController, visitNotePayload);
 
         return savePromise
           .then((response) => {
             if (response.status === 201 || response.status === 200) {
-              const encounterUuid = encounter?.id || response.data.uuid;
+              const encounterUuid = encounter?.uuid || response.data.uuid;
 
               // If editing, first delete existing diagnoses
               if (isEditing && encounter?.diagnoses?.length) {
@@ -589,7 +589,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       clinicianEncounterRole,
       closeWorkspace,
       encounter?.diagnoses,
-      encounter?.id,
+      encounter?.uuid,
       encounter?.obs,
       encounterNoteTextConceptUuid,
       encounterTypeUuid,

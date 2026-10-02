@@ -1,7 +1,7 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach, afterAll } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { esmPatientChartSchema, type ChartConfig } from '../config-schema';
 import { mockPatient } from 'tools';
@@ -164,6 +164,33 @@ describe('MarkPatientDeceasedForm', () => {
     expect(mockShowSnackbar).toHaveBeenCalledWith({
       title: 'Patient marked deceased successfully',
     });
+  });
+
+  it('accepts a death date on the day of birth in timezones ahead of UTC', async () => {
+    // Date-only strings like "1972-04-04" are parsed by `new Date()` as UTC midnight, which is after local midnight
+    // anywhere ahead of UTC. The suite runs in UTC, so switch zones to exercise that case.
+    const originalTz = process.env.TZ;
+    process.env.TZ = 'Africa/Nairobi';
+
+    try {
+      const user = userEvent.setup();
+
+      render(<MarkPatientDeceasedForm {...defaultProps} />);
+
+      await user.click(screen.getByRole('radio', { name: 'Traumatic injury' }));
+      fireEvent.change(screen.getByLabelText(/^date$/i), { target: { value: mockPatient.birthDate } });
+      await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+      expect(screen.queryByText(/death date cannot be before the date of birth/i)).not.toBeInTheDocument();
+      expect(markPatientDeceased).toHaveBeenCalledWith(
+        new Date(1972, 3, 4),
+        mockPatient.id,
+        '8b64f45e-1d5f-4894-b77c-4e1d840e2c99',
+        '',
+      );
+    } finally {
+      process.env.TZ = originalTz;
+    }
   });
 
   it('renders an error message when saving the cause of death fails', async () => {

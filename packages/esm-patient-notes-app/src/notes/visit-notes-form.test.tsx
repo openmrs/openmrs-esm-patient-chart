@@ -493,10 +493,8 @@ test('initializes form with existing encounter data when in edit mode', () => {
   mockedUseFeatureFlag.mockReturnValue(true);
 
   const mockEncounter = {
-    id: '123',
     uuid: '123',
-    datetime: '20/03/2024',
-    rawDatetime: '2024-03-20T10:00:00.000Z',
+    encounterDatetime: '2024-03-20T10:00:00.000Z',
     obs: [
       {
         concept: { uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
@@ -540,10 +538,8 @@ test('initializes form with existing encounter data when in edit mode', () => {
 test('updates existing visit note when in edit mode', async () => {
   const user = userEvent.setup();
   const mockEncounter = {
-    id: '123',
     uuid: '123',
-    datetime: '20/03/2024',
-    rawDatetime: '2024-03-20T10:00:00.000Z',
+    encounterDatetime: '2024-03-20T10:00:00.000Z',
     obs: [
       {
         concept: { uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
@@ -606,7 +602,7 @@ test('updates existing visit note when in edit mode', async () => {
 
   expect(mockUpdateVisitNote).toHaveBeenCalledWith(
     expect.any(AbortController),
-    mockEncounter.id,
+    mockEncounter.uuid,
     expect.objectContaining(updatePayload),
   );
 });
@@ -614,10 +610,8 @@ test('updates existing visit note when in edit mode', async () => {
 test('handles existing diagnoses correctly when in edit mode', async () => {
   const user = userEvent.setup();
   const mockEncounter = {
-    id: '123',
     uuid: '123',
-    datetime: '20/03/2024',
-    rawDatetime: '2024-03-20T10:00:00.000Z',
+    encounterDatetime: '2024-03-20T10:00:00.000Z',
     diagnoses: [
       {
         uuid: '456',
@@ -657,10 +651,8 @@ test('handles existing diagnoses correctly when in edit mode', async () => {
 test('preserves CONFIRMED certainty on diagnoses when re-saving a visit note in edit mode', async () => {
   const user = userEvent.setup();
   const mockEncounter = {
-    id: '123',
     uuid: '123',
-    datetime: '20/03/2024',
-    rawDatetime: '2024-03-20T10:00:00.000Z',
+    encounterDatetime: '2024-03-20T10:00:00.000Z',
     obs: [
       {
         concept: { uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
@@ -867,7 +859,7 @@ test.each([false, true])(
     const encounter: Encounter = {
       uuid: 'existing-note',
       id: 'existing-note',
-      rawDatetime: '2024-03-20T10:00:00.000Z',
+      encounterDatetime: '2024-03-20T10:00:00.000Z',
       obs: [],
       diagnoses: [],
     };
@@ -918,7 +910,7 @@ test.each(['creating', 'editing'] as const)(
         encounter: {
           uuid: 'existing-note',
           id: 'existing-note',
-          rawDatetime: '2024-03-20T10:00:00.000Z',
+          encounterDatetime: '2024-03-20T10:00:00.000Z',
           obs: [],
           diagnoses: [],
         },
@@ -980,7 +972,7 @@ test('labels image removal with the description, filename or image number', asyn
 const existingNote: Encounter = {
   uuid: 'existing-note',
   id: 'existing-note',
-  rawDatetime: '2024-03-20T10:00:00.000Z',
+  encounterDatetime: '2024-03-20T10:00:00.000Z',
   obs: [{ concept: { uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }, value: 'Existing clinical note' }],
   diagnoses: [],
 } as unknown as Encounter;
@@ -1429,10 +1421,8 @@ test('presumes secondary and confirmed for out-of-enum rank and certainty from o
   });
 
   const mockEncounter = {
-    id: '123',
     uuid: '123',
-    datetime: '20/03/2024',
-    rawDatetime: '2024-03-20T10:00:00.000Z',
+    encounterDatetime: '2024-03-20T10:00:00.000Z',
     diagnoses: [
       {
         uuid: '456',
@@ -1594,9 +1584,8 @@ test('keeps rows in place when Primary is toggled and lists new diagnoses on top
 
 test('sorts stored primaries first once when a note is opened for editing', () => {
   const encounter = {
-    id: '123',
     uuid: '123',
-    rawDatetime: '2024-03-20T10:00:00.000Z',
+    encounterDatetime: '2024-03-20T10:00:00.000Z',
     diagnoses: [
       {
         uuid: '1',
@@ -1678,10 +1667,8 @@ test('supports selecting a diagnosis search result with the keyboard', async () 
 });
 
 const mixedClassEncounter = {
-  id: '123',
   uuid: '123',
-  datetime: '20/03/2024',
-  rawDatetime: '2024-03-20T10:00:00.000Z',
+  encounterDatetime: '2024-03-20T10:00:00.000Z',
   diagnoses: [
     {
       uuid: '456',
