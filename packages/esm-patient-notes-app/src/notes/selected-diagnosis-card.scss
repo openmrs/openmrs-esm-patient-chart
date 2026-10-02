@@ -38,15 +38,8 @@ $diagnosis-columns: 3rem minmax(0, 1fr) 2rem 2rem;
 
   // Center the checkbox under its column header and strip Carbon's stacked-form margins
   :global(.cds--form-item) {
-    flex: 0 0 auto;
     margin: 0;
     justify-self: center;
-  }
-
-  // The remove button auto-flows into the last column; keep it at the row's top-right
-  > :global(.cds--btn) {
-    justify-self: end;
-    align-self: start;
   }
 }
 
@@ -66,6 +59,14 @@ $diagnosis-columns: 3rem minmax(0, 1fr) 2rem 2rem;
   &::before,
   &::after {
     translate: 0.5rem 0.375rem;
+  }
+}
+
+// `translate` is physical, so mirror the horizontal offset when the locale is right-to-left
+:global([dir='rtl'] .omrs-breakpoint-lt-desktop) .diagnosisRow :global(.cds--checkbox-label) {
+  &::before,
+  &::after {
+    translate: -0.5rem 0.375rem;
   }
 }
 

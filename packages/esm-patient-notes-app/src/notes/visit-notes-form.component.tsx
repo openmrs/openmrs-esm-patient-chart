@@ -962,34 +962,31 @@ function DiagnosisSearch({
     <Controller
       name={name}
       control={control}
-      render={({ field: { value, onChange, onBlur }, fieldState }) => (
-        <>
-          <ResponsiveWrapper>
-            <Search
-              size={isTablet ? 'lg' : 'md'}
-              id={name}
-              labelText={labelText}
-              placeholder={placeholder}
-              onChange={(e) => {
-                setIsSearching(true);
-                onChange(e);
-                handleSearch();
-              }}
-              onKeyDown={(event) => {
-                if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-                  const results = document.getElementById(`${name}-results`)?.querySelectorAll('button');
-                  if (results?.length) {
-                    event.preventDefault();
-                    results[event.key === 'ArrowDown' ? 0 : results.length - 1].focus();
-                  }
+      render={({ field: { value, onChange, onBlur } }) => (
+        <ResponsiveWrapper>
+          <Search
+            size={isTablet ? 'lg' : 'md'}
+            id={name}
+            labelText={labelText}
+            placeholder={placeholder}
+            onChange={(e) => {
+              setIsSearching(true);
+              onChange(e);
+              handleSearch();
+            }}
+            onKeyDown={(event) => {
+              if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                const results = document.getElementById(`${name}-results`)?.querySelectorAll('button');
+                if (results?.length) {
+                  event.preventDefault();
+                  results[event.key === 'ArrowDown' ? 0 : results.length - 1].focus();
                 }
-              }}
-              value={value}
-              onBlur={onBlur}
-            />
-          </ResponsiveWrapper>
-          {fieldState?.error?.message && <p className={styles.errorMessage}>{fieldState?.error?.message}</p>}
-        </>
+              }
+            }}
+            value={value}
+            onBlur={onBlur}
+          />
+        </ResponsiveWrapper>
       )}
     />
   );

@@ -42,9 +42,6 @@ export function DiagnosisListHeader() {
   return (
     <div aria-hidden="true" className={styles.diagnosisListHeader}>
       <span>{t('primary', 'Primary')}</span>
-      <span />
-      <span />
-      <span />
     </div>
   );
 }

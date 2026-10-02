@@ -115,6 +115,13 @@ test('Add, edit, and delete a visit note', async ({ page, patient }) => {
   await test.step('Then the visit note form should open in edit mode with the existing note prefilled', async () => {
     await expect(page.getByText('Edit visit note', { exact: true })).toBeVisible();
     await expect(page.getByPlaceholder('Write any notes here')).toHaveValue('This is a note');
+    // Rank and certainty must come back exactly as saved, not just the diagnosis names
+    const asthma = page.getByRole('group', { name: 'Asthma' });
+    const giUpset = page.getByRole('group', { name: /gi upset/i });
+    await expect(asthma.getByRole('checkbox', { name: 'Primary' })).toBeChecked();
+    await expect(asthma.getByText('?', { exact: true })).toBeHidden();
+    await expect(giUpset.getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
+    await expect(giUpset.getByText('?', { exact: true })).toBeVisible();
   });
 
   await test.step('When I change the note text and click `Save and close`', async () => {
