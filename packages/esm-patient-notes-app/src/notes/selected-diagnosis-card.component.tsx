@@ -69,6 +69,7 @@ export default function SelectedDiagnosisCard({
   return (
     <div className={styles.diagnosisRow} role="group" aria-label={diagnosis.display}>
       <Checkbox
+        aria-describedby="primary-diagnosis-requirement"
         checked={diagnosis.rank === 1}
         hideLabel
         id={`diagnosis-${diagnosis.draftId}-primary`}

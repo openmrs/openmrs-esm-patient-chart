@@ -93,7 +93,7 @@ const createSchema = (t: TFunction, isRetrospectiveDataEntryEnabled: boolean, is
   return z.object({
     noteDate: isRetrospectiveDataEntryEnabled ? z.date() : z.date().optional(),
     diagnosisSearch: z.string().optional(),
-    // Every diagnosis is always complete (secondary/provisional are presumed defaults), so the
+    // Every diagnosis is always complete (secondary and confirmed are the defaults), so the
     // only diagnosis-level rule is the primary requirement, which belongs to the list as a whole
     diagnoses: z
       .array(z.custom<DiagnosisDraft>())
@@ -111,19 +111,23 @@ const SEARCH_TIMEOUT_MS = 500;
 /**
  * The diagnoses already recorded on the note being edited. Values outside the known enums
  * (possible from other REST writers) fall back to the form's presumption: secondary and
- * confirmed. Only an explicit PROVISIONAL shows the provisional mark.
+ * confirmed. Only an explicit PROVISIONAL shows the provisional mark. Primaries are sorted
+ * first once, here, as the visits table lists them; after that rows stay where they are so
+ * toggling Primary never moves a row out from under the pointer.
  */
 const toDiagnosisDrafts = (encounter: Encounter | undefined, patientUuid: string): Array<DiagnosisDraft> =>
-  (encounter?.diagnoses ?? []).map(
-    (d): DiagnosisDraft => ({
-      draftId: nextDraftId(),
-      patient: patientUuid,
-      diagnosis: d.diagnosis.coded?.uuid ? { coded: d.diagnosis.coded.uuid } : { nonCoded: d.diagnosis.nonCoded },
-      certainty: d.certainty === 'PROVISIONAL' ? 'PROVISIONAL' : 'CONFIRMED',
-      rank: d.rank === 1 ? 1 : 2,
-      display: d.display,
-    }),
-  );
+  (encounter?.diagnoses ?? [])
+    .map(
+      (d): DiagnosisDraft => ({
+        draftId: nextDraftId(),
+        patient: patientUuid,
+        diagnosis: d.diagnosis.coded?.uuid ? { coded: d.diagnosis.coded.uuid } : { nonCoded: d.diagnosis.nonCoded },
+        certainty: d.certainty === 'PROVISIONAL' ? 'PROVISIONAL' : 'CONFIRMED',
+        rank: d.rank === 1 ? 1 : 2,
+        display: d.display,
+      }),
+    )
+    .sort((a, b) => Number(b.rank === 1) - Number(a.rank === 1));
 
 /** Image formats browsers render, so a staged file always has a real thumbnail. */
 const imageExtensions = new Set(['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp']);
@@ -301,6 +305,10 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
         // Unknown while the lookup is pending; if it failed, keep the action rather than
         // stranding a stored provisional diagnosis with no way to confirm it
         return Boolean(conceptClassLookupError);
+      }
+      if (conceptClassUuid === null) {
+        // The lookup answered but left this concept out: treat it like a failed lookup
+        return true;
       }
       return conceptClassUuid === config.diagnosisConceptClass;
     },
@@ -616,13 +624,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
   const hasUserUnsavedChanges = Object.keys(dirtyFields).length > 0;
 
-  // Primary diagnoses list first; within each group the most recently added stays on top
-  // (the stored order is newest-first). The sort is stable, so only rank moves rows.
-  const orderedDiagnoses = useMemo(
-    () => [...selectedDiagnoses].sort((a, b) => Number(b.rank === 1) - Number(a.rank === 1)),
-    [selectedDiagnoses],
-  );
-
   // The primary requirement is shown live: as soon as there are diagnoses but none is
   // primary (or after a save attempt with nothing selected), and it clears the moment a
   // primary is ticked. Until a save is attempted it reads as a warning; once a save has
@@ -730,7 +731,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                         )}
                       </p>
                       <DiagnosisListHeader />
-                      {orderedDiagnoses.map((diagnosis) => (
+                      {selectedDiagnoses.map((diagnosis) => (
                         <SelectedDiagnosisCard
                           key={diagnosis.draftId}
                           canMarkProvisional={canMarkProvisional(diagnosis)}
@@ -743,6 +744,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                   )}
                   {showPrimaryRequiredWarning && (
                     <p
+                      id="primary-diagnosis-requirement"
                       className={classnames(styles.primaryRequiredWarning, {
                         [styles.primaryRequiredError]: primaryRequiredBlockedSave,
                       })}

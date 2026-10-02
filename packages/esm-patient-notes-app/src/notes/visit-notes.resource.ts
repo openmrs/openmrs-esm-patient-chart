@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import useSWRInfinite from 'swr/infinite';
-import { openmrsFetch, restBaseUrl, useAttachments, useConfig } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, useAttachments, useConfig, type FetchResponse } from '@openmrs/esm-framework';
 import { getAttachmentBytesUrl } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 import type {
@@ -108,25 +108,31 @@ export function fetchDiagnosisConceptsByName(searchTerm: string, diagnosisConcep
 /**
  * Concept class of each coded diagnosis already on the note being edited. The encounter handed
  * to the form carries only each diagnosis's concept uuid and display, but the certainty action
- * is offered for true diagnoses (the configured diagnosis concept class) only, so the class is
- * looked up once per concept and kept for the session.
+ * is offered for true diagnoses (the configured diagnosis concept class) only, so the classes
+ * are looked up in one `conceptreferences` request and kept for the session. The endpoint
+ * silently omits references it cannot resolve, so those come back as `null` and the form treats
+ * them like a failed lookup rather than as "not a diagnosis".
  */
 export function useDiagnosisConceptClasses(conceptUuids: Array<string>) {
-  const { data, error, isLoading } = useSWRImmutable<Record<string, string | undefined>, Error>(
-    conceptUuids.length > 0 ? ['diagnosisConceptClasses', ...conceptUuids] : null,
-    async () => {
-      const responses = await Promise.all(
-        conceptUuids.map((uuid) =>
-          openmrsFetch<{ uuid: string; conceptClass: { uuid: string } | null }>(
-            `${restBaseUrl}/concept/${uuid}?v=custom:(uuid,conceptClass:(uuid))`,
-          ),
-        ),
-      );
-      return Object.fromEntries(responses.map(({ data }) => [data.uuid, data.conceptClass?.uuid]));
-    },
+  const { data, error, isLoading } = useSWRImmutable<
+    FetchResponse<Record<string, { conceptClass?: { uuid: string } }>>,
+    Error
+  >(
+    conceptUuids.length > 0
+      ? `${restBaseUrl}/conceptreferences?references=${conceptUuids.join(',')}&v=custom:(uuid,conceptClass:(uuid))`
+      : null,
+    openmrsFetch,
   );
 
-  return { conceptClassByUuid: data ?? {}, error, isLoading };
+  const conceptClassByUuid = useMemo<Record<string, string | null>>(
+    () =>
+      data?.data
+        ? Object.fromEntries(conceptUuids.map((uuid) => [uuid, data.data[uuid]?.conceptClass?.uuid ?? null]))
+        : {},
+    [conceptUuids, data],
+  );
+
+  return { conceptClassByUuid, error, isLoading };
 }
 
 export function saveVisitNote(abortController: AbortController, payload: VisitNotePayload) {

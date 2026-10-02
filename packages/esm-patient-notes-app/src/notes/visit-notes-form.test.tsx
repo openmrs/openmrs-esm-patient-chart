@@ -1569,7 +1569,7 @@ test('shows the primary-required warning live and keeps saving blocked until a p
   expect(await screen.findByText(/at least one diagnosis must be selected as primary/i)).toBeInTheDocument();
 });
 
-test('lists primary diagnoses first and the newest of the rest on top', async () => {
+test('keeps rows in place when Primary is toggled and lists new diagnoses on top', async () => {
   const user = userEvent.setup();
   mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
   renderVisitNotesForm();
@@ -1577,16 +1577,60 @@ test('lists primary diagnoses first and the newest of the rest on top', async ()
   await addDiagnosis(user, 'Diabetes Mellitus');
   await addDiagnosis(user, 'Diabetes Mellitus, Type II');
 
-  // Newest first while nothing is primary
-  let [top, second] = screen.getAllByRole('group', { name: /diabetes mellitus/i });
-  expect(top).toHaveAccessibleName('Diabetes Mellitus, Type II');
-  expect(second).toHaveAccessibleName('Diabetes Mellitus');
+  // Newest first
+  const names = () =>
+    screen.getAllByRole('group', { name: /diabetes mellitus/i }).map((g) => g.getAttribute('aria-label'));
+  expect(names()).toEqual(['Diabetes Mellitus, Type II', 'Diabetes Mellitus']);
 
-  // Ticking Primary on the older one pins it to the top; the rest keep newest-first order
-  await user.click(within(second).getByRole('checkbox', { name: 'Primary' }));
-  [top, second] = screen.getAllByRole('group', { name: /diabetes mellitus/i });
-  expect(top).toHaveAccessibleName('Diabetes Mellitus');
-  expect(second).toHaveAccessibleName('Diabetes Mellitus, Type II');
+  // Ticking Primary on the lower row leaves it where it is, so the next click lands on the
+  // row the user is looking at; switching primaries never reshuffles the list
+  const [, lower] = screen.getAllByRole('group', { name: /diabetes mellitus/i });
+  await user.click(within(lower).getByRole('checkbox', { name: 'Primary' }));
+  expect(within(lower).getByRole('checkbox', { name: 'Primary' })).toBeChecked();
+  expect(names()).toEqual(['Diabetes Mellitus, Type II', 'Diabetes Mellitus']);
+  await user.click(within(lower).getByRole('checkbox', { name: 'Primary' }));
+  expect(names()).toEqual(['Diabetes Mellitus, Type II', 'Diabetes Mellitus']);
+});
+
+test('sorts stored primaries first once when a note is opened for editing', () => {
+  const encounter = {
+    id: '123',
+    uuid: '123',
+    rawDatetime: '2024-03-20T10:00:00.000Z',
+    diagnoses: [
+      {
+        uuid: '1',
+        diagnosis: { coded: { uuid: '789', display: 'Cough' } },
+        certainty: 'CONFIRMED',
+        rank: 2,
+        display: 'Cough',
+      },
+      {
+        uuid: '2',
+        diagnosis: { coded: { uuid: '789', display: 'Malaria' } },
+        certainty: 'CONFIRMED',
+        rank: 1,
+        display: 'Malaria',
+      },
+      {
+        uuid: '3',
+        diagnosis: { coded: { uuid: '789', display: 'Fever' } },
+        certainty: 'PROVISIONAL',
+        rank: 2,
+        display: 'Fever',
+      },
+    ],
+  } as unknown as Encounter;
+
+  renderVisitNotesForm({ formContext: 'editing', encounter });
+
+  // Primary first, the rest in stored order — the same order the visits table shows
+  expect(
+    screen
+      .getAllByRole('group')
+      .filter((g) => g.getAttribute('aria-label'))
+      .map((g) => g.getAttribute('aria-label')),
+  ).toEqual(['Malaria', 'Cough', 'Fever']);
 });
 
 test('tracks added and removed diagnoses as form changes and returns to clean when the draft is empty', async () => {
@@ -1718,4 +1762,33 @@ test('keeps the certainty action for prefilled concepts when the class lookup fa
   // Better to offer the action to a symptom than to strand a stored provisional diagnosis
   expect(actionsMenuFor(screen.getByRole('group', { name: 'Diabetes Mellitus' }))).toBeInTheDocument();
   expect(actionsMenuFor(screen.getByRole('group', { name: 'Fever' }))).toBeInTheDocument();
+});
+
+test('treats a concept the class lookup left out like a failed lookup', () => {
+  // conceptreferences omits references it cannot resolve; the hook reports those as null
+  mockUseDiagnosisConceptClasses.mockReturnValue({
+    conceptClassByUuid: { '789': diagnosisConceptClass, '790': null },
+    error: undefined,
+    isLoading: false,
+  });
+
+  renderVisitNotesForm({ formContext: 'editing', encounter: mixedClassEncounter });
+
+  expect(actionsMenuFor(screen.getByRole('group', { name: 'Diabetes Mellitus' }))).toBeInTheDocument();
+  expect(actionsMenuFor(screen.getByRole('group', { name: 'Fever' }))).toBeInTheDocument();
+});
+
+test('describes every Primary checkbox with the primary-required message while it is shown', async () => {
+  const user = userEvent.setup();
+  mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
+  renderVisitNotesForm();
+
+  const card = await addDiagnosis(user, 'Diabetes Mellitus');
+  const checkbox = within(card).getByRole('checkbox', { name: 'Primary' });
+  expect(checkbox).toHaveAttribute('aria-describedby', 'primary-diagnosis-requirement');
+  expect(checkbox).toHaveAccessibleDescription(/at least one diagnosis must be selected as primary/i);
+
+  // Once a primary exists the message unmounts and the reference points at nothing
+  await user.click(checkbox);
+  expect(checkbox).not.toHaveAccessibleDescription();
 });

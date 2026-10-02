@@ -55,6 +55,20 @@ $diagnosis-columns: 3rem minmax(0, 1fr) 2rem 2rem;
   justify-content: center;
 }
 
+// On tablets the Primary checkbox needs a touch target on a par with the 32px actions beside
+// it. Carbon's label is 20px wide with a 16px box at its top-left; grow the label to 32x32 and
+// slide the box (and its checkmark) to the middle without touching Carbon's own transforms.
+:global(.omrs-breakpoint-lt-desktop) .diagnosisRow :global(.cds--checkbox-label) {
+  min-inline-size: 2rem;
+  min-block-size: 2rem;
+  padding-inline-start: 2rem;
+
+  &::before,
+  &::after {
+    translate: 0.5rem 0.375rem;
+  }
+}
+
 // Carbon caps each menu item at 11.25rem, which leaves a gutter inside the wider O3 menu;
 // let the items span the whole menu instead
 .diagnosisActionsMenu :global(.cds--overflow-menu-options__btn) {
