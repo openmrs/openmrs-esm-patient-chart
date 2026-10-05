@@ -88,7 +88,12 @@ function* fhirObservationRequests(queries: Record<string, string>) {
   const pathWithPageOffset = (offset) => path + '&_getpagesoffset=' + offset * PAGE_SIZE;
   let offsetCounter = 0;
   while (true) {
-    yield fetch(pathWithPageOffset(offsetCounter++)).then((res) => res.json());
+    yield fetch(pathWithPageOffset(offsetCounter++)).then((res) => {
+      if (!res.ok) {
+        throw new Error(`Failed to fetch laboratory observations: ${res.status} ${res.statusText}`.trim());
+      }
+      return res.json();
+    });
   }
 }
 
