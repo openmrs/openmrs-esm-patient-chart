@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { useSWRConfig } from 'swr';
 import { useVisit, type Visit, restBaseUrl } from '@openmrs/esm-framework';
 import { usePatientChartStore } from '../store/patient-chart-store';
+import { invalidateVisitByUuid } from './revalidation-utils';
 
 export interface VisitMutationOptions {
   encounters?: boolean;
@@ -20,7 +21,7 @@ export interface VisitMutationOptions {
  */
 export function useOptimisticVisitMutations(patientUuid: string) {
   const { mutate } = useSWRConfig();
-  const { visitContext, mutateVisitContext } = usePatientChartStore(patientUuid);
+  const { visitContext } = usePatientChartStore(patientUuid);
 
   /**
    * Optimistically updates visit data in SWR caches without triggering network requests.
@@ -30,7 +31,7 @@ export function useOptimisticVisitMutations(patientUuid: string) {
     (visitUuid: string, updates: Partial<Visit>) => {
       // Update current visit SWR cache if it matches
       if (visitContext?.uuid === visitUuid) {
-        mutateVisitContext?.();
+        invalidateVisitByUuid(mutate, visitUuid);
       }
 
       // Update visit lists across all hooks using regex pattern matching
@@ -53,7 +54,7 @@ export function useOptimisticVisitMutations(patientUuid: string) {
         false, // Don't revalidate
       );
     },
-    [visitContext, mutateVisitContext, mutate, patientUuid],
+    [visitContext, mutate, patientUuid],
   );
 
   /**
@@ -82,10 +83,10 @@ export function useOptimisticVisitMutations(patientUuid: string) {
 
       // If deleted visit was current, revalidate current visit to get new state
       if (visitContext?.uuid === visitUuid) {
-        mutateVisitContext?.();
+        invalidateVisitByUuid(mutate, visitUuid);
       }
     },
-    [visitContext, mutateVisitContext, mutate, patientUuid],
+    [visitContext, mutate, patientUuid],
   );
 
   /**

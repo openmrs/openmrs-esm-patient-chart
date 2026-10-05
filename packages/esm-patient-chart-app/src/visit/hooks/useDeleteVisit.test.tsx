@@ -65,7 +65,6 @@ describe('useDeleteVisit', () => {
       patientUuid: 'patient-123',
       patient: null,
       visitContext: null,
-      mutateVisitContext: vi.fn(),
       setPatient: vi.fn(),
       setVisitContext: mockSetVisitContext,
     });
@@ -144,7 +143,6 @@ describe('useDeleteVisit', () => {
       patientUuid: 'patient-123',
       patient: null,
       visitContext: null,
-      mutateVisitContext: vi.fn(),
       setPatient: vi.fn(),
       setVisitContext: mockSetVisitContext,
     });
@@ -190,7 +188,6 @@ describe('useDeleteVisit', () => {
       patientUuid: 'patient-123',
       patient: null,
       visitContext: null,
-      mutateVisitContext: vi.fn(),
       setPatient: vi.fn(),
       setVisitContext: mockSetVisitContext,
     });

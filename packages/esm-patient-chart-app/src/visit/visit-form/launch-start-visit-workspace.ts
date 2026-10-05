@@ -28,6 +28,6 @@ export function launchStartVisitWorkspace<T extends VisitFormProps>(
     'start-visit-workspace-form',
     workspaceProps,
     windowProps,
-    { ...windowProps, mutateVisitContext: null },
+    windowProps,
   );
 }

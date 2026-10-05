@@ -3,7 +3,6 @@ import dayjs from 'dayjs';
 import { capitalize } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
-import { useSWRConfig } from 'swr';
 import {
   Button,
   DataTable,
@@ -34,7 +33,6 @@ import {
   ErrorState,
   getDrugOrderByUuid,
   getPatientChartWindowProps,
-  invalidateVisitByUuid,
   PatientChartPagination,
   type FulfillerStatus,
   type Order,
@@ -632,16 +630,14 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
   }, [orderItem.type, orderItem.orderType.uuid]);
   const { orders, setOrders } = useOrderBasket<OrderBasketItem>(patient, grouping, postDataPrepFn);
   const alreadyInBasket = orders.some((x) => x.uuid === orderItem.uuid);
-  const { mutate: globalMutate } = useSWRConfig();
 
   const groupProps = useMemo(
     () => ({
       patient,
       patientUuid: patient.id,
       visitContext: orderItem.encounter.visit,
-      mutateVisitContext: () => invalidateVisitByUuid(globalMutate, orderItem.encounter.visit?.uuid),
     }),
-    [patient, orderItem.encounter.visit, globalMutate],
+    [patient, orderItem.encounter.visit],
   );
   // The workspaces read the patient / visit from their window props, not from the group props
   const windowProps = useMemo(

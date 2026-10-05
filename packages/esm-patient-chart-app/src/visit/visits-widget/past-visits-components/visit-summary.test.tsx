@@ -49,7 +49,6 @@ beforeEach(() => {
     patientUuid: mockPatient.id,
     patient: mockFhirPatient,
     visitContext: null,
-    mutateVisitContext: vi.fn(),
     setPatient: vi.fn(),
     setVisitContext: vi.fn(),
   } as any);
@@ -210,7 +209,6 @@ describe('VisitSummary encounter editing', () => {
 describe('VisitSummary encounter deletion', () => {
   const mockVisitWithEncounters = visitOverviewDetailMockDataNotEmpty.data.results[0];
   const [mockAdmissionEncounter, mockVisitNoteEncounter] = mockVisitWithEncounters.encounters;
-  const chartMutateVisitContext = vi.fn();
 
   beforeEach(() => {
     mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(esmPatientChartSchema));
@@ -222,25 +220,17 @@ describe('VisitSummary encounter deletion', () => {
       patientUuid: mockPatient.id,
       patient: mockFhirPatient,
       visitContext: null,
-      mutateVisitContext: chartMutateVisitContext,
       setPatient: vi.fn(),
       setVisitContext: vi.fn(),
     } as any);
   });
 
-  it('passes mutateVisitContext down to the timeline', async () => {
+  it('deletes an encounter from the timeline', async () => {
     const user = userEvent.setup();
-    const mutateVisitContext = vi.fn();
     // The timeline offers one actions menu per encounter, so keep the visit to the one being deleted
     const visitWithVisitNoteOnly = { ...mockVisitWithEncounters, encounters: [mockVisitNoteEncounter] };
 
-    renderWithSwr(
-      <VisitSummary
-        patientUuid={mockPatient.id}
-        visit={visitWithVisitNoteOnly}
-        mutateVisitContext={mutateVisitContext}
-      />,
-    );
+    renderWithSwr(<VisitSummary patientUuid={mockPatient.id} visit={visitWithVisitNoteOnly} />);
 
     // The timeline is the tab the visit summary opens on
     await user.click(screen.getByRole('button', { name: /encounter table actions menu/i }));
@@ -252,13 +242,11 @@ describe('VisitSummary encounter deletion', () => {
     await user.click(deleteItem);
     confirmDeletion();
 
-    await waitFor(() => expect(mutateVisitContext).toHaveBeenCalledTimes(1));
-    expect(chartMutateVisitContext).not.toHaveBeenCalled();
+    await waitFor(() => expect(mockDeleteEncounter).toHaveBeenCalledTimes(1));
   });
 
-  it('passes mutateVisitContext down to the completed forms tab', async () => {
+  it('deletes an encounter from the completed forms tab', async () => {
     const user = userEvent.setup();
-    const mutateVisitContext = vi.fn();
     const mockCompletedFormEncounter = {
       ...mockAdmissionEncounter,
       uuid: 'enc-with-schema',
@@ -273,20 +261,13 @@ describe('VisitSummary encounter deletion', () => {
       encounters: [...mockVisitWithEncounters.encounters, mockCompletedFormEncounter],
     };
 
-    renderWithSwr(
-      <VisitSummary
-        patientUuid={mockPatient.id}
-        visit={visitWithCompletedForm}
-        mutateVisitContext={mutateVisitContext}
-      />,
-    );
+    renderWithSwr(<VisitSummary patientUuid={mockPatient.id} visit={visitWithCompletedForm} />);
 
     await user.click(screen.getByRole('tab', { name: /completed forms/i }));
     await clickDeleteEncounter(/poc consent form/i);
     confirmDeletion();
 
-    await waitFor(() => expect(mutateVisitContext).toHaveBeenCalledTimes(1));
-    expect(chartMutateVisitContext).not.toHaveBeenCalled();
+    await waitFor(() => expect(mockDeleteEncounter).toHaveBeenCalledTimes(1));
   });
 });
 

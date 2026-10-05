@@ -16,7 +16,6 @@ const testProps = {
   patientUuid: mockPatient.id,
   patient: mockPatient,
   visitContext: null,
-  mutateVisitContext: null,
 };
 
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
