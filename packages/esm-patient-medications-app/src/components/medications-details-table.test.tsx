@@ -153,10 +153,16 @@ describe('MedicationsDetailsTable - Renew', () => {
 
     await clickRenew(user);
 
-    // The clinician sees the order-basket workspace open to finish the renewal, and it opens
-    // plain -- nothing pins it back to the stale visit the original order was written in, so
-    // it lands in whatever visit is current.
-    await waitFor(() => expect(mockLaunchWorkspace2).toHaveBeenCalledWith('order-basket'));
+    // The clinician sees the order-basket workspace open to finish the renewal, and it opens with
+    // the chart's current patient / visit as its window props and no group props -- nothing pins it
+    // back to the stale visit the original order was written in, so it lands in whatever visit is current.
+    await waitFor(() =>
+      expect(mockLaunchWorkspace2).toHaveBeenCalledWith(
+        'order-basket',
+        {},
+        expect.objectContaining({ patientUuid: mockPatient.id }),
+      ),
+    );
 
     // The queued item is a renewal of this order rather than a copy of it.
     expect(getBasketedMedications()).toEqual([
@@ -214,7 +220,13 @@ describe('MedicationsDetailsTable - Renew', () => {
     const unrelatedItem = seedBasketWithUnrelatedMedication();
     answerVisitPrompt(true);
 
-    await waitFor(() => expect(mockLaunchWorkspace2).toHaveBeenCalledWith('order-basket'));
+    await waitFor(() =>
+      expect(mockLaunchWorkspace2).toHaveBeenCalledWith(
+        'order-basket',
+        {},
+        expect.objectContaining({ patientUuid: mockPatient.id }),
+      ),
+    );
     expect(getBasketedMedications()).toEqual([
       unrelatedItem,
       expect.objectContaining({ uuid: medicationFixture.uuid, action: 'RENEW' }),
@@ -242,7 +254,7 @@ describe('MedicationsDetailsTable - Modify', () => {
         order: expect.objectContaining({ action: 'REVISE' }),
         orderToEditOrdererUuid: medicationFixture.orderer.uuid,
       }),
-      { encounterUuid: medicationFixture.encounter.uuid },
+      expect.objectContaining({ patientUuid: mockPatient.id }),
       expect.objectContaining({ patientUuid: mockPatient.id }),
     );
     expect(mockStartVisitIfNeeded).not.toHaveBeenCalled();

@@ -25,6 +25,7 @@ export function useLaunchVitalsAndBiometricsForm(patientUuid: string) {
           workspaceTitle: formName,
           form: { uuid: formUuid },
           encounterUuid: '',
+          handlePostResponse: invalidateCachedVitalsAndBiometrics,
         }
       : {};
 
@@ -32,10 +33,7 @@ export function useLaunchVitalsAndBiometricsForm(patientUuid: string) {
       patient,
       patientUuid,
       visitContext,
-      mutateVisitContext: () => {
-        mutateVisitContext?.();
-        invalidateCachedVitalsAndBiometrics();
-      },
+      mutateVisitContext,
     };
 
     launchVitalsAndBiometricsForm(workspaceProps, {}, groupProps);
@@ -44,8 +42,8 @@ export function useLaunchVitalsAndBiometricsForm(patientUuid: string) {
     formName,
     formUuid,
     launchVitalsAndBiometricsForm,
-    visitContext,
     mutateVisitContext,
+    visitContext,
     patient,
     patientUuid,
   ]);

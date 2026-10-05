@@ -94,6 +94,7 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
   } = useVisit(isVisitContextValid ? null : patientUuid);
 
   const launchedWorkspaceGroupKey = useRef<WorkspaceGroupLaunchKey | null>(null);
+  const launchedWorkspaceGroupProps = useRef<PatientWorkspaceGroupProps | null>(null);
   const latestWorkspaceGroupProps = useRef<PatientWorkspaceGroupProps | null>(null);
   const isWorkspaceGroupLaunchPending = useRef(false);
   const isMounted = useRef(false);
@@ -140,6 +141,7 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
         }
 
         launchedWorkspaceGroupKey.current = launchKey;
+        launchedWorkspaceGroupProps.current = groupProps;
 
         const latestLaunchKey = getWorkspaceGroupLaunchKey(latestWorkspaceGroupProps.current);
         if (workspaceGroupLaunchKeysEqual(latestLaunchKey, launchedWorkspaceGroupKey.current)) {
@@ -183,7 +185,10 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
         latestWorkspaceGroupProps.current = groupProps;
         await launchLatestWorkspaceGroup();
         if (isMounted.current) {
-          setPatientChartWorkspaceGroupVisitUuid(launchedWorkspaceGroupKey.current?.visitContextUuid ?? null);
+          setPatientChartWorkspaceGroupVisitUuid(
+            launchedWorkspaceGroupKey.current?.visitContextUuid ?? null,
+            launchedWorkspaceGroupProps.current,
+          );
         }
       }
     };
