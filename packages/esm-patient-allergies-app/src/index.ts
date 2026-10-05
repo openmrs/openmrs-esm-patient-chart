@@ -34,10 +34,10 @@ export const allergyFormWorkspace = getAsyncLifecycle(
   options,
 );
 
-// Variant for use outside the patient chart (e.g. registered by the ward app into its own
-// workspace group). Receives the patient context via window props instead of the chart group.
+// Public name referenced by other apps' routes.json (e.g. the ward app registers it into its own
+// workspace window). The same component as `allergyFormWorkspace`: both take the patient via window props.
 export const exportedAllergyFormWorkspace = getAsyncLifecycle(
-  () => import('./allergies/allergies-form/exported-allergy-form.workspace'),
+  () => import('./allergies/allergies-form/allergy-form.workspace'),
   options,
 );
 

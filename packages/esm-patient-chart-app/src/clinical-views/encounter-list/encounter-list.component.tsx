@@ -108,9 +108,9 @@ export const EncounterList: React.FC<EncounterListProps> = ({
 
   const createLaunchFormAction = useCallback(
     (encounter: Encounter, mode: LaunchAction) => () => {
-      launchEncounterForm(formsJson, mode, '*', requireActiveVisitForEncounterTile, visit, encounter.uuid);
+      launchEncounterForm(patientUuid, formsJson, mode, '*', requireActiveVisitForEncounterTile, visit, encounter.uuid);
     },
-    [formsJson, visit, requireActiveVisitForEncounterTile],
+    [patientUuid, formsJson, visit, requireActiveVisitForEncounterTile],
   );
 
   const handleDeleteEncounter = useCallback(
@@ -212,6 +212,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
                       handleDeleteEncounter(encounter.uuid, encounter.encounterType.name);
                     } else {
                       launchEncounterForm(
+                        patientUuid,
                         formsJson,
                         actionItem.mode,
                         actionItem.intent,
@@ -261,7 +262,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
           iconDescription="Add"
           onClick={(e) => {
             e.preventDefault();
-            launchEncounterForm(formsJson, 'add', '*', requireActiveVisitForEncounterTile, visit);
+            launchEncounterForm(patientUuid, formsJson, 'add', '*', requireActiveVisitForEncounterTile, visit);
           }}
         >
           {t(displayText)}
@@ -269,7 +270,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
       );
     }
     return null;
-  }, [formsJson, displayText, t, visit, requireActiveVisitForEncounterTile]);
+  }, [patientUuid, formsJson, displayText, t, visit, requireActiveVisitForEncounterTile]);
 
   if (isLoading === true || isLoadingFormsJson === true) {
     return <DataTableSkeleton rowCount={10} />;
@@ -304,7 +305,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
           launchForm={
             hideFormLauncher || deathStatus
               ? null
-              : () => launchEncounterForm(formsJson, 'add', '*', requireActiveVisitForEncounterTile, visit)
+              : () => launchEncounterForm(patientUuid, formsJson, 'add', '*', requireActiveVisitForEncounterTile, visit)
           }
         />
       )}

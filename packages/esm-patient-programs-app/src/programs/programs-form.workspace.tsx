@@ -31,7 +31,7 @@ import {
   useSession,
   Workspace2,
 } from '@openmrs/esm-framework';
-import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
+import { type PatientWorkspace2DefinitionProps, useShowPatientBanner } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 import {
   createProgramEnrollment,
@@ -76,10 +76,12 @@ export type ProgramsFormData = z.infer<ReturnType<typeof createProgramsFormSchem
 
 const ProgramsForm: React.FC<PatientWorkspace2DefinitionProps<ProgramsFormProps, {}>> = ({
   closeWorkspace,
-  groupProps: { patient, patientUuid },
+  groupProps,
   workspaceProps: { programEnrollmentId },
 }) => {
+  const { patient, patientUuid } = groupProps;
   const { t } = useTranslation();
+  const shouldShowPatientBanner = useShowPatientBanner(groupProps);
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const { data: availablePrograms } = useAvailablePrograms();
@@ -358,7 +360,7 @@ const ProgramsForm: React.FC<PatientWorkspace2DefinitionProps<ProgramsFormProps,
       }
       hasUnsavedChanges={isDirty}
     >
-      {isTablet && patient && patientUuid && (
+      {shouldShowPatientBanner && patient && patientUuid && (
         <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
       )}
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>

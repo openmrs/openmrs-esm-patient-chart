@@ -22,7 +22,13 @@ describe('VisitNoteActionButton', () => {
 
     render(
       <VisitNoteActionButton
-        groupProps={{ patientUuid: 'patient-uuid', mutateVisitContext: null, patient: null, visitContext: null }}
+        groupProps={{
+          showPatientBanner: 'tabletOnly',
+          patientUuid: 'patient-uuid',
+          mutateVisitContext: null,
+          patient: null,
+          visitContext: null,
+        }}
       />,
     );
   });
@@ -32,7 +38,13 @@ describe('VisitNoteActionButton', () => {
 
     render(
       <VisitNoteActionButton
-        groupProps={{ patientUuid: mockPatient.id, patient: mockPatient, visitContext: null, mutateVisitContext: null }}
+        groupProps={{
+          showPatientBanner: 'tabletOnly',
+          patientUuid: mockPatient.id,
+          patient: mockPatient,
+          visitContext: null,
+          mutateVisitContext: null,
+        }}
       />,
     );
 

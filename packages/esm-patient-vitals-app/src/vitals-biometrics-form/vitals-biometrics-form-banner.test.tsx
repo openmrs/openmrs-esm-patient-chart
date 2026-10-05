@@ -1,10 +1,16 @@
 import React from 'react';
 import { vi, describe, it, expect } from 'vitest';
 import { render } from '@testing-library/react';
-import { ExtensionSlot, getDefaultsFromConfigSchema, useConfig, type Visit } from '@openmrs/esm-framework';
+import {
+  ExtensionSlot,
+  getDefaultsFromConfigSchema,
+  useConfig,
+  useLayoutType,
+  type Visit,
+} from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import { type ConfigObject, configSchema } from '../config-schema';
-import ExportedVitalsAndBiometricsForm from './exported-vitals-biometrics-form.workspace';
+import VitalsAndBiometricsForm from './vitals-biometrics-form.workspace';
 
 vi.mock('../common', () => ({
   assessValue: vi.fn(),
@@ -29,6 +35,7 @@ vi.mock('../common/data.resource', () => ({
 
 const mockExtensionSlot = vi.mocked(ExtensionSlot);
 const mockUseConfig = vi.mocked(useConfig);
+const mockUseLayoutType = vi.mocked(useLayoutType);
 
 mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
@@ -47,12 +54,12 @@ const defaultProps = {
   showActionMenu: true,
   workspaceProps: {
     formContext: 'creating' as const,
+  },
+  windowProps: {
     patientUuid: mockPatient.id,
     patient: mockPatient,
     visitContext: null as unknown as Visit,
-    showPatientBanner: true,
   },
-  windowProps: {},
   groupProps: {},
 };
 
@@ -60,26 +67,22 @@ function getExtensionSlotState(name: string) {
   return mockExtensionSlot.mock.calls.find(([props]) => props.name === name)?.[0]?.state;
 }
 
-describe('ExportedVitalsAndBiometricsForm', () => {
-  it('renders the patient banner when it is enabled', () => {
-    render(<ExportedVitalsAndBiometricsForm {...defaultProps} />);
+describe('VitalsAndBiometricsForm patient banner', () => {
+  it('renders the patient banner when the group asks for it at every width', () => {
+    render(<VitalsAndBiometricsForm {...defaultProps} />);
 
     expect(getExtensionSlotState('patient-header-slot')).toBeDefined();
   });
 
   it('hides the form engine patient banner when the workspace renders its own', () => {
-    render(<ExportedVitalsAndBiometricsForm {...defaultProps} />);
+    render(<VitalsAndBiometricsForm {...defaultProps} />);
 
     expect(getExtensionSlotState('form-widget-slot').hidePatientBanner).toBe(true);
   });
 
   it('lets the form engine render its own patient banner when the workspace does not render one', () => {
-    render(
-      <ExportedVitalsAndBiometricsForm
-        {...defaultProps}
-        workspaceProps={{ ...defaultProps.workspaceProps, showPatientBanner: false }}
-      />,
-    );
+    mockUseLayoutType.mockReturnValue('large-desktop');
+    render(<VitalsAndBiometricsForm {...defaultProps} groupProps={{ showPatientBanner: 'tabletOnly' }} />);
 
     expect(getExtensionSlotState('patient-header-slot')).toBeUndefined();
     expect(getExtensionSlotState('form-widget-slot').hidePatientBanner).toBe(false);
