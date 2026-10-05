@@ -51,7 +51,7 @@ describe('<OrderBasketActionButton/>', () => {
           showPatientBanner: 'tabletOnly',
           patient: mockPatient,
           patientUuid: mockPatient.id,
-          visitContext: null,
+          activeVisit: null,
         }}
       />,
     );
@@ -69,7 +69,7 @@ describe('<OrderBasketActionButton/>', () => {
           showPatientBanner: 'tabletOnly',
           patient: mockPatient,
           patientUuid: mockPatient.id,
-          visitContext: null,
+          activeVisit: null,
         }}
       />,
     );
@@ -90,7 +90,7 @@ describe('<OrderBasketActionButton/>', () => {
           showPatientBanner: 'tabletOnly',
           patient: mockPatient,
           patientUuid: mockPatient.id,
-          visitContext: null,
+          activeVisit: null,
         }}
       />,
     );
@@ -109,7 +109,7 @@ describe('<OrderBasketActionButton/>', () => {
           showPatientBanner: 'tabletOnly',
           patient: mockPatient,
           patientUuid: mockPatient.id,
-          visitContext: null,
+          activeVisit: null,
         }}
       />,
     );
@@ -126,7 +126,7 @@ describe('<OrderBasketActionButton/>', () => {
           showPatientBanner: 'tabletOnly',
           patient: mockPatient,
           patientUuid: mockPatient.id,
-          visitContext: null,
+          activeVisit: null,
         }}
       />,
     );

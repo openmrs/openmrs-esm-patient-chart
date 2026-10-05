@@ -18,7 +18,7 @@ describe('launchStartVisitWorkspace', () => {
       {
         patient,
         patientUuid: patient.id,
-        visitContext: null,
+        activeVisit: null,
         showPatientBanner: 'tabletOnly',
       },
     );

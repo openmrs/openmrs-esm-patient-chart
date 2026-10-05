@@ -58,7 +58,7 @@ describe('useStartVisitIfNeeded', () => {
   afterEach(() => {
     const { result } = renderHook(() => usePatientChartStore(patient.id));
     act(() => {
-      result.current.setVisitContext(null);
+      result.current.setActiveVisit(null);
       result.current.setPatient(null);
       setPatientChartWorkspaceGroupVisitUuid(null);
     });
@@ -66,7 +66,7 @@ describe('useStartVisitIfNeeded', () => {
 
   it('resolves true without prompting when the patient already has a visit context', async () => {
     const result = setUpStartVisitIfNeeded();
-    act(() => result.current.store.setVisitContext(visit));
+    act(() => result.current.store.setActiveVisit(visit));
 
     await expect(result.current.startVisitIfNeeded()).resolves.toBe(true);
     expect(mockShowModal).not.toHaveBeenCalled();
@@ -83,7 +83,7 @@ describe('useStartVisitIfNeeded', () => {
     const { onVisitStarted } = getModalProps('start-visit-dialog');
 
     await act(async () => {
-      result.current.store.setVisitContext(visit);
+      result.current.store.setActiveVisit(visit);
       onVisitStarted();
     });
     expect(settlement.settled).toBe(false);
@@ -123,7 +123,7 @@ describe('useStartVisitIfNeeded', () => {
     expect(dialogs).toHaveLength(2);
 
     await act(async () => {
-      result.current.store.setVisitContext(visit);
+      result.current.store.setActiveVisit(visit);
       dialogs.forEach(({ onVisitStarted }) => onVisitStarted());
     });
     await act(async () => setPatientChartWorkspaceGroupVisitUuid(visit.uuid));
@@ -137,7 +137,7 @@ describe('getPatientChartWindowProps', () => {
   afterEach(() => {
     const { result } = renderHook(() => usePatientChartStore(patient.id));
     act(() => {
-      result.current.setVisitContext(null);
+      result.current.setActiveVisit(null);
       result.current.setPatient(null);
       setPatientChartWorkspaceGroupVisitUuid(null, null);
     });
@@ -148,12 +148,12 @@ describe('getPatientChartWindowProps', () => {
     const groupProps = {
       patient,
       patientUuid: patient.id,
-      visitContext: visit,
+      activeVisit: visit,
       showPatientBanner: 'tabletOnly' as const,
     };
     act(() => result.current.setPatient(patient));
     act(() => {
-      result.current.setVisitContext({ ...visit });
+      result.current.setActiveVisit({ ...visit });
       setPatientChartWorkspaceGroupVisitUuid(visit.uuid, groupProps);
     });
 
@@ -164,7 +164,7 @@ describe('getPatientChartWindowProps', () => {
   it('falls back to the store values when no workspace group was launched', () => {
     const { result } = renderHook(() => usePatientChartStore(patient.id));
     act(() => result.current.setPatient(patient));
-    act(() => result.current.setVisitContext(visit));
+    act(() => result.current.setActiveVisit(visit));
 
     expect(getPatientChartWindowProps(patient.id)).toEqual({
       patient,
@@ -178,7 +178,7 @@ describe('getPatientChartWindowProps', () => {
     const previousPatientGroupProps = {
       patient: { ...patient, id: 'previous-patient-uuid' },
       patientUuid: 'previous-patient-uuid',
-      visitContext: visit,
+      activeVisit: visit,
       showPatientBanner: 'tabletOnly' as const,
     };
     act(() => result.current.setPatient(patient));
@@ -194,7 +194,7 @@ describe('getPatientChartWindowProps', () => {
   it("does not return another patient's chart context", () => {
     const { result } = renderHook(() => usePatientChartStore(patient.id));
     act(() => result.current.setPatient(patient));
-    act(() => result.current.setVisitContext(visit));
+    act(() => result.current.setActiveVisit(visit));
 
     expect(getPatientChartWindowProps('other-patient-uuid')).toEqual({
       patient: null,
@@ -224,9 +224,11 @@ describe('getPatientAndVisitProps', () => {
   });
 
   it('falls back to group props when a launch supplies neither window props nor workspace props', () => {
-    expect(getPatientAndVisitProps(null, undefined, { patient, patientUuid: patient.id, visitContext: visit })).toEqual(
-      { patient, patientUuid: patient.id, visitContext: visit },
-    );
+    expect(getPatientAndVisitProps(null, undefined, { patient, patientUuid: patient.id, activeVisit: visit })).toEqual({
+      patient,
+      patientUuid: patient.id,
+      visitContext: visit,
+    });
   });
 
   it("doesn't mix the group's visit into a patient given by the window", () => {
@@ -234,7 +236,7 @@ describe('getPatientAndVisitProps', () => {
       getPatientAndVisitProps({ patient, patientUuid: patient.id, visitContext: null }, undefined, {
         patient,
         patientUuid: patient.id,
-        visitContext: visit,
+        activeVisit: visit,
       }),
     ).toEqual({ patient, patientUuid: patient.id, visitContext: null });
   });
@@ -245,7 +247,7 @@ describe('getPatientAndVisitProps', () => {
       getPatientAndVisitProps(
         undefined,
         { patient, patientUuid: patient.id, visitContext: visit },
-        { patient: otherPatient, patientUuid: 'other', visitContext: null },
+        { patient: otherPatient, patientUuid: 'other', activeVisit: null },
       ),
     ).toEqual({ patient, patientUuid: patient.id, visitContext: visit });
   });
@@ -265,7 +267,7 @@ describe('useLaunchWorkspaceRequiringVisit', () => {
   afterEach(() => {
     const { result } = renderHook(() => usePatientChartStore(patient.id));
     act(() => {
-      result.current.setVisitContext(null);
+      result.current.setActiveVisit(null);
       result.current.setPatient(null);
       setPatientChartWorkspaceGroupVisitUuid(null, null);
     });
@@ -278,7 +280,7 @@ describe('useLaunchWorkspaceRequiringVisit', () => {
       launch: useLaunchWorkspaceRequiringVisit(patient.id, 'some-workspace'),
     }));
     act(() => result.current.store.setPatient(patient));
-    act(() => result.current.store.setVisitContext(visit));
+    act(() => result.current.store.setActiveVisit(visit));
 
     await act(async () => result.current.launch({ a: 1 } as any, { extra: true }));
 
@@ -301,7 +303,7 @@ describe('useLaunchWorkspaceRequiringVisit', () => {
     const groupPropsWithoutVisit = {
       patient,
       patientUuid: patient.id,
-      visitContext: null,
+      activeVisit: null,
       showPatientBanner: 'tabletOnly' as const,
     };
     const { result } = renderHook(() => ({
@@ -321,14 +323,14 @@ describe('useLaunchWorkspaceRequiringVisit', () => {
 
     // The visit is started, and the chart relaunches its workspace group with it
     await act(async () => {
-      result.current.store.setVisitContext(visit);
+      result.current.store.setActiveVisit(visit);
       onVisitStarted();
     });
     expect(mockLaunchWorkspace2).not.toHaveBeenCalled();
     const groupPropsWithVisit = {
       patient,
       patientUuid: patient.id,
-      visitContext: visit,
+      activeVisit: visit,
       showPatientBanner: 'tabletOnly' as const,
     };
     await act(async () => setPatientChartWorkspaceGroupVisitUuid(visit.uuid, groupPropsWithVisit));
@@ -349,7 +351,7 @@ describe('useLaunchWorkspaceRequiringVisit', () => {
     const groupPropsWithVisit = {
       patient,
       patientUuid: patient.id,
-      visitContext: visit,
+      activeVisit: visit,
       showPatientBanner: 'tabletOnly' as const,
     };
     const { result } = renderHook(() => ({
@@ -357,7 +359,7 @@ describe('useLaunchWorkspaceRequiringVisit', () => {
       launch: useActionMenuButtonLaunchProps(groupPropsWithVisit, 'some-workspace'),
     }));
     act(() => result.current.store.setPatient(patient));
-    act(() => result.current.store.setVisitContext(visit));
+    act(() => result.current.store.setActiveVisit(visit));
     act(() => setPatientChartWorkspaceGroupVisitUuid(visit.uuid, groupPropsWithVisit));
 
     await expect(result.current.launch.onBeforeWorkspaceLaunch()).resolves.toBe(true);
