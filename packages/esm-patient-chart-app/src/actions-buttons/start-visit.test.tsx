@@ -5,7 +5,6 @@ import { render, screen } from '@testing-library/react';
 import { launchWorkspace2 } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import StartVisitOverflowMenuItem from './start-visit.component';
-import { object } from 'zod';
 
 const mockLaunchWorkspace = vi.mocked(launchWorkspace2);
 
@@ -24,7 +23,6 @@ describe('StartVisitOverflowMenuItem', () => {
       'start-visit-workspace-form',
       { openedFrom: 'patient-chart-start-visit' },
       expect.objectContaining({ patient: mockPatient, patientUuid: mockPatient.id, visitContext: null }),
-      expect.objectContaining({ patient: mockPatient, patientUuid: mockPatient.id }),
     );
   });
 

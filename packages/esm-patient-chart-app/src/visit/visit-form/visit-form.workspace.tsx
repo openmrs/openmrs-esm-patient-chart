@@ -41,7 +41,6 @@ import {
   getPatientAndVisitProps,
   hasPatientBannerData,
   invalidateVisitAndEncounterData,
-  invalidateVisitByUuid,
   type PatientBannerGroupProps,
   type PatientWorkspaceWindowProps,
   useActivePatientEnrollment,
@@ -393,7 +392,8 @@ const VisitForm: React.FC<Workspace2DefinitionProps<VisitFormProps, VisitFormWin
           setIsVisitSaved(true);
 
           // Use targeted SWR invalidation instead of global mutateVisit
-          // This will invalidate visit history and encounter tables for this patient
+          // This will invalidate visit history and encounter tables for this patient,
+          // and the current visit, which is the visit in the patient chart store
           invalidateVisitAndEncounterData(globalMutate, patientUuid);
 
           const visitAttributesRequest = visitToEdit
