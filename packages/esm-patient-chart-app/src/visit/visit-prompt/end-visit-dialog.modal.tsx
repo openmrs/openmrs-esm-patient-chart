@@ -36,7 +36,7 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
           window.dispatchEvent(new CustomEvent('queue-entry-updated'));
           closeModal();
           if (visitContext?.uuid == activeVisit.uuid) {
-            setVisitContext(null, null);
+            setVisitContext(null);
           }
           showSnackbar({
             isLowContrast: true,
