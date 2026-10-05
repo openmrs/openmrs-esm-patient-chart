@@ -188,7 +188,6 @@ export function DrugOrderForm({
     formState: { isDirty, isSubmitting },
     getValues,
     handleSubmit,
-    resetField,
     setError,
     setValue,
     watch,
@@ -345,7 +344,7 @@ export function DrugOrderForm({
       quantityUnits: data.quantityUnits,
       numRefills: data.numRefills,
       indication: data.indication,
-      frequency: data.frequency,
+      frequency: data.isFreeTextDosage ? null : data.frequency,
       scheduledDate,
       action: initialOrderBasketItem?.action ?? 'NEW',
       commonMedicationName: data.drug.display,
@@ -355,12 +354,6 @@ export function DrugOrderForm({
 
     try {
       await onSave(newBasketItem);
-      resetField('patientInstructions', { defaultValue: '' });
-      resetField('freeTextDosage', { defaultValue: '' });
-      resetField('indication', { defaultValue: '' });
-      resetField('pillsDispensed', { defaultValue: null });
-      resetField('quantityUnits', { defaultValue: null });
-      resetField('numRefills', { defaultValue: null });
     } catch (error) {
       console.error('Error saving drug order', error);
     }

@@ -321,6 +321,27 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
     expect(screen.queryByText(/auto-calculated/i)).not.toBeInTheDocument();
   });
 
+  it('submits only free-text dosage fields while preserving the structured frequency draft', async () => {
+    const user = userEvent.setup();
+    const onSave = vi.fn().mockResolvedValue(undefined);
+    renderDrugOrderForm(createNewOrderBasketItem({ ...completeMedicationOrderFields, isQuantityManual: true }), onSave);
+    await user.click(screen.getByRole('switch', { name: /free text dosage/i }));
+    await user.type(screen.getByPlaceholderText(/^free text dosage$/i), 'Take one tablet twice daily');
+    fireEvent.submit(screen.getByRole('form', { name: /add drug order/i }));
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
+    expect(onSave.mock.calls[0][0]).toMatchObject({
+      isFreeTextDosage: true,
+      freeTextDosage: 'Take one tablet twice daily',
+      dosage: null,
+      unit: null,
+      route: null,
+      frequency: null,
+      patientInstructions: null,
+    });
+    await user.click(screen.getByRole('switch', { name: /free text dosage/i }));
+    expect(screen.getByRole('combobox', { name: /frequency/i })).toHaveValue('Once daily');
+  });
+
   it('preserves both dosage drafts when switching between dosage modes', async () => {
     const user = userEvent.setup();
     renderDrugOrderForm(createNewOrderBasketItem());
@@ -358,7 +379,7 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
     expect(screen.queryByText(/oral/i)).not.toBeInTheDocument();
   });
 
-  it('clears submitted dosage, prescription, and dispensing drafts after save', async () => {
+  it('submits dosage, prescription, and dispensing details on save', async () => {
     const user = userEvent.setup();
     const onSave = vi.fn().mockResolvedValue(undefined);
     renderDrugOrderForm(createNewOrderBasketItem(completeMedicationOrderFields), onSave);
@@ -378,11 +399,6 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
       quantityUnits: expect.objectContaining({ value: 'Tablet' }),
       numRefills: 0,
     });
-    expect(screen.getByPlaceholderText(/additional dosing instructions/i)).toHaveValue('');
-    expect(screen.getByPlaceholderText(/e\.g\. "Hypertension"/i)).toHaveValue('');
-    expect(screen.getByRole('spinbutton', { name: /quantity to dispense/i })).not.toHaveValue();
-    expect(screen.getByRole('combobox', { name: /quantity unit/i })).toHaveValue('');
-    expect(screen.getByRole('spinbutton', { name: /prescription refills/i })).not.toHaveValue();
   });
 
   it('keeps draft values when saving fails so clinicians can retry', async () => {
