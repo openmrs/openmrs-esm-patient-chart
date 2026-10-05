@@ -176,6 +176,7 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
           title: t('errorSavingDrugOrder', 'Error saving drug order'),
           subtitle: error.message,
         });
+        throw error;
       };
 
       return postOrder(
