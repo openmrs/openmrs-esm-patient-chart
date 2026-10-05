@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useSWRConfig } from 'swr';
 import { useVisit, type Visit, restBaseUrl } from '@openmrs/esm-framework';
 import { usePatientChartStore } from '../store/patient-chart-store';
-import { invalidateVisitByUuid } from './revalidation-utils';
+import { invalidateCurrentVisit } from './revalidation-utils';
 
 export interface VisitMutationOptions {
   encounters?: boolean;
@@ -31,7 +31,7 @@ export function useOptimisticVisitMutations(patientUuid: string) {
     (visitUuid: string, updates: Partial<Visit>) => {
       // Update current visit SWR cache if it matches
       if (activeVisit?.uuid === visitUuid) {
-        invalidateVisitByUuid(mutate, visitUuid);
+        invalidateCurrentVisit(mutate, patientUuid);
       }
 
       // Update visit lists across all hooks using regex pattern matching
@@ -83,7 +83,7 @@ export function useOptimisticVisitMutations(patientUuid: string) {
 
       // If deleted visit was current, revalidate current visit to get new state
       if (activeVisit?.uuid === visitUuid) {
-        invalidateVisitByUuid(mutate, visitUuid);
+        invalidateCurrentVisit(mutate, patientUuid);
       }
     },
     [activeVisit, mutate, patientUuid],
