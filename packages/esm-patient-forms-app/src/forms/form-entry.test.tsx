@@ -68,7 +68,14 @@ describe('FormEntry', () => {
         showBackButton
         form={{
           ...defaultProps.form,
-          resources: [{ name: 'formEngine', valueReference: 'htmlformentry' }],
+          resources: [
+            {
+              uuid: 'html-form-engine-resource',
+              name: 'formEngine',
+              dataType: 'java.lang.String',
+              valueReference: 'htmlformentry',
+            },
+          ],
         }}
       />,
     );
