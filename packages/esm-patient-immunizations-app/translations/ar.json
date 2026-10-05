@@ -9,6 +9,7 @@
   "doses": "Doses",
   "due": "Due",
   "duplicateDoseWarning": "Dose {{dose}} has already been recorded for this vaccine",
+  "editImmunization": "Edit immunization",
   "error": "Error",
   "errorSaving": "خطأ في حفظ التطعيم",
   "expirationDate": "تاريخ الانتهاء",

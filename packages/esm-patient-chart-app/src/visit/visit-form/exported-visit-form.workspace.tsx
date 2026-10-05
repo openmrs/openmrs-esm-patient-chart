@@ -26,10 +26,10 @@ import {
   showSnackbar,
   updateVisit,
   useConfig,
-  useConnectivity,
   useEmrConfiguration,
   useLayoutType,
   useVisit,
+  useVisitTypes,
   Workspace2,
   type AssignedExtension,
   type NewVisitPayload,
@@ -37,7 +37,6 @@ import {
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import {
-  createOfflineVisitForPatient,
   invalidateCurrentVisit,
   invalidateVisitAndEncounterData,
   useActivePatientEnrollment,
@@ -50,7 +49,6 @@ import {
   extractErrorMessagesFromResponse,
   updateVisitAttribute,
   useAllowOverlappingVisits,
-  useConditionalVisitTypes,
   useEarliestAllowedVisitStartDate,
   useVisitFormCallbacks,
   useVisitFormSchemaAndDefaultValues,
@@ -127,7 +125,6 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const isOnline = useConnectivity();
   const config = useConfig<ChartConfig>();
   const { emrConfiguration } = useEmrConfiguration();
   const [visitTypeContentSwitcherIndex, setVisitTypeContentSwitcherIndex] = useState(
@@ -139,7 +136,7 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
   const { allowOverlappingVisits, isLoading: isLoadingOverlapSetting } = useAllowOverlappingVisits();
 
   const { mutate: globalMutate } = useSWRConfig();
-  const allVisitTypes = useConditionalVisitTypes();
+  const allVisitTypes = useVisitTypes();
   const { earliestAllowedStartDate, isLoading: isLoadingBirthdateCheck } =
     useEarliestAllowedVisitStartDate(patientUuid);
 
@@ -322,121 +319,85 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
       };
 
       const abortController = new AbortController();
-      if (isOnline) {
-        const visitRequest = visitToEdit?.uuid
-          ? updateVisit(visitToEdit?.uuid, payload, abortController)
-          : saveVisit(payload, abortController);
+      const visitRequest = visitToEdit?.uuid
+        ? updateVisit(visitToEdit?.uuid, payload, abortController)
+        : saveVisit(payload, abortController);
 
-        await visitRequest
-          .then((response) => {
-            showSnackbar({
-              isLowContrast: true,
-              kind: 'success',
-              subtitle: !visitToEdit
-                ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
-                    visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
-                  })
-                : t('visitDetailsUpdatedSuccessfully', '{{visit}} updated successfully', {
-                    visit: response?.data?.visitType?.display ?? t('pastVisit', 'Past visit'),
-                  }),
-              title: !visitToEdit
-                ? t('visitStarted', 'Visit started')
-                : t('visitDetailsUpdated', 'Visit details updated'),
-            });
-            return response;
-          })
-          .catch((error) => {
-            showSnackbar({
-              title: !visitToEdit
-                ? t('startVisitError', 'Error starting visit')
-                : t('errorUpdatingVisitDetails', 'Error updating visit details'),
-              kind: 'error',
-              isLowContrast: false,
-              subtitle: getErrorDescription(error),
-            });
-            return Promise.reject(error); // short-circuit promise chain
-          })
-          .then(async (response) => {
-            // now that visit is created / updated, we run post-submit actions
-            // to update visit attributes or any other OnVisitCreatedOrUpdated actions
-            const visit = response.data;
-            setIsVisitSaved(true);
-
-            // Use targeted SWR invalidation instead of global mutateVisit
-            // This will invalidate visit history and encounter tables for this patient
-            // (if visitContext is updated, it should have been invalidated with mutateSavedOrUpdatedVisit)
-            invalidateVisitAndEncounterData(globalMutate, patientUuid);
-            invalidateCurrentVisit(globalMutate, patientUuid);
-
-            const visitAttributesRequest = visitToEdit
-              ? handleVisitAttributes(visitAttributes, response.data.uuid).then((visitAttributesResponses) => {
-                  if (visitAttributesResponses.length > 0) {
-                    showSnackbar({
-                      isLowContrast: true,
-                      kind: 'success',
-                      title: t(
-                        'additionalVisitInformationUpdatedSuccessfully',
-                        'Additional visit information updated successfully',
-                      ),
-                    });
-                  }
+      await visitRequest
+        .then((response) => {
+          showSnackbar({
+            isLowContrast: true,
+            kind: 'success',
+            subtitle: !visitToEdit
+              ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
+                  visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
                 })
-              : Promise.resolve();
-
-            const onVisitCreatedOrUpdatedRequests = [...visitFormCallbacks.values()].map((callbacks) =>
-              callbacks.onVisitCreatedOrUpdated(visit),
-            );
-
-            await Promise.all([visitAttributesRequest, ...onVisitCreatedOrUpdatedRequests]);
-            await handleCreateExtraVisitInfo?.();
-            await closeWorkspace({ discardUnsavedChanges: true });
-            onVisitStarted?.(visit);
-          })
-          .catch(() => {
-            // do nothing, this catches any reject promises used for short-circuiting
+              : t('visitDetailsUpdatedSuccessfully', '{{visit}} updated successfully', {
+                  visit: response?.data?.visitType?.display ?? t('pastVisit', 'Past visit'),
+                }),
+            title: !visitToEdit
+              ? t('visitStarted', 'Visit started')
+              : t('visitDetailsUpdated', 'Visit details updated'),
           });
-      } else {
-        await createOfflineVisitForPatient(
-          patientUuid,
-          visitLocation.uuid,
-          config.offlineVisitTypeUuid,
-          payload.startDatetime,
-        ).then(
-          async (visit) => {
-            setIsVisitSaved(true);
-            // Also invalidate visit history and encounter tables
-            invalidateVisitAndEncounterData(globalMutate, patientUuid);
-            invalidateCurrentVisit(globalMutate, patientUuid);
-            showSnackbar({
-              isLowContrast: true,
-              kind: 'success',
-              subtitle: t('visitStartedSuccessfully', '{{visit}} started successfully', {
-                visit: t('offlineVisit', 'Offline Visit'),
-              }),
-              title: t('visitStarted', 'Visit started'),
-            });
-            await closeWorkspace({ discardUnsavedChanges: true });
-            onVisitStarted?.(visit);
-          },
-          (error: Error) => {
-            showSnackbar({
-              title: t('startVisitError', 'Error starting visit'),
-              kind: 'error',
-              isLowContrast: false,
-              subtitle: error?.message,
-            });
-          },
-        );
-      }
+          return response;
+        })
+        .catch((error) => {
+          showSnackbar({
+            title: !visitToEdit
+              ? t('startVisitError', 'Error starting visit')
+              : t('errorUpdatingVisitDetails', 'Error updating visit details'),
+            kind: 'error',
+            isLowContrast: false,
+            subtitle: getErrorDescription(error),
+          });
+          return Promise.reject(error); // short-circuit promise chain
+        })
+        .then(async (response) => {
+          // now that visit is created / updated, we run post-submit actions
+          // to update visit attributes or any other OnVisitCreatedOrUpdated actions
+          const visit = response.data;
+          setIsVisitSaved(true);
+
+          // Use targeted SWR invalidation instead of global mutateVisit
+          // This will invalidate visit history and encounter tables for this patient
+          // (if visitContext is updated, it should have been invalidated with mutateSavedOrUpdatedVisit)
+          invalidateVisitAndEncounterData(globalMutate, patientUuid);
+          invalidateCurrentVisit(globalMutate, patientUuid);
+
+          const visitAttributesRequest = visitToEdit
+            ? handleVisitAttributes(visitAttributes, response.data.uuid).then((visitAttributesResponses) => {
+                if (visitAttributesResponses.length > 0) {
+                  showSnackbar({
+                    isLowContrast: true,
+                    kind: 'success',
+                    title: t(
+                      'additionalVisitInformationUpdatedSuccessfully',
+                      'Additional visit information updated successfully',
+                    ),
+                  });
+                }
+              })
+            : Promise.resolve();
+
+          const onVisitCreatedOrUpdatedRequests = [...visitFormCallbacks.values()].map((callbacks) =>
+            callbacks.onVisitCreatedOrUpdated(visit),
+          );
+
+          await Promise.all([visitAttributesRequest, ...onVisitCreatedOrUpdatedRequests]);
+          await handleCreateExtraVisitInfo?.();
+          await closeWorkspace({ discardUnsavedChanges: true });
+          onVisitStarted?.(visit);
+        })
+        .catch(() => {
+          // do nothing, this catches any reject promises used for short-circuiting
+        });
     },
     [
       closeWorkspace,
-      config.offlineVisitTypeUuid,
       extraVisitInfo,
       getErrorDescription,
       globalMutate,
       handleVisitAttributes,
-      isOnline,
       onVisitStarted,
       patientUuid,
       t,

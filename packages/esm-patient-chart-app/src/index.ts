@@ -3,7 +3,6 @@ import * as Framework from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { esmPatientChartSchema } from './config-schema';
 import { moduleName } from './constants';
-import { setupCacheableRoutes, setupOfflineVisitsSync } from './offline';
 import { summaryDashboardMeta, encountersDashboardMeta } from './dashboard.meta';
 import deleteVisitActionButtonComponent from './actions-buttons/delete-visit.component';
 import currentVisitSummaryComponent from './visit/visits-widget/current-visit-summary.extension';
@@ -25,9 +24,6 @@ window['_openmrs_esm_framework'] = Framework;
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 export function startupApp() {
-  setupOfflineVisitsSync();
-  setupCacheableRoutes();
-
   defineConfigSchema(moduleName, esmPatientChartSchema);
 }
 

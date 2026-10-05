@@ -35,9 +35,9 @@ yarn start --sources 'packages/esm-patient-growth-chart-app'
 
 ## OpenMRS O3 resources
 
-- [Getting Started](https://o3-docs.openmrs.org/docs/getting-started) - Start here for O3 development
-- [Creating a Frontend Module](https://o3-docs.openmrs.org/docs/frontend-modules/creating-a-frontend-module) - Step-by-step guide
-- [Framework Concepts](https://o3-docs.openmrs.org/docs/framework-concepts) - Core O3 patterns
+- [Getting Started](https://o3-docs.openmrs.org/en-US/docs/frontend-modules/setup) - Start here for O3 development
+- [Creating a Frontend Module](https://o3-docs.openmrs.org/en-US/docs/recipes/create-a-frontend-module) - Step-by-step guide
+- [Framework Concepts](https://o3-docs.openmrs.org/en-US/docs/core-concepts) - Core O3 patterns
 
 ---
 This module was scaffolded with [`@openmrs/create-o3-app`](https://github.com/openmrs/create-o3-app). The `generator` field in `package.json` records the CLI version that produced it and is safe to remove.

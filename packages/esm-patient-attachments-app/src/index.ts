@@ -45,3 +45,8 @@ export const deleteAttachmentModal = getAsyncLifecycle(() => import('./attachmen
   featureName: 'delete-attachment-modal',
   moduleName,
 });
+
+export const attachmentPreviewModal = getAsyncLifecycle(() => import('./attachments/attachment-preview.modal'), {
+  featureName: 'attachment-preview-modal',
+  moduleName,
+});

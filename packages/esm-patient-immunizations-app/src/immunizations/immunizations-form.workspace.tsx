@@ -212,7 +212,14 @@ const ImmunizationsForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
   );
 
   return (
-    <Workspace2 title={t('immunizationWorkspaceTitle', 'Immunization')} hasUnsavedChanges={isDirty}>
+    <Workspace2
+      title={
+        immunizationToEditMeta
+          ? t('editImmunization', 'Edit immunization')
+          : t('immunizationWorkspaceTitle', 'Immunization')
+      }
+      hasUnsavedChanges={isDirty}
+    >
       <FormProvider {...formProps}>
         <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
           <Stack gap={5} className={styles.container}>

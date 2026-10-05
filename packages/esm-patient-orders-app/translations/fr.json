@@ -15,6 +15,7 @@
   "chooseAnOption": "Sélectionner une option",
   "clearSearchResults": "Réinitialiser",
   "collapsePinnedOrders": "Collapse pinned orders",
+  "couldNotSaveResultsFor": "Could not save results for {{tests}}",
   "dateOfOrder": "Date de prescription",
   "dateRange": "Période",
   "directlyAddToBasket": "Ajouter à l'ordonnance",

@@ -4,7 +4,6 @@
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .condition {
-  padding: layout.$spacing-04;
   border-top: 0.0625rem solid $grey-2;
 
   &:first-of-type {
@@ -115,4 +114,20 @@
 .required {
   color: colors.$red-60;
   margin-left: layout.$spacing-01;
+}
+
+.conditionButton {
+  width: 100%;
+  padding: layout.$spacing-04;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid colors.$blue-60;
+    outline-offset: -2px;
+  }
 }

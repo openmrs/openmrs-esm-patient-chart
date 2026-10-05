@@ -10,7 +10,11 @@ import {
   useVisit,
   type Visit,
 } from '@openmrs/esm-framework';
-import { type PatientWorkspaceGroupProps, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import {
+  type PatientWorkspaceGroupProps,
+  setPatientChartWorkspaceGroupVisitUuid,
+  usePatientChartStore,
+} from '@openmrs/esm-patient-common-lib';
 
 const defaultVisitCustomRepresentation =
   'custom:(uuid,display,voided,indication,startDatetime,stopDatetime,' +
@@ -178,6 +182,9 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
 
         latestWorkspaceGroupProps.current = groupProps;
         await launchLatestWorkspaceGroup();
+        if (isMounted.current) {
+          setPatientChartWorkspaceGroupVisitUuid(launchedWorkspaceGroupKey.current?.visitContextUuid ?? null);
+        }
       }
     };
 

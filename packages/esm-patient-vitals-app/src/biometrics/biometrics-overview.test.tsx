@@ -1,8 +1,8 @@
-import { vi, describe, it, expect } from 'vitest';
+import { vi, describe, it, expect, afterEach } from 'vitest';
 import React from 'react';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, NumericObservation, useConfig } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { formattedBiometrics, mockBiometricsConfig, mockConceptUnits } from '__mocks__';
@@ -244,7 +244,7 @@ describe('Biometrics Overview', () => {
     await user.click(chartViewButton);
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByText(/biometric displayed/i)).toBeInTheDocument();
+    expect(await screen.findByText(/biometric displayed/i)).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /weight/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /height/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /bmi/i })).toBeInTheDocument();
@@ -360,5 +360,59 @@ describe('Biometrics Overview', () => {
 
     // A 20-month-old is 1 year old, so BMI should be shown
     expect(screen.getByRole('columnheader', { name: /bmi/i })).toBeInTheDocument();
+  });
+
+  describe('chart loading', () => {
+    const loadChart = vi.fn();
+
+    // Fresh module instances give each test its own React.lazy state and chart import.
+    const renderWithMockedChart = async () => {
+      vi.resetModules();
+      vi.doMock('./biometrics-chart.component', () => loadChart());
+      const { useConfig: freshUseConfig } = await import('@openmrs/esm-framework');
+      const { useVitalsAndBiometrics: freshUseVitalsAndBiometrics } = await import('../common');
+      const { default: FreshBiometricsOverview } = await import('./biometrics-overview.component');
+      vi.mocked(freshUseConfig<ConfigObject>).mockReturnValue({
+        ...getDefaultsFromConfigSchema(configSchema),
+        ...mockBiometricsConfig,
+      } as ConfigObject);
+      vi.mocked(freshUseVitalsAndBiometrics).mockReturnValue({
+        data: formattedBiometrics.slice(0, 2),
+      } as ReturnType<typeof useVitalsAndBiometrics>);
+      renderWithSwr(<FreshBiometricsOverview {...testProps} />);
+      await waitForLoadingToFinish();
+      await screen.findByRole('table', { name: /biometrics/i });
+    };
+
+    afterEach(() => {
+      vi.doUnmock('./biometrics-chart.component');
+      loadChart.mockReset();
+    });
+
+    it('starts loading the chart when the view switcher is hovered', async () => {
+      const user = userEvent.setup();
+      loadChart.mockReturnValue({ default: () => <p>Mock biometrics chart</p> });
+
+      await renderWithMockedChart();
+      expect(loadChart).not.toHaveBeenCalled();
+
+      await user.hover(screen.getByRole('tab', { name: /chart view/i }));
+
+      await waitFor(() => expect(loadChart).toHaveBeenCalledTimes(1));
+      expect(screen.getByRole('table', { name: /biometrics/i })).toBeInTheDocument();
+    });
+
+    it('ignores a failed prefetch', async () => {
+      const user = userEvent.setup();
+      loadChart.mockImplementation(() => {
+        throw new Error('Loading chunk failed');
+      });
+
+      await renderWithMockedChart();
+      await user.hover(screen.getByRole('tab', { name: /chart view/i }));
+
+      await waitFor(() => expect(loadChart).toHaveBeenCalledTimes(1));
+      expect(screen.getByRole('table', { name: /biometrics/i })).toBeInTheDocument();
+    });
   });
 });
