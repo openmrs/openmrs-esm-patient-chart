@@ -8,7 +8,7 @@ import {
   showSnackbar,
   userHasAccess,
 } from '@openmrs/esm-framework';
-import { invalidateVisitAndEncounterData } from '@openmrs/esm-patient-common-lib';
+import { getPatientChartWindowProps, invalidateVisitAndEncounterData } from '@openmrs/esm-patient-common-lib';
 import { type ChartConfig } from '../../../../config-schema';
 import { deleteEncounter, type EncountersTableProps, type MappedEncounter } from './encounters-table.resource';
 
@@ -60,16 +60,23 @@ export function editEncounter(
   if (onEditEncounter) {
     onEditEncounter(encounter, isVisitNoteEncounter(encounter));
   } else if (isVisitNoteEncounter(encounter)) {
-    launchWorkspace2('visit-notes-form-workspace', {
-      encounter,
-      formContext: 'editing',
-      patientUuid,
-    });
+    launchWorkspace2(
+      'visit-notes-form-workspace',
+      {
+        encounter,
+        formContext: 'editing',
+      },
+      getPatientChartWindowProps(patientUuid),
+    );
   } else {
-    launchWorkspace2('patient-form-entry-workspace', {
-      form: encounter.form,
-      encounterUuid: encounter.uuid,
-    });
+    launchWorkspace2(
+      'patient-form-entry-workspace',
+      {
+        form: encounter.form,
+        encounterUuid: encounter.uuid,
+      },
+      getPatientChartWindowProps(patientUuid),
+    );
   }
 }
 

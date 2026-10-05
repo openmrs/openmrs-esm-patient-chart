@@ -1,9 +1,6 @@
 import React from 'react';
-import {
-  type OrderBasketWindowProps,
-  type OrderBasketItem,
-  type PatientWorkspace2DefinitionProps,
-} from '@openmrs/esm-patient-common-lib';
+import { type Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import { type OrderBasketItem, type OrderBasketWindowProps } from '@openmrs/esm-patient-common-lib';
 import AddLabOrder from './add-test-order.component';
 
 export interface AddTestOrderWorkspaceProps {
@@ -21,14 +18,14 @@ export interface AddTestOrderWorkspaceProps {
  *
  * Design: https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
  *
- * This workspace must only be used within the patient chart.
- * @see exported-add-test-order.workspace.tsx
+ * It takes the patient and visit from its window props, not from group props, so it can be used
+ * both inside and outside the patient chart.
  */
 export default function AddTestOrderWorkspace({
-  groupProps: { patient, visitContext },
+  windowProps: { patient, visitContext },
   workspaceProps: { order: initialOrder, orderTypeUuid, orderToEditOrdererUuid },
   closeWorkspace,
-}: PatientWorkspace2DefinitionProps<AddTestOrderWorkspaceProps, OrderBasketWindowProps>) {
+}: Workspace2DefinitionProps<AddTestOrderWorkspaceProps, OrderBasketWindowProps, object>) {
   return (
     <AddLabOrder
       patient={patient}

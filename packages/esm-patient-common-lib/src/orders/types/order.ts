@@ -1,4 +1,5 @@
 import type { Encounter, OpenmrsResource, Visit, Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import type { PatientWorkspaceWindowProps } from '../../workspaces';
 
 export interface Concept extends OpenmrsResource {
   name?: {
@@ -321,29 +322,41 @@ export interface TestOrderBasketItem extends OrderBasketItem {
   specimenSource?: string;
 }
 
-export interface OrderBasketWindowProps {
-  encounterUuid: string;
-  onOrderBasketSubmitted?: (encounterUuid: string, postedOrders: Array<Order>) => void;
-}
-
-export interface ExportedOrderBasketWindowProps {
-  encounterUuid: string;
-  drugOrderWorkspaceName: string;
-  labOrderWorkspaceName: string;
-  generalOrderWorkspaceName: string;
+/**
+ * Window props of the order basket window (`patient-chart-order-basket`), taken by the order basket
+ * and the add drug / lab / general order workspaces. In the patient chart, the patient / visit are
+ * supplied by `getPatientChartWindowProps`; other apps supply them themselves, along with the
+ * names of the child workspaces they have registered into the window.
+ */
+export interface OrderBasketWindowProps extends PatientWorkspaceWindowProps {
+  /**
+   * Names of the workspaces the order basket launches as child workspaces. Optional: if none of the
+   * three is supplied, the patient chart's own `add-drug-order`, `add-lab-order` and
+   * `orderable-concept-workspace` are used. If any is supplied, only the supplied ones are launchable,
+   * so a host can limit the basket to the order types it registered workspaces for.
+   */
+  drugOrderWorkspaceName?: string;
+  labOrderWorkspaceName?: string;
+  generalOrderWorkspaceName?: string;
   /**
    * Name of a workspace, registered by the host into the order basket window, that renders the
    * allergy form. Supplied when the order basket runs outside the patient chart so the allergy
    * "+" affordance can launch the form in the host's workspace group instead of the chart's.
    */
   allergyFormWorkspaceName?: string;
-  patient: fhir.Patient;
-  patientUuid: string;
-  visitContext: Visit;
-  mutateVisitContext: () => void;
   onOrderBasketSubmitted?: (encounterUuid: string, postedOrders: Array<Order>) => void;
   /**
    * An optional array of order type UUIDs to display. If not provided, all panels are shown.
    */
   visibleOrderPanels?: Array<string>;
+  /**
+   * Whether the order basket shows the patient banner. Defaults to showing it outside the patient
+   * chart (which has its own patient header) and hiding it inside.
+   */
+  showPatientBanner?: boolean;
 }
+
+/**
+ * @deprecated Use `OrderBasketWindowProps`.
+ */
+export type ExportedOrderBasketWindowProps = OrderBasketWindowProps;

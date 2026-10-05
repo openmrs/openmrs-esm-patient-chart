@@ -1,9 +1,6 @@
-import React from 'react';
-import {
-  type DrugOrderBasketItem,
-  type OrderBasketWindowProps,
-  type PatientWorkspace2DefinitionProps,
-} from '@openmrs/esm-patient-common-lib';
+import React, { useCallback } from 'react';
+import { type Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import { type DrugOrderBasketItem, type OrderBasketWindowProps } from '@openmrs/esm-patient-common-lib';
 import AddDrugOrder from './add-drug-order.component';
 
 export interface AddDrugOrderWorkspaceProps {
@@ -29,15 +26,23 @@ export interface AddDrugOrderWorkspaceProps {
  * On form save, it either saves the order in the order basket (case 1 and 2)
  * or directly submits the modified order to the server (case 3).
  *
- *
- * This workspace must only be used within the patient chart.
- * @see exported-add-drug-order.workspace.tsx
+ * It takes the patient and visit from its window props, not from group props, so it can be used
+ * both inside and outside the patient chart.
  */
 export default function AddDrugOrderWorkspace({
   workspaceProps: { order, orderToEditOrdererUuid },
-  groupProps: { patient, patientUuid, visitContext },
+  windowProps: { patient, patientUuid, visitContext, allergyFormWorkspaceName },
   closeWorkspace,
-}: PatientWorkspace2DefinitionProps<AddDrugOrderWorkspaceProps, OrderBasketWindowProps>) {
+  launchChildWorkspace,
+}: Workspace2DefinitionProps<AddDrugOrderWorkspaceProps, OrderBasketWindowProps, object>) {
+  // When the host registers an allergy form workspace in this window, launch it as a child so the
+  // "+" allergy affordance opens the form in the host's workspace group. Without one (as in the
+  // patient chart), the allergy list launches the chart's own allergy form itself.
+  const launchAllergyForm = useCallback(
+    () => launchChildWorkspace(allergyFormWorkspaceName, { formContext: 'creating' }),
+    [allergyFormWorkspaceName, launchChildWorkspace],
+  );
+
   return (
     <AddDrugOrder
       initialOrder={order}
@@ -46,6 +51,7 @@ export default function AddDrugOrderWorkspace({
       patientUuid={patientUuid}
       visitContext={visitContext}
       closeWorkspace={closeWorkspace}
+      launchAllergyForm={allergyFormWorkspaceName ? launchAllergyForm : undefined}
     />
   );
 }

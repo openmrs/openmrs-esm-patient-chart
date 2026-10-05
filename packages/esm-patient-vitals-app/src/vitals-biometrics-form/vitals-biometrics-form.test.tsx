@@ -2,8 +2,14 @@ import React from 'react';
 import { vi, describe, it, expect } from 'vitest';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { type FetchResponse, showSnackbar, useConfig, getDefaultsFromConfigSchema } from '@openmrs/esm-framework';
-import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
+import {
+  type FetchResponse,
+  showSnackbar,
+  useConfig,
+  getDefaultsFromConfigSchema,
+  type Workspace2DefinitionProps,
+} from '@openmrs/esm-framework';
+import { type PatientWorkspaceWindowProps } from '@openmrs/esm-patient-common-lib';
 import { createOrUpdateVitalsAndBiometrics, useEncounterVitalsAndBiometrics } from '../common';
 import { type ConfigObject, configSchema } from '../config-schema';
 import { mockConceptUnits, mockVitalsConceptMetadata, mockVitalsConfig } from '__mocks__';
@@ -19,17 +25,22 @@ const weightValue = 62;
 const systolicBloodPressureValue = 120;
 const temperatureValue = 37;
 
-const defaultProps: PatientWorkspace2DefinitionProps<VitalsAndBiometricsFormProps, {}> = {
+type VitalsFormWorkspaceDefinitionProps = Workspace2DefinitionProps<
+  VitalsAndBiometricsFormProps,
+  PatientWorkspaceWindowProps,
+  object
+>;
+
+const defaultProps: VitalsFormWorkspaceDefinitionProps = {
   workspaceProps: {
     formContext: 'creating',
   },
-  windowProps: {},
-  groupProps: {
+  windowProps: {
     patientUuid: mockPatient.id,
     patient: mockPatient,
     visitContext: null,
-    mutateVisitContext: null,
   },
+  groupProps: {},
   workspaceName: '',
   launchChildWorkspace: vi.fn(),
   closeWorkspace: vi.fn(),
@@ -444,10 +455,10 @@ describe('VitalsBiometricsForm', () => {
       },
     } as ConfigObject);
 
-    const props: PatientWorkspace2DefinitionProps<VitalsAndBiometricsFormProps, {}> = {
+    const props: VitalsFormWorkspaceDefinitionProps = {
       ...defaultProps,
-      groupProps: {
-        ...defaultProps.groupProps,
+      windowProps: {
+        ...defaultProps.windowProps,
         patient: minorPatient,
       },
     };
@@ -466,7 +477,7 @@ describe('VitalsBiometricsForm', () => {
 });
 
 function renderVitalsAndBiometricsForm(formContext?: 'creating' | 'editing', editEncounterUuid?: string) {
-  const props: PatientWorkspace2DefinitionProps<VitalsAndBiometricsFormProps, {}> = {
+  const props: VitalsFormWorkspaceDefinitionProps = {
     ...defaultProps,
     workspaceProps: {
       ...defaultProps.workspaceProps,

@@ -26,6 +26,10 @@ const setPatient = vi.fn();
 const setVisitContext = vi.fn();
 const setWorkspaceGroupVisitUuid = vi.mocked(setPatientChartWorkspaceGroupVisitUuid);
 
+// The group props the workspace group was launched with are recorded alongside its visit uuid
+const groupPropsFor = (visit: Visit) =>
+  expect.objectContaining({ visitContext: expect.objectContaining({ uuid: visit.uuid }) });
+
 const visitA = { uuid: 'visit-a', patient: { uuid: mockFhirPatient.id } } as Visit;
 const visitB = { uuid: 'visit-b', patient: { uuid: mockFhirPatient.id } } as Visit;
 const patientB = { ...mockFhirPatient, id: 'patient-b' };
@@ -130,7 +134,9 @@ describe('usePatientChartPatientAndVisit', () => {
 
     const { rerender } = renderHook(() => usePatientChartPatientAndVisit(mockFhirPatient.id));
 
-    await waitFor(() => expect(setWorkspaceGroupVisitUuid).toHaveBeenLastCalledWith(visitA.uuid));
+    await waitFor(() =>
+      expect(setWorkspaceGroupVisitUuid).toHaveBeenLastCalledWith(visitA.uuid, groupPropsFor(visitA)),
+    );
     expect(mockLaunchWorkspaceGroup.mock.invocationCallOrder[0]).toBeLessThan(
       setWorkspaceGroupVisitUuid.mock.invocationCallOrder.at(-1),
     );
@@ -138,7 +144,9 @@ describe('usePatientChartPatientAndVisit', () => {
     activeVisit = visitB;
     rerender();
 
-    await waitFor(() => expect(setWorkspaceGroupVisitUuid).toHaveBeenLastCalledWith(visitB.uuid));
+    await waitFor(() =>
+      expect(setWorkspaceGroupVisitUuid).toHaveBeenLastCalledWith(visitB.uuid, groupPropsFor(visitB)),
+    );
   });
 
   it('does not record a new visit when the workspace group relaunch is declined', async () => {
@@ -154,7 +162,9 @@ describe('usePatientChartPatientAndVisit', () => {
     }));
 
     const { rerender } = renderHook(() => usePatientChartPatientAndVisit(mockFhirPatient.id));
-    await waitFor(() => expect(setWorkspaceGroupVisitUuid).toHaveBeenLastCalledWith(visitA.uuid));
+    await waitFor(() =>
+      expect(setWorkspaceGroupVisitUuid).toHaveBeenLastCalledWith(visitA.uuid, groupPropsFor(visitA)),
+    );
 
     mockLaunchWorkspaceGroup.mockResolvedValueOnce(false);
     activeVisit = visitB;
@@ -162,7 +172,7 @@ describe('usePatientChartPatientAndVisit', () => {
 
     await waitFor(() => expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(2));
     await waitFor(() => expect(setWorkspaceGroupVisitUuid).toHaveBeenCalledTimes(2));
-    expect(setWorkspaceGroupVisitUuid).toHaveBeenLastCalledWith(visitA.uuid);
+    expect(setWorkspaceGroupVisitUuid).toHaveBeenLastCalledWith(visitA.uuid, groupPropsFor(visitA));
   });
 
   it('does not relaunch when the same visit UUID is returned with new object references', async () => {

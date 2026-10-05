@@ -162,7 +162,11 @@ describe('AllergyList', () => {
 
     await user.click(screen.getByRole('button', { name: /recordnewallergy/i }));
 
-    expect(mockLaunchWorkspace2).toHaveBeenCalledWith(patientAllergiesFormWorkspace, { formContext: 'creating' });
+    expect(mockLaunchWorkspace2).toHaveBeenCalledWith(
+      patientAllergiesFormWorkspace,
+      { formContext: 'creating' },
+      expect.objectContaining({ patientUuid: 'patient-uuid' }),
+    );
   });
 
   it('defers to the host-provided launcher when one is given (e.g. outside the patient chart)', async () => {
