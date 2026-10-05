@@ -47,7 +47,7 @@ describe('<OrderBasketActionButton/>', () => {
     mockUseLayoutType.mockReturnValue('tablet');
     render(
       <OrderBasketActionButton
-        groupProps={{ patient: mockPatient, patientUuid: mockPatient.id, visitContext: null, mutateVisitContext: null }}
+        groupProps={{ patient: mockPatient, patientUuid: mockPatient.id, visitContext: null }}
       />,
     );
 
@@ -60,7 +60,7 @@ describe('<OrderBasketActionButton/>', () => {
     mockUseLayoutType.mockReturnValue('small-desktop');
     render(
       <OrderBasketActionButton
-        groupProps={{ patient: mockPatient, patientUuid: mockPatient.id, visitContext: null, mutateVisitContext: null }}
+        groupProps={{ patient: mockPatient, patientUuid: mockPatient.id, visitContext: null }}
       />,
     );
 
@@ -76,7 +76,7 @@ describe('<OrderBasketActionButton/>', () => {
 
     render(
       <OrderBasketActionButton
-        groupProps={{ patient: mockPatient, patientUuid: mockPatient.id, visitContext: null, mutateVisitContext: null }}
+        groupProps={{ patient: mockPatient, patientUuid: mockPatient.id, visitContext: null }}
       />,
     );
 
@@ -90,7 +90,7 @@ describe('<OrderBasketActionButton/>', () => {
     expect(result.current.orders).toHaveLength(1); // sanity check
     render(
       <OrderBasketActionButton
-        groupProps={{ patient: mockPatient, patientUuid: mockPatient.id, visitContext: null, mutateVisitContext: null }}
+        groupProps={{ patient: mockPatient, patientUuid: mockPatient.id, visitContext: null }}
       />,
     );
 
@@ -102,7 +102,7 @@ describe('<OrderBasketActionButton/>', () => {
     mockUseLayoutType.mockReturnValue('tablet');
     render(
       <OrderBasketActionButton
-        groupProps={{ patient: mockPatient, patientUuid: mockPatient.id, visitContext: null, mutateVisitContext: null }}
+        groupProps={{ patient: mockPatient, patientUuid: mockPatient.id, visitContext: null }}
       />,
     );
 

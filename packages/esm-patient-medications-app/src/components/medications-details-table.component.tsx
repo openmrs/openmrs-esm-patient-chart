@@ -20,13 +20,10 @@ import {
 import { capitalize } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
-import { useSWRConfig } from 'swr';
 import {
   CardHeader,
   compare,
   getPatientChartWindowProps,
-  invalidateVisitAndEncounterData,
-  invalidateVisitByUuid,
   PatientChartPagination,
   type DrugOrderBasketItem,
   type Order,
@@ -399,7 +396,6 @@ function OrderBasketItemActions({
   items: Array<DrugOrderBasketItem>;
   setItems: (items: Array<DrugOrderBasketItem>) => void;
 }) {
-  const { mutate: globalMutate } = useSWRConfig();
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const alreadyInBasket = items.some((x) => x.uuid === medication.uuid);
@@ -418,12 +414,8 @@ function OrderBasketItemActions({
       patient,
       patientUuid: patient.id,
       visitContext: medication.encounter.visit,
-      mutateVisitContext: () => {
-        invalidateVisitByUuid(globalMutate, medication.encounter.visit?.uuid);
-        invalidateVisitAndEncounterData(globalMutate, patient.id);
-      },
     }),
-    [patient, medication, globalMutate],
+    [patient, medication],
   );
   // The workspaces read the patient / visit from their window props, not from the group props
   const workspaceWindowProps = useMemo(

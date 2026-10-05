@@ -36,7 +36,6 @@ mockUsePatientChartStore.mockReturnValue({
   patientUuid: 'patient-123',
   patient: null,
   visitContext: mockCurrentVisit,
-  mutateVisitContext: vi.fn(),
   setPatient: vi.fn(),
   setVisitContext: mockSetVisitContext,
 });

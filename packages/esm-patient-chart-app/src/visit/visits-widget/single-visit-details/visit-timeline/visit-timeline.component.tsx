@@ -37,7 +37,6 @@ import styles from './visit-timeline.scss';
 interface VisitTimelineProps {
   patientUuid: string;
   onEditEncounter?: EncountersTableProps['onEditEncounter'];
-  mutateVisitContext?: EncountersTableProps['mutateVisitContext'];
   patient?: EncountersTableProps['patient'];
   /**
    * Rendered straight from `visit.encounters`, so the visit must be fetched with the fields
@@ -49,12 +48,12 @@ interface VisitTimelineProps {
   visit: Visit;
 }
 
-function VisitTimeline({ onEditEncounter, mutateVisitContext, patient, patientUuid, visit }: VisitTimelineProps) {
+function VisitTimeline({ onEditEncounter, patient, patientUuid, visit }: VisitTimelineProps) {
   const { t } = useTranslation();
   const session = useSession();
   const responsiveSize = isDesktop(useLayoutType()) ? 'sm' : 'lg';
   const { mutate } = useSWRConfig();
-  const { mutateVisitContext: chartMutateVisitContext, patient: chartPatient } = usePatientChartStore(patientUuid);
+  const { patient: chartPatient } = usePatientChartStore(patientUuid);
   const config = useConfig<ChartConfig>();
   const enableEmbeddedFormView = useFeatureFlag('enable-embedded-form-view');
   const canPrintEncounters = userHasAccess('App: Print encounter forms', session?.user);
@@ -114,10 +113,9 @@ function VisitTimeline({ onEditEncounter, mutateVisitContext, patient, patientUu
         patientUuid,
         t,
         mutate,
-        mutateVisitContext: mutateVisitContext ?? chartMutateVisitContext,
       });
     },
-    [chartMutateVisitContext, mutate, mutateVisitContext, patientUuid, t],
+    [mutate, patientUuid, t],
   );
 
   if (timelineEntries.length === 0) {

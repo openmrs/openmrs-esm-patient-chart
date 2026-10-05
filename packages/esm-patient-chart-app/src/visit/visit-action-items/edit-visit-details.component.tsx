@@ -10,12 +10,7 @@ import {
   useLayoutType,
 } from '@openmrs/esm-framework';
 import { type VisitFormProps, type VisitFormWindowProps } from '../visit-form/visit-form.workspace';
-import {
-  invalidateVisitAndEncounterData,
-  invalidateVisitByUuid,
-  type PatientWorkspaceGroupProps,
-} from '@openmrs/esm-patient-common-lib';
-import { useSWRConfig } from 'swr';
+import { type PatientWorkspaceGroupProps } from '@openmrs/esm-patient-common-lib';
 
 interface EditVisitDetailsActionItemProps {
   visit: Visit;
@@ -32,7 +27,6 @@ interface EditVisitDetailsActionItemProps {
  */
 const EditVisitDetailsActionItem: React.FC<EditVisitDetailsActionItemProps> = ({ visit, patient, compact }) => {
   const { t } = useTranslation();
-  const { mutate: globalMutate } = useSWRConfig();
 
   const isTablet = useLayoutType() === 'tablet';
   const responsiveSize = isTablet ? 'lg' : 'sm';
@@ -45,13 +39,7 @@ const EditVisitDetailsActionItem: React.FC<EditVisitDetailsActionItemProps> = ({
       'start-visit-workspace-form',
       { openedFrom: 'patient-chart-edit-visit' },
       windowProps,
-      {
-        ...windowProps,
-        mutateVisitContext: () => {
-          invalidateVisitByUuid(globalMutate, visit.uuid);
-          invalidateVisitAndEncounterData(globalMutate, patientUuid);
-        },
-      },
+      windowProps,
     );
   };
 

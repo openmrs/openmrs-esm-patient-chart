@@ -21,7 +21,6 @@ const defaultProps: PatientWorkspace2DefinitionProps<ConditionFormProps, object>
     patientUuid: mockPatient.id,
     patient: mockPatient,
     visitContext: null,
-    mutateVisitContext: null,
   },
   workspaceName: '',
   launchChildWorkspace: vi.fn(),

@@ -14,7 +14,7 @@ describe('launchStartVisitWorkspace', () => {
       'start-visit-workspace-form',
       { openedFrom: 'test' },
       { patient, patientUuid: patient.id, visitContext: null },
-      { patient, patientUuid: patient.id, visitContext: null, mutateVisitContext: null },
+      { patient, patientUuid: patient.id, visitContext: null },
     );
   });
 });
