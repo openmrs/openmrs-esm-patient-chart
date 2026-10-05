@@ -1,7 +1,6 @@
 const { DefinePlugin, container } = require('webpack');
 const { ModuleFederationPlugin } = container;
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const { StatsWriterPlugin } = require('webpack-stats-plugin');
 const { existsSync, statSync } = require('fs');
 const { inc } = require('semver');
 
@@ -85,13 +84,6 @@ module.exports = {
         };
         return obj;
       }, {}),
-    }),
-    new StatsWriterPlugin({
-      filename: `${filename}.buildmanifest.json`,
-      stats: {
-        all: false,
-        chunks: true,
-      },
     }),
     hasRoutesDefined
       ? new CopyWebpackPlugin({
