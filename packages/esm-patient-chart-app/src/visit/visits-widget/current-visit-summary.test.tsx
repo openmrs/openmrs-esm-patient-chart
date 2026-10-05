@@ -20,7 +20,6 @@ describe('CurrentVisitSummary', () => {
       patientUuid: mockPatient.id,
       patient: mockPatient,
       visitContext: null,
-      mutateVisitContext: null,
       setPatient: vi.fn(),
       setVisitContext: vi.fn(),
     });
@@ -34,7 +33,6 @@ describe('CurrentVisitSummary', () => {
       patientUuid: 'different-patient-id',
       patient: mockPatient,
       visitContext: null,
-      mutateVisitContext: null,
       setPatient: vi.fn(),
       setVisitContext: vi.fn(),
     });
@@ -66,7 +64,6 @@ describe('CurrentVisitSummary', () => {
           display: 'Test Patient',
         },
       },
-      mutateVisitContext: null,
       setPatient: vi.fn(),
       setVisitContext: vi.fn(),
     });
