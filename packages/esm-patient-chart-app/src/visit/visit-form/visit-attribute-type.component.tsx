@@ -1,4 +1,5 @@
 import React, { useEffect, useId, useMemo } from 'react';
+import dayjs from 'dayjs';
 import {
   Checkbox,
   NumberInput,
@@ -209,9 +210,14 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
         return (
           <OpenmrsDatePicker
             {...fieldProps}
+            // The backend's DateDatatype reads only the yyyy-MM-dd part. Saved values come back as
+            // an ISO datetime in the server's offset, so use the date part to avoid shifting the day.
+            value={fieldProps.value?.split('T')[0]}
+            // A cleared date becomes undefined, not '', so the required check still applies
+            onChange={(date) => fieldProps.onChange(date ? dayjs(date).format('YYYY-MM-DD') : undefined)}
             id={`date-${baseId}`}
             labelText={labelText}
-            aria-invalid={!!fieldState?.error?.message}
+            invalid={!!fieldState?.error?.message}
             invalidText={fieldState?.error?.message}
           />
         );

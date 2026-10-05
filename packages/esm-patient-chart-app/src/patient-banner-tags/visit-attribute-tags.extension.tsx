@@ -1,4 +1,5 @@
 import React from 'react';
+import dayjs from 'dayjs';
 import { Tag } from '@carbon/react';
 import { formatDate, useConfig, useVisit } from '@openmrs/esm-framework';
 import { type ChartConfig } from '../config-schema';
@@ -18,7 +19,9 @@ const getAttributeValue = (attributeType, value) => {
     case 'org.openmrs.customdatatype.datatype.BooleanDatatype':
       return value;
     case 'org.openmrs.customdatatype.datatype.DateDatatype':
-      return formatDate(new Date(value), {
+      // The saved value is midnight in the server's offset, so read only the date part
+      // as local midnight. Otherwise a browser behind the server shows the previous day.
+      return formatDate(dayjs(String(value).split('T')[0]).toDate(), {
         mode: 'wide',
       });
     default:

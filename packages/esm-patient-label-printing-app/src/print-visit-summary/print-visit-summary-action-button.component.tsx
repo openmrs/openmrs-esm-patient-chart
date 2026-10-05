@@ -1,8 +1,7 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, IconButton } from '@carbon/react';
-import { PrinterIcon, showModal, UserHasAccess, useConfig, useLayoutType, type Visit } from '@openmrs/esm-framework';
-import type { ConfigObject } from '../config-schema';
+import { PrinterIcon, showModal, UserHasAccess, useLayoutType, type Visit } from '@openmrs/esm-framework';
 
 interface PrintVisitSummaryActionButtonProps {
   visit: Visit;
@@ -18,8 +17,6 @@ interface PrintVisitSummaryActionButtonProps {
 
 const PrintVisitSummaryActionButton: React.FC<PrintVisitSummaryActionButtonProps> = ({ visit, compact }) => {
   const { t } = useTranslation();
-  const { showPrintVisitSummaryButton } = useConfig<ConfigObject>();
-
   const isTablet = useLayoutType() === 'tablet';
   const responsiveSize = isTablet ? 'lg' : 'sm';
 
@@ -30,7 +27,7 @@ const PrintVisitSummaryActionButton: React.FC<PrintVisitSummaryActionButtonProps
     });
   }, [visit?.uuid]);
 
-  if (!showPrintVisitSummaryButton || !visit?.uuid) {
+  if (!visit?.uuid) {
     return null;
   }
 
