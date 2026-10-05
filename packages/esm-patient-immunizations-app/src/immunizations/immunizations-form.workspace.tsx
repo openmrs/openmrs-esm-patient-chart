@@ -17,7 +17,7 @@ import {
   useSession,
   Workspace2,
 } from '@openmrs/esm-framework';
-import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
+import { type PatientWorkspace2DefinitionProps, useShowPatientBanner } from '@openmrs/esm-patient-common-lib';
 import { DoseInput } from './components/dose-input.component';
 import { immunizationFormSub } from './utils';
 import { mapToFHIRImmunizationResource } from './immunization-mapper';
@@ -28,12 +28,11 @@ import { useImmunizations } from '../hooks/useImmunizations';
 import { useImmunizationsConceptSet } from '../hooks/useImmunizationsConceptSet';
 import styles from './immunizations-form.scss';
 
-const ImmunizationsForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
-  closeWorkspace,
-  groupProps: { patientUuid, patient, visitContext },
-}) => {
+const ImmunizationsForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({ closeWorkspace, groupProps }) => {
+  const { patientUuid, patient, visitContext } = groupProps;
   const config = useConfig<ImmunizationConfigObject>();
   const currentUser = useSession();
+  const shouldShowPatientBanner = useShowPatientBanner(groupProps);
   const isTablet = useLayoutType() === 'tablet';
   const { t } = useTranslation();
   const { immunizationsConceptSet } = useImmunizationsConceptSet(config);
@@ -221,7 +220,7 @@ const ImmunizationsForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
       }
       hasUnsavedChanges={isDirty}
     >
-      {isTablet && patient && patientUuid && (
+      {shouldShowPatientBanner && patient && patientUuid && (
         <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
       )}
       <FormProvider {...formProps}>

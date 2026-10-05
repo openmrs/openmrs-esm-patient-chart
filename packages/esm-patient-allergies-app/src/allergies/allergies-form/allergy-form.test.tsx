@@ -1,3 +1,4 @@
+import { type PatientBannerGroupProps } from '@openmrs/esm-patient-common-lib';
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
@@ -10,7 +11,6 @@ import {
   useLayoutType,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
-import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import { mockAllergens, mockAllergicReactions, mockAllergy } from '__mocks__';
 import { mockPatient } from 'tools';
 import {
@@ -21,8 +21,10 @@ import {
   updatePatientAllergy,
 } from './allergy-form.resource';
 import { type AllergiesConfigObject, configSchema } from '../../config-schema';
-import AllergyFormWorkspace, { type AllergyFormWorkspaceProps } from './allergy-form.workspace';
-import ExportedAllergyFormWorkspace, { type ExportedAllergyFormWindowProps } from './exported-allergy-form.workspace';
+import AllergyFormWorkspace, {
+  type AllergyFormWindowProps,
+  type AllergyFormWorkspaceProps,
+} from './allergy-form.workspace';
 
 const mockSaveAllergy = vi.mocked(saveAllergy);
 const mockShowSnackbar = vi.mocked(showSnackbar);
@@ -169,22 +171,6 @@ describe('AllergyForm', () => {
         kind: 'error',
       });
     });
-
-    // Regression test for the order basket "Add allergy" crash in the ward app. Outside the patient
-    // chart there is no patient-chart workspace group, so the host launches `exportedAllergyFormWorkspace`
-    // instead, which sources the patient from window props. This exercises that out-of-chart path.
-    it('renders and saves via the exported workspace, sourcing the patient from window props', async () => {
-      renderExportedAllergyForm();
-
-      await user.click(screen.getByRole('combobox', { name: /allergen/i }));
-      await user.click(screen.getByText(aceInhibitorsAllergen.display));
-      await user.click(screen.getByRole('checkbox', { name: reactionToAceInhibitors }));
-      await user.click(screen.getByRole('radio', { name: /moderate/i }));
-      await user.click(screen.getByRole('button', { name: /save and close/i }));
-
-      expect(mockSaveAllergy).toHaveBeenCalledTimes(1);
-      expect(mockSaveAllergy).toHaveBeenCalledWith(expect.anything(), mockPatient.id, expect.anything());
-    });
   });
 
   describe('Editing an existing allergy', () => {
@@ -225,12 +211,30 @@ describe('AllergyForm', () => {
     });
   });
 
+  it('acts on the group props patient when launched without window props', () => {
+    render(
+      <AllergyFormWorkspace
+        closeWorkspace={vi.fn()}
+        launchChildWorkspace={vi.fn()}
+        workspaceProps={{ allergy: null, formContext: 'creating' }}
+        windowProps={null}
+        groupProps={{ patient: mockPatient, patientUuid: mockPatient.id, showPatientBanner: 'tabletOnly' }}
+        workspaceName=""
+        windowName=""
+        isRootWorkspace={false}
+        showActionMenu={true}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: /save and close/i })).toBeInTheDocument();
+  });
+
   describe('Patient header banner', () => {
-    // Outside the chart (e.g. the ward order basket), the exported workspace is the only place a
-    // patient identifier can appear, so it must render at every width, not just on tablet.
+    // Outside the chart (e.g. the ward order basket), the patient identifier appears at every width,
+    // not just on tablet.
     it('displays the patient header at every width outside the chart', () => {
       mockUseLayoutType.mockReturnValue('large-desktop');
-      renderExportedAllergyForm();
+      renderAllergyForm({}, {}, {});
 
       expect(
         mockExtensionSlot.mock.calls.some(
@@ -253,21 +257,24 @@ describe('AllergyForm', () => {
   });
 });
 
-function renderAllergyForm(workspaceProps: Partial<AllergyFormWorkspaceProps> = {}) {
-  const defaultProps: PatientWorkspace2DefinitionProps<AllergyFormWorkspaceProps, {}> = {
+function renderAllergyForm(
+  workspaceProps: Partial<AllergyFormWorkspaceProps> = {},
+  windowProps: Partial<AllergyFormWindowProps> = {},
+  groupProps: PatientBannerGroupProps = { showPatientBanner: 'tabletOnly' },
+) {
+  const defaultProps: Workspace2DefinitionProps<AllergyFormWorkspaceProps, AllergyFormWindowProps> = {
     workspaceProps: {
       allergy: null,
       formContext: 'creating' as 'creating' | 'editing',
     },
-    groupProps: {
+    windowProps: {
       patient: mockPatient,
       patientUuid: mockPatient.id,
-      visitContext: null,
-      mutateVisitContext: null,
+      ...windowProps,
     },
+    groupProps,
     closeWorkspace: vi.fn(),
     launchChildWorkspace: vi.fn(),
-    windowProps: {},
     workspaceName: '',
     windowName: '',
     isRootWorkspace: false,
@@ -283,28 +290,6 @@ function renderAllergyForm(workspaceProps: Partial<AllergyFormWorkspaceProps> = 
   };
 
   render(<AllergyFormWorkspace {...props} />);
-}
-
-function renderExportedAllergyForm() {
-  const props: Workspace2DefinitionProps<AllergyFormWorkspaceProps, ExportedAllergyFormWindowProps> = {
-    workspaceProps: {
-      allergy: null,
-      formContext: 'creating',
-    },
-    windowProps: {
-      patient: mockPatient,
-      patientUuid: mockPatient.id,
-    },
-    groupProps: {},
-    closeWorkspace: vi.fn(),
-    launchChildWorkspace: vi.fn(),
-    workspaceName: '',
-    windowName: '',
-    isRootWorkspace: false,
-    showActionMenu: true,
-  };
-
-  render(<ExportedAllergyFormWorkspace {...props} />);
 }
 
 function buildExpectedPayload(allergen, reaction, severity, comment) {

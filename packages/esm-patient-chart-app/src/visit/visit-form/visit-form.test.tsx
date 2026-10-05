@@ -4,7 +4,6 @@ import dayjs from 'dayjs';
 import { fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
-  type AssignedExtension,
   type FetchResponse,
   ExtensionSlot,
   getDefaultsFromConfigSchema,
@@ -38,9 +37,7 @@ import {
   useVisitFormCallbacks,
   useVisitFormSchemaAndDefaultValues,
 } from './visit-form.resource';
-import VisitForm, { type VisitFormProps } from './visit-form.workspace';
-import ExportedVisitForm, { type ExportedVisitFormProps } from './exported-visit-form.workspace';
-import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib/src';
+import VisitForm, { type VisitFormProps, type VisitFormWindowProps } from './visit-form.workspace';
 
 const visitUuid = 'test_visit_uuid';
 const visitAttributes = {
@@ -77,19 +74,19 @@ const visitAttributes = {
 };
 
 const mockCloseWorkspace = vi.fn();
-const mockMutateVisitContext = vi.fn();
-const defaultProps: PatientWorkspace2DefinitionProps<VisitFormProps, {}> = {
+type VisitFormWorkspaceDefinitionProps = Workspace2DefinitionProps<VisitFormProps, VisitFormWindowProps, object>;
+
+const defaultProps: VisitFormWorkspaceDefinitionProps = {
   closeWorkspace: mockCloseWorkspace,
   workspaceProps: {
     openedFrom: 'test',
   },
-  windowProps: {},
-  groupProps: {
+  windowProps: {
     patientUuid: mockPatient.id,
     patient: mockPatient,
     visitContext: null,
-    mutateVisitContext: mockMutateVisitContext,
   },
+  groupProps: { showPatientBanner: 'tabletOnly' },
   workspaceName: '',
   launchChildWorkspace: vi.fn(),
   windowName: '',
@@ -378,10 +375,10 @@ describe('Visit form', () => {
       uuid: 'location-b',
     });
 
-    const props: PatientWorkspace2DefinitionProps<VisitFormProps, {}> = {
+    const props: VisitFormWorkspaceDefinitionProps = {
       ...defaultProps,
-      groupProps: {
-        ...defaultProps.groupProps,
+      windowProps: {
+        ...defaultProps.windowProps,
         visitContext: null,
       },
     };
@@ -1516,10 +1513,10 @@ describe('useVisitFormSchemaAndDefaultValues birthdate validation', () => {
 });
 
 function renderVisitForm(visitToEdit?: Visit) {
-  const props: PatientWorkspace2DefinitionProps<VisitFormProps, {}> = {
+  const props: VisitFormWorkspaceDefinitionProps = {
     ...defaultProps,
-    groupProps: {
-      ...defaultProps.groupProps,
+    windowProps: {
+      ...defaultProps.windowProps,
       visitContext: visitToEdit ?? null,
     },
   };
@@ -1547,31 +1544,52 @@ describe('Visit form patient header banner', () => {
     mockUsePatient.mockReturnValue({ patient: null, patientUuid: null, isLoading: false, error: null });
   });
 
-  it('shows the patient header by default in the exported visit form', () => {
-    renderExportedVisitForm();
+  const hasPatientHeaderSlot = () =>
+    mockExtensionSlot.mock.calls.some(([props]) => props.name === 'visit-form-header-slot');
+
+  it('never renders the standard patient header slot', () => {
+    mockUseLayoutType.mockReturnValue('tablet');
+    renderVisitFormWithPatientHeader();
+
+    expect(mockExtensionSlot.mock.calls.some(([props]) => props.name === 'patient-header-slot')).toBe(false);
+  });
+
+  it('shows the visit form header when the group always shows the banner', () => {
+    renderVisitFormWithPatientHeader();
 
     expect(
       mockExtensionSlot.mock.calls.some(
-        ([props]) => props.name === 'patient-header-slot' && props.state.patientUuid === mockPatient.id,
+        ([props]) => props.name === 'visit-form-header-slot' && props.state.patientUuid === mockPatient.id,
       ),
     ).toBe(true);
   });
 
-  it('does not show the patient header in the in-chart visit form', () => {
-    renderVisitForm();
+  it('shows the visit form header at every width by default outside the patient chart', () => {
+    render(<VisitForm {...defaultProps} groupProps={{}} />);
 
-    expect(mockExtensionSlot.mock.calls.some(([props]) => props.name === 'patient-header-slot')).toBe(false);
+    expect(hasPatientHeaderSlot()).toBe(true);
   });
 
-  it('does not show the patient header until the full patient is available', () => {
+  it('shows the visit form header only on tablet in the patient chart', () => {
+    const { unmount } = renderVisitForm();
+    expect(hasPatientHeaderSlot()).toBe(false);
+    unmount();
+
+    mockExtensionSlot.mockClear();
+    mockUseLayoutType.mockReturnValue('tablet');
+    renderVisitForm();
+    expect(hasPatientHeaderSlot()).toBe(true);
+  });
+
+  it('does not show the visit form header until the full patient is available', () => {
     const partialPatient = { id: mockPatient.id, birthDate: mockPatient.birthDate } as fhir.Patient;
 
-    renderExportedVisitForm({ patient: partialPatient });
+    renderVisitFormWithPatientHeader({ patient: partialPatient });
 
-    expect(mockExtensionSlot.mock.calls.some(([props]) => props.name === 'patient-header-slot')).toBe(false);
+    expect(hasPatientHeaderSlot()).toBe(false);
   });
 
-  it('shows the patient header once the full patient is fetched for a partial patient', () => {
+  it('shows the visit form header once the full patient is fetched for a partial patient', () => {
     const partialPatient = { id: mockPatient.id, birthDate: mockPatient.birthDate } as fhir.Patient;
     mockUsePatient.mockReturnValue({
       patient: mockPatient,
@@ -1580,58 +1598,32 @@ describe('Visit form patient header banner', () => {
       error: null,
     });
 
-    renderExportedVisitForm({ patient: partialPatient });
+    renderVisitFormWithPatientHeader({ patient: partialPatient });
 
     expect(
       mockExtensionSlot.mock.calls.some(
         ([props]) =>
-          props.name === 'patient-header-slot' &&
+          props.name === 'visit-form-header-slot' &&
           props.state.patientUuid === mockPatient.id &&
           props.state.patient === mockPatient,
       ),
     ).toBe(true);
   });
 
-  it('keeps the weight tile while hiding the duplicate patient details on tablet', () => {
+  it('does not filter any extension out of the visit form header slot', () => {
     mockUseLayoutType.mockReturnValue('tablet');
-
-    renderExportedVisitForm();
-
-    const headerSlot = mockExtensionSlot.mock.calls.find(([props]) => props.name === 'visit-form-header-slot')?.[0];
-    expect(headerSlot).toBeDefined();
-
-    const extensions = [{ name: 'patient-details-tile' }, { name: 'weight-tile' }] as Array<AssignedExtension>;
-
-    expect(headerSlot.select(extensions).map((extension) => extension.name)).toEqual(['weight-tile']);
-  });
-
-  it('keeps the patient details tile on tablet when the patient header is not shown', () => {
-    mockUseLayoutType.mockReturnValue('tablet');
-
-    renderVisitForm();
+    renderVisitFormWithPatientHeader();
 
     const headerSlot = mockExtensionSlot.mock.calls.find(([props]) => props.name === 'visit-form-header-slot')?.[0];
     expect(headerSlot.select).toBeUndefined();
   });
 });
 
-function renderExportedVisitForm(workspaceProps: Partial<ExportedVisitFormProps> = {}) {
-  const props: Workspace2DefinitionProps<ExportedVisitFormProps, {}, {}> = {
-    closeWorkspace: vi.fn(),
-    workspaceProps: {
-      openedFrom: 'test',
-      patient: mockPatient,
-      patientUuid: mockPatient.id,
-      visitContext: null,
-      ...workspaceProps,
-    },
-    windowProps: {},
-    groupProps: {},
-    workspaceName: '',
-    launchChildWorkspace: vi.fn(),
-    windowName: '',
-    isRootWorkspace: false,
-    showActionMenu: true,
+function renderVisitFormWithPatientHeader(windowProps: Partial<VisitFormWindowProps> = {}) {
+  const props: VisitFormWorkspaceDefinitionProps = {
+    ...defaultProps,
+    windowProps: { ...defaultProps.windowProps, ...windowProps },
+    groupProps: { showPatientBanner: 'always' },
   };
-  return render(<ExportedVisitForm {...props} />);
+  return render(<VisitForm {...props} />);
 }
