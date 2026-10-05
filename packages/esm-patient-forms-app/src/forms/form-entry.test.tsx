@@ -1,6 +1,6 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { BehaviorSubject } from 'rxjs';
 import { ExtensionSlot, openmrsFetch } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
@@ -40,6 +40,21 @@ describe('FormEntry', () => {
 
     await screen.findByText(/form-widget-slot/);
     expect(screen.getByText(/form-widget-slot/)).toBeInTheDocument();
+  });
+
+  it('returns to clinical forms without bypassing unsaved-change handling', () => {
+    const closeWorkspace = vi.fn();
+    render(<FormEntry {...defaultProps} showBackButton closeWorkspace={closeWorkspace} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /Back to clinical forms/ }));
+
+    expect(closeWorkspace).toHaveBeenCalledExactlyOnceWith();
+  });
+
+  it('does not offer Back when opened without a parent', () => {
+    render(<FormEntry {...defaultProps} />);
+
+    expect(screen.queryByRole('button', { name: /Back to clinical forms/ })).not.toBeInTheDocument();
   });
 
   it('uses the encounter visit when editing an existing encounter', async () => {
