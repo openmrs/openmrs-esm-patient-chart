@@ -82,7 +82,7 @@ const testProps: PatientWorkspace2DefinitionProps<{}, {}> = {
   groupProps: {
     patientUuid: mockPatient.id,
     patient: mockPatient,
-    visitContext: mockCurrentVisit,
+    activeVisit: mockCurrentVisit,
   },
   workspaceName: '',
   launchChildWorkspace: vi.fn(),

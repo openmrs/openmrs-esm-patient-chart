@@ -44,7 +44,7 @@ vi.mock('./task-details-view.component', () => ({
 }));
 
 const defaultProps = {
-  groupProps: { patientUuid: 'patient-uuid-123', visitContext: { uuid: 'visit-uuid' } },
+  groupProps: { patientUuid: 'patient-uuid-123', activeVisit: { uuid: 'visit-uuid' } },
 };
 
 describe('TaskListWorkspace', () => {

@@ -413,7 +413,7 @@ function OrderBasketItemActions({
     () => ({
       patient,
       patientUuid: patient.id,
-      visitContext: medication.encounter.visit,
+      activeVisit: medication.encounter.visit,
     }),
     [patient, medication],
   );

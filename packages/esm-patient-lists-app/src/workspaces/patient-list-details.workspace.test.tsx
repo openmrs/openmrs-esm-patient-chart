@@ -11,7 +11,7 @@ const defaultProps: PatientWorkspace2DefinitionProps<PatientListDetailsWorkspace
   groupProps: {
     patientUuid: '',
     patient: undefined,
-    visitContext: null,
+    activeVisit: null,
   },
   closeWorkspace: vi.fn(),
   workspaceProps: {

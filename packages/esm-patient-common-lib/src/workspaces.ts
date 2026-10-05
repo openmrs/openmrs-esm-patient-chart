@@ -12,7 +12,7 @@ import { useSystemVisitSetting } from './useSystemVisitSetting';
 export interface PatientWorkspaceGroupProps {
   patient: fhir.Patient;
   patientUuid: string;
-  visitContext: Visit;
+  activeVisit: Visit;
 }
 
 /**
@@ -69,8 +69,8 @@ export function getPatientAndVisitProps(
  * Converts the group props of the patient chart into window props.
  */
 function groupPropsToWindowProps(groupProps: PatientWorkspaceGroupProps): PatientWorkspaceWindowProps {
-  const { patient, patientUuid, visitContext } = groupProps;
-  return { patient, patientUuid, visitContext };
+  const { patient, patientUuid, activeVisit } = groupProps;
+  return { patient, patientUuid, visitContext: activeVisit };
 }
 
 /**
@@ -80,7 +80,7 @@ function groupPropsToWindowProps(groupProps: PatientWorkspaceGroupProps): Patien
  *
  * The group props are used rather than the latest store values because the window props of an open
  * window are compared (shallowly) with the window props of every later launch into that window, and
- * an incompatible launch prompts the user to close the window. The store's `patient` / `visitContext`
+ * an incompatible launch prompts the user to close the window. The store's `patient` / `activeVisit`
  * objects are replaced on every revalidation, while the group props stay the same until the
  * patient or visit changes, so reading the group props keeps launches compatible.
  *
@@ -96,7 +96,7 @@ export function getPatientChartWindowProps(patientUuid?: string): PatientWorkspa
   return {
     patient: state?.patient ?? null,
     patientUuid: state?.patientUuid ?? patientUuid ?? null,
-    visitContext: state?.visitContext ?? null,
+    visitContext: state?.activeVisit ?? null,
   };
 }
 
@@ -199,23 +199,23 @@ export function useActionMenuButtonLaunchProps<T extends object>(
 }
 
 export function useStartVisitIfNeeded(patientUuid: string) {
-  const { visitContext, workspaceGroupVisitUuid } = usePatientChartStore(patientUuid);
+  const { activeVisit, workspaceGroupVisitUuid } = usePatientChartStore(patientUuid);
   const { systemVisitEnabled } = useSystemVisitSetting();
-  // Setting a new visit context makes the patient chart relaunch its workspace group, which closes
+  // Setting a new active visit makes the patient chart relaunch its workspace group, which closes
   // any workspace opened before the relaunch. So a pending prompt resolves only once the workspace
-  // group has the new visit context.
+  // group has the new active visit.
   const pendingPromptResolvers = useRef<Array<() => void>>([]);
 
   useEffect(() => {
-    if (visitContext && workspaceGroupVisitUuid === visitContext.uuid) {
+    if (activeVisit && workspaceGroupVisitUuid === activeVisit.uuid) {
       const resolvers = pendingPromptResolvers.current;
       pendingPromptResolvers.current = [];
       resolvers.forEach((resolvePrompt) => resolvePrompt());
     }
-  }, [visitContext, workspaceGroupVisitUuid]);
+  }, [activeVisit, workspaceGroupVisitUuid]);
 
   const startVisitIfNeeded = useCallback(async (): Promise<boolean> => {
-    if (!systemVisitEnabled || visitContext) {
+    if (!systemVisitEnabled || activeVisit) {
       return true;
     } else {
       return new Promise<boolean>((resolve) => {
@@ -234,6 +234,6 @@ export function useStartVisitIfNeeded(patientUuid: string) {
         });
       });
     }
-  }, [visitContext, systemVisitEnabled, patientUuid]);
+  }, [activeVisit, systemVisitEnabled, patientUuid]);
   return startVisitIfNeeded;
 }

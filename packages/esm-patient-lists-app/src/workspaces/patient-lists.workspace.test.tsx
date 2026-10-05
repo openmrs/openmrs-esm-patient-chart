@@ -87,7 +87,7 @@ function renderPatientListWorkspace() {
       groupProps={{
         patient: null,
         patientUuid: null,
-        visitContext: null,
+        activeVisit: null,
       }}
       windowName={''}
       isRootWorkspace={false}
