@@ -170,7 +170,8 @@ const FormEntry: React.FC<FormEntryProps> = ({
   return (
     <Workspace2 title={form.display ?? t('clinicalForm', 'Clinical form')} hasUnsavedChanges={hasUnsavedChanges}>
       <div>
-        {showBackButton && (
+        {/* Legacy HTML forms do not report unsaved changes to the workspace. */}
+        {showBackButton && !isHtmlForm && (
           <div className={styles.backButton}>
             <Button
               kind="ghost"

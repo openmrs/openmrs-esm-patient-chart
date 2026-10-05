@@ -6,6 +6,10 @@ import { ExtensionSlot, openmrsFetch } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import FormEntry, { type FormEntryProps } from './form-entry.component';
 
+vi.mock('../htmlformentry/html-form-entry-wrapper.component', () => ({
+  default: () => <iframe title="Legacy HTML form" />,
+}));
+
 const defaultProps: FormEntryProps = {
   form: {
     uuid: 'some-form-uuid',
@@ -55,6 +59,22 @@ describe('FormEntry', () => {
     render(<FormEntry {...defaultProps} />);
 
     expect(screen.queryByRole('button', { name: /Back to clinical forms/ })).not.toBeInTheDocument();
+  });
+
+  it('does not offer Back for legacy HTML forms without unsaved-change tracking', () => {
+    render(
+      <FormEntry
+        {...defaultProps}
+        showBackButton
+        form={{
+          ...defaultProps.form,
+          resources: [{ name: 'formEngine', valueReference: 'htmlformentry' }],
+        }}
+      />,
+    );
+
+    expect(screen.queryByRole('button', { name: /Back to clinical forms/ })).not.toBeInTheDocument();
+    expect(screen.getByTitle('Legacy HTML form')).toBeInTheDocument();
   });
 
   it('uses the encounter visit when editing an existing encounter', async () => {
