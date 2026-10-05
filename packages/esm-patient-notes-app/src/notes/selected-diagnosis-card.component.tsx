@@ -6,18 +6,8 @@ import type { Diagnosis, DiagnosisCertainty } from '../types';
 import styles from './selected-diagnosis-card.scss';
 
 /**
- * A diagnosis being assembled on a visit note. Rank and certainty always carry a value:
- * every diagnosis is confirmed and secondary until the clinician says otherwise, so an
- * untouched diagnosis is immediately saveable. Primary is a checkbox (at least one is
- * required when the distro says so); certainty is changed through the row's actions
- * menu ("Mark as provisional" / "Mark as confirmed"), which is also where future
- * per-diagnosis actions belong (O3-5823 design discussion on Talk).
- * `draftId` is a client-side identity: coded concept uuids are not unique within an
- * encounter (other writers can record the same concept twice) and non-coded diagnoses
- * have no uuid at all, so cards must not be keyed or matched by concept.
- * `conceptClassUuid` is known up front for concepts picked from the search (which is
- * restricted to the diagnosis class); diagnoses prefilled from an encounter leave it unset
- * and the form looks the class up.
+ * Draft IDs distinguish duplicate concepts and non-coded diagnoses. Search results supply
+ * the concept class; diagnoses loaded from an encounter need a lookup.
  */
 export type DiagnosisDraft = Omit<Diagnosis, 'rank' | 'certainty'> & {
   draftId: number;
@@ -31,11 +21,6 @@ export function nextDraftId(): number {
   return ++lastDraftId;
 }
 
-/**
- * Column header for the diagnosis rows below. Rendered once above the list and aligned to
- * the rows' Primary column; hidden from assistive tech because every checkbox carries its
- * own hidden label.
- */
 export function DiagnosisListHeader() {
   const { t } = useTranslation();
 
@@ -47,7 +32,6 @@ export function DiagnosisListHeader() {
 }
 
 interface SelectedDiagnosisCardProps {
-  /** Only true diagnoses (by concept class) get the certainty action; symptoms and findings do not */
   canMarkProvisional: boolean;
   diagnosis: DiagnosisDraft;
   onRemove: (diagnosis: DiagnosisDraft) => void;
@@ -84,9 +68,6 @@ export default function SelectedDiagnosisCard({
         )}
         {diagnosis.display}
       </span>
-      {/* Certainty belongs to diagnoses. Symptoms and findings recorded as encounter diagnoses
-          by other forms keep their stored certainty but get no action; the cell stays so the
-          grid keeps its columns. */}
       <div className={styles.actionsCell}>
         {canMarkProvisional && (
           <OverflowMenu

@@ -106,12 +106,8 @@ export function fetchDiagnosisConceptsByName(searchTerm: string, diagnosisConcep
 }
 
 /**
- * Concept class of each coded diagnosis already on the note being edited. The encounter handed
- * to the form carries only each diagnosis's concept uuid and display, but the certainty action
- * is offered for true diagnoses (the configured diagnosis concept class) only, so the classes
- * are looked up in one `conceptreferences` request and kept for the session. The endpoint
- * silently omits references it cannot resolve, so those come back as `null` and the form treats
- * them like a failed lookup rather than as "not a diagnosis".
+ * Fetch classes for stored coded diagnoses in one cached request. Unresolved references
+ * are omitted by the endpoint; return null so the form can retain its certainty action.
  */
 export function useDiagnosisConceptClasses(conceptUuids: Array<string>) {
   const { data, error, isLoading } = useSWRImmutable<

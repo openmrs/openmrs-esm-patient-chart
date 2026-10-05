@@ -3,9 +3,6 @@
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
-// One compact row per diagnosis: the Primary checkbox leads, then the name, then the actions
-// menu and the remove button, all on a single grid aligned to the column header rendered once
-// above the list. The fixed columns are kept tight so long names get as much width as possible.
 $diagnosis-columns: 3rem minmax(0, 1fr) 2rem 2rem;
 
 .diagnosisListHeader {
@@ -26,14 +23,12 @@ $diagnosis-columns: 3rem minmax(0, 1fr) 2rem 2rem;
 .diagnosisRow {
   display: grid;
   grid-template-columns: $diagnosis-columns;
-  // Vertically centre the name and checkbox within the row
   align-items: center;
   column-gap: layout.$spacing-02;
   padding: layout.$spacing-03;
   margin-top: layout.$spacing-02;
   border-radius: 4px;
 
-  // A subtle shaded background sets each selected diagnosis apart from the form around it
   background-color: colors.$gray-10;
 
   // Center the checkbox under its column header and strip Carbon's stacked-form margins
@@ -82,7 +77,6 @@ $diagnosis-columns: 3rem minmax(0, 1fr) 2rem 2rem;
   overflow-wrap: anywhere;
 }
 
-// Leading "?" marks a provisional diagnosis
 .provisionalMark {
   @include type.type-style('heading-compact-01');
   margin-inline-end: layout.$spacing-02;

@@ -93,8 +93,6 @@ const createSchema = (t: TFunction, isRetrospectiveDataEntryEnabled: boolean, is
   return z.object({
     noteDate: isRetrospectiveDataEntryEnabled ? z.date() : z.date().optional(),
     diagnosisSearch: z.string().optional(),
-    // Every diagnosis is always complete (secondary and confirmed are the defaults), so the
-    // only diagnosis-level rule is the primary requirement, which belongs to the list as a whole
     diagnoses: z
       .array(z.custom<DiagnosisDraft>())
       .refine((diagnoses) => !isPrimaryDiagnosisRequired || hasPrimaryDiagnosis(diagnoses), {
@@ -108,13 +106,7 @@ const createSchema = (t: TFunction, isRetrospectiveDataEntryEnabled: boolean, is
 
 const SEARCH_TIMEOUT_MS = 500;
 
-/**
- * The diagnoses already recorded on the note being edited. Values outside the known enums
- * (possible from other REST writers) fall back to the form's presumption: secondary and
- * confirmed. Only an explicit PROVISIONAL shows the provisional mark. Primaries are sorted
- * first once, here, as the visits table lists them; after that rows stay where they are so
- * toggling Primary never moves a row out from under the pointer.
- */
+// Sort stored primaries once; subsequent edits keep rows under the pointer in place.
 const toDiagnosisDrafts = (encounter: Encounter | undefined, patientUuid: string): Array<DiagnosisDraft> =>
   (encounter?.diagnoses ?? [])
     .map(
@@ -263,10 +255,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   }, [debouncedSearch, watch]);
 
   const createDiagnosis = useCallback(
-    // Secondary and confirmed are the presumed defaults; the row's Primary checkbox and
-    // "Mark as provisional" action record the exceptions, always as an explicit choice —
-    // nothing is auto-ticked on the clinician's behalf (O3-5823). The search only returns
-    // concepts of the configured diagnosis class, so the class is known without a lookup.
     (concept: Concept): DiagnosisDraft => ({
       draftId: nextDraftId(),
       display: concept.display,
@@ -281,9 +269,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     [config.diagnosisConceptClass, patientUuid],
   );
 
-  // Certainty is a property of diagnoses only (O3-5823 design discussion): the certainty action
-  // is offered when a row's concept is of the configured diagnosis class. Rows prefilled from the
-  // encounter being edited carry just a concept uuid, so their class is looked up once.
   const prefilledCodedConceptUuids = useMemo(
     () =>
       Array.from(
@@ -294,9 +279,9 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     [initialDiagnoses],
   );
   const { conceptClassByUuid, error: conceptClassLookupError } = useDiagnosisConceptClasses(prefilledCodedConceptUuids);
+  // Only diagnosis-class concepts get certainty actions; free-text diagnoses also qualify.
   const canMarkProvisional = useCallback(
     (diagnosis: DiagnosisDraft) => {
-      // A free-text diagnosis has no concept class; it is a diagnosis by the clinician's intent
       if (!diagnosis.diagnosis.coded) {
         return true;
       }
@@ -324,7 +309,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       if (diagnoses.some((diagnosis) => diagnosis.diagnosis.coded === conceptDiagnosisToAdd.uuid)) {
         return;
       }
-      // Newest first, so a freshly added diagnosis is visible at the top without scrolling
       setSelectedDiagnoses([createDiagnosis(conceptDiagnosisToAdd), ...diagnoses]);
     },
     [createDiagnosis, getValues, setSelectedDiagnoses, setValue],
@@ -448,7 +432,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
             if (response.status === 201 || response.status === 200) {
               const encounterUuid = encounter?.uuid || response.data.uuid;
 
-              // If editing, first delete existing diagnoses
               if (isEditing && encounter?.diagnoses?.length) {
                 return Promise.all(
                   encounter.diagnoses.map((diagnosis) => deletePatientDiagnosis(abortController, diagnosis.uuid)),
@@ -516,7 +499,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                 },
               );
             }
-            // Diagnoses live in the form state, so any change to them already shows up in dirtyFields
             if (!isEditing || Object.keys(dirtyFields).some((field) => field !== 'removedImageIds')) {
               noteSaveAttempted = true;
               return await saveNote();
@@ -624,10 +606,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
   const hasUserUnsavedChanges = Object.keys(dirtyFields).length > 0;
 
-  // The primary requirement is shown live: as soon as there are diagnoses but none is
-  // primary (or after a save attempt with nothing selected), and it clears the moment a
-  // primary is ticked. Until a save is attempted it reads as a warning; once a save has
-  // been blocked by it, the same line turns into an error. The schema still blocks the save.
+  // Show a live warning, escalating to an error after a blocked save.
   const showPrimaryRequiredWarning =
     isPrimaryDiagnosisRequired &&
     !hasPrimaryDiagnosis(selectedDiagnoses) &&
@@ -721,7 +700,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                     t={t}
                     value={watch('diagnosisSearch')}
                   />
-                  {/* An empty list needs no placeholder line: the search prompt above already says what to do */}
                   {selectedDiagnoses.length > 0 && (
                     <>
                       <p className={styles.diagnosisHelperText}>
@@ -750,7 +728,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                       })}
                       role={primaryRequiredBlockedSave ? 'alert' : 'status'}
                     >
-                      {/* Carbon's form-field convention: triangle for a warning, round for an invalid state */}
                       {primaryRequiredBlockedSave ? (
                         <WarningFilled aria-hidden="true" size={16} />
                       ) : (
