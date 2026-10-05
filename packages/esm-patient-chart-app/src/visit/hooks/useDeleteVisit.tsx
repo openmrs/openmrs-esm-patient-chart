@@ -14,13 +14,13 @@ export function useDeleteVisit(activeVisit: Visit, onVisitDelete = () => {}, onV
   const { mutate: globalMutate } = useSWRConfig();
   const [isDeletingVisit, setIsDeletingVisit] = useState(false);
   const patientUuid = activeVisit?.patient?.uuid || '';
-  const { visitContext, setVisitContext } = usePatientChartStore(patientUuid);
+  const { activeVisit: storeActiveVisit, setActiveVisit } = usePatientChartStore(patientUuid);
 
   const restoreDeletedVisit = () => {
     restoreVisit(activeVisit?.uuid)
       .then(({ data: updatedVisit }) => {
         if (!updatedVisit.stopDatetime) {
-          setVisitContext(updatedVisit);
+          setActiveVisit(updatedVisit);
         }
 
         // Use targeted SWR invalidation instead of global mutateVisit
@@ -56,8 +56,8 @@ export function useDeleteVisit(activeVisit: Visit, onVisitDelete = () => {}, onV
 
     deleteVisit(activeVisit?.uuid)
       .then(() => {
-        if (activeVisit.uuid == visitContext?.uuid) {
-          setVisitContext(null);
+        if (activeVisit.uuid == storeActiveVisit?.uuid) {
+          setActiveVisit(null);
         }
 
         // Use targeted SWR invalidation instead of global mutateVisit

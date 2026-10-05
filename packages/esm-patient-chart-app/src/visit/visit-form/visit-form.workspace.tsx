@@ -146,8 +146,8 @@ const VisitForm: React.FC<Workspace2DefinitionProps<VisitFormProps, VisitFormWin
   const { allowOverlappingVisits, isLoading: isLoadingOverlapSetting } = useAllowOverlappingVisits();
 
   const { mutate: globalMutate } = useSWRConfig();
-  // Outside the patient chart, the store has no entry for this patient and `setVisitContext` does nothing
-  const { setVisitContext } = usePatientChartStore(patientUuid);
+  // Outside the patient chart, the store has no entry for this patient and `setActiveVisit` does nothing
+  const { setActiveVisit } = usePatientChartStore(patientUuid);
 
   const onVisitStarted = useCallback(
     (visit: Visit) => {
@@ -155,10 +155,10 @@ const VisitForm: React.FC<Workspace2DefinitionProps<VisitFormProps, VisitFormWin
       // 1. Current visit data (for critical components like visit summary, action buttons)
       // 2. Visit history table (for the paginated visit list)
       mutateActiveVisit();
-      setVisitContext?.(visit);
+      setActiveVisit?.(visit);
       onVisitStartedCallback?.(visit);
     },
-    [mutateActiveVisit, onVisitStartedCallback, setVisitContext],
+    [mutateActiveVisit, onVisitStartedCallback, setActiveVisit],
   );
   const allVisitTypes = useVisitTypes();
   const { earliestAllowedStartDate, isLoading: isLoadingBirthdateCheck } =

@@ -32,7 +32,7 @@ describe('MarkPatientDeceasedForm', () => {
     groupProps: {
       patientUuid: mockPatient.id,
       patient: mockPatient,
-      visitContext: null,
+      activeVisit: null,
     },
     windowName: '',
     isRootWorkspace: false,

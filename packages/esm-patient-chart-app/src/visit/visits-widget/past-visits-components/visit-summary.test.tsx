@@ -48,9 +48,9 @@ beforeEach(() => {
   mockUsePatientChartStore.mockReturnValue({
     patientUuid: mockPatient.id,
     patient: mockFhirPatient,
-    visitContext: null,
+    activeVisit: null,
     setPatient: vi.fn(),
-    setVisitContext: vi.fn(),
+    setActiveVisit: vi.fn(),
   } as any);
 });
 
@@ -219,9 +219,9 @@ describe('VisitSummary encounter deletion', () => {
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: mockPatient.id,
       patient: mockFhirPatient,
-      visitContext: null,
+      activeVisit: null,
       setPatient: vi.fn(),
-      setVisitContext: vi.fn(),
+      setActiveVisit: vi.fn(),
     } as any);
   });
 

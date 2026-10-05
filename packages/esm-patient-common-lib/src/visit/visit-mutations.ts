@@ -21,7 +21,7 @@ export interface VisitMutationOptions {
  */
 export function useOptimisticVisitMutations(patientUuid: string) {
   const { mutate } = useSWRConfig();
-  const { visitContext } = usePatientChartStore(patientUuid);
+  const { activeVisit } = usePatientChartStore(patientUuid);
 
   /**
    * Optimistically updates visit data in SWR caches without triggering network requests.
@@ -30,7 +30,7 @@ export function useOptimisticVisitMutations(patientUuid: string) {
   const updateVisitOptimistically = useCallback(
     (visitUuid: string, updates: Partial<Visit>) => {
       // Update current visit SWR cache if it matches
-      if (visitContext?.uuid === visitUuid) {
+      if (activeVisit?.uuid === visitUuid) {
         invalidateVisitByUuid(mutate, visitUuid);
       }
 
@@ -54,7 +54,7 @@ export function useOptimisticVisitMutations(patientUuid: string) {
         false, // Don't revalidate
       );
     },
-    [visitContext, mutate, patientUuid],
+    [activeVisit, mutate, patientUuid],
   );
 
   /**
@@ -82,11 +82,11 @@ export function useOptimisticVisitMutations(patientUuid: string) {
       );
 
       // If deleted visit was current, revalidate current visit to get new state
-      if (visitContext?.uuid === visitUuid) {
+      if (activeVisit?.uuid === visitUuid) {
         invalidateVisitByUuid(mutate, visitUuid);
       }
     },
-    [visitContext, mutate, patientUuid],
+    [activeVisit, mutate, patientUuid],
   );
 
   /**

@@ -20,14 +20,14 @@ describe('VisitNoteActionButton', () => {
   it('should display tablet view', async () => {
     mockUseLayoutType.mockReturnValue('tablet');
 
-    render(<VisitNoteActionButton groupProps={{ patientUuid: 'patient-uuid', patient: null, visitContext: null }} />);
+    render(<VisitNoteActionButton groupProps={{ patientUuid: 'patient-uuid', patient: null, activeVisit: null }} />);
   });
 
   it('should display desktop view', async () => {
     mockUseLayoutType.mockReturnValue('desktop' as LayoutType);
 
     render(
-      <VisitNoteActionButton groupProps={{ patientUuid: mockPatient.id, patient: mockPatient, visitContext: null }} />,
+      <VisitNoteActionButton groupProps={{ patientUuid: mockPatient.id, patient: mockPatient, activeVisit: null }} />,
     );
 
     const visitNoteButton = screen.getByRole('button', { name: /Note/i });
