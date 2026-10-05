@@ -32,12 +32,6 @@ describe('StartVisitButton', () => {
         patientUuid: mockPatient.id,
         visitContext: null,
       },
-      {
-        patient: mockPatient,
-        patientUuid: mockPatient.id,
-        activeVisit: null,
-        showPatientBanner: 'tabletOnly',
-      },
     );
   });
 });
