@@ -1,6 +1,7 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { BehaviorSubject } from 'rxjs';
 import { ExtensionSlot, openmrsFetch } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
@@ -46,11 +47,12 @@ describe('FormEntry', () => {
     expect(screen.getByText(/form-widget-slot/)).toBeInTheDocument();
   });
 
-  it('returns to clinical forms without bypassing unsaved-change handling', () => {
+  it('closes the child workspace without overriding close options', async () => {
+    const user = userEvent.setup();
     const closeWorkspace = vi.fn();
     render(<FormEntry {...defaultProps} showBackButton closeWorkspace={closeWorkspace} />);
 
-    fireEvent.click(screen.getByRole('button', { name: /Back to clinical forms/ }));
+    await user.click(screen.getByRole('button', { name: /Back to clinical forms/ }));
 
     expect(closeWorkspace).toHaveBeenCalledExactlyOnceWith();
   });

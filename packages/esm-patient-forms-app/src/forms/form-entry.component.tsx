@@ -175,6 +175,7 @@ const FormEntry: React.FC<FormEntryProps> = ({
           <div className={styles.backButton}>
             <Button
               kind="ghost"
+              iconDescription={t('backToClinicalForms', 'Back to clinical forms')}
               size="sm"
               renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
               onClick={() => closeWorkspace()}
