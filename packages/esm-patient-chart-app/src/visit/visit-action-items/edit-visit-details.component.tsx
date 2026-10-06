@@ -10,11 +10,7 @@ import {
   useLayoutType,
 } from '@openmrs/esm-framework';
 import { type VisitFormProps } from '../visit-form/visit-form.workspace';
-import {
-  invalidateVisitAndEncounterData,
-  invalidateVisitByUuid,
-  type PatientWorkspaceGroupProps,
-} from '@openmrs/esm-patient-common-lib';
+import { invalidateVisitAndEncounterData, type PatientWorkspaceGroupProps } from '@openmrs/esm-patient-common-lib';
 import { useSWRConfig } from 'swr';
 
 interface EditVisitDetailsActionItemProps {
@@ -48,7 +44,6 @@ const EditVisitDetailsActionItem: React.FC<EditVisitDetailsActionItemProps> = ({
         patientUuid: patientUuid,
         visitContext: visit,
         mutateVisitContext: () => {
-          invalidateVisitByUuid(globalMutate, visit.uuid);
           invalidateVisitAndEncounterData(globalMutate, patientUuid);
         },
       },

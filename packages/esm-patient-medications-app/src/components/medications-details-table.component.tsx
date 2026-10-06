@@ -25,7 +25,6 @@ import {
   CardHeader,
   compare,
   invalidateVisitAndEncounterData,
-  invalidateVisitByUuid,
   PatientChartPagination,
   type DrugOrderBasketItem,
   type Order,
@@ -418,7 +417,6 @@ function OrderBasketItemActions({
       patientUuid: patient.id,
       visitContext: medication.encounter.visit,
       mutateVisitContext: () => {
-        invalidateVisitByUuid(globalMutate, medication.encounter.visit?.uuid);
         invalidateVisitAndEncounterData(globalMutate, patient.id);
       },
     }),

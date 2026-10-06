@@ -2,7 +2,7 @@ import React from 'react';
 import { useSWRConfig } from 'swr';
 import { useVisit, type Visit } from '@openmrs/esm-framework';
 import {
-  invalidateVisitByUuid,
+  invalidateVisitAndEncounterData,
   type PatientWorkspace2DefinitionProps,
   usePatientChartStore,
 } from '@openmrs/esm-patient-common-lib';
@@ -42,7 +42,7 @@ const VisitForm: React.FC<PatientWorkspace2DefinitionProps<VisitFormProps, {}>> 
     // For visit creation, we need to update:
     // 1. Current visit data (for critical components like visit summary, action buttons)
     // 2. Visit history table (for the paginated visit list)
-    const mutateSavedOrUpdatedVisit = () => invalidateVisitByUuid(globalMutate, visit.uuid);
+    const mutateSavedOrUpdatedVisit = () => invalidateVisitAndEncounterData(globalMutate, patientUuid);
     mutateActiveVisit();
     setVisitContext?.(visit, mutateSavedOrUpdatedVisit);
     onVisitStartedCallback?.(visit);

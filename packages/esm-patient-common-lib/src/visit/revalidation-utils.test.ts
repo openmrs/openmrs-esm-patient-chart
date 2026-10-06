@@ -1,41 +1,37 @@
-import { vi, describe, it, expect, test } from 'vitest';
-import {
-  invalidateVisitHistory,
-  invalidatePatientEncounters,
-  invalidateVisitAndEncounterData,
-  invalidateCurrentVisit,
-  invalidateVisitByUuid,
-} from './revalidation-utils';
+import { vi, describe, it, expect } from 'vitest';
+import { invalidateVisits, invalidatePatientEncounters, invalidateVisitAndEncounterData } from './revalidation-utils';
 
 const mockMutate = vi.fn();
 
 describe('revalidation-utils', () => {
-  describe('invalidateVisitHistory', () => {
-    it('should invalidate visit history keys but not current visit keys', () => {
+  describe('invalidateVisits', () => {
+    it('should invalidate active visit, visit history and visit-by-uuid keys', () => {
       const patientUuid = 'test-patient-123';
 
-      invalidateVisitHistory(mockMutate, patientUuid);
+      invalidateVisits(mockMutate, patientUuid);
 
       expect(mockMutate).toHaveBeenCalledTimes(1);
       expect(mockMutate).toHaveBeenCalledWith(expect.any(Function));
 
-      // Test the cache key matcher function
       const matcherFn = mockMutate.mock.calls[0][0];
 
-      // Should invalidate visit history keys (with pagination params)
+      // Active visit keys
+      expect(matcherFn('/ws/rest/v1/visit?patient=test-patient-123&v=custom&includeInactive=false')).toBe(true);
+
+      // Visit history keys (with pagination params)
       expect(
         matcherFn(
           '/ws/rest/v1/visit?patient=test-patient-123&v=custom:(uuid,location)&limit=10&startIndex=0&totalCount=true',
         ),
       ).toBe(true);
 
-      // Should invalidate visit history keys (without includeInactive)
+      // Visit history keys (without includeInactive)
       expect(matcherFn('/ws/rest/v1/visit?patient=test-patient-123&v=custom:(uuid,location)')).toBe(true);
 
-      // Should NOT invalidate current visit keys (with includeInactive=false)
-      expect(matcherFn('/ws/rest/v1/visit?patient=test-patient-123&v=custom&includeInactive=false')).toBe(false);
+      // Visits fetched by UUID (e.g. the visit context)
+      expect(matcherFn('/ws/rest/v1/visit/test-visit-123?v=custom:(uuid,display)')).toBe(true);
 
-      // Should not match other patient's keys
+      // Should not match other patient's visit lists
       expect(matcherFn('/ws/rest/v1/visit?patient=other-patient&v=custom')).toBe(false);
 
       // Should not match non-visit endpoints
@@ -77,7 +73,7 @@ describe('revalidation-utils', () => {
   });
 
   describe('invalidateVisitAndEncounterData', () => {
-    it('should call both visit history and encounter invalidation functions', () => {
+    it('should call both visit and encounter invalidation functions', () => {
       const patientUuid = 'test-patient-123';
 
       invalidateVisitAndEncounterData(mockMutate, patientUuid);
@@ -93,66 +89,10 @@ describe('revalidation-utils', () => {
 
       // Visit matcher should work
       expect(visitMatcherFn('/ws/rest/v1/visit?patient=test-patient-123&v=custom&limit=10')).toBe(true);
+      expect(visitMatcherFn('/ws/rest/v1/visit?patient=test-patient-123&v=custom&includeInactive=false')).toBe(true);
 
       // Encounter matcher should work
       expect(encounterMatcherFn('/ws/rest/v1/encounter?patient=test-patient-123&v=custom')).toBe(true);
-    });
-  });
-
-  describe('invalidateCurrentVisit', () => {
-    it('should invalidate only current visit keys', () => {
-      const patientUuid = 'test-patient-123';
-
-      invalidateCurrentVisit(mockMutate, patientUuid);
-
-      expect(mockMutate).toHaveBeenCalledTimes(1);
-      expect(mockMutate).toHaveBeenCalledWith(expect.any(Function));
-
-      const matcherFn = mockMutate.mock.calls[0][0];
-
-      // Should match current visit key (includeInactive=false)
-      expect(matcherFn('/ws/rest/v1/visit?patient=test-patient-123&v=custom&includeInactive=false')).toBe(true);
-
-      // Should not match other visit keys
-      expect(matcherFn('/ws/rest/v1/visit?patient=test-patient-123&v=custom&includeInactive=true')).toBe(false);
-      expect(
-        matcherFn('/ws/rest/v1/visit?patient=test-patient-123&v=custom&limit=10&startIndex=0&totalCount=true'),
-      ).toBe(false);
-      expect(matcherFn('/ws/rest/v1/visit/test-patient-123')).toBe(false);
-
-      // Should not match encounter keys
-      expect(matcherFn('/ws/rest/v1/encounter?patient=test-patient-123&v=custom')).toBe(false);
-    });
-  });
-
-  describe('invalidateVisitByUuid', () => {
-    it('should invalidate only keys for the specified visit', () => {
-      const visitUuid = 'test-visit-123';
-
-      invalidateVisitByUuid(mockMutate, visitUuid);
-
-      expect(mockMutate).toHaveBeenCalledTimes(1);
-      expect(mockMutate).toHaveBeenCalledWith(expect.any(Function));
-
-      const matcherFn = mockMutate.mock.calls[0][0];
-
-      // Should match the visit fetched by UUID
-      expect(matcherFn('/ws/rest/v1/visit/test-visit-123?v=custom:(uuid,display)')).toBe(true);
-
-      // Should not match other visits
-      expect(matcherFn('/ws/rest/v1/visit/other-visit?v=custom:(uuid,display)')).toBe(false);
-
-      // Should not match visit list keys
-      expect(matcherFn('/ws/rest/v1/visit?patient=test-patient-123&v=custom&includeInactive=false')).toBe(false);
-
-      // Should not match non-string keys
-      expect(matcherFn({ url: '/ws/rest/v1/visit/test-visit-123' })).toBe(false);
-    });
-
-    it('should not invalidate anything when the visit UUID is undefined', () => {
-      invalidateVisitByUuid(mockMutate, undefined);
-
-      expect(mockMutate).not.toHaveBeenCalled();
     });
   });
 });

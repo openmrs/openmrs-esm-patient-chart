@@ -33,7 +33,7 @@ import {
   EmptyState,
   ErrorState,
   getDrugOrderByUuid,
-  invalidateVisitByUuid,
+  invalidateVisitAndEncounterData,
   PatientChartPagination,
   type FulfillerStatus,
   type Order,
@@ -639,7 +639,7 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
       patient,
       patientUuid: patient.id,
       visitContext: orderItem.encounter.visit,
-      mutateVisitContext: () => invalidateVisitByUuid(globalMutate, orderItem.encounter.visit?.uuid),
+      mutateVisitContext: () => invalidateVisitAndEncounterData(globalMutate, patient.id),
     }),
     [patient, orderItem.encounter.visit, globalMutate],
   );

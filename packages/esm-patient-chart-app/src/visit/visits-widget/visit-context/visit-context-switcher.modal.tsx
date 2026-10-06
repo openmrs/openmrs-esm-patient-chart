@@ -11,7 +11,7 @@ import {
   useOnVisible,
   type Visit,
 } from '@openmrs/esm-framework';
-import { invalidateVisitByUuid, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { invalidateVisitAndEncounterData, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { useInfiniteVisits } from '../visit.resource';
 import VisitContextInfo from './visit-context-info.component';
 import styles from './visit-context-switcher.scss';
@@ -107,7 +107,7 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
           disabled={selectedVisitUuid === null || isLoading}
           onClick={() => {
             const selectedVisit = visits.find((v) => v.uuid === selectedVisitUuid);
-            const mutateVisitContext = () => invalidateVisitByUuid(globalMutate, selectedVisit.uuid);
+            const mutateVisitContext = () => invalidateVisitAndEncounterData(globalMutate, patientUuid);
             setVisitContext(selectedVisit, mutateVisitContext);
             onAfterVisitSelected?.();
             closeModal();
