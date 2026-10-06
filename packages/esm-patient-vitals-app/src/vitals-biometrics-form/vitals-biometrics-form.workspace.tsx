@@ -32,7 +32,6 @@ import {
   getPatientAndVisitProps,
   invalidateVisitAndEncounterData,
   type PatientWorkspaceWindowProps,
-  useOptimisticVisitMutations,
 } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 import {
@@ -96,7 +95,6 @@ const VitalsAndBiometricsForm: React.FC<
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const abortController = useAbortController();
   const { mutate: globalMutate } = useSWRConfig();
-  const { invalidateVisitRelatedData } = useOptimisticVisitMutations(patientUuid);
   const showBmi = useMemo(() => shouldShowBmi(patient, config.biometrics), [patient, config.biometrics]);
 
   const isLoadingInitialValues = useMemo(
@@ -245,8 +243,6 @@ const VitalsAndBiometricsForm: React.FC<
             if (mutateEncounter) {
               mutateEncounter();
             }
-            // Only invalidate observations data since we created new vitals/biometrics observations
-            invalidateVisitRelatedData({ observations: true, encounters: true });
             invalidateVisitAndEncounterData(globalMutate, patientUuid);
             invalidateCachedVitalsAndBiometrics();
             onEncounterSaved?.();
@@ -289,7 +285,6 @@ const VitalsAndBiometricsForm: React.FC<
       mutateEncounter,
       onEncounterSaved,
       globalMutate,
-      invalidateVisitRelatedData,
       patientUuid,
       session?.sessionLocation?.uuid,
       t,

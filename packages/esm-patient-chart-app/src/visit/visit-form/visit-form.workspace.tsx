@@ -39,7 +39,6 @@ import {
 import {
   type DeprecatedPatientWorkspaceProps,
   getPatientAndVisitProps,
-  invalidateCurrentVisit,
   invalidateVisitAndEncounterData,
   type PatientWorkspaceWindowProps,
   useActivePatientEnrollment,
@@ -385,7 +384,6 @@ const VisitForm: React.FC<Workspace2DefinitionProps<VisitFormProps, VisitFormWin
           // This will invalidate visit history and encounter tables for this patient,
           // and the current visit, which is the visit in the patient chart store
           invalidateVisitAndEncounterData(globalMutate, patientUuid);
-          invalidateCurrentVisit(globalMutate, patientUuid);
 
           const visitAttributesRequest = visitToEdit
             ? handleVisitAttributes(visitAttributes, response.data.uuid).then((visitAttributesResponses) => {
