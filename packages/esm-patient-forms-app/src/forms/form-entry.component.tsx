@@ -1,7 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, { type ComponentProps, useMemo, useState } from 'react';
+import { Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import useSWR, { useSWRConfig } from 'swr';
 import {
+  ArrowLeftIcon,
   ExtensionSlot,
   openmrsFetch,
   type FetchResponse,
@@ -16,6 +18,8 @@ import { toHtmlForm } from './form-entry.resources';
 import { useForms } from '../hooks/use-forms';
 import HtmlFormEntryWrapper from '../htmlformentry/html-form-entry-wrapper.component';
 
+import styles from './form-entry.scss';
+
 const encounterVisitRep = 'custom:(visit:(uuid,startDatetime,stopDatetime,visitType:(uuid,name)))';
 
 export interface FormEntryProps {
@@ -28,6 +32,7 @@ export interface FormEntryProps {
   additionalProps?: Record<string, any>;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   handlePostResponse?: (encounter: Encounter) => void;
+  showBackButton?: boolean;
   hideControls?: boolean;
   hidePatientBanner?: boolean;
   preFilledQuestions?: Record<string, string>;
@@ -42,6 +47,7 @@ const FormEntry: React.FC<FormEntryProps> = ({
   mutateVisitContext,
   closeWorkspace,
   handlePostResponse,
+  showBackButton = false,
   hideControls,
   hidePatientBanner,
   preFilledQuestions,
@@ -164,6 +170,20 @@ const FormEntry: React.FC<FormEntryProps> = ({
   return (
     <Workspace2 title={form.display ?? t('clinicalForm', 'Clinical form')} hasUnsavedChanges={hasUnsavedChanges}>
       <div>
+        {/* Legacy HTML forms do not report unsaved changes to the workspace. */}
+        {showBackButton && !isHtmlForm && (
+          <div className={styles.backButton}>
+            <Button
+              kind="ghost"
+              iconDescription={t('backToClinicalForms', 'Back to clinical forms')}
+              size="sm"
+              renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
+              onClick={() => closeWorkspace()}
+            >
+              <span>{t('backToClinicalForms', 'Back to clinical forms')}</span>
+            </Button>
+          </div>
+        )}
         <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
         {showFormAndLoadedData &&
           (isHtmlForm ? (
