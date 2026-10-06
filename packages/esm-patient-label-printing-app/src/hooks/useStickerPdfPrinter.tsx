@@ -39,29 +39,26 @@ export const useStickerPdfPrinter = () => {
         let pollInterval: ReturnType<typeof setInterval> | undefined;
         let fallbackTimeout: ReturnType<typeof setTimeout> | undefined;
 
-        const stopTimers = () => {
+        const finish = () => {
           clearInterval(pollInterval);
           clearTimeout(fallbackTimeout);
+          if (hasClosed) return;
+          hasClosed = true;
+          finishPrintRef.current = null;
+          setIsPrinting(false);
+          resolve();
         };
+
+        // Registered before loading so an unmount mid-load still settles the promise
+        finishPrintRef.current = finish;
 
         const handleLoad = () => {
           try {
             const contentWindow = iframe.contentWindow;
             if (!contentWindow) throw new Error('No content window');
 
-            const cleanup = () => {
-              stopTimers();
-              if (hasClosed) return;
-              hasClosed = true;
-              finishPrintRef.current = null;
-              setIsPrinting(false);
-              resolve();
-            };
-
-            finishPrintRef.current = cleanup;
-
             try {
-              contentWindow.addEventListener('afterprint', cleanup, { once: true });
+              contentWindow.addEventListener('afterprint', finish, { once: true });
             } catch (e) {
               // Cross-origin, use polling fallback
             }
@@ -69,26 +66,26 @@ export const useStickerPdfPrinter = () => {
             contentWindow.focus();
             contentWindow.print();
 
-            stopTimers();
+            // `afterprint` may already have fired if `print()` blocked until the dialog closed
+            if (hasClosed) return;
+
+            clearInterval(pollInterval);
+            clearTimeout(fallbackTimeout);
             let wasFocused = false;
             pollInterval = setInterval(() => {
               const hasFocus = document.hasFocus();
-              if (hasFocus && wasFocused) cleanup();
+              if (hasFocus && wasFocused) finish();
               if (!hasFocus) wasFocused = true;
             }, 250);
 
-            fallbackTimeout = setTimeout(cleanup, 30000);
+            fallbackTimeout = setTimeout(finish, 30000);
           } catch (error) {
-            setIsPrinting(false);
-            resolve();
+            finish();
           }
         };
 
         iframe.onload = handleLoad;
-        iframe.onerror = () => {
-          setIsPrinting(false);
-          resolve();
-        };
+        iframe.onerror = finish;
         iframe.src = url;
       });
     },
