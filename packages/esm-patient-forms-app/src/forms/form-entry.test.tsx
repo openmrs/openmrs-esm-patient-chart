@@ -1,9 +1,9 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BehaviorSubject } from 'rxjs';
-import { ExtensionSlot, openmrsFetch } from '@openmrs/esm-framework';
+import { ExtensionSlot, openmrsFetch, Workspace2 } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import FormEntry, { type FormEntryProps } from './form-entry.component';
 import FormEntryWorkspace from './form-entry.workspace';
@@ -33,6 +33,7 @@ const mockFormEntrySub = vi.fn();
 const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 
 const mockExtensionSlot = vi.mocked(ExtensionSlot);
+const mockWorkspace2 = vi.mocked(Workspace2);
 
 describe('FormEntry', () => {
   beforeEach(() => {
@@ -49,10 +50,16 @@ describe('FormEntry', () => {
     expect(screen.getByText(/form-widget-slot/)).toBeInTheDocument();
   });
 
-  it('closes the child workspace without overriding close options', async () => {
+  it('keeps the unsaved-changes prompt when going back from a form with changes', async () => {
     const user = userEvent.setup();
     const closeWorkspace = vi.fn();
     render(<FormEntry {...defaultProps} showBackButton closeWorkspace={closeWorkspace} />);
+
+    const { state } = mockExtensionSlot.mock.calls.find(([props]) => props.name === 'form-widget-slot')[0];
+    const setHasUnsavedChanges = state.setHasUnsavedChanges as (hasUnsavedChanges: boolean) => void;
+    act(() => setHasUnsavedChanges(true));
+
+    expect(mockWorkspace2.mock.lastCall[0].hasUnsavedChanges).toBe(true);
 
     await user.click(screen.getByRole('button', { name: /Back to clinical forms/ }));
 
