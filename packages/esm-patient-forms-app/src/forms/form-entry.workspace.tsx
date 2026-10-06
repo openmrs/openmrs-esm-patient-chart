@@ -16,6 +16,7 @@ interface FormEntryWorkspaceProps {
  */
 const FormEntryWorkspace: React.FC<PatientWorkspace2DefinitionProps<FormEntryWorkspaceProps, object>> = ({
   closeWorkspace,
+  isRootWorkspace,
   workspaceProps: { form, encounterUuid, additionalProps },
   groupProps: { patientUuid, patient, visitContext, mutateVisitContext },
 }) => {
@@ -29,6 +30,7 @@ const FormEntryWorkspace: React.FC<PatientWorkspace2DefinitionProps<FormEntryWor
       visitContext={visitContext}
       mutateVisitContext={mutateVisitContext}
       closeWorkspace={closeWorkspace}
+      showBackButton={!isRootWorkspace}
     />
   );
 };
