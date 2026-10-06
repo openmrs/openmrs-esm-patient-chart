@@ -29,10 +29,17 @@ const tableLoaders = {
 type ZScoreTableName = keyof typeof tableLoaders;
 
 /**
+ * The under-5 tables (the WHO child growth standards) go up to day 1,856, and the 5 to 19 year tables (the WHO
+ * growth reference) start at 61 months.
+ */
+const lastDayOfUnderFiveTables = 1856;
+const firstMonthOfOlderChildTables = 61;
+
+/**
  * Loads the WHO reference data for each z-score reference the form schema mentions, chosen by the patient's sex
- * and age the same way as AMPATH's ng2-amrs. A reference that doesn't apply to the patient is `null`, which the
- * z-score helpers handle. Each mentioned reference must be registered, even as `null`, because the expression
- * runner treats an expression that refers to an unregistered name as failed and sets the field to `false`.
+ * and age. A reference that doesn't apply to the patient is `null`, which the z-score helpers handle. Each mentioned
+ * reference must be registered, even as `null`, because the expression runner treats an expression that refers to
+ * an unregistered name as failed and sets the field to `false`.
  */
 export async function loadZScoreReferences(
   formSchema: FormSchema,
@@ -69,17 +76,22 @@ async function loadReference(
   const age = today.diff(birth, 'years');
   const ageInMonths = today.diff(birth, 'months');
   const ageInDays = today.diff(birth, 'days');
+  // A child past the under-5 tables can still be a day short of 61 completed months
+  const olderChildMonth = Math.max(ageInMonths, firstMonthOfOlderChildTables);
 
   switch (name) {
     case 'weightForHeightRef':
       return age < 5 ? loadTable(`wfl_${children}_below5`) : null;
     case 'heightForAgeRef':
-      if (age < 5) {
+      if (ageInDays <= lastDayOfUnderFiveTables) {
         return rowsFor(await loadTable(`hfa_${children}_below5`), 'Day', ageInDays);
       }
-      return age < 18 ? rowsFor(await loadTable(`hfa_${children}_5_above`), 'Month', ageInMonths) : null;
+      return age < 18 ? rowsFor(await loadTable(`hfa_${children}_5_above`), 'Month', olderChildMonth) : null;
     case 'bmiForAgeRef':
-      return age >= 5 && age < 18 ? rowsFor(await loadTable(`bfa_${children}_5_above`), 'Month', ageInMonths) : null;
+      // There's no BMI-for-age table for children under 5
+      return ageInDays > lastDayOfUnderFiveTables && age < 18
+        ? rowsFor(await loadTable(`bfa_${children}_5_above`), 'Month', olderChildMonth)
+        : null;
   }
 }
 

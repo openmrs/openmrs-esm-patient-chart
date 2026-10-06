@@ -376,6 +376,14 @@ describe('Service: FormCreationService, z-score references', () => {
     expect(bmiScore).toBe('0');
   });
 
+  it("should calculate height-for-age against the girls' reference for a girl aged 5 to 17", async () => {
+    setPatient('F', moment().subtract(15, 'years').subtract(40, 'days').format('YYYY-MM-DD'));
+
+    const { heightLengthScore } = await calculateScores(160, 50);
+
+    expect(heightLengthScore).toBe('-1');
+  });
+
   it('should not register the WHO reference data for a form that does not use it', async () => {
     setPatient('F', '2023-08-27');
     const service: FormCreationService = TestBed.inject(FormCreationService);
