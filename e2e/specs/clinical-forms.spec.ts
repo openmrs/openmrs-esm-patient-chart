@@ -65,7 +65,7 @@ test('Fill a clinical form', async ({ page, patient }) => {
   });
 
   await test.step('And I click the `Clinical forms` button on the siderail', async () => {
-    await page.getByRole('button', { name: /clinical forms/i }).click();
+    await page.getByRole('button', { name: 'Clinical forms', exact: true }).click();
   });
 
   await test.step('Then I should see retained inputs in `Structured SOAP note` form', async () => {
