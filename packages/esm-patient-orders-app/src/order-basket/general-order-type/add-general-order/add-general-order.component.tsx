@@ -1,8 +1,7 @@
-import React, { type ComponentProps, useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Button, Search } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import {
-  ArrowLeftIcon,
   ResponsiveWrapper,
   useConfig,
   useDebounce,
@@ -11,7 +10,12 @@ import {
   Workspace2,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
-import { type OrderBasketItem, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
+import {
+  type OrderBasketItem,
+  useOrderBasket,
+  useOrderType,
+  WorkspaceBackButton,
+} from '@openmrs/esm-patient-common-lib';
 import { OrderForm } from '../general-order-form/general-order-form.component';
 import { prepOrderPostData } from '../resources';
 import { type ConfigObject } from '../../../config-schema';
@@ -83,17 +87,10 @@ const AddGeneralOrder: React.FC<AddGeneralOrderProps> = ({
     <Workspace2 title={title} hasUnsavedChanges={hasUnsavedChanges}>
       <div className={styles.workspaceWrapper}>
         {!isTablet && (
-          <div className={styles.backButton}>
-            <Button
-              iconDescription={t('backToOrderBasket', 'Back to order basket')}
-              kind="ghost"
-              onClick={() => closeWorkspace()}
-              renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
-              size="sm"
-            >
-              <span>{t('backToOrderBasket', 'Back to order basket')}</span>
-            </Button>
-          </div>
+          <WorkspaceBackButton
+            label={t('backToOrderBasket', 'Back to order basket')}
+            onClick={() => closeWorkspace()}
+          />
         )}
         {currentOrder ? (
           <OrderForm
