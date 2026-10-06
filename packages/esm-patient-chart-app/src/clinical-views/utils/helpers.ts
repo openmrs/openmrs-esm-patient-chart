@@ -1,5 +1,5 @@
 import { age, formatDate, launchWorkspace2, parseDate, type Visit } from '@openmrs/esm-framework';
-import { launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
+import { getPatientChartWindowProps, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 import type {
   ConfigConcepts,
   Encounter,
@@ -14,6 +14,7 @@ import type { TFunction } from 'i18next';
 export type LaunchAction = 'add' | 'view' | 'edit' | 'embedded-view';
 
 export function launchEncounterForm(
+  patientUuid: string,
   form: Form,
   action: LaunchAction = 'add',
   intent: string = '*',
@@ -24,16 +25,20 @@ export function launchEncounterForm(
   if (!visit && requireActiveVisitForEncounterTile) {
     launchStartVisitPrompt();
   } else {
-    launchWorkspace2('patient-form-entry-workspace', {
-      workspaceTitle: form?.display ?? form?.name,
-      form,
-      encounterUuid,
-      additionalProps: {
-        mode: action === 'add' ? 'enter' : action,
-        formSessionIntent: intent,
-        openClinicalFormsWorkspaceOnFormClose: false,
+    launchWorkspace2(
+      'patient-form-entry-workspace',
+      {
+        workspaceTitle: form?.display ?? form?.name,
+        form,
+        encounterUuid,
+        additionalProps: {
+          mode: action === 'add' ? 'enter' : action,
+          formSessionIntent: intent,
+          openClinicalFormsWorkspaceOnFormClose: false,
+        },
       },
-    });
+      getPatientChartWindowProps(patientUuid),
+    );
   }
 }
 

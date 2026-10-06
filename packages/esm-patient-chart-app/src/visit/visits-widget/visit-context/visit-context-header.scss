@@ -8,7 +8,7 @@
   grid-template-areas:
     'addingTo    visitType'
     'addingTo    visitInfo';
-  grid-template-columns: max-content 1fr min-content;
+  grid-template-columns: max-content 1fr;
 }
 
 .activeVisit {

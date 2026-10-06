@@ -31,7 +31,13 @@ export interface EncountersTableProps {
   setPageSize: React.Dispatch<React.SetStateAction<number>>;
   isSelectable: boolean;
   canPrintEncounters: boolean;
-  onEncounterSaved: (encounter: Encounter) => void;
+  /**
+   * Called after an encounter has been edited or deleted from this table, so hosts can refresh any data
+   * of their own. The patient chart's visit and encounter data is already invalidated by the workspaces
+   * and by the deletion.
+   */
+  onEncounterSaved?: (encounter?: Encounter) => void;
+  /** The patient these encounters belong to */
   patient: fhir.Patient;
 }
 

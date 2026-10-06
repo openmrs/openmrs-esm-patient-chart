@@ -2,8 +2,6 @@ import React, { useCallback, useState, useMemo } from 'react';
 import { userHasAccess, useSession, type EncounterType } from '@openmrs/esm-framework';
 import { type EncountersTableProps, useAllEncounters, encounterHasJsonSchemaForm } from './encounters-table.resource';
 import EncountersTable from './encounters-table.component';
-import { invalidateVisitAndEncounterData } from '@openmrs/esm-patient-common-lib';
-import { useSWRConfig } from 'swr';
 
 interface CompletedFormsTableProps {
   patient: fhir.Patient;
@@ -46,7 +44,6 @@ const CompletedFormsTable: React.FC<CompletedFormsTableProps> = ({ patient, isTa
 
   const session = useSession();
   const canPrintEncounters = userHasAccess('App: Print encounter forms', session?.user);
-  const {mutate: globalMutate} = useSWRConfig();
 
   const encountersTableProps: EncountersTableProps = {
     currentPage,
@@ -63,9 +60,6 @@ const CompletedFormsTable: React.FC<CompletedFormsTableProps> = ({ patient, isTa
     totalCount: filteredCompletedForms.length,
     isSelectable: true,
     canPrintEncounters,
-    onEncounterSaved: () => {
-      invalidateVisitAndEncounterData(globalMutate, patientUuid);
-    },
     patient,
   };
 

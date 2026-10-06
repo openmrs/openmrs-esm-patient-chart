@@ -606,11 +606,8 @@ describe('OrderDetailsTable', () => {
     expect(mockLaunchWorkspace2).toHaveBeenCalledWith(
       'order-basket',
       {},
-      expect.anything(),
-      expect.objectContaining({
-        visitContext: mockOrders[1].encounter.visit,
-        mutateVisitContext: expect.any(Function),
-      }),
+      expect.objectContaining({ visitContext: mockOrders[1].encounter.visit }),
+      expect.objectContaining({ activeVisit: mockOrders[1].encounter.visit }),
     );
   });
 });

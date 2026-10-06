@@ -17,7 +17,7 @@ import {
   useSession,
   type Visit,
 } from '@openmrs/esm-framework';
-import { EmptyState, PatientChartPagination, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { type ChartConfig, defaultVisitTimelinePageSize } from '../../../../config-schema';
 import {
   canModifyEncounter,
@@ -35,12 +35,19 @@ import styles from './visit-timeline.scss';
 
 interface VisitTimelineProps {
   patientUuid: string;
-  mutateVisitContext: () => void;
-  patient: fhir.Patient;
+  patient: EncountersTableProps['patient'];
+  onEncounterSaved?: EncountersTableProps['onEncounterSaved'];
+  /**
+   * Rendered straight from `visit.encounters`, so the visit must be fetched with the fields
+   * the visits widget's `customRepresentation` (in `visit.resource.tsx`) asks for. The framework's
+   * `defaultVisitCustomRepresentation` is not enough: it omits `obs`, `form.resources`, and
+   * `encounterType.editPrivilege`, leaving expanded panels empty and the edit and delete actions
+   * offered regardless of privilege.
+   */
   visit: Visit;
 }
 
-function VisitTimeline({ mutateVisitContext, patient, patientUuid, visit }: VisitTimelineProps) {
+function VisitTimeline({ onEncounterSaved, patient, patientUuid, visit }: VisitTimelineProps) {
   const { t } = useTranslation();
   const session = useSession();
   const responsiveSize = isDesktop(useLayoutType()) ? 'sm' : 'lg';
@@ -104,10 +111,10 @@ function VisitTimeline({ mutateVisitContext, patient, patientUuid, visit }: Visi
         patientUuid,
         t,
         mutate,
-        onEncounterDeleted: mutateVisitContext,
+        onEncounterDeleted: onEncounterSaved,
       });
     },
-    [mutate, mutateVisitContext, patientUuid, t],
+    [mutate, onEncounterSaved, patientUuid, t],
   );
 
   if (timelineEntries.length === 0) {
@@ -187,12 +194,14 @@ function VisitTimeline({ mutateVisitContext, patient, patientUuid, visit }: Visi
                           <OverflowMenuItem
                             className={styles.menuItem}
                             itemText={t('editThisEncounter', 'Edit this encounter')}
-                            onClick={() => editEncounter({
-                              patient,
-                              encounter: encounter,
-                              visitContext: visit,
-                              onEncounterSaved: mutateVisitContext
-                            })}
+                            onClick={() =>
+                              editEncounter({
+                                patient,
+                                encounter,
+                                visitContext: visit,
+                                onEncounterSaved,
+                              })
+                            }
                           />
                         )}
                         {canPrintEncounter && (
@@ -231,7 +240,7 @@ function VisitTimeline({ mutateVisitContext, patient, patientUuid, visit }: Visi
                           visitStartDatetime: visit.startDatetime ?? null,
                           visitStopDatetime: visit.stopDatetime ?? null,
                           patientUuid,
-                          patient: patient,
+                          patient,
                           formUuid: encounter.form.uuid,
                           encounterUuid: encounter.uuid,
                           promptBeforeClosing: () => {},

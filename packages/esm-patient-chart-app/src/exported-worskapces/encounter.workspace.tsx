@@ -4,23 +4,20 @@ import {
   ExtensionSlot,
   type ExportedWorkspaceWindowInfo,
   useWorkspace2Context,
-  type Visit,
   Workspace2,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import {
   encounterWorkspaceSlotName,
   type EncounterWorkspaceSlotState,
-  type PatientWorkspaceGroupProps,
+  type PatientWorkspaceWindowProps,
 } from '@openmrs/esm-patient-common-lib';
 import VisitContextHeader from '../visit/visits-widget/visit-context/visit-context-header.extension';
 import styles from './encounter.workspace.scss';
 
-interface WindowProps {
-  patient: fhir.Patient;
-  visitContext: Visit;
+interface WindowProps extends PatientWorkspaceWindowProps {
   encounter?: Encounter;
-  onEncounterSaved?: () => void;
+  onEncounterSaved?: (encounter?: Encounter) => void;
   additionalProps?: Record<string, unknown>;
 }
 
@@ -29,7 +26,7 @@ interface WindowProps {
  * each kind of encounter, through extensions in the encounter workspace slot.
  */
 const EncounterWorkspace: React.FC<Workspace2DefinitionProps<{}, WindowProps, {}>> = ({
-  windowProps: { patient, visitContext, encounter, onEncounterSaved, additionalProps },
+  windowProps: { patient, patientUuid, visitContext, encounter, onEncounterSaved, additionalProps },
   closeWorkspace,
 }) => {
   const { workspaceMeta } = useWorkspace2Context();
@@ -43,16 +40,11 @@ const EncounterWorkspace: React.FC<Workspace2DefinitionProps<{}, WindowProps, {}
     }
   }, [exportedWorkspaceWindowInfo, closeWorkspace]);
 
-  // Must be referentially stable: ExportedWorkspace re-seeds (resetting its title) whenever groupProps
+  // Must be referentially stable: ExportedWorkspace re-seeds (resetting its title) whenever windowProps
   // changes shallowly, which fires onWindowChanged and re-renders this component.
-  const groupProps: PatientWorkspaceGroupProps = useMemo(
-    () => ({
-      patient,
-      patientUuid: patient.id,
-      visitContext,
-      mutateVisitContext: onEncounterSaved,
-    }),
-    [patient, visitContext, onEncounterSaved],
+  const hostedWindowProps: PatientWorkspaceWindowProps = useMemo(
+    () => ({ patient, patientUuid, visitContext }),
+    [patient, patientUuid, visitContext],
   );
 
   const slotState: EncounterWorkspaceSlotState = useMemo(
@@ -61,10 +53,10 @@ const EncounterWorkspace: React.FC<Workspace2DefinitionProps<{}, WindowProps, {}
       encounter,
       additionalProps,
       onEncounterSaved,
-      groupProps,
+      windowProps: hostedWindowProps,
       onWindowChanged: setExportedWorkspaceWindowInfo,
     }),
-    [workspaceType, encounter, additionalProps, onEncounterSaved, groupProps],
+    [workspaceType, encounter, additionalProps, onEncounterSaved, hostedWindowProps],
   );
 
   const isEditing = !!encounter;

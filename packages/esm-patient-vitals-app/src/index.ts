@@ -47,8 +47,10 @@ export const vitalsBiometricsFormWorkspace = getAsyncLifecycle(
   options,
 );
 
+// Referenced by other apps' routes.json. The same component as `vitalsBiometricsFormWorkspace`: it takes the
+// patient / visit as window props (still accepting them as deprecated workspace props).
 export const exportedVitalsBiometricsFormWorkspace = getAsyncLifecycle(
-  () => import('./vitals-biometrics-form/exported-vitals-biometrics-form.workspace'),
+  () => import('./vitals-biometrics-form/vitals-biometrics-form.workspace'),
   options,
 );
 

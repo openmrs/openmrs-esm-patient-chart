@@ -2,14 +2,12 @@ import React, { useMemo, useState } from 'react';
 import { userHasAccess, useSession, type Visit } from '@openmrs/esm-framework';
 import { type EncountersTableProps, encounterHasJsonSchemaForm } from './encounters-table.resource';
 import EncountersTable from './encounters-table.component';
-import { invalidateVisitAndEncounterData } from '@openmrs/esm-patient-common-lib';
-import { useSWRConfig } from 'swr';
 
 interface VisitCompletedFormsTableProps {
   patientUuid: string;
   visit: Visit;
-  mutateVisitContext: EncountersTableProps['onEncounterSaved'];
-  patient?: EncountersTableProps['patient'];
+  patient: EncountersTableProps['patient'];
+  onEncounterSaved?: EncountersTableProps['onEncounterSaved'];
 }
 
 /**
@@ -18,8 +16,8 @@ interface VisitCompletedFormsTableProps {
 const VisitCompletedFormsTable: React.FC<VisitCompletedFormsTableProps> = ({
   patientUuid,
   visit,
-  mutateVisitContext,
   patient,
+  onEncounterSaved,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -62,8 +60,7 @@ const VisitCompletedFormsTable: React.FC<VisitCompletedFormsTableProps> = ({
     setPageSize,
     isSelectable: false,
     canPrintEncounters,
-    onEncounterSaved:
-      mutateVisitContext,
+    onEncounterSaved,
     patient,
   };
 

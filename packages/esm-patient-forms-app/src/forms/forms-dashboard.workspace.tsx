@@ -1,30 +1,31 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Workspace2, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import { type ClinicalFormsWindowProps, type Form } from '@openmrs/esm-patient-common-lib';
 import FormsDashboard from './forms-dashboard.component';
 import styles from './forms-dashboard-workspace.scss';
-import { type Form, type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
-import { ExtensionSlot, Workspace2 } from '@openmrs/esm-framework';
 
 /**
- * This workspace lists a table of available forms. When clicking on a row, it launches
- * either the form-entry workspace or the html-form-entry workspace.
+ * This workspace lists a table of available forms. When clicking on a row, it launches the form
+ * entry workspace (by default, the patient chart's `patient-form-entry-workspace`; other apps pass
+ * the name of the one they registered as `formEntryWorkspaceName`).
  *
- * This workspace must only be used within the patient chart.
- * @see exported-forms-dashboard.workspace.tsx
+ * It takes the patient and visit from its window props, not from group props, so it can be used
+ * both inside and outside the patient chart.
  */
-const FormsDashboardWorkspace: React.FC<PatientWorkspace2DefinitionProps<object, object>> = ({
+const FormsDashboardWorkspace: React.FC<Workspace2DefinitionProps<object, ClinicalFormsWindowProps, object>> = ({
   launchChildWorkspace,
-  groupProps: { patient, patientUuid, visitContext },
+  windowProps: { formEntryWorkspaceName = 'patient-form-entry-workspace', patient, patientUuid, visitContext },
 }) => {
   const { t } = useTranslation();
   const handleFormOpen = useCallback(
     (form: Form, encounterUuid: string) => {
-      launchChildWorkspace('patient-form-entry-workspace', {
+      launchChildWorkspace(formEntryWorkspaceName, {
         form,
         encounterUuid,
       });
     },
-    [launchChildWorkspace],
+    [launchChildWorkspace, formEntryWorkspaceName],
   );
 
   return (

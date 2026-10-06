@@ -12,9 +12,9 @@ interface VisitTagProps {
 
 function VisitTag({ patientUuid, patient }: VisitTagProps) {
   const { activeVisit, isLoading } = useVisit(patientUuid);
-  const { visitContext } = usePatientChartStore(patientUuid);
+  const { activeVisit: storeActiveVisit } = usePatientChartStore(patientUuid);
   const isNotDeceased = !patient?.deceasedDateTime;
-  const isPastVisitContext = Boolean(visitContext && visitContext.stopDatetime);
+  const isPastVisitContext = Boolean(storeActiveVisit && storeActiveVisit.stopDatetime);
   return !isLoading && activeVisit && isNotDeceased && !isPastVisitContext ? (
     <ActiveVisitTag activeVisit={activeVisit} />
   ) : null;

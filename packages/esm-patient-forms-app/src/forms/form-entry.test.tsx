@@ -18,7 +18,6 @@ const defaultProps: FormEntryProps = {
   patientUuid: mockPatient.id,
   patient: mockPatient,
   visitContext: null,
-  mutateVisitContext: null,
   closeWorkspace: vi.fn(),
 };
 

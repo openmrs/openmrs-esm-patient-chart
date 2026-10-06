@@ -8,15 +8,18 @@ import { useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 
 interface VisitContextHeaderProps {
   visitContext: Visit;
-  mode: 'edit' | 'create';
+  /** Whether the user is adding to the visit or editing an encounter of it. Defaults to `create`. */
+  mode?: 'edit' | 'create';
 }
 
 /**
- * The visit context header displays the currently visit context
- * while editing or creating encounters
+ * The visit context header displays the visit that encounters are being added to or edited in.
  *
+ * It is registered in the `visit-context-header-slot` slot. The visit is passed in through the slot
+ * state (`{ visitContext, mode }`), not read from the patient chart store, so it can show a visit
+ * other than the active visit.
  */
-const VisitContextHeader: React.FC<VisitContextHeaderProps> = ({ visitContext, mode }) => {
+const VisitContextHeader: React.FC<VisitContextHeaderProps> = ({ visitContext, mode = 'create' }) => {
   const { t } = useTranslation();
   const { systemVisitEnabled } = useSystemVisitSetting();
 

@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { launchWorkspace2 } from '@openmrs/esm-framework';
 import { launchPatientChartWithWorkspaceOpen } from '@openmrs/esm-patient-common-lib';
+import { launchStartVisitWorkspace } from '../visit-form/launch-start-visit-workspace';
 import styles from './start-visit-dialog.scss';
 
 interface StartVisitDialogProps {
@@ -31,7 +31,7 @@ const StartVisitDialog: React.FC<StartVisitDialogProps> = ({
         additionalProps: { openedFrom: 'patient-chart-start-visit' },
       });
     } else {
-      launchWorkspace2('start-visit-workspace-form', { openedFrom: 'patient-chart-start-visit', onVisitStarted });
+      launchStartVisitWorkspace({ openedFrom: 'patient-chart-start-visit', onVisitStarted }, patientUuid);
     }
 
     closeModal();

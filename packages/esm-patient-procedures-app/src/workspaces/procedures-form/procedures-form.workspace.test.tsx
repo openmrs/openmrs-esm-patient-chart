@@ -63,8 +63,7 @@ const defaultProps: PatientWorkspace2DefinitionProps<ProceduresFormProps, object
   groupProps: {
     patientUuid: mockPatient.id,
     patient: mockPatient,
-    visitContext: null,
-    mutateVisitContext: null,
+    activeVisit: null,
   },
   workspaceName: '',
   launchChildWorkspace: vi.fn(),

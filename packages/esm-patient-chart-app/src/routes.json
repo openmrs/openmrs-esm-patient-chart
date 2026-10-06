@@ -177,6 +177,11 @@
       "order": 1
     },
     {
+      "name": "visit-context-header",
+      "slot": "visit-context-header-slot",
+      "component": "visitContextHeader"
+    },
+    {
       "name": "retrospective-date-time-picker",
       "slot": "restrospective-date-time-picker-slot",
       "component": "retrospectiveDateTimePicker"
@@ -218,10 +223,6 @@
     {
       "name": "start-visit-dialog",
       "component": "startVisitModal"
-    },
-    {
-      "name": "visit-context-switcher",
-      "component": "visitContextSwitcherModal"
     }
   ],
   "pages": [

@@ -30,6 +30,7 @@ import {
   useLayoutType,
   ResponsiveWrapper,
   Workspace2,
+  type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import {
   type Allergen,
@@ -43,7 +44,7 @@ import { useAllergies } from '../allergy-intolerance.resource';
 import { type AllergiesConfigObject } from '../../config-schema';
 import { ALLERGEN_TYPES, type Allergy } from '../../types';
 import styles from './allergy-form.scss';
-import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
+import { type PatientWorkspaceWindowProps } from '@openmrs/esm-patient-common-lib';
 
 interface AllergyFormData {
   allergen: Allergen;
@@ -58,6 +59,8 @@ export interface AllergyFormWorkspaceProps {
   allergy?: Allergy;
   formContext: 'creating' | 'editing';
 }
+
+export type AllergyFormWindowProps = Pick<PatientWorkspaceWindowProps, 'patient' | 'patientUuid'>;
 
 interface FormValues {
   allergen: Allergen | null;
@@ -120,16 +123,19 @@ const allergyFormSchema = (t: TFunction, otherConceptUuid: string) =>
 
 export interface AllergyFormProps {
   allergy?: Allergy;
-  closeWorkspace: PatientWorkspace2DefinitionProps<AllergyFormWorkspaceProps, {}>['closeWorkspace'];
+  closeWorkspace: Workspace2DefinitionProps<
+    AllergyFormWorkspaceProps,
+    AllergyFormWindowProps,
+    object
+  >['closeWorkspace'];
   formContext: 'creating' | 'editing';
   patient: fhir.Patient;
   patientUuid: string;
 }
 
-// Presentational form, decoupled from how the patient context is sourced. The patient chart and
-// the exported (out-of-chart) workspace each resolve `patient`/`patientUuid` their own way and
-// render this. We never call `usePatient()` here: per O3-4505, only the root chart component loads
-// the patient, to avoid an SWR re-render cascade.
+// Presentational form, decoupled from how the patient context is sourced (the workspace below takes
+// it from its window props). We never call `usePatient()` here: per O3-4505, only the root chart
+// component loads the patient, to avoid an SWR re-render cascade.
 export function AllergyForm({ allergy, closeWorkspace, formContext, patient, patientUuid }: AllergyFormProps) {
   const { allergens } = useAllergens();
   const { allergicReactions, isLoading: isLoadingReactions } = useAllergicReactions();
@@ -613,22 +619,23 @@ export function AllergyForm({ allergy, closeWorkspace, formContext, patient, pat
   );
 }
 
-// Chart wrapper: inside the patient chart, `patient`/`patientUuid` come from the chart's workspace
-// group. Hosts outside the chart use `exportedAllergyFormWorkspace` instead, which sources the
-// patient from window props. The optional chaining guards against this workspace being launched
-// without the chart group (it should not be): a non-functional form beats an uncaught TypeError.
+/**
+ * This workspace displays the form to record or edit an allergy. It acts on the patient given by its
+ * window props rather than by the patient chart's group props, so it works both in the patient chart
+ * and in other apps' workspace windows (e.g. the ward's order basket).
+ */
 function AllergyFormWorkspace({
   closeWorkspace,
-  groupProps,
+  windowProps: { patient, patientUuid },
   workspaceProps: { allergy, formContext },
-}: PatientWorkspace2DefinitionProps<AllergyFormWorkspaceProps, {}>) {
+}: Workspace2DefinitionProps<AllergyFormWorkspaceProps, AllergyFormWindowProps, object>) {
   return (
     <AllergyForm
       allergy={allergy}
       closeWorkspace={closeWorkspace}
       formContext={formContext}
-      patient={groupProps?.patient}
-      patientUuid={groupProps?.patientUuid}
+      patient={patient}
+      patientUuid={patientUuid}
     />
   );
 }

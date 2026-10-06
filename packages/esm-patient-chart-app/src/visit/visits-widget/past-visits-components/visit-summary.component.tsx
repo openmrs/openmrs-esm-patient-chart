@@ -27,18 +27,13 @@ import styles from './visit-summary.scss';
 interface VisitSummaryProps {
   visit: Visit;
   patientUuid: string;
-  mutateVisitContext: () => void;
-  patient?: EncountersTableProps['patient'];
+  patient: EncountersTableProps['patient'];
+  onEncounterSaved?: EncountersTableProps['onEncounterSaved'];
 }
 
 const visitSummaryPanelSlot = 'visit-summary-panels';
 
-const VisitSummary: React.FC<VisitSummaryProps> = ({
-  visit,
-  patientUuid,
-  mutateVisitContext,
-  patient,
-}) => {
+const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid, patient, onEncounterSaved }) => {
   const config = useConfig<ChartConfig>();
   const { t } = useTranslation();
   const extensions = useAssignedExtensions(visitSummaryPanelSlot);
@@ -155,8 +150,8 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({
             <VisitTimeline
               visit={visit}
               patientUuid={patientUuid}
-              mutateVisitContext={mutateVisitContext}
               patient={patient}
+              onEncounterSaved={onEncounterSaved}
             />
           </TabPanel>
           <TabPanel>
@@ -172,8 +167,8 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({
             <VisitCompletedFormsTable
               visit={visit}
               patientUuid={patientUuid}
-              mutateVisitContext={mutateVisitContext}
               patient={patient}
+              onEncounterSaved={onEncounterSaved}
             />
           </TabPanel>
           <ExtensionSlot name={visitSummaryPanelSlot}>

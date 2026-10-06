@@ -13,7 +13,7 @@ import styles from './task-list.scss';
 type View = 'list' | 'form' | 'details' | 'edit';
 
 const TaskListWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({ groupProps }) => {
-  const { patientUuid, visitContext } = groupProps ?? { patientUuid: '', visitContext: undefined as unknown as Visit };
+  const { patientUuid, activeVisit } = groupProps ?? { patientUuid: '', activeVisit: undefined as unknown as Visit };
   const { t } = useTranslation();
   const [view, setView] = useState<View>('list');
   const [selectedTaskUuid, setSelectedTaskUuid] = useState<string | null>(null);
@@ -75,7 +75,7 @@ const TaskListWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
           </div>
         )}
         {view === 'form' && (
-          <AddTaskForm patientUuid={patientUuid} activeVisit={visitContext} onClose={() => setView('list')} />
+          <AddTaskForm patientUuid={patientUuid} activeVisit={activeVisit} onClose={() => setView('list')} />
         )}
         {view === 'list' && <TaskListView patientUuid={patientUuid} onTaskClick={handleTaskClick} />}
         {view === 'list' && (
@@ -101,7 +101,7 @@ const TaskListWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
         {view === 'edit' && selectedTaskUuid && (
           <AddTaskForm
             patientUuid={patientUuid}
-            activeVisit={visitContext}
+            activeVisit={activeVisit}
             onClose={handleEditComplete}
             editTaskUuid={selectedTaskUuid}
           />

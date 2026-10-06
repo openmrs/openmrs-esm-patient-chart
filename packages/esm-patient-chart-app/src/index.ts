@@ -121,7 +121,10 @@ export const startVisitWorkspace = getAsyncLifecycle(() => import('./visit/visit
   moduleName,
 });
 
-export const exportedVisitForm = getAsyncLifecycle(() => import('./visit/visit-form/exported-visit-form.workspace'), {
+// Referenced by other apps' routes.json (appointments, patient lists). The same component as
+// `startVisitWorkspace`: it takes the patient (and the visit to edit) as window props, still accepting them
+// as deprecated workspace props.
+export const exportedVisitForm = getAsyncLifecycle(() => import('./visit/visit-form/visit-form.workspace'), {
   featureName: 'exported-visit-form',
   moduleName,
 });
@@ -196,11 +199,6 @@ export const activeVisitActionsComponent = getAsyncLifecycle(
 export const encounterListTableTabs = getAsyncLifecycle(
   () => import('./clinical-views/encounter-list/encounter-list-tabs.extension'),
   { featureName: 'encounter-list-table-tabs', moduleName },
-);
-
-export const visitContextSwitcherModal = getAsyncLifecycle(
-  () => import('./visit/visits-widget/visit-context/visit-context-switcher.modal'),
-  { featureName: 'visit-context-switcher', moduleName },
 );
 
 export const visitContextHeader = getAsyncLifecycle(

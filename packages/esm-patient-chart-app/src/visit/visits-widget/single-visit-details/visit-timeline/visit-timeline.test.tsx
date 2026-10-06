@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type ComponentProps } from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -67,10 +67,16 @@ function buildEncounters(count: number): Array<Encounter> {
 
 function renderVisitTimeline(
   encounters: Array<Encounter> = mockEncountersAlice,
+  onEncounterSaved?: ComponentProps<typeof VisitTimeline>['onEncounterSaved'],
 ) {
   const visit = { ...mockVisit, encounters } as Visit;
   return renderWithSwr(
-    <VisitTimeline visit={visit} patientUuid={mockPatientAlice.uuid} mutateVisitContext={vi.fn()} patient={mockFhirPatient} />
+    <VisitTimeline
+      visit={visit}
+      patientUuid={mockPatientAlice.uuid}
+      patient={mockFhirPatient}
+      onEncounterSaved={onEncounterSaved}
+    />,
   );
 }
 
@@ -92,10 +98,9 @@ beforeEach(() => {
   mockUsePatientChartStore.mockReturnValue({
     patientUuid: mockPatientAlice.uuid,
     patient: mockFhirPatient,
-    visitContext: null,
-    mutateVisitContext: vi.fn(),
+    activeVisit: null,
     setPatient: vi.fn(),
-    setVisitContext: vi.fn(),
+    setActiveVisit: vi.fn(),
   } as any);
 });
 
@@ -176,7 +181,8 @@ describe('VisitTimeline', () => {
   });
 
   it('launches the encounter workspace when editing an encounter', async () => {
-    renderVisitTimeline([admissionEncounter]);
+    const onEncounterSaved = vi.fn();
+    renderVisitTimeline([admissionEncounter], onEncounterSaved);
     await clickEditEncounter();
 
     expect(mockLaunchWorkspace).toHaveBeenCalledTimes(1);
@@ -187,7 +193,7 @@ describe('VisitTimeline', () => {
         patient: mockFhirPatient,
         encounter: expect.objectContaining({ uuid: admissionEncounter.uuid }),
         visitContext: expect.objectContaining({ uuid: mockVisit.uuid }),
-        onEncounterSaved: expect.any(Function),
+        onEncounterSaved,
       }),
     );
   });

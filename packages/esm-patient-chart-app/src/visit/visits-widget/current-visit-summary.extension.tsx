@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { launchWorkspace2 } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { launchStartVisitWorkspace } from '../visit-form/launch-start-visit-workspace';
 import VisitSummary from './past-visits-components/visit-summary.component';
 import styles from './current-visit-summary.scss';
 
@@ -15,20 +15,18 @@ interface CurrentVisitSummaryProps {
  */
 const CurrentVisitSummary: React.FC<CurrentVisitSummaryProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { patientUuid: storePatientUuid, patient, visitContext, mutateVisitContext } = usePatientChartStore(patientUuid);
+  const { patientUuid: storePatientUuid, patient, activeVisit } = usePatientChartStore(patientUuid);
 
   if (patientUuid !== storePatientUuid) {
     return null;
   }
 
-  if (!visitContext) {
+  if (!activeVisit) {
     return (
       <EmptyState
         headerTitle={t('currentVisit', 'Current visit')}
         displayText={t('noActiveVisitMessage', 'active visits')}
-        launchForm={() =>
-          launchWorkspace2('start-visit-workspace-form', { openedFrom: 'patient-chart-current-visit-summary' })
-        }
+        launchForm={() => launchStartVisitWorkspace({ openedFrom: 'patient-chart-current-visit-summary' }, patientUuid)}
       />
     );
   }
@@ -39,7 +37,7 @@ const CurrentVisitSummary: React.FC<CurrentVisitSummaryProps> = ({ patientUuid }
         <span />
       </CardHeader>
       <div className={styles.visitSummaryCard}>
-        <VisitSummary visit={visitContext} patientUuid={patientUuid} patient={patient} mutateVisitContext={mutateVisitContext} />
+        <VisitSummary visit={activeVisit} patientUuid={patientUuid} patient={patient} />
       </div>
     </div>
   );

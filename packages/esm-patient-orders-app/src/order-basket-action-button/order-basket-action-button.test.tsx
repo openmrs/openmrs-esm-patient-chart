@@ -46,9 +46,7 @@ describe('<OrderBasketActionButton/>', () => {
     const user = userEvent.setup();
     mockUseLayoutType.mockReturnValue('tablet');
     render(
-      <OrderBasketActionButton
-        groupProps={{ patient: mockPatient, patientUuid: mockPatient.id, visitContext: null, mutateVisitContext: null }}
-      />,
+      <OrderBasketActionButton groupProps={{ patient: mockPatient, patientUuid: mockPatient.id, activeVisit: null }} />,
     );
 
     const orderBasketButton = screen.getByRole('button', { name: /Order Basket/i });
@@ -59,9 +57,7 @@ describe('<OrderBasketActionButton/>', () => {
     const user = userEvent.setup();
     mockUseLayoutType.mockReturnValue('small-desktop');
     render(
-      <OrderBasketActionButton
-        groupProps={{ patient: mockPatient, patientUuid: mockPatient.id, visitContext: null, mutateVisitContext: null }}
-      />,
+      <OrderBasketActionButton groupProps={{ patient: mockPatient, patientUuid: mockPatient.id, activeVisit: null }} />,
     );
 
     const orderBasketButton = screen.getByRole('button', { name: /order basket/i });
@@ -75,9 +71,7 @@ describe('<OrderBasketActionButton/>', () => {
     mockUseSystemVisitSetting.mockReturnValue({ systemVisitEnabled: true });
 
     render(
-      <OrderBasketActionButton
-        groupProps={{ patient: mockPatient, patientUuid: mockPatient.id, visitContext: null, mutateVisitContext: null }}
-      />,
+      <OrderBasketActionButton groupProps={{ patient: mockPatient, patientUuid: mockPatient.id, activeVisit: null }} />,
     );
 
     const orderBasketButton = screen.getByRole('button', { name: /order basket/i });
@@ -89,9 +83,7 @@ describe('<OrderBasketActionButton/>', () => {
     const { result } = renderHook(() => useOrderBasket(mockPatient));
     expect(result.current.orders).toHaveLength(1); // sanity check
     render(
-      <OrderBasketActionButton
-        groupProps={{ patient: mockPatient, patientUuid: mockPatient.id, visitContext: null, mutateVisitContext: null }}
-      />,
+      <OrderBasketActionButton groupProps={{ patient: mockPatient, patientUuid: mockPatient.id, activeVisit: null }} />,
     );
 
     expect(screen.getByText(/order basket/i)).toBeInTheDocument();
@@ -101,9 +93,7 @@ describe('<OrderBasketActionButton/>', () => {
   it('should display the count tag when orders are present on the tablet view', () => {
     mockUseLayoutType.mockReturnValue('tablet');
     render(
-      <OrderBasketActionButton
-        groupProps={{ patient: mockPatient, patientUuid: mockPatient.id, visitContext: null, mutateVisitContext: null }}
-      />,
+      <OrderBasketActionButton groupProps={{ patient: mockPatient, patientUuid: mockPatient.id, activeVisit: null }} />,
     );
 
     expect(screen.getByRole('button', { name: /1 order basket/i })).toBeInTheDocument();

@@ -26,7 +26,7 @@ const mockUseVisit = vi.mocked(useVisit);
 const mockUpdateVisit = vi.mocked(updateVisit);
 
 const mockUsePatientChartStore = vi.mocked(usePatientChartStore);
-const mockSetVisitContext = vi.fn();
+const mockSetActiveVisit = vi.fn();
 
 vi.mock('@openmrs/esm-patient-common-lib', () => ({
   usePatientChartStore: vi.fn(),
@@ -35,10 +35,9 @@ vi.mock('@openmrs/esm-patient-common-lib', () => ({
 mockUsePatientChartStore.mockReturnValue({
   patientUuid: 'patient-123',
   patient: null,
-  visitContext: mockCurrentVisit,
-  mutateVisitContext: vi.fn(),
+  activeVisit: mockCurrentVisit,
   setPatient: vi.fn(),
-  setVisitContext: mockSetVisitContext,
+  setActiveVisit: mockSetActiveVisit,
 });
 
 describe('End visit dialog', () => {
@@ -93,7 +92,7 @@ describe('End visit dialog', () => {
       title: 'Visit ended',
     });
 
-    expect(mockSetVisitContext).toHaveBeenCalledTimes(1);
+    expect(mockSetActiveVisit).toHaveBeenCalledTimes(1);
   });
 
   test('displays an error snackbar if there was a problem ending a visit', async () => {

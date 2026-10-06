@@ -9,7 +9,8 @@ const EncounterClinicalForm: React.FC<EncounterWorkspaceSlotState> = ({
   workspaceType,
   encounter,
   additionalProps,
-  groupProps,
+  onEncounterSaved,
+  windowProps,
   onWindowChanged,
 }) => {
   const matches = workspaceType ? workspaceType === 'clinical-form' : Boolean(encounter?.form);
@@ -25,8 +26,9 @@ const EncounterClinicalForm: React.FC<EncounterWorkspaceSlotState> = ({
         form: encounter.form,
         encounterUuid: encounter.uuid,
         additionalProps,
+        handlePostResponse: onEncounterSaved,
       }}
-      groupProps={groupProps}
+      windowProps={windowProps}
       onWindowChanged={onWindowChanged}
     />
   );

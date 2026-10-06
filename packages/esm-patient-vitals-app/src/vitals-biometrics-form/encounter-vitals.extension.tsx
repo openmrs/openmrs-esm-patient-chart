@@ -9,7 +9,8 @@ import { type ConfigObject } from '../config-schema';
 const EncounterVitals: React.FC<EncounterWorkspaceSlotState> = ({
   workspaceType,
   encounter,
-  groupProps,
+  onEncounterSaved,
+  windowProps,
   onWindowChanged,
 }) => {
   const { vitals } = useConfig<ConfigObject>();
@@ -28,8 +29,9 @@ const EncounterVitals: React.FC<EncounterWorkspaceSlotState> = ({
       workspaceProps={{
         editEncounterUuid: encounter?.uuid,
         formContext: encounter ? 'editing' : 'creating',
+        onEncounterSaved,
       }}
-      groupProps={groupProps}
+      windowProps={windowProps}
       onWindowChanged={onWindowChanged}
     />
   );

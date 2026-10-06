@@ -31,10 +31,15 @@ describe('StartVisit', () => {
 
     await user.click(startNewVisitButton);
 
-    expect(mockLaunchWorkspace).toHaveBeenCalledWith('start-visit-workspace-form', {
-      openedFrom: 'patient-chart-start-visit',
-      onVisitStarted,
-    });
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith(
+      'start-visit-workspace-form',
+      {
+        openedFrom: 'patient-chart-start-visit',
+        onVisitStarted,
+      },
+      expect.objectContaining({ visitContext: null }),
+      expect.objectContaining({ activeVisit: null }),
+    );
     expect(onCancel).not.toHaveBeenCalled();
     expect(defaultProps.closeModal).toHaveBeenCalled();
   });

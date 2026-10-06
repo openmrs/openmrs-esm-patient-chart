@@ -36,4 +36,15 @@ describe('VisitContextHeader', () => {
     expect(screen.getByText(/Adding to/i)).toBeInTheDocument();
     expect(screen.getByText(mockCurrentVisit.visitType.display)).toBeInTheDocument();
   });
+
+  it('should default to showing that encounters are being added to the visit', () => {
+    render(<VisitContextHeader visitContext={mockCurrentVisit} />);
+    expect(screen.getByText(/Adding to/i)).toBeInTheDocument();
+  });
+
+  it('should indicate that an encounter is being edited in the visit it belongs to', () => {
+    render(<VisitContextHeader visitContext={mockCurrentVisit} mode={'edit'} />);
+    expect(screen.getByText(/Editing/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Adding to/i)).not.toBeInTheDocument();
+  });
 });

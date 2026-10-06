@@ -1,5 +1,5 @@
-import { useSWRConfig, type KeyedMutator } from 'swr';
-import { restBaseUrl, type FetchResponse, type Visit } from '@openmrs/esm-framework';
+import type { KeyedMutator } from 'swr';
+import { restBaseUrl } from '@openmrs/esm-framework';
 
 /**
  * Invalidates visit history table data without triggering global visit revalidation cascade.

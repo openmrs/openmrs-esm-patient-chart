@@ -23,7 +23,7 @@ describe('StartVisitOverflowMenuItem', () => {
     expect(mockLaunchWorkspace).toHaveBeenCalledWith(
       'start-visit-workspace-form',
       { openedFrom: 'patient-chart-start-visit' },
-      {},
+      expect.objectContaining({ patient: mockPatient, patientUuid: mockPatient.id, visitContext: null }),
       expect.objectContaining({ patient: mockPatient, patientUuid: mockPatient.id }),
     );
   });

@@ -106,6 +106,7 @@ export interface VisitNotesFormProps {
   patient: fhir.Patient;
   visitContext: Visit;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
+  onEncounterSaved?: (encounter?: Encounter) => void;
 }
 
 /**
@@ -119,6 +120,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   patient,
   visitContext,
   closeWorkspace,
+  onEncounterSaved,
 }) => {
   const isEditing: boolean = Boolean(formContext === 'editing' && encounter?.uuid);
   const { t } = useTranslation();
@@ -546,6 +548,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
           }
         })
         .then((failedUploads = []) => {
+          onEncounterSaved?.();
           closeWorkspace({ discardUnsavedChanges: true });
 
           if (failedUploads.length) {
@@ -615,6 +618,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       locationUuid,
       mutateAttachments,
       mutateVisitNotes,
+      onEncounterSaved,
       patientUuid,
       providerUuid,
       selectedPrimaryDiagnoses.length,

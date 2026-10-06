@@ -1,7 +1,6 @@
 import { vi, describe, it, expect, test, beforeEach, afterEach } from 'vitest';
 import React from 'react';
 import {
-  type Encounter,
   ExtensionSlot,
   getDefaultsFromConfigSchema,
   launchWorkspace2,
@@ -32,7 +31,6 @@ const testProps: EncountersTableProps = {
   setPageSize: vi.fn(),
   isSelectable: true,
   canPrintEncounters: true,
-  onEncounterSaved: vi.fn(),
   patient: mockFhirPatient,
 };
 
@@ -422,6 +420,7 @@ describe('Delete Encounter', () => {
     const [, modalProps] = mockShowModal.mock.calls[0];
     (modalProps as { onConfirmation: () => void }).onConfirmation();
 
+    await waitFor(() => expect(mockDeleteEncounter).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(onEncounterSaved).toHaveBeenCalledTimes(1));
     expect(onEncounterSaved).toHaveBeenCalledWith({ uuid: mockEncountersAlice[0].uuid });
   });

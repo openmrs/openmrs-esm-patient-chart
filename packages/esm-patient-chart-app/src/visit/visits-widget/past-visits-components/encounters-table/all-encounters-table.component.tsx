@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { userHasAccess, useSession, type EncounterType } from '@openmrs/esm-framework';
 import { type EncountersTableProps, usePaginatedEncounters } from './encounters-table.resource';
 import EncountersTable from './encounters-table.component';
-import { invalidateVisitAndEncounterData } from '@openmrs/esm-patient-common-lib';
-import { useSWRConfig } from 'swr';
 
 interface AllEncountersTableProps {
   patient: fhir.Patient;
@@ -27,11 +25,10 @@ const AllEncountersTable: React.FC<AllEncountersTableProps> = ({ patient }) => {
 
   const session = useSession();
   const canPrintEncounters = userHasAccess('App: Print encounter forms', session?.user);
-  const {mutate: globalMutate} = useSWRConfig();
 
   const encountersTableProps: EncountersTableProps = {
     currentPage,
-  encounterTypeToFilter,
+    encounterTypeToFilter,
     goTo,
     isLoading,
     pageSize,
@@ -44,10 +41,7 @@ const AllEncountersTable: React.FC<AllEncountersTableProps> = ({ patient }) => {
     totalCount,
     isSelectable: false,
     canPrintEncounters,
-    onEncounterSaved: () => {
-      invalidateVisitAndEncounterData(globalMutate, patientUuid)
-    },
-    patient
+    patient,
   };
 
   return <EncountersTable {...encountersTableProps} />;

@@ -58,16 +58,11 @@ function renderAddLabOrderWorkspace() {
         orderTypeUuid: 'test-lab-order-type-uuid',
         orderToEditOrdererUuid: '',
       }}
-      groupProps={{
-        patientUuid: mockPatient.id,
-        patient: mockPatient,
-        visitContext: null,
-        mutateVisitContext: null,
-      }}
+      groupProps={{}}
       workspaceName={''}
       launchChildWorkspace={vi.fn()}
       windowName={''}
-      windowProps={{ encounterUuid: '' }}
+      windowProps={{ patientUuid: mockPatient.id, patient: mockPatient, visitContext: null }}
       isRootWorkspace={false}
       showActionMenu={true}
     />,
@@ -231,16 +226,15 @@ describe('AddLabOrder', () => {
             action: 'REVISE',
           },
         }}
-        groupProps={{
-          patientUuid: mockPatient.id,
-          patient: mockPatient,
-          visitContext: null,
-          mutateVisitContext: null,
-        }}
+        groupProps={{}}
         workspaceName={''}
         launchChildWorkspace={vi.fn()}
         windowName={''}
-        windowProps={{ encounterUuid: '' }}
+        windowProps={{
+          patientUuid: mockPatient.id,
+          patient: mockPatient,
+          visitContext: null,
+        }}
         isRootWorkspace={false}
         showActionMenu={true}
       />,
@@ -297,16 +291,15 @@ describe('AddLabOrder', () => {
         workspaceProps={{
           orderToEditOrdererUuid: '',
         }}
-        groupProps={{
-          patientUuid: mockPatient.id,
-          patient: mockPatient,
-          visitContext: null,
-          mutateVisitContext: null,
-        }}
+        groupProps={{}}
         workspaceName={''}
         launchChildWorkspace={vi.fn()}
         windowName={''}
-        windowProps={{ encounterUuid: '' }}
+        windowProps={{
+          patientUuid: mockPatient.id,
+          patient: mockPatient,
+          visitContext: null,
+        }}
         isRootWorkspace={false}
         showActionMenu={true}
       />,

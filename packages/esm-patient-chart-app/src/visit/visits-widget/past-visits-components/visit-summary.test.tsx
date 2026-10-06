@@ -50,10 +50,9 @@ beforeEach(() => {
   mockUsePatientChartStore.mockReturnValue({
     patientUuid: mockPatient.id,
     patient: mockFhirPatient,
-    visitContext: null,
-    mutateVisitContext: vi.fn(),
+    activeVisit: null,
     setPatient: vi.fn(),
-    setVisitContext: vi.fn(),
+    setActiveVisit: vi.fn(),
   } as any);
 });
 
@@ -71,7 +70,7 @@ describe('VisitSummary', () => {
     const user = userEvent.setup();
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
 
-    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} mutateVisitContext={vi.fn()} />);
+    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} patient={mockPatient} />);
 
     expect(screen.getByText(/^Diagnoses$/i)).toBeInTheDocument();
     expect(screen.getByText(/^No diagnoses found$/)).toBeInTheDocument();
@@ -103,9 +102,7 @@ describe('VisitSummary', () => {
 
   it('renders diagnoses tags when there are diagnoses', () => {
     const mockVisit = visitOverviewDetailMockDataNotEmpty.data.results[0];
-    renderWithSwr(
-      <VisitSummary patientUuid={mockPatient.id} visit={mockVisit} patient={mockPatient} mutateVisitContext={vi.fn()} />,
-    );
+    renderWithSwr(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} patient={mockPatient} />);
 
     const malariaTag = screen.getByText(/^malaria, confirmed$/i);
     const hivTag = screen.getByText(/human immunodeficiency virus \(hiv\)/i);
@@ -119,10 +116,7 @@ describe('VisitSummary', () => {
     const user = userEvent.setup();
 
     const mockVisit = visitOverviewDetailMockDataNotEmpty.data.results[0];
-    renderWithSwr(
-      <VisitSummary patientUuid={mockPatient.id} visit={mockVisit} patient={mockPatient} mutateVisitContext={vi.fn()} />,
-    );
-    
+    renderWithSwr(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} patient={mockPatient} />);
 
     expect(screen.getByText(/^Diagnoses$/i)).toBeInTheDocument();
     expect(screen.getByText(/^Malaria, confirmed$/)).toBeInTheDocument();
@@ -162,16 +156,17 @@ describe('VisitSummary encounter editing', () => {
 
   it('launches the encounter workspace when editing an encounter from the timeline', async () => {
     const user = userEvent.setup();
-    const mutateVisitContext = vi.fn();
     // The timeline offers one actions menu per encounter, so keep the visit to the one being edited
     const visitWithVisitNoteOnly = { ...mockVisitWithEncounters, encounters: [mockVisitNoteEncounter] };
+
+    const onEncounterSaved = vi.fn();
 
     renderWithSwr(
       <VisitSummary
         patientUuid={mockPatient.id}
         visit={visitWithVisitNoteOnly}
         patient={mockPatient}
-        mutateVisitContext={mutateVisitContext}
+        onEncounterSaved={onEncounterSaved}
       />,
     );
 
@@ -192,7 +187,7 @@ describe('VisitSummary encounter editing', () => {
         patient: mockPatient,
         visitContext: visitWithVisitNoteOnly,
         encounter: expect.objectContaining({ uuid: mockVisitNoteEncounter.uuid }),
-        onEncounterSaved: mutateVisitContext,
+        onEncounterSaved,
       }),
     );
   });
@@ -213,16 +208,7 @@ describe('VisitSummary encounter editing', () => {
       encounters: [...mockVisitWithEncounters.encounters, mockCompletedFormEncounter],
     };
 
-    const mutateVisitContext = vi.fn();
-
-    renderWithSwr(
-      <VisitSummary
-        patientUuid={mockPatient.id}
-        visit={visitWithCompletedForm}
-        patient={mockPatient}
-        mutateVisitContext={mutateVisitContext}
-      />,
-    );
+    renderWithSwr(<VisitSummary patientUuid={mockPatient.id} visit={visitWithCompletedForm} patient={mockPatient} />);
 
     await user.click(screen.getByRole('tab', { name: /completed forms/i }));
     await clickEditEncounter(/poc consent form/i);
@@ -235,7 +221,6 @@ describe('VisitSummary encounter editing', () => {
         patient: mockPatient,
         visitContext: visitWithCompletedForm,
         encounter: expect.objectContaining(mockCompletedFormEncounter),
-        onEncounterSaved: mutateVisitContext,
       }),
     );
   });
@@ -244,7 +229,6 @@ describe('VisitSummary encounter editing', () => {
 describe('VisitSummary encounter deletion', () => {
   const mockVisitWithEncounters = visitOverviewDetailMockDataNotEmpty.data.results[0];
   const [mockAdmissionEncounter, mockVisitNoteEncounter] = mockVisitWithEncounters.encounters;
-  const chartMutateVisitContext = vi.fn();
 
   beforeEach(() => {
     mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(esmPatientChartSchema));
@@ -255,26 +239,18 @@ describe('VisitSummary encounter deletion', () => {
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: mockPatient.id,
       patient: mockFhirPatient,
-      visitContext: null,
-      mutateVisitContext: chartMutateVisitContext,
+      activeVisit: null,
       setPatient: vi.fn(),
-      setVisitContext: vi.fn(),
+      setActiveVisit: vi.fn(),
     } as any);
   });
 
-  it('passes mutateVisitContext down to the timeline', async () => {
+  it('deletes an encounter from the timeline', async () => {
     const user = userEvent.setup();
-    const mutateVisitContext = vi.fn();
     // The timeline offers one actions menu per encounter, so keep the visit to the one being deleted
     const visitWithVisitNoteOnly = { ...mockVisitWithEncounters, encounters: [mockVisitNoteEncounter] };
 
-    renderWithSwr(
-      <VisitSummary
-        patientUuid={mockPatient.id}
-        visit={visitWithVisitNoteOnly}
-        mutateVisitContext={mutateVisitContext}
-      />,
-    );
+    renderWithSwr(<VisitSummary patientUuid={mockPatient.id} visit={visitWithVisitNoteOnly} patient={mockPatient} />);
 
     // The timeline is the tab the visit summary opens on
     await user.click(screen.getByRole('button', { name: /encounter table actions menu/i }));
@@ -286,13 +262,11 @@ describe('VisitSummary encounter deletion', () => {
     await user.click(deleteItem);
     confirmDeletion();
 
-    await waitFor(() => expect(mutateVisitContext).toHaveBeenCalledTimes(1));
-    expect(chartMutateVisitContext).not.toHaveBeenCalled();
+    await waitFor(() => expect(mockDeleteEncounter).toHaveBeenCalledTimes(1));
   });
 
-  it('passes mutateVisitContext down to the completed forms tab', async () => {
+  it('deletes an encounter from the completed forms tab', async () => {
     const user = userEvent.setup();
-    const mutateVisitContext = vi.fn();
     const mockCompletedFormEncounter = {
       ...mockAdmissionEncounter,
       uuid: 'enc-with-schema',
@@ -307,20 +281,13 @@ describe('VisitSummary encounter deletion', () => {
       encounters: [...mockVisitWithEncounters.encounters, mockCompletedFormEncounter],
     };
 
-    renderWithSwr(
-      <VisitSummary
-        patientUuid={mockPatient.id}
-        visit={visitWithCompletedForm}
-        mutateVisitContext={mutateVisitContext}
-      />,
-    );
+    renderWithSwr(<VisitSummary patientUuid={mockPatient.id} visit={visitWithCompletedForm} patient={mockPatient} />);
 
     await user.click(screen.getByRole('tab', { name: /completed forms/i }));
     await clickDeleteEncounter(/poc consent form/i);
     confirmDeletion();
 
-    await waitFor(() => expect(mutateVisitContext).toHaveBeenCalledTimes(1));
-    expect(chartMutateVisitContext).not.toHaveBeenCalled();
+    await waitFor(() => expect(mockDeleteEncounter).toHaveBeenCalledTimes(1));
   });
 });
 

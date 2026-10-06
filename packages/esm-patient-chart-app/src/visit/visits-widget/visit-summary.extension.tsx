@@ -6,8 +6,9 @@ import { type EncountersTableProps } from './past-visits-components/encounters-t
 interface VisitSummaryExtensionProps {
   visit: Visit;
   patientUuid: string;
-  mutateVisitContext?: () => void;
-  patient: fhir.Patient;
+  patient: EncountersTableProps['patient'];
+  /** Called after an encounter of the visit has been edited or deleted */
+  onEncounterSaved?: EncountersTableProps['onEncounterSaved'];
 }
 
 /**
@@ -17,21 +18,14 @@ interface VisitSummaryExtensionProps {
 const VisitSummaryExtension: React.FC<VisitSummaryExtensionProps> = ({
   visit,
   patientUuid,
-  mutateVisitContext,
   patient,
+  onEncounterSaved,
 }) => {
-  if (!visit || !patientUuid) {
+  if (!visit || !patientUuid || !patient) {
     return null;
   }
 
-  return (
-    <VisitSummary
-      visit={visit}
-      patientUuid={patientUuid}
-      mutateVisitContext={mutateVisitContext}
-      patient={patient}
-    />
-  );
+  return <VisitSummary visit={visit} patientUuid={patientUuid} patient={patient} onEncounterSaved={onEncounterSaved} />;
 };
 
 export default VisitSummaryExtension;

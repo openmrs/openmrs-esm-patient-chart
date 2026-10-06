@@ -1,7 +1,8 @@
 import { useCallback } from 'react';
 import { useSWRConfig } from 'swr';
-import { useVisit, type Visit, restBaseUrl } from '@openmrs/esm-framework';
+import { type Visit, restBaseUrl } from '@openmrs/esm-framework';
 import { usePatientChartStore } from '../store/patient-chart-store';
+import { invalidateCurrentVisit } from './revalidation-utils';
 
 export interface VisitMutationOptions {
   encounters?: boolean;
@@ -20,7 +21,7 @@ export interface VisitMutationOptions {
  */
 export function useOptimisticVisitMutations(patientUuid: string) {
   const { mutate } = useSWRConfig();
-  const { visitContext, mutateVisitContext } = usePatientChartStore(patientUuid);
+  const { activeVisit } = usePatientChartStore(patientUuid);
 
   /**
    * Optimistically updates visit data in SWR caches without triggering network requests.
@@ -29,8 +30,8 @@ export function useOptimisticVisitMutations(patientUuid: string) {
   const updateVisitOptimistically = useCallback(
     (visitUuid: string, updates: Partial<Visit>) => {
       // Update current visit SWR cache if it matches
-      if (visitContext?.uuid === visitUuid) {
-        mutateVisitContext?.();
+      if (activeVisit?.uuid === visitUuid) {
+        invalidateCurrentVisit(mutate, patientUuid);
       }
 
       // Update visit lists across all hooks using regex pattern matching
@@ -53,7 +54,7 @@ export function useOptimisticVisitMutations(patientUuid: string) {
         false, // Don't revalidate
       );
     },
-    [visitContext, mutateVisitContext, mutate, patientUuid],
+    [activeVisit, mutate, patientUuid],
   );
 
   /**
@@ -81,11 +82,11 @@ export function useOptimisticVisitMutations(patientUuid: string) {
       );
 
       // If deleted visit was current, revalidate current visit to get new state
-      if (visitContext?.uuid === visitUuid) {
-        mutateVisitContext?.();
+      if (activeVisit?.uuid === visitUuid) {
+        invalidateCurrentVisit(mutate, patientUuid);
       }
     },
-    [visitContext, mutateVisitContext, mutate, patientUuid],
+    [activeVisit, mutate, patientUuid],
   );
 
   /**
