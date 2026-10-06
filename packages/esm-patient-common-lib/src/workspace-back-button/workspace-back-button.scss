@@ -8,14 +8,8 @@
     margin-left: -(layout.$spacing-03);
 
     svg {
-      order: 1;
+      align-self: center;
       margin-right: layout.$spacing-03;
-      margin-left: 0 !important;
-      fill: currentColor !important;
-    }
-
-    span {
-      order: 2;
     }
   }
 }

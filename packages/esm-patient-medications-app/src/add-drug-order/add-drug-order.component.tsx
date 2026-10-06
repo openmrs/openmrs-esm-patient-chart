@@ -1,8 +1,7 @@
-import React, { type ComponentProps, useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
 import {
-  ArrowLeftIcon,
   SearchIcon,
   ListCheckedIcon,
   showSnackbar,
@@ -18,6 +17,7 @@ import {
   showOrderSuccessToast,
   useMutatePatientOrders,
   useOrderBasket,
+  WorkspaceBackButton,
 } from '@openmrs/esm-patient-common-lib';
 
 import { type ConfigObject } from '../config-schema';
@@ -197,17 +197,10 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
     return (
       <Workspace2 title={workspaceTitle}>
         {!isTablet && (
-          <div className={styles.backButton}>
-            <Button
-              iconDescription="Return to order basket"
-              kind="ghost"
-              onClick={() => closeWorkspace()}
-              renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
-              size="sm"
-            >
-              <span>{t('backToOrderBasket', 'Back to order basket')}</span>
-            </Button>
-          </div>
+          <WorkspaceBackButton
+            label={t('backToOrderBasket', 'Back to order basket')}
+            onClick={() => closeWorkspace()}
+          />
         )}
         {drugCategoryConceptSets?.length > 0 ? (
           <Tabs>
