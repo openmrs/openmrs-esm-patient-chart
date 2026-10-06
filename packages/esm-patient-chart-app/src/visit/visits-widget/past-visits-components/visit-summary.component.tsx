@@ -111,7 +111,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({
       <p className={styles.diagnosisLabel}>{t('diagnoses', 'Diagnoses')}</p>
       <div className={styles.diagnosesList}>
         {diagnoses.length > 0 ? (
-          <DiagnosisTags diagnoses={diagnoses} />
+          <DiagnosisTags diagnoses={diagnoses} showCertainty />
         ) : (
           <p className={classNames(styles.bodyLong01, styles.text02)} style={{ marginBottom: '0.5rem' }}>
             {t('noDiagnosesFound', 'No diagnoses found')}
