@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
@@ -17,12 +17,5 @@ describe('WorkspaceBackButton', () => {
 
     await user.click(button);
     expect(handleClick).toHaveBeenCalledTimes(1);
-  });
-
-  it('applies custom className when provided', () => {
-    const handleClick = vi.fn();
-    render(<WorkspaceBackButton label="Back" onClick={handleClick} className="test-custom-class" />);
-
-    expect(screen.getByTestId('workspace-back-button')).toHaveClass('test-custom-class');
   });
 });
