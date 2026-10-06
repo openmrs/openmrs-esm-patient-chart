@@ -17,6 +17,7 @@ import { applyConceptReferenceRanges } from '../form-schema/concept-reference-ra
 import { FormDataSourceService } from '../form-data-source/form-data-source.service';
 import { MonthlyScheduleResourceService } from '../services/monthly-scheduled-resource.service';
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
+import { loadZScoreReferences } from '../zscore/zscore-references';
 
 /**
  * Data required for creating a {@link Form} instance.
@@ -147,6 +148,10 @@ export class FormCreationService {
     this.dataSources.registerDataSource('patient', { visitTypeUuid }, true);
     const patientObj = this.formDataSourceService.getPatientObject(patient);
     this.dataSources.registerDataSource('patient', patientObj, true);
+    const zScoreReferences = await loadZScoreReferences(formSchema, patientObj.sex, patient.birthDate);
+    for (const [name, reference] of Object.entries(zScoreReferences)) {
+      this.dataSources.registerDataSource(name, reference);
+    }
     this.dataSources.registerDataSource('rawPrevEnc', createFormParams.previousEncounter, false);
     const rawPrevObs = await dataSources.recentObs(patient.id);
     this.dataSources.registerDataSource('rawPrevObs', rawPrevObs, false);
