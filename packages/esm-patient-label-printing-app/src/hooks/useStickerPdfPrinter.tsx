@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 export const useStickerPdfPrinter = () => {
   const { t } = useTranslation();
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  // Finishes the in-flight print, if any, stopping its timers and resolving its promise
+  const finishPrintRef = useRef<(() => void) | null>(null);
   const [isPrinting, setIsPrinting] = useState(false);
 
   const printPdf = useCallback(
@@ -33,6 +35,14 @@ export const useStickerPdfPrinter = () => {
 
         const iframe = iframeRef.current;
         let hasClosed = false;
+        // Tracked per print, not per load, since `onload` can fire more than once
+        let pollInterval: ReturnType<typeof setInterval> | undefined;
+        let fallbackTimeout: ReturnType<typeof setTimeout> | undefined;
+
+        const stopTimers = () => {
+          clearInterval(pollInterval);
+          clearTimeout(fallbackTimeout);
+        };
 
         const handleLoad = () => {
           try {
@@ -40,11 +50,15 @@ export const useStickerPdfPrinter = () => {
             if (!contentWindow) throw new Error('No content window');
 
             const cleanup = () => {
+              stopTimers();
               if (hasClosed) return;
               hasClosed = true;
+              finishPrintRef.current = null;
               setIsPrinting(false);
               resolve();
             };
+
+            finishPrintRef.current = cleanup;
 
             try {
               contentWindow.addEventListener('afterprint', cleanup, { once: true });
@@ -55,15 +69,15 @@ export const useStickerPdfPrinter = () => {
             contentWindow.focus();
             contentWindow.print();
 
+            stopTimers();
             let wasFocused = false;
-            const pollInterval = setInterval(() => {
+            pollInterval = setInterval(() => {
               const hasFocus = document.hasFocus();
               if (hasFocus && wasFocused) cleanup();
               if (!hasFocus) wasFocused = true;
             }, 250);
 
-            setTimeout(cleanup, 30000);
-            setTimeout(() => clearInterval(pollInterval), 30000);
+            fallbackTimeout = setTimeout(cleanup, 30000);
           } catch (error) {
             setIsPrinting(false);
             resolve();
@@ -83,6 +97,7 @@ export const useStickerPdfPrinter = () => {
 
   useEffect(() => {
     return () => {
+      finishPrintRef.current?.();
       if (iframeRef.current?.parentNode) {
         iframeRef.current.parentNode.removeChild(iframeRef.current);
       }
