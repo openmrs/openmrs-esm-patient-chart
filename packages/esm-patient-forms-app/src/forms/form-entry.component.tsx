@@ -1,9 +1,7 @@
-import React, { type ComponentProps, useMemo, useState } from 'react';
-import { Button } from '@carbon/react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useSWR, { useSWRConfig } from 'swr';
 import {
-  ArrowLeftIcon,
   ExtensionSlot,
   openmrsFetch,
   type FetchResponse,
@@ -12,13 +10,16 @@ import {
   type Workspace2DefinitionProps,
   type Encounter,
 } from '@openmrs/esm-framework';
-import { type Form, type FormRendererProps, invalidateVisitAndEncounterData } from '@openmrs/esm-patient-common-lib';
+import {
+  type Form,
+  type FormRendererProps,
+  invalidateVisitAndEncounterData,
+  WorkspaceBackButton,
+} from '@openmrs/esm-patient-common-lib';
 import { type FormEntryConfigSchema } from '../config-schema';
 import { toHtmlForm } from './form-entry.resources';
 import { useForms } from '../hooks/use-forms';
 import HtmlFormEntryWrapper from '../htmlformentry/html-form-entry-wrapper.component';
-
-import styles from './form-entry.scss';
 
 const encounterVisitRep = 'custom:(visit:(uuid,startDatetime,stopDatetime,visitType:(uuid,name)))';
 
@@ -172,17 +173,10 @@ const FormEntry: React.FC<FormEntryProps> = ({
       <div>
         {/* Legacy HTML forms do not report unsaved changes to the workspace. */}
         {showBackButton && !isHtmlForm && (
-          <div className={styles.backButton}>
-            <Button
-              kind="ghost"
-              iconDescription={t('backToClinicalForms', 'Back to clinical forms')}
-              size="sm"
-              renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
-              onClick={() => closeWorkspace()}
-            >
-              <span>{t('backToClinicalForms', 'Back to clinical forms')}</span>
-            </Button>
-          </div>
+          <WorkspaceBackButton
+            label={t('backToClinicalForms', 'Back to clinical forms')}
+            onClick={() => closeWorkspace()}
+          />
         )}
         <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
         {showFormAndLoadedData &&
