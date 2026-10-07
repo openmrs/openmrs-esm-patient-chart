@@ -11,7 +11,7 @@ import styles from './selected-diagnosis-card.scss';
  */
 export type DiagnosisDraft = Omit<Diagnosis, 'rank' | 'certainty'> & {
   draftId: number;
-  rank: 1 | 2;
+  rank: number;
   certainty: DiagnosisCertainty;
   conceptClassUuid?: string;
 };

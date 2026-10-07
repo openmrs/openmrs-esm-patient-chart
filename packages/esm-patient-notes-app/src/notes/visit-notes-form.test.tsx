@@ -713,6 +713,50 @@ test('preserves CONFIRMED certainty on diagnoses when re-saving a visit note in 
   expect(mockDeletePatientDiagnosis).toHaveBeenCalledWith(expect.any(AbortController), '456');
 });
 
+test('preserves stored diagnosis ranks when only the clinical note is edited', async () => {
+  const user = userEvent.setup();
+  const encounter: Encounter = {
+    ...existingNote,
+    diagnoses: [
+      {
+        uuid: 'dx-1',
+        display: 'Diabetes Mellitus',
+        diagnosis: { coded: { uuid: '789', display: 'Diabetes Mellitus' } },
+        certainty: 'CONFIRMED',
+        rank: 1,
+      },
+      {
+        uuid: 'dx-3',
+        display: 'Anemia',
+        diagnosis: { coded: { uuid: 'concept-3', display: 'Anemia' } },
+        certainty: 'PROVISIONAL',
+        rank: 3,
+      },
+    ],
+  };
+  mockUpdateVisitNote.mockResolvedValueOnce({ status: 200 } as Awaited<ReturnType<typeof updateVisitNote>>);
+
+  renderVisitNotesForm({ formContext: 'editing', encounter });
+
+  const primary = screen.getByRole('group', { name: 'Diabetes Mellitus' });
+  const other = screen.getByRole('group', { name: 'Anemia' });
+  expect(within(primary).getByRole('checkbox', { name: 'Primary' })).toBeChecked();
+  expect(within(other).getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
+
+  await user.type(screen.getByRole('textbox', { name: /write your notes/i }), ' (edited)');
+  await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+  await waitFor(() => expect(mockSavePatientDiagnosis).toHaveBeenCalledTimes(2));
+  expect(mockSavePatientDiagnosis).toHaveBeenCalledWith(
+    expect.any(AbortController),
+    expect.objectContaining({ diagnosis: { coded: '789' }, certainty: 'CONFIRMED', rank: 1 }),
+  );
+  expect(mockSavePatientDiagnosis).toHaveBeenCalledWith(
+    expect.any(AbortController),
+    expect.objectContaining({ diagnosis: { coded: 'concept-3' }, certainty: 'PROVISIONAL', rank: 3 }),
+  );
+});
+
 test('allows saving visit note without primary diagnosis when isPrimaryDiagnosisRequired is false', async () => {
   const user = userEvent.setup();
 
@@ -1411,7 +1455,7 @@ test('keeps a saved image removal when a replacement upload fails and closes wit
   expect(mockShowSnackbar).not.toHaveBeenCalledWith(expect.objectContaining({ kind: 'error' }));
 });
 
-test('presumes secondary and confirmed for out-of-enum rank and certainty from other writers', async () => {
+test('preserves rank zero and defaults an unrecognized certainty to confirmed', async () => {
   const user = userEvent.setup();
 
   mockUseConfig.mockReturnValue({
@@ -1445,13 +1489,12 @@ test('presumes secondary and confirmed for out-of-enum rank and certainty from o
     encounter: mockEncounter as unknown as Encounter,
   });
 
-  // Out-of-enum values fall back to the presumed defaults: secondary (Primary unticked)
-  // and confirmed (no provisional mark)
+  // Rank zero leaves Primary unticked; an unrecognized certainty has no provisional mark.
   const card = screen.getByRole('group', { name: 'Diabetes Mellitus' });
   expect(within(card).getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
   expect(isMarkedProvisional(card)).toBe(false);
 
-  // Saving proceeds with the presumed values rather than blocking on a per-card choice
+  // Saving preserves the stored rank and uses the default certainty.
   const clinicalNote = screen.getByRole('textbox', { name: /Write your notes/i });
   await user.type(clinicalNote, ' updated');
   await user.click(screen.getByRole('button', { name: /Save and close/i }));
@@ -1461,7 +1504,7 @@ test('presumes secondary and confirmed for out-of-enum rank and certainty from o
       expect.any(AbortController),
       expect.objectContaining({
         certainty: 'CONFIRMED',
-        rank: 2,
+        rank: 0,
         diagnosis: { coded: '789' },
       }),
     ),

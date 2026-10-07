@@ -115,7 +115,7 @@ const toDiagnosisDrafts = (encounter: Encounter | undefined, patientUuid: string
         patient: patientUuid,
         diagnosis: d.diagnosis.coded?.uuid ? { coded: d.diagnosis.coded.uuid } : { nonCoded: d.diagnosis.nonCoded },
         certainty: d.certainty === 'PROVISIONAL' ? 'PROVISIONAL' : 'CONFIRMED',
-        rank: d.rank === 1 ? 1 : 2,
+        rank: d.rank ?? 2,
         display: d.display,
       }),
     )
