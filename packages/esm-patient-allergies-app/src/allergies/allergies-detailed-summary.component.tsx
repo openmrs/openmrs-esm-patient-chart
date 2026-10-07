@@ -13,9 +13,10 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { AddIcon, formatDate, launchWorkspace2, parseDate, useLayoutType } from '@openmrs/esm-framework';
+import { AddIcon, formatDate, launchWorkspace2, parseDate, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { patientAllergiesFormWorkspace } from '../constants';
+import { type AllergiesConfigObject } from '../config-schema';
 import { useAllergies } from './allergy-intolerance.resource';
 import { AllergiesActionMenu } from './allergies-action-menu.component';
 import styles from './allergies-detailed-summary.scss';
@@ -28,6 +29,7 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
   const { t } = useTranslation();
   const layout = useLayoutType();
   const { allergies, error, isLoading, isValidating } = useAllergies(patient.id);
+  const { severityStyleMap, enableSeverityBackgroundColoring } = useConfig<AllergiesConfigObject>();
   const isTablet = layout === 'tablet';
   const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';
   const displayText = t('allergyIntolerances', 'allergy intolerances');
@@ -48,16 +50,51 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
     },
   ];
 
+  const getReactionSeverityClassName = useCallback(
+    (severity?: string) => {
+      const normalizedSeverity = severity?.toLowerCase();
+      const styleLevel = normalizedSeverity ? severityStyleMap?.[normalizedSeverity] : undefined;
+
+      if (styleLevel === 'high') {
+        return styles.allergySeverityHigh;
+      }
+
+      if (styleLevel === 'moderate') {
+        return styles.allergySeverityModerate;
+      }
+
+      if (styleLevel === 'low') {
+        return styles.allergySeverityLow;
+      }
+
+      return undefined;
+    },
+    [severityStyleMap],
+  );
+
   const tableRows = useMemo(
     () =>
       allergies?.map((allergy) => ({
         ...allergy,
+        display: (
+          <div
+            className={[
+              styles.cell,
+              getReactionSeverityClassName(allergy.reactionSeverity),
+              enableSeverityBackgroundColoring ? styles.withSeverityBackground : undefined,
+            ]
+              .filter(Boolean)
+              .join(' ')}
+          >
+            {allergy.display ?? '--'}
+          </div>
+        ),
         lastUpdated: allergy.lastUpdated ? formatDate(parseDate(allergy.lastUpdated), { time: false }) : '--',
         note: allergy?.note ?? '--',
         reaction: allergy.reactionManifestations?.sort((a, b) => a.localeCompare(b))?.join(', ') ?? '--',
         reactionSeverity: t(allergy.reactionSeverity) ?? '--',
       })),
-    [allergies, t],
+    [allergies, enableSeverityBackgroundColoring, getReactionSeverityClassName, t],
   );
 
   if (isLoading) {
@@ -105,7 +142,12 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
                   {rows.map((row) => (
                     <TableRow key={row.id}>
                       {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                        <TableCell
+                          key={cell.id}
+                          className={cell.info.header === 'display' ? styles.allergenCell : undefined}
+                        >
+                          {cell.value?.content ?? cell.value}
+                        </TableCell>
                       ))}
                       <TableCell className="cds--table-column-menu">
                         <AllergiesActionMenu
