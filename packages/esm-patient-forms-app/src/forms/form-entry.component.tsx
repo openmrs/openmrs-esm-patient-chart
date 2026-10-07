@@ -6,12 +6,16 @@ import {
   openmrsFetch,
   type FetchResponse,
   useConfig,
-  useConnectivity,
   Workspace2,
   type Workspace2DefinitionProps,
   type Encounter,
 } from '@openmrs/esm-framework';
-import { type Form, type FormRendererProps, invalidateVisitAndEncounterData } from '@openmrs/esm-patient-common-lib';
+import {
+  type Form,
+  type FormRendererProps,
+  invalidateVisitAndEncounterData,
+  WorkspaceBackButton,
+} from '@openmrs/esm-patient-common-lib';
 import { type FormEntryConfigSchema } from '../config-schema';
 import { toHtmlForm } from './form-entry.resources';
 import { useForms } from '../hooks/use-forms';
@@ -29,6 +33,7 @@ export interface FormEntryProps {
   additionalProps?: Record<string, any>;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   handlePostResponse?: (encounter: Encounter) => void;
+  showBackButton?: boolean;
   hideControls?: boolean;
   hidePatientBanner?: boolean;
   preFilledQuestions?: Record<string, string>;
@@ -43,6 +48,7 @@ const FormEntry: React.FC<FormEntryProps> = ({
   mutateVisitContext,
   closeWorkspace,
   handlePostResponse,
+  showBackButton = false,
   hideControls,
   hidePatientBanner,
   preFilledQuestions,
@@ -74,7 +80,6 @@ const FormEntry: React.FC<FormEntryProps> = ({
   const visitUuid = effectiveVisitContext?.uuid;
   const htmlForm = toHtmlForm(form, htmlFormEntryForms);
   const isHtmlForm = htmlForm != null;
-  const isOnline = useConnectivity();
   const { mutate: globalMutate } = useSWRConfig();
   const { t } = useTranslation();
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -89,7 +94,6 @@ const FormEntry: React.FC<FormEntryProps> = ({
       visitTypeUuid: visitTypeUuid ?? null,
       visitStartDatetime: visitStartDatetime ?? null,
       visitStopDatetime: visitStopDatetime ?? null,
-      isOffline: !isOnline,
       patientUuid: patientUuid ?? null,
       patient,
       encounterUuid: encounterUuid ?? '',
@@ -124,7 +128,6 @@ const FormEntry: React.FC<FormEntryProps> = ({
       handlePostResponse,
       hideControls,
       hidePatientBanner,
-      isOnline,
       mutateForms,
       mutateVisitContext,
       patient,
@@ -168,6 +171,13 @@ const FormEntry: React.FC<FormEntryProps> = ({
   return (
     <Workspace2 title={form.display ?? t('clinicalForm', 'Clinical form')} hasUnsavedChanges={hasUnsavedChanges}>
       <div>
+        {/* Legacy HTML forms do not report unsaved changes to the workspace. */}
+        {showBackButton && !isHtmlForm && (
+          <WorkspaceBackButton
+            label={t('backToClinicalForms', 'Back to clinical forms')}
+            onClick={() => closeWorkspace()}
+          />
+        )}
         <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
         {showFormAndLoadedData &&
           (isHtmlForm ? (

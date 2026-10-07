@@ -266,6 +266,7 @@ describe('Immunizations Form', () => {
     });
 
     render(<ImmunizationsForm {...testProps} />);
+    expect(await screen.findByText('Edit immunization')).toBeInTheDocument();
 
     const vaccinationDateField = screen.getByRole('textbox', { name: /vaccination date/i });
     const vaccineField = screen.getByRole('combobox', { name: /Immunization/i });

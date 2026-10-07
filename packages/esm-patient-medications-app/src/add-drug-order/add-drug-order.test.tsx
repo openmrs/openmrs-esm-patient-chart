@@ -224,6 +224,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
             (getDefaultsFromConfigSchema(configSchema) as ConfigObject).daysDurationUnit,
             mockDrugOrderTemplateApiData[mockDrugSearchResultApiData[0].uuid][0],
           ),
+          freeTextDosage: null,
           scheduledDate: undefined,
           indication: 'Hypertension',
         }),

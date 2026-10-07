@@ -112,6 +112,29 @@ describe('VisitSummary', () => {
     expect(hivTag).toBeInTheDocument();
   });
 
+  it('marks provisional diagnoses with a leading question mark', () => {
+    const visit = visitOverviewDetailMockDataNotEmpty.data.results[0];
+    const visitWithCertainty = {
+      ...visit,
+      encounters: visit.encounters.map((encounter) =>
+        encounter.diagnoses
+          ? {
+              ...encounter,
+              diagnoses: encounter.diagnoses.map((diagnosis) => ({
+                ...diagnosis,
+                certainty: diagnosis.rank === 1 ? 'CONFIRMED' : 'PROVISIONAL',
+              })),
+            }
+          : encounter,
+      ),
+    };
+
+    render(<VisitSummary patientUuid={mockPatient.id} visit={visitWithCertainty} />);
+
+    expect(screen.getByText(/^malaria, confirmed$/i)).toBeInTheDocument();
+    expect(screen.getByText(/^\? human immunodeficiency virus \(hiv\) disease$/i)).toBeInTheDocument();
+  });
+
   it('should display notes, tests and medication summary', async () => {
     const user = userEvent.setup();
 
@@ -175,10 +198,7 @@ describe('VisitSummary encounter editing', () => {
     await user.click(editItem);
 
     expect(onEditEncounter).toHaveBeenCalledTimes(1);
-    expect(onEditEncounter).toHaveBeenCalledWith(
-      expect.objectContaining({ id: mockVisitNoteEncounter.uuid, encounterType: 'Visit Note' }),
-      true,
-    );
+    expect(onEditEncounter).toHaveBeenCalledWith(expect.objectContaining({ uuid: mockVisitNoteEncounter.uuid }), true);
   });
 
   it('passes onEditEncounter down to the completed forms tab', async () => {
@@ -206,10 +226,7 @@ describe('VisitSummary encounter editing', () => {
     await clickEditEncounter(/poc consent form/i);
 
     expect(onEditEncounter).toHaveBeenCalledTimes(1);
-    expect(onEditEncounter).toHaveBeenCalledWith(
-      expect.objectContaining({ id: mockCompletedFormEncounter.uuid, encounterType: 'Admission' }),
-      false,
-    );
+    expect(onEditEncounter).toHaveBeenCalledWith(expect.objectContaining(mockCompletedFormEncounter), false);
   });
 });
 

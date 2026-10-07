@@ -1,9 +1,8 @@
 import React, { useCallback, useContext, useState } from 'react';
-import { FileUploaderDropContainer, InlineNotification } from '@carbon/react';
+import { FileUploaderDropContainer, InlineLoading, InlineNotification, Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { useConfig } from '@openmrs/esm-framework';
+import { useMaxAttachmentFileSize } from '@openmrs/esm-patient-common-lib';
 import { readFileAsString } from '../utils';
-import { useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 import styles from './media-uploader.scss';
 
@@ -14,13 +13,21 @@ interface ErrorNotification {
 
 const MediaUploaderComponent = () => {
   const { t } = useTranslation();
-  const { maxFileSize } = useConfig();
-  const { setFilesToUpload, multipleFiles } = useContext(CameraMediaUploaderContext);
-  const { allowedFileExtensions } = useAllowedFileExtensions();
+  const { maxFileSize, error: sizeLimitError, isValidating: isLoadingSizeLimit, retry } = useMaxAttachmentFileSize();
+  const isSizeLimitUnavailable = Boolean(sizeLimitError) || maxFileSize === undefined;
+  const isUploadDisabled = isLoadingSizeLimit || isSizeLimitUnavailable;
+  const {
+    setFilesToUpload,
+    multipleFiles,
+    allowedExtensions: allowedFileExtensions,
+  } = useContext(CameraMediaUploaderContext);
   const [errorNotification, setErrorNotification] = useState<ErrorNotification>(null);
 
   const upload = useCallback(
     (files: Array<File>) => {
+      if (isUploadDisabled) {
+        return;
+      }
       files.forEach((file) => {
         if (file.size > maxFileSize * 1024 * 1024) {
           setErrorNotification({
@@ -31,16 +38,13 @@ const MediaUploaderComponent = () => {
             )} ${maxFileSize} MB.`,
           });
         } else if (!isFileExtensionAllowed(file.name, allowedFileExtensions)) {
-          const lastExtension = allowedFileExtensions.pop();
-
           setErrorNotification({
             title: t('unsupportedFileType', 'Unsupported file type'),
             subtitle: t(
-              'chooseAnAllowedFileType',
-              'The file "{{fileName}}" cannot be uploaded. Please upload a file with one of the following extensions: {{supportedExtensions}}, or {{ lastExtension }}.',
+              'chooseSupportedFileType',
+              'The file "{{fileName}}" cannot be uploaded. Please upload a file with one of the following extensions: {{supportedExtensions}}.',
               {
                 fileName: file.name,
-                lastExtension: lastExtension,
                 supportedExtensions: allowedFileExtensions.join(', '),
               },
             ),
@@ -64,7 +68,7 @@ const MediaUploaderComponent = () => {
         }
       });
     },
-    [setFilesToUpload, maxFileSize, t, allowedFileExtensions],
+    [setFilesToUpload, maxFileSize, t, allowedFileExtensions, isUploadDisabled],
   );
 
   const isFileExtensionAllowed = (fileName: string, allowedFileExtensions: string[]): boolean => {
@@ -78,6 +82,21 @@ const MediaUploaderComponent = () => {
 
   return (
     <div className="cds--file__container">
+      {isLoadingSizeLimit ? (
+        <InlineLoading description={t('loadingUploadLimit', 'Loading upload size limit...')} />
+      ) : isSizeLimitUnavailable ? (
+        <div className={styles.errorContainer}>
+          <InlineNotification
+            kind="error"
+            hideCloseButton
+            title={t('uploadLimitUnavailable', 'Could not load the upload size limit')}
+            subtitle={t('retryUploadLimit', 'Try again before choosing a file.')}
+          />
+          <Button kind="tertiary" size="sm" onClick={() => void retry()}>
+            {t('retry', 'Retry')}
+          </Button>
+        </div>
+      ) : null}
       {errorNotification && (
         <div className={styles.errorContainer}>
           <InlineNotification
@@ -90,10 +109,9 @@ const MediaUploaderComponent = () => {
         </div>
       )}
       <p className="cds--label-description">
-        {t('fileUploadSizeConstraints', 'Size limit is {{fileSize}}MB', {
-          fileSize: maxFileSize,
-        })}
-        .{' '}
+        {maxFileSize !== undefined && (
+          <>{t('fileUploadSizeConstraints', 'Size limit is {{fileSize}}MB', { fileSize: maxFileSize })}. </>
+        )}
         {t('supportedFiletypes', 'Supported files are {{supportedFiles}}', {
           supportedFiles: allowedFileExtensions?.join(', '),
         })}
@@ -101,6 +119,7 @@ const MediaUploaderComponent = () => {
       </p>
       <div className={styles.uploadFile}>
         <FileUploaderDropContainer
+          disabled={isUploadDisabled}
           accept={allowedFileExtensions?.map((ext) => '.' + ext) || ['*']}
           labelText={t('fileSizeInstructions', 'Drag and drop files here or click to upload')}
           tabIndex={0}

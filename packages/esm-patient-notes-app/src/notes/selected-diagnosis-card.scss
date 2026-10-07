@@ -1,0 +1,84 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+$diagnosis-columns: 3rem minmax(0, 1fr) 2rem 2rem;
+
+.diagnosisListHeader {
+  display: grid;
+  grid-template-columns: $diagnosis-columns;
+  align-items: end;
+  column-gap: layout.$spacing-02;
+  margin-top: layout.$spacing-03;
+  padding: 0 layout.$spacing-03;
+
+  > span {
+    @include type.type-style('label-01');
+    color: $text-02;
+    text-align: center;
+  }
+}
+
+.diagnosisRow {
+  display: grid;
+  grid-template-columns: $diagnosis-columns;
+  align-items: center;
+  column-gap: layout.$spacing-02;
+  padding: layout.$spacing-03;
+  margin-top: layout.$spacing-02;
+  border-radius: 4px;
+
+  background-color: colors.$gray-10;
+
+  // Center the checkbox under its column header and strip Carbon's stacked-form margins
+  :global(.cds--form-item) {
+    margin: 0;
+    justify-self: center;
+  }
+}
+
+.actionsCell {
+  display: flex;
+  justify-content: center;
+}
+
+// On tablets the Primary checkbox needs a touch target on a par with the 32px actions beside
+// it. Carbon's label is 20px wide with a 16px box at its top-left; grow the label to 32x32 and
+// slide the box (and its checkmark) to the middle without touching Carbon's own transforms.
+:global(.omrs-breakpoint-lt-desktop) .diagnosisRow :global(.cds--checkbox-label) {
+  min-inline-size: 2rem;
+  min-block-size: 2rem;
+  padding-inline-start: 2rem;
+
+  &::before,
+  &::after {
+    translate: 0.5rem 0.375rem;
+  }
+}
+
+// `translate` is physical, so mirror the horizontal offset when the locale is right-to-left
+:global([dir='rtl'] .omrs-breakpoint-lt-desktop) .diagnosisRow :global(.cds--checkbox-label) {
+  &::before,
+  &::after {
+    translate: -0.5rem 0.375rem;
+  }
+}
+
+// Carbon caps each menu item at 11.25rem, which leaves a gutter inside the wider O3 menu;
+// let the items span the whole menu instead
+.diagnosisActionsMenu :global(.cds--overflow-menu-options__btn) {
+  max-inline-size: none;
+}
+
+.diagnosisName {
+  @include type.type-style('body-compact-01');
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.provisionalMark {
+  @include type.type-style('heading-compact-01');
+  margin-inline-end: layout.$spacing-02;
+  color: $text-02;
+}

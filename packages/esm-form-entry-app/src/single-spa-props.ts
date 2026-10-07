@@ -1,7 +1,6 @@
 import { ReplaySubject } from 'rxjs';
 import { AppProps } from 'single-spa';
 import { Encounter, EncounterCreate } from './app/types';
-import { DefaultWorkspaceProps } from '@openmrs/esm-framework';
 
 export const singleSpaPropsSubject = new ReplaySubject<SingleSpaProps>(1);
 
@@ -26,12 +25,10 @@ type PatientProperties = {
 type UIBehavior = {
   view: string;
   closeWorkspace: () => void;
+  closeWorkspaceWithSavedChanges?: () => void;
+  promptBeforeClosing?: (testFcn: () => boolean) => void;
   handleOnValidate?: (valid: boolean) => void;
   showDiscardSubmitButtons?: boolean;
-};
-
-type ApplicationStatus = {
-  isOffline: boolean;
 };
 
 type Form = {
@@ -50,7 +47,6 @@ export type SingleSpaProps = AppProps &
   VisitProperties &
   EncounterProperties &
   PatientProperties &
-  PreFilledQuestions &
-  ApplicationStatus & {
+  PreFilledQuestions & {
     additionalProps?: any;
-  } & Partial<DefaultWorkspaceProps>;
+  };

@@ -19,6 +19,7 @@ const ExportedFormEntryWorkspace: React.FC<
   Workspace2DefinitionProps<FormEntryWorkspaceProps, ExportedClinicalFormsWindowProps, object>
 > = ({
   closeWorkspace,
+  isRootWorkspace,
   workspaceProps: { form, encounterUuid, handlePostResponse },
   windowProps: { patient, patientUuid, visitContext, mutateVisitContext },
 }) => {
@@ -31,6 +32,7 @@ const ExportedFormEntryWorkspace: React.FC<
       visitContext={visitContext}
       mutateVisitContext={mutateVisitContext}
       closeWorkspace={closeWorkspace}
+      showBackButton={!isRootWorkspace}
       handlePostResponse={handlePostResponse}
     />
   );
