@@ -10,7 +10,7 @@ import styles from './forms-list.scss';
 
 export type FormsListProps = {
   forms?: Array<CompletedFormInfo>;
-  error?: any;
+  error?: Error;
   sectionName?: string;
   handleFormOpen: (form: Form, encounterUuid: string) => void;
 };
