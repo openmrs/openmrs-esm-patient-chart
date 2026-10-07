@@ -5319,8 +5319,8 @@ __metadata:
   linkType: soft
 
 "@openmrs/esm-form-engine-lib@npm:next":
-  version: 4.2.2-pre.2669
-  resolution: "@openmrs/esm-form-engine-lib@npm:4.2.2-pre.2669"
+  version: 4.2.2-pre.2673
+  resolution: "@openmrs/esm-form-engine-lib@npm:4.2.2-pre.2673"
   dependencies:
     classnames: "npm:^2.5.1"
     lodash-es: "npm:^4.17.21"
@@ -5338,7 +5338,7 @@ __metadata:
     react: 18.x
     react-i18next: 16.x
     swr: 2.x
-  checksum: 10/13976dd49bbdda6922257bc8f5cc03ebd7296d8e0a68e8645dd5a9f76ef1c66eff98992d4326c495414ae9d451ccc586ced9cf649c6652bd1830a754ba90e56f
+  checksum: 10/3a18b0747a761b8146d24781ffe68ea46ff80fc2bc48e35fd545b25d5e893a1fb769888abc57673513ac2fda9aadee37c8573d2a3b23c99ebb58d9736ac13f68
   languageName: node
   linkType: hard
 
@@ -6153,8 +6153,8 @@ __metadata:
   linkType: hard
 
 "@openmrs/ngx-formentry@npm:next":
-  version: 20.0.1-pre.589
-  resolution: "@openmrs/ngx-formentry@npm:20.0.1-pre.589"
+  version: 20.0.1-pre.2
+  resolution: "@openmrs/ngx-formentry@npm:20.0.1-pre.2"
   dependencies:
     tslib: "npm:^2.3.0"
   peerDependencies:
@@ -6175,7 +6175,7 @@ __metadata:
     reflect-metadata: ^0.1.13
     shelljs: ^0.7.8
     tree-model: ^1.0.7
-  checksum: 10/9040f29d6d06c5950bb798e77fde3e1b9727b314d1dd3bb33255c1162f1552942416a107266bf1572ae38f94adec6e3e90bdff23064f1f369ecbfe770c07dd18
+  checksum: 10/d93e24c6c8e70ab9c86f833539d4a3a61d25f66a6a3310d70c82d736f23f8bd08e744fb751a5d27bc5a51a9817db6bb5b773e7156d1fdbec3807f40867aeee6a
   languageName: node
   linkType: hard
 
