@@ -43,6 +43,11 @@ export const orderStockDetailsExtension = getAsyncLifecycle(
   options,
 );
 
+export const orderPaymentPanel = getAsyncLifecycle(
+  () => import('./order-basket/order-payment-panel.extension'),
+  options,
+);
+
 export const ShoppingCartIcon = getAsyncLifecycle(
   () => import('./order-basket-action-button/order-basket-action-button.component'),
   options,

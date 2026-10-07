@@ -91,7 +91,46 @@ export const configSchema = {
     _description: 'Maximum number of pinned drug orders per user',
     _validators: [validators.inRange(1, 50)],
   },
+  billableServices: {
+    _type: Type.Array,
+    _elements: {
+      uuid: { _type: Type.String },
+      name: { _type: Type.String },
+      price: { _type: Type.Number },
+    },
+    _default: [
+      { uuid: 'consultation', name: 'Consultation', price: 10000 },
+      { uuid: 'lab-general', name: 'Laboratory test', price: 15000 },
+      { uuid: 'pharmacy-general', name: 'Pharmacy / Drugs', price: 5000 },
+    ],
+    _description:
+      'Billable services (with prices) offered by the facility. These populate the order pricing panel in the order basket. Configure these in the distro since the billing backend module may not be installed.',
+  },
+  paymentMethods: {
+    _type: Type.Array,
+    _elements: { _type: Type.String },
+    _default: ['Cash', 'Bank', 'Mobile Money', 'Airtel Money'],
+    _description:
+      'Payment modes available to PRIVATE (self-paying) patients. These populate the payment-method selector when the client type is "Private".',
+  },
+  defaultCurrency: {
+    _type: Type.String,
+    _default: 'UGX',
+    _description: 'Currency code shown next to prices in the order payment panel.',
+  },
 };
+
+export interface ConfiguredBillableService {
+  uuid: string;
+  name: string;
+  price: number;
+}
+
+export interface PaymentManagerConfig {
+  billableServices: ConfiguredBillableService[];
+  paymentMethods: string[];
+  defaultCurrency: string;
+}
 
 export interface OrderTypeDefinition {
   label?: string;
@@ -112,4 +151,7 @@ export interface ConfigObject {
   orderLocationTagName: string;
   enableDrugOrderFavorites: boolean;
   maxPinnedDrugOrders: number;
+  billableServices: Array<ConfiguredBillableService>;
+  paymentMethods: Array<string>;
+  defaultCurrency: string;
 }
