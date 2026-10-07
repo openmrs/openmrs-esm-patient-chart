@@ -1,0 +1,15 @@
+@use '@carbon/layout';
+
+.backButton {
+  padding: layout.$spacing-03;
+
+  button {
+    display: flex;
+    margin-left: -(layout.$spacing-03);
+
+    svg {
+      align-self: center;
+      margin-right: layout.$spacing-03;
+    }
+  }
+}

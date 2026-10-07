@@ -1,7 +1,14 @@
+@use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
 
 .chartContainer {
+  // Percentile line colors. Mirrored percentiles (P3/P97, P15/P85) share a color
+  --growth-chart-p3-p97: #{colors.$red-60};
+  --growth-chart-p15-p85: #{colors.$yellow-30};
+  --growth-chart-p50: #{colors.$green-50};
+  --growth-chart-patient: var(--cds-text-primary);
+
   // A wider start-side gutter: the rotated y-axis title draws slightly outside
   // the chart holder's box and needs the extra breathing room
   padding: layout.$spacing-05 layout.$spacing-05 layout.$spacing-05 layout.$spacing-06;
@@ -55,8 +62,8 @@
       stroke-dasharray: 4 2;
     }
 
-    .cds--cc--line path[stroke='var(--cds-text-primary)'],
-    .cds--cc--line path[style*='stroke: var(--cds-text-primary)'] {
+    .cds--cc--line path[stroke='var(--growth-chart-patient)'],
+    .cds--cc--line path[style*='stroke: var(--growth-chart-patient)'] {
       stroke-width: 3px !important;
       stroke-dasharray: none !important;
     }

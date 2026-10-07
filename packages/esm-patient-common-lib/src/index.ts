@@ -19,3 +19,4 @@ export * from './useMaxAttachmentFileSize';
 export * from './useSystemVisitSetting';
 export * from './visit';
 export * from './workspaces';
+export * from './workspace-back-button';
