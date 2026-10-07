@@ -106,9 +106,18 @@ const createSchema = (t: TFunction, isRetrospectiveDataEntryEnabled: boolean, is
 
 const SEARCH_TIMEOUT_MS = 500;
 
+/**
+ * Other REST writers can store a diagnosis with neither a coded concept nor free text. The form
+ * cannot represent such a row, so it is left on the encounter untouched: not shown, not deleted,
+ * not recreated.
+ */
+const hasDiagnosisContent = (diagnosis: NonNullable<Encounter['diagnoses']>[number]) =>
+  Boolean(diagnosis.diagnosis?.coded?.uuid || diagnosis.diagnosis?.nonCoded);
+
 // Sort stored primaries once; subsequent edits keep rows under the pointer in place.
 const toDiagnosisDrafts = (encounter: Encounter | undefined, patientUuid: string): Array<DiagnosisDraft> =>
   (encounter?.diagnoses ?? [])
+    .filter(hasDiagnosisContent)
     .map(
       (d): DiagnosisDraft => ({
         draftId: nextDraftId(),
@@ -432,9 +441,10 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
             if (response.status === 201 || response.status === 200) {
               const encounterUuid = encounter?.uuid || response.data.uuid;
 
-              if (isEditing && encounter?.diagnoses?.length) {
+              const storedDiagnoses = encounter?.diagnoses?.filter(hasDiagnosisContent) ?? [];
+              if (isEditing && storedDiagnoses.length) {
                 return Promise.all(
-                  encounter.diagnoses.map((diagnosis) => deletePatientDiagnosis(abortController, diagnosis.uuid)),
+                  storedDiagnoses.map((diagnosis) => deletePatientDiagnosis(abortController, diagnosis.uuid)),
                 ).then(() => encounterUuid);
               }
 

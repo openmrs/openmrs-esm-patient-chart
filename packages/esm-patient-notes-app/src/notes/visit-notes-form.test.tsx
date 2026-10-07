@@ -757,6 +757,47 @@ test('preserves stored diagnosis ranks when only the clinical note is edited', a
   );
 });
 
+test('leaves a stored diagnosis with neither a concept nor free text untouched when editing', async () => {
+  const user = userEvent.setup();
+  const encounter = {
+    ...existingNote,
+    diagnoses: [
+      {
+        uuid: 'dx-1',
+        display: 'Diabetes Mellitus',
+        diagnosis: { coded: { uuid: '789', display: 'Diabetes Mellitus' } },
+        certainty: 'CONFIRMED',
+        rank: 1,
+      },
+      { uuid: 'dx-empty', display: '', diagnosis: null, certainty: 'CONFIRMED', rank: 2 },
+      { uuid: 'dx-blank', display: '', diagnosis: { coded: null, nonCoded: null }, certainty: 'CONFIRMED', rank: 2 },
+    ],
+  } as unknown as Encounter;
+  mockUpdateVisitNote.mockResolvedValueOnce({ status: 200 } as Awaited<ReturnType<typeof updateVisitNote>>);
+
+  renderVisitNotesForm({ formContext: 'editing', encounter });
+
+  // Only the row the form can represent is shown
+  expect(
+    screen
+      .getAllByRole('group')
+      .filter((g) => g.getAttribute('aria-label'))
+      .map((g) => g.getAttribute('aria-label')),
+  ).toEqual(['Diabetes Mellitus']);
+
+  await user.type(screen.getByRole('textbox', { name: /write your notes/i }), ' (edited)');
+  await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+  // The empty rows are neither voided nor recreated
+  await waitFor(() => expect(mockSavePatientDiagnosis).toHaveBeenCalledTimes(1));
+  expect(mockDeletePatientDiagnosis).toHaveBeenCalledTimes(1);
+  expect(mockDeletePatientDiagnosis).toHaveBeenCalledWith(expect.any(AbortController), 'dx-1');
+  expect(mockSavePatientDiagnosis).toHaveBeenCalledWith(
+    expect.any(AbortController),
+    expect.objectContaining({ diagnosis: { coded: '789' }, certainty: 'CONFIRMED', rank: 1 }),
+  );
+});
+
 test('allows saving visit note without primary diagnosis when isPrimaryDiagnosisRequired is false', async () => {
   const user = userEvent.setup();
 
