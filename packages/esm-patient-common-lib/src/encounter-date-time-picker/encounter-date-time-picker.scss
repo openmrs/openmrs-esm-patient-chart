@@ -1,17 +1,17 @@
 @use '@carbon/layout';
 
 .wrapper {
-  padding: 0 layout.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 }
 
-.heading {
-  font-weight: 600;
-  margin-bottom: layout.$spacing-03;
+.timingSwitcher {
+  margin-bottom: layout.$spacing-05;
 }
 
 .pickerWrapper {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  gap: layout.$spacing-03;
 }
 
 .datePicker {
@@ -26,10 +26,5 @@
 
   :global(.cds--form-requirement) {
     max-width: layout.$spacing-12;
-    max-height: 0 !important;
   }
-}
-
-.checkBox {
-  margin-bottom: layout.$spacing-05;
 }

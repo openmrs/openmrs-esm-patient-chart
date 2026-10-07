@@ -1,9 +1,10 @@
 import { beforeEach, expect, test, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { useAttachments } from '@openmrs/esm-framework';
-import { useVisitNoteImages } from './visit-notes.resource';
+import { openmrsFetch, useAttachments } from '@openmrs/esm-framework';
+import { replaceEncounterClinician, useVisitNoteImages } from './visit-notes.resource';
 
 const mockUseAttachments = vi.mocked(useAttachments);
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 
 const attachments = [
   {
@@ -52,4 +53,30 @@ test('fetches nothing when there is no encounter yet', () => {
   renderHook(() => useVisitNoteImages('patient-uuid', undefined));
 
   expect(mockUseAttachments).toHaveBeenCalledWith(null, false, undefined);
+});
+
+test('replaces the clinician by adding the new one and voiding the other clinicians of the same role', async () => {
+  const abortController = new AbortController();
+  mockOpenmrsFetch.mockResolvedValueOnce({
+    data: {
+      results: [
+        { uuid: 'ep-old', provider: { uuid: 'old-provider' }, encounterRole: { uuid: 'clinician-role' } },
+        { uuid: 'ep-other-role', provider: { uuid: 'old-provider' }, encounterRole: { uuid: 'nurse-role' } },
+        { uuid: 'ep-new', provider: { uuid: 'new-provider' }, encounterRole: { uuid: 'clinician-role' } },
+      ],
+    },
+  } as Awaited<ReturnType<typeof openmrsFetch>>);
+  mockOpenmrsFetch.mockResolvedValue({ data: {} } as Awaited<ReturnType<typeof openmrsFetch>>);
+
+  await replaceEncounterClinician(abortController, 'enc-uuid', 'new-provider', 'clinician-role');
+
+  const calls = mockOpenmrsFetch.mock.calls.map(([url, options]) => [url, (options as RequestInit)?.method]);
+  expect(calls).toEqual([
+    [expect.stringContaining('/encounter/enc-uuid/encounterprovider?v='), undefined],
+    [expect.stringMatching(/\/encounter\/enc-uuid\/encounterprovider$/), 'POST'],
+    [expect.stringMatching(/\/encounter\/enc-uuid\/encounterprovider\/ep-old$/), 'DELETE'],
+  ]);
+  expect(mockOpenmrsFetch.mock.calls[1][1]).toMatchObject({
+    body: { provider: 'new-provider', encounterRole: 'clinician-role' },
+  });
 });

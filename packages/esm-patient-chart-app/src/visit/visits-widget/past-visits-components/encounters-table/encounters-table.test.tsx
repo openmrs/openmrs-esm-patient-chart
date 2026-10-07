@@ -12,6 +12,7 @@ import {
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockEncountersAlice, mockEncounterTypes, mockFhirPatient, mockPatientAlice } from '__mocks__';
+import { PRIVILEGE_EDIT_PAST_VISITS } from '@openmrs/esm-patient-common-lib';
 import { renderWithSwr } from 'tools';
 import { type EncountersTableProps, useEncounterTypes } from './encounters-table.resource';
 import { type ChartConfig, esmPatientChartSchema } from '../../../../config-schema';
@@ -220,7 +221,7 @@ describe('Encounter editability', () => {
   });
 
   it('displays edit and delete encounter buttons by default', async () => {
-    mockUserHasAccess.mockImplementation((privilege) => privilege == null);
+    mockUserHasAccess.mockImplementation((privilege) => privilege == null || privilege === PRIVILEGE_EDIT_PAST_VISITS);
     const user = userEvent.setup();
 
     renderEncountersTable();
@@ -255,7 +256,7 @@ describe('Encounter editability', () => {
         encounterEditableDurationOverridePrivileges: ['Super Edit Encounter', 'Magic Superpowers'],
       };
     });
-    mockUserHasAccess.mockImplementation((privilege) => privilege == null);
+    mockUserHasAccess.mockImplementation((privilege) => privilege == null || privilege === PRIVILEGE_EDIT_PAST_VISITS);
 
     const user = userEvent.setup();
 
@@ -302,7 +303,9 @@ describe('Encounter editability', () => {
       };
     });
 
-    mockUserHasAccess.mockImplementation((privilege) => privilege == null || privilege === 'Magic Superpowers');
+    mockUserHasAccess.mockImplementation(
+      (privilege) => privilege == null || privilege === PRIVILEGE_EDIT_PAST_VISITS || privilege === 'Magic Superpowers',
+    );
 
     const user = userEvent.setup();
 
@@ -324,6 +327,21 @@ describe('Encounter editability', () => {
     await user.click(within(oldRow).getByRole('button', { name: /expand current row/i }));
     expect(screen.getByRole('button', { name: /edit this encounter/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /danger\s*Delete this encounter/i })).toBeInTheDocument();
+  });
+
+  it('does not allow editing or deleting encounters of past visits without the edit past visits privilege', async () => {
+    mockUserHasAccess.mockImplementation((privilege) => privilege !== PRIVILEGE_EDIT_PAST_VISITS);
+    const user = userEvent.setup();
+
+    renderEncountersTable();
+
+    const row = screen.getByRole('row', {
+      name: /Select row 18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form/i,
+    });
+    await user.click(within(row).getByRole('button', { name: /expand current row/i }));
+
+    expect(screen.queryByRole('button', { name: /edit this encounter/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /delete this encounter/i })).not.toBeInTheDocument();
   });
 
   it('launches the encounter workspace when editing an encounter from the overflow menu', async () => {

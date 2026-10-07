@@ -26,6 +26,18 @@ export interface FormRendererProps {
   hidePatientBanner?: boolean;
   handlePostResponse?: (encounter: Encounter) => void;
   preFilledQuestions?: Record<string, string>;
+  /**
+   * Set by hosts that manage the encounter datetime themselves (see `EncounterDateTimePicker`). When not
+   * `undefined`, the form does not render its own encounter datetime question. A `Date` is the backdated datetime
+   * chosen by the user; `null` means no explicit datetime, so the server stamps (or keeps) it.
+   */
+  encounterDatetime?: Date | null;
+  /**
+   * Set by hosts that manage the encounter provider themselves (see `ClinicianPicker`). When not `undefined`, the
+   * form does not render its own encounter provider question. The value is the UUID of the provider the encounter
+   * is attributed to.
+   */
+  encounterProvider?: string | null;
   launchChildWorkspace?: Workspace2DefinitionProps['launchChildWorkspace'];
   closeWorkspace?: Workspace2DefinitionProps['closeWorkspace'];
   closeWorkspaceWithSavedChanges?: () => void;

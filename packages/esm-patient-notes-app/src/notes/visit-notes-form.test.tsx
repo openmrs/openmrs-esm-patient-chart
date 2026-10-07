@@ -19,7 +19,7 @@ import {
   useConfig,
   useSession,
   useLayoutType,
-  useFeatureFlag,
+  userHasAccess,
   type Visit,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
@@ -95,7 +95,7 @@ const mockShowSnackbar = vi.mocked(showSnackbar);
 const mockUpdateVisitNote = vi.mocked(updateVisitNote);
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const mockUseSession = vi.mocked(useSession);
-const mockedUseFeatureFlag = vi.mocked(useFeatureFlag);
+const mockUserHasAccess = vi.mocked(userHasAccess);
 
 vi.mock('lodash-es/debounce', () => vi.fn((fn) => fn));
 
@@ -110,6 +110,7 @@ vi.mock('@openmrs/esm-patient-common-lib', async () => {
 vi.mock('./visit-notes.resource', () => ({
   fetchDiagnosisConceptsByName: vi.fn(),
   removeVisitNoteImage: vi.fn(),
+  replaceEncounterClinician: vi.fn(),
   updateVisitNote: vi.fn(),
   useLocationUuid: vi.fn().mockImplementation(() => ({
     data: mockFetchLocationByUuidResponse.data.uuid,
@@ -131,24 +132,35 @@ mockUseConfig.mockReturnValue({
 });
 
 beforeEach(() => {
-  mockedUseFeatureFlag.mockReturnValue(false);
+  mockUserHasAccess.mockReturnValue(false);
   vi.mocked(useLayoutType).mockReturnValue('small-desktop');
 });
 
-test('does not render the date picker when RDE is disabled', () => {
+test('renders the date and time picker for the active visit', () => {
   renderVisitNotesForm();
 
-  expect(screen.queryByLabelText(/visit date/i)).not.toBeInTheDocument();
+  expect(screen.getByRole('tab', { name: /^now$/i })).toBeInTheDocument();
 });
 
-// TODO: re-renable when we have a more general way to backdate notes
-// for both active and past visits
-test.skip('renders the date picker when RDE is enabled', () => {
-  mockedUseFeatureFlag.mockReturnValue(true);
-
+test('does not render the clinician picker without the privilege to act on behalf of others', () => {
   renderVisitNotesForm();
 
-  expect(screen.getByLabelText(/visit date/i)).toBeInTheDocument();
+  expect(screen.queryByRole('combobox', { name: /clinician/i })).not.toBeInTheDocument();
+});
+
+test('does not render the date picker for a past visit without the privilege to edit past visits', () => {
+  renderVisitNotesForm(
+    {},
+    {
+      visitContext: {
+        uuid: 'past-visit-uuid',
+        startDatetime: '2024-03-01T08:00:00.000+0000',
+        stopDatetime: '2024-03-02T08:00:00.000+0000',
+      } as Visit,
+    },
+  );
+
+  expect(screen.queryByRole('tab', { name: /^now$/i })).not.toBeInTheDocument();
 });
 
 test('renders the visit notes form with all the relevant fields and values', () => {
@@ -285,7 +297,6 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
       },
     ]),
     patient: mockPatient.id,
-    encounterDatetime: undefined,
   };
 
   mockSaveVisitNote.mockResolvedValueOnce({ status: 201, body: 'Condition created' } as unknown as Awaited<
@@ -473,7 +484,6 @@ test.each(['small-desktop', 'tablet'] as const)(
   'initializes the edit form with existing encounter data on %s',
   (layout) => {
     vi.mocked(useLayoutType).mockReturnValue(layout);
-    mockedUseFeatureFlag.mockReturnValue(true);
 
     const mockEncounter = {
       uuid: '123',
@@ -506,7 +516,7 @@ test.each(['small-desktop', 'tablet'] as const)(
     expect(screen.queryByText('Add visit note')).not.toBeInTheDocument();
 
     // Verify date is pre-filled
-    expect(screen.getByLabelText(/visit date/i)).toHaveValue('20/03/2024');
+    expect(screen.getByLabelText('Visit note date')).toHaveValue('20/03/2024');
 
     // Verify clinical note is pre-filled
     expect(screen.getByRole('textbox', { name: /write your notes/i })).toHaveValue('Existing clinical note');
@@ -541,12 +551,6 @@ test('updates existing visit note when in edit mode', async () => {
   };
 
   const updatePayload = {
-    encounterProviders: [
-      {
-        encounterRole: ConfigMock.visitNoteConfig.clinicianEncounterRole,
-        provider: mockSessionDataResponse.data.currentProvider.uuid,
-      },
-    ],
     encounterType: ConfigMock.visitNoteConfig.encounterTypeUuid,
     form: ConfigMock.visitNoteConfig.formConceptUuid,
     location: mockSessionDataResponse.data.sessionLocation.uuid,
@@ -558,7 +562,6 @@ test('updates existing visit note when in edit mode', async () => {
       },
     ],
     patient: mockPatient.id,
-    encounterDatetime: undefined,
   };
 
   mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
@@ -586,6 +589,42 @@ test('updates existing visit note when in edit mode', async () => {
     mockEncounter.uuid,
     expect.objectContaining(updatePayload),
   );
+  // neither the datetime nor the clinician were changed, so they are left untouched
+  const sentPayload = mockUpdateVisitNote.mock.calls[0][2];
+  expect(sentPayload).not.toHaveProperty('encounterDatetime');
+  expect(sentPayload).not.toHaveProperty('encounterProviders');
+});
+
+test('saves an edit that only changes the encounter datetime', async () => {
+  const user = userEvent.setup();
+  mockUseConfig.mockReturnValue({
+    ...getDefaultsFromConfigSchema(configSchema),
+    ...ConfigMock,
+    isPrimaryDiagnosisRequired: false,
+  });
+  const mockEncounter = {
+    uuid: '123',
+    encounterDatetime: '2024-03-20T10:00:00.000Z',
+    obs: [{ concept: { uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }, value: 'Existing clinical note' }],
+    diagnoses: [],
+  };
+  mockUpdateVisitNote.mockResolvedValueOnce({ status: 200, body: 'Visit note updated' } as unknown as Awaited<
+    ReturnType<typeof updateVisitNote>
+  >);
+
+  renderVisitNotesForm({ formContext: 'editing', encounter: mockEncounter as any as Encounter });
+
+  const timeInput = screen.getByLabelText('Time');
+  await user.clear(timeInput);
+  await user.type(timeInput, '03:45');
+  await user.click(screen.getByRole('button', { name: /Save and close/i }));
+
+  expect(mockUpdateVisitNote).toHaveBeenCalledTimes(1);
+  const sentPayload = mockUpdateVisitNote.mock.calls[0][2];
+  expect(new Date(sentPayload.encounterDatetime).getTime()).not.toBe(
+    new Date(mockEncounter.encounterDatetime).getTime(),
+  );
+  expect(sentPayload).not.toHaveProperty('encounterProviders');
 });
 
 test('handles existing diagnoses correctly when in edit mode', async () => {
@@ -633,6 +672,34 @@ test('handles existing diagnoses correctly when in edit mode', async () => {
   expect(screen.getByTitle('Diabetes Mellitus')).toBeInTheDocument();
 });
 
+test('dates a new visit note within a past visit when the user did not pick a datetime', async () => {
+  const user = userEvent.setup();
+  mockUserHasAccess.mockReturnValue(true);
+  mockUseConfig.mockReturnValue({
+    ...getDefaultsFromConfigSchema(configSchema),
+    ...ConfigMock,
+    isPrimaryDiagnosisRequired: false,
+  });
+  mockSaveVisitNote.mockResolvedValueOnce({ status: 201, body: 'Visit note created' } as unknown as Awaited<
+    ReturnType<typeof saveVisitNote>
+  >);
+  const pastVisit = {
+    uuid: 'past-visit-uuid',
+    startDatetime: '2024-03-01T08:00:00.000+0000',
+    stopDatetime: '2024-03-02T08:00:00.000+0000',
+  } as Visit;
+
+  renderVisitNotesForm({}, { visitContext: pastVisit });
+
+  await user.type(screen.getByRole('textbox', { name: /Write your notes/i }), 'A note');
+  await user.click(screen.getByRole('button', { name: /Save and close/i }));
+
+  expect(mockSaveVisitNote).toHaveBeenCalledTimes(1);
+  const payload = mockSaveVisitNote.mock.calls[0][1];
+  expect(payload.visit).toBe('past-visit-uuid');
+  expect(new Date(payload.encounterDatetime).getTime()).toBe(new Date('2024-03-01T08:00:00.000Z').getTime());
+});
+
 test('allows saving visit note without primary diagnosis when isPrimaryDiagnosisRequired is false', async () => {
   const user = userEvent.setup();
 
@@ -659,7 +726,6 @@ test('allows saving visit note without primary diagnosis when isPrimaryDiagnosis
       },
     ]),
     patient: mockPatient.id,
-    encounterDatetime: undefined,
   };
 
   mockSaveVisitNote.mockResolvedValueOnce({ status: 201, body: 'Visit note created' } as unknown as Awaited<

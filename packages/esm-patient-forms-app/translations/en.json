@@ -1,10 +1,12 @@
 {
   "clinicalForm": "Clinical Form",
   "clinicalForms": "Clinical forms",
+  "encounterDate": "Encounter date",
   "formName": "Form Name (A-Z)",
   "forms": "Forms",
   "lastCompleted": "Last completed",
   "never": "Never",
   "noFormsToDisplay": "There are no forms to display.",
-  "searchThisList": "Search this list"
+  "searchThisList": "Search this list",
+  "thisFormIs": "This form is"
 }

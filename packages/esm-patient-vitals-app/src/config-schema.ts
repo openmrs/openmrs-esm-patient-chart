@@ -62,6 +62,12 @@ export const configSchema = {
       _type: Type.UUID,
       _default: '67a71486-1a54-468f-ac3e-7091a9a79584',
     },
+    clinicianEncounterRole: {
+      _type: Type.UUID,
+      _default: '240b26f9-dd88-4172-823d-4a8bfeb7841f',
+      _description:
+        'The encounter role of the clinician an encounter is attributed to when it is placed on behalf of another clinician',
+    },
     vitalsOverdueThresholdHours: {
       _type: Type.Number,
       _default: 12,
@@ -148,6 +154,7 @@ export interface ConfigObject {
   vitals: {
     useFormEngine: boolean;
     encounterTypeUuid: string;
+    clinicianEncounterRole: string;
     vitalsOverdueThresholdHours: number;
     logo: LogoConfigObject;
     formUuid: string;

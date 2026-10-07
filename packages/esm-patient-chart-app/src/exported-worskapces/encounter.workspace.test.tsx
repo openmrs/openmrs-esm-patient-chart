@@ -1,8 +1,12 @@
 import React from 'react';
 import { act, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { type Encounter, ExtensionSlot, useWorkspace2Context } from '@openmrs/esm-framework';
-import { encounterWorkspaceSlotName, type EncounterWorkspaceSlotState } from '@openmrs/esm-patient-common-lib';
+import { type Encounter, ExtensionSlot, useWorkspace2Context, userHasAccess, type Visit } from '@openmrs/esm-framework';
+import {
+  encounterWorkspaceSlotName,
+  type EncounterWorkspaceSlotState,
+  PRIVILEGE_EDIT_PAST_VISITS,
+} from '@openmrs/esm-patient-common-lib';
 import { mockCurrentVisit } from '__mocks__';
 import { mockPatient } from 'tools';
 import EncounterWorkspace from './encounter.workspace';
@@ -58,6 +62,32 @@ describe('EncounterWorkspace', () => {
       expect.objectContaining({ name: encounterWorkspaceSlotName }),
       expect.anything(),
     );
+  });
+
+  describe('editing past visits', () => {
+    const pastVisit = { ...mockCurrentVisit, stopDatetime: '2021-05-01T10:00:00.000+0000' } as Visit;
+
+    it('does not render the encounter workspace slot without the edit past visits privilege', () => {
+      vi.mocked(userHasAccess).mockReturnValue(false);
+      mockExtensionSlot.mockClear();
+
+      renderEncounterWorkspace({ visitContext: pastVisit });
+
+      expect(screen.getByText(/you cannot edit past visits/i)).toBeInTheDocument();
+      expect(mockExtensionSlot).not.toHaveBeenCalled();
+    });
+
+    it('renders the encounter workspace slot with the edit past visits privilege', () => {
+      vi.mocked(userHasAccess).mockImplementation((privilege) => privilege === PRIVILEGE_EDIT_PAST_VISITS);
+
+      renderEncounterWorkspace({ visitContext: pastVisit });
+
+      expect(screen.queryByText(/you cannot edit past visits/i)).not.toBeInTheDocument();
+      expect(mockExtensionSlot).toHaveBeenCalledWith(
+        expect.objectContaining({ name: encounterWorkspaceSlotName }),
+        expect.anything(),
+      );
+    });
   });
 
   it('hands the patient and the visit of its window props to the hosted workspaces as window props', () => {
