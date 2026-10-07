@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import classnames from 'classnames';
 import dayjs from 'dayjs';
 import { debounce } from 'lodash-es';
@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useForm, type Control } from 'react-hook-form';
+import { Controller, useController, useForm, type Control, type FieldErrors } from 'react-hook-form';
 import type { TFunction } from 'i18next';
 import {
   Button,
@@ -20,11 +20,10 @@ import {
   Search,
   SkeletonText,
   Stack,
-  Tag,
   TextArea,
   Tile,
 } from '@carbon/react';
-import { Add, Close, WarningFilled } from '@carbon/react/icons';
+import { Add, Close, WarningAltFilled, WarningFilled } from '@carbon/react/icons';
 import {
   createAttachment,
   createErrorHandler,
@@ -46,7 +45,7 @@ import {
 } from '@openmrs/esm-framework';
 import { invalidateVisitAndEncounterData, useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
-import type { Concept, Diagnosis, DiagnosisPayload, VisitNotePayload } from '../types';
+import type { Concept, DiagnosisCertainty, DiagnosisPayload, VisitNotePayload } from '../types';
 import {
   deletePatientDiagnosis,
   fetchDiagnosisConceptsByName,
@@ -54,9 +53,15 @@ import {
   savePatientDiagnosis,
   saveVisitNote,
   updateVisitNote,
+  useDiagnosisConceptClasses,
   useVisitNoteImages,
   useVisitNotes,
 } from './visit-notes.resource';
+import SelectedDiagnosisCard, {
+  DiagnosisListHeader,
+  type DiagnosisDraft,
+  nextDraftId,
+} from './selected-diagnosis-card.component';
 import styles from './visit-notes-form.scss';
 
 type VisitNotesFormData = Omit<z.infer<ReturnType<typeof createSchema>>, 'images'> & {
@@ -64,11 +69,10 @@ type VisitNotesFormData = Omit<z.infer<ReturnType<typeof createSchema>>, 'images
 };
 
 interface DiagnosesDisplayProps {
-  fieldName: string;
   isDiagnosisNotSelected: (diagnosis: Concept) => boolean;
   isLoading: boolean;
   isSearching: boolean;
-  onAddDiagnosis: (diagnosis: Concept, searchInputField: string) => void;
+  onAddDiagnosis: (diagnosis: Concept) => void;
   searchResults: Array<Concept>;
   t: TFunction;
   value: string;
@@ -76,19 +80,24 @@ interface DiagnosesDisplayProps {
 
 interface DiagnosisSearchProps {
   control: Control<VisitNotesFormData>;
-  error?: object;
-  handleSearch: (fieldName) => void;
+  handleSearch: () => void;
   labelText: string;
-  name: 'noteDate' | 'primaryDiagnosisSearch' | 'secondaryDiagnosisSearch' | 'clinicalNote';
+  name: 'diagnosisSearch';
   placeholder: string;
   setIsSearching: (isSearching: boolean) => void;
 }
 
-const createSchema = (t: TFunction, isRetrospectiveDataEntryEnabled: boolean) => {
+const hasPrimaryDiagnosis = (diagnoses: Array<DiagnosisDraft>) => diagnoses.some((diagnosis) => diagnosis.rank === 1);
+
+const createSchema = (t: TFunction, isRetrospectiveDataEntryEnabled: boolean, isPrimaryDiagnosisRequired: boolean) => {
   return z.object({
     noteDate: isRetrospectiveDataEntryEnabled ? z.date() : z.date().optional(),
-    primaryDiagnosisSearch: z.string(),
-    secondaryDiagnosisSearch: z.string().optional(),
+    diagnosisSearch: z.string().optional(),
+    diagnoses: z
+      .array(z.custom<DiagnosisDraft>())
+      .refine((diagnoses) => !isPrimaryDiagnosisRequired || hasPrimaryDiagnosis(diagnoses), {
+        message: t('atLeastOnePrimaryDiagnosis', 'At least one diagnosis must be selected as primary'),
+      }),
     clinicalNote: z.string().optional(),
     images: z.array(z.any()).optional(),
     removedImageIds: z.array(z.string()),
@@ -96,6 +105,30 @@ const createSchema = (t: TFunction, isRetrospectiveDataEntryEnabled: boolean) =>
 };
 
 const SEARCH_TIMEOUT_MS = 500;
+
+/**
+ * Other REST writers can store a diagnosis with neither a coded concept nor free text. The form
+ * cannot represent such a row, so it is left on the encounter untouched: not shown, not deleted,
+ * not recreated.
+ */
+const hasDiagnosisContent = (diagnosis: NonNullable<Encounter['diagnoses']>[number]) =>
+  Boolean(diagnosis.diagnosis?.coded?.uuid || diagnosis.diagnosis?.nonCoded);
+
+// Sort stored primaries once; subsequent edits keep rows under the pointer in place.
+const toDiagnosisDrafts = (encounter: Encounter | undefined, patientUuid: string): Array<DiagnosisDraft> =>
+  (encounter?.diagnoses ?? [])
+    .filter(hasDiagnosisContent)
+    .map(
+      (d): DiagnosisDraft => ({
+        draftId: nextDraftId(),
+        patient: patientUuid,
+        diagnosis: d.diagnosis.coded?.uuid ? { coded: d.diagnosis.coded.uuid } : { nonCoded: d.diagnosis.nonCoded },
+        certainty: d.certainty === 'PROVISIONAL' ? 'PROVISIONAL' : 'CONFIRMED',
+        rank: d.rank ?? 2,
+        display: d.display,
+      }),
+    )
+    .sort((a, b) => Number(b.rank === 1) - Number(a.rank === 1));
 
 /** Image formats browsers render, so a staged file always has a real thumbnail. */
 const imageExtensions = new Set(['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp']);
@@ -130,14 +163,9 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   const memoizedState = useMemo(() => ({ patientUuid, patient }), [patientUuid, patient]);
   const { clinicianEncounterRole, encounterNoteTextConceptUuid, encounterTypeUuid, formConceptUuid } =
     config.visitNoteConfig;
-  const [isLoadingPrimaryDiagnoses, setIsLoadingPrimaryDiagnoses] = useState(false);
-  const [isLoadingSecondaryDiagnoses, setIsLoadingSecondaryDiagnoses] = useState(false);
+  const [isLoadingDiagnoses, setIsLoadingDiagnoses] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
-  const [selectedPrimaryDiagnoses, setSelectedPrimaryDiagnoses] = useState<Array<Diagnosis>>([]);
-  const [selectedSecondaryDiagnoses, setSelectedSecondaryDiagnoses] = useState<Array<Diagnosis>>([]);
-  const [searchPrimaryResults, setSearchPrimaryResults] = useState<Array<Concept>>(null);
-  const [searchSecondaryResults, setSearchSecondaryResults] = useState<Array<Concept>>(null);
-  const [combinedDiagnoses, setCombinedDiagnoses] = useState<Array<Diagnosis>>([]);
+  const [searchResults, setSearchResults] = useState<Array<Concept>>(null);
   const [rows, setRows] = useState<number>();
   const [removedImages, setRemovedImages] = useState<string[]>([]);
   const [saveError, setSaveError] = useState<string>();
@@ -156,47 +184,27 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   const isRetrospectiveDataEntryEnabled = useFeatureFlag('rde');
 
   const visitNoteFormSchema = useMemo(
-    () => createSchema(t, isRetrospectiveDataEntryEnabled),
-    [t, isRetrospectiveDataEntryEnabled],
+    () => createSchema(t, isRetrospectiveDataEntryEnabled, isPrimaryDiagnosisRequired),
+    [t, isRetrospectiveDataEntryEnabled, isPrimaryDiagnosisRequired],
   );
 
-  const customResolver = useCallback(
-    async (data, context, options) => {
-      const zodResult = await zodResolver(visitNoteFormSchema)(data, context, options);
-
-      if (isPrimaryDiagnosisRequired && selectedPrimaryDiagnoses.length === 0) {
-        return {
-          ...zodResult,
-          errors: {
-            ...zodResult.errors,
-            primaryDiagnosisSearch: {
-              type: 'custom',
-              message: t('primaryDiagnosisRequired', 'Choose at least one primary diagnosis'),
-            },
-          },
-        };
-      }
-
-      return zodResult;
-    },
-    [visitNoteFormSchema, isPrimaryDiagnosisRequired, selectedPrimaryDiagnoses, t],
-  );
+  const [initialDiagnoses] = useState(() => toDiagnosisDrafts(encounter, patientUuid));
 
   const {
-    clearErrors,
     control,
-    formState: { errors, dirtyFields, isSubmitting },
-    handleSubmit,
+    formState: { dirtyFields, isSubmitted, isSubmitting },
     getValues,
+    handleSubmit,
     setValue,
     watch,
   } = useForm<VisitNotesFormData>({
     mode: 'onSubmit',
-    resolver: customResolver,
+    resolver: zodResolver(visitNoteFormSchema),
     defaultValues: {
       images: [],
       removedImageIds: [],
-      primaryDiagnosisSearch: '',
+      diagnosisSearch: '',
+      diagnoses: initialDiagnoses,
       noteDate: isEditing ? new Date(encounter.encounterDatetime) : new Date(),
       clinicalNote: isEditing
         ? String(encounter?.obs?.find((obs) => obs.concept.uuid === encounterNoteTextConceptUuid)?.value || '')
@@ -204,31 +212,9 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     },
   });
 
-  useEffect(() => {
-    if (encounter?.diagnoses?.length) {
-      try {
-        const transformedDiagnoses = encounter.diagnoses.map((d) => ({
-          patient: patientUuid,
-          diagnosis: {
-            coded: d.diagnosis.coded?.uuid,
-          },
-          certainty: d.certainty,
-          rank: d.rank,
-          display: d.display,
-        }));
-
-        const primaryDiagnoses = transformedDiagnoses.filter((d) => d.rank === 1);
-        const secondaryDiagnoses = transformedDiagnoses.filter((d) => d.rank === 2);
-
-        setSelectedPrimaryDiagnoses(primaryDiagnoses);
-        setSelectedSecondaryDiagnoses(secondaryDiagnoses);
-        setCombinedDiagnoses([...primaryDiagnoses, ...secondaryDiagnoses]);
-      } catch (err) {
-        setError(new Error(t('errorTransformingDiagnoses', 'Error transforming diagnoses')));
-        createErrorHandler();
-      }
-    }
-  }, [encounter, patientUuid, t]);
+  const {
+    field: { value: selectedDiagnoses, onChange: setSelectedDiagnoses },
+  } = useController({ name: 'diagnoses', control });
 
   const currentImages = watch('images');
   const removedImageIds = watch('removedImageIds');
@@ -251,24 +237,14 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
   const debouncedSearch = useMemo(
     () =>
-      debounce((fieldQuery, fieldName) => {
-        clearErrors('primaryDiagnosisSearch');
+      debounce((fieldQuery) => {
         if (fieldQuery) {
-          if (fieldName === 'primaryDiagnosisSearch') {
-            setIsLoadingPrimaryDiagnoses(true);
-          } else if (fieldName === 'secondaryDiagnosisSearch') {
-            setIsLoadingSecondaryDiagnoses(true);
-          }
+          setIsLoadingDiagnoses(true);
 
           fetchDiagnosisConceptsByName(fieldQuery, config.diagnosisConceptClass)
             .then((matchingConceptDiagnoses: Array<Concept>) => {
-              if (fieldName === 'primaryDiagnosisSearch') {
-                setSearchPrimaryResults(matchingConceptDiagnoses);
-                setIsLoadingPrimaryDiagnoses(false);
-              } else if (fieldName === 'secondaryDiagnosisSearch') {
-                setSearchSecondaryResults(matchingConceptDiagnoses);
-                setIsLoadingSecondaryDiagnoses(false);
-              }
+              setSearchResults(matchingConceptDiagnoses);
+              setIsLoadingDiagnoses(false);
             })
             .catch((e) => {
               setError(e);
@@ -276,84 +252,101 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
             });
         }
       }, SEARCH_TIMEOUT_MS),
-    [config.diagnosisConceptClass, clearErrors],
+    [config.diagnosisConceptClass],
   );
 
-  const handleSearch = useCallback(
-    (fieldName) => {
-      const fieldQuery = watch(fieldName);
-      if (fieldQuery) {
-        debouncedSearch(fieldQuery, fieldName);
-      }
-      setIsSearching(false);
-    },
-    [debouncedSearch, watch],
-  );
+  const handleSearch = useCallback(() => {
+    const fieldQuery = watch('diagnosisSearch');
+    if (fieldQuery) {
+      debouncedSearch(fieldQuery);
+    }
+    setIsSearching(false);
+  }, [debouncedSearch, watch]);
 
   const createDiagnosis = useCallback(
-    (concept: Concept) => ({
-      certainty: 'PROVISIONAL',
+    (concept: Concept): DiagnosisDraft => ({
+      draftId: nextDraftId(),
       display: concept.display,
       diagnosis: {
         coded: concept.uuid,
       },
       patient: patientUuid,
       rank: 2,
+      certainty: 'CONFIRMED',
+      conceptClassUuid: config.diagnosisConceptClass,
     }),
-    [patientUuid],
+    [config.diagnosisConceptClass, patientUuid],
+  );
+
+  const prefilledCodedConceptUuids = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          initialDiagnoses.flatMap((diagnosis) => (diagnosis.diagnosis.coded ? [diagnosis.diagnosis.coded] : [])),
+        ),
+      ),
+    [initialDiagnoses],
+  );
+  const { conceptClassByUuid, error: conceptClassLookupError } = useDiagnosisConceptClasses(prefilledCodedConceptUuids);
+  // Only diagnosis-class concepts get certainty actions; free-text diagnoses also qualify.
+  const canMarkProvisional = useCallback(
+    (diagnosis: DiagnosisDraft) => {
+      if (!diagnosis.diagnosis.coded) {
+        return true;
+      }
+      const conceptClassUuid = diagnosis.conceptClassUuid ?? conceptClassByUuid[diagnosis.diagnosis.coded];
+      if (conceptClassUuid === undefined) {
+        // Unknown while the lookup is pending; if it failed, keep the action rather than
+        // stranding a stored provisional diagnosis with no way to confirm it
+        return Boolean(conceptClassLookupError);
+      }
+      if (conceptClassUuid === null) {
+        // The lookup answered but left this concept out: treat it like a failed lookup
+        return true;
+      }
+      return conceptClassUuid === config.diagnosisConceptClass;
+    },
+    [conceptClassByUuid, conceptClassLookupError, config.diagnosisConceptClass],
   );
 
   const handleAddDiagnosis = useCallback(
-    (conceptDiagnosisToAdd: Concept, searchInputField: string) => {
-      const newDiagnosis = createDiagnosis(conceptDiagnosisToAdd);
-      if (searchInputField === 'primaryDiagnosisSearch') {
-        newDiagnosis.rank = 1;
-        setValue('primaryDiagnosisSearch', '');
-        setSearchPrimaryResults([]);
-        setSelectedPrimaryDiagnoses((selectedDiagnoses) => [...selectedDiagnoses, newDiagnosis]);
-        clearErrors('primaryDiagnosisSearch');
-      } else if (searchInputField === 'secondaryDiagnosisSearch') {
-        setValue('secondaryDiagnosisSearch', '');
-        setSearchSecondaryResults([]);
-        setSelectedSecondaryDiagnoses((selectedDiagnoses) => [...selectedDiagnoses, newDiagnosis]);
+    (conceptDiagnosisToAdd: Concept) => {
+      setValue('diagnosisSearch', '', { shouldDirty: true });
+      setSearchResults([]);
+      const diagnoses = getValues('diagnoses');
+      // Guards against a double-click on the same result racing the render-time filter
+      if (diagnoses.some((diagnosis) => diagnosis.diagnosis.coded === conceptDiagnosisToAdd.uuid)) {
+        return;
       }
-      setCombinedDiagnoses((combinedDiagnoses) => [...combinedDiagnoses, newDiagnosis]);
+      setSelectedDiagnoses([createDiagnosis(conceptDiagnosisToAdd), ...diagnoses]);
     },
-    [createDiagnosis, setValue, clearErrors],
+    [createDiagnosis, getValues, setSelectedDiagnoses, setValue],
   );
 
   const handleRemoveDiagnosis = useCallback(
-    (diagnosisToRemove: Diagnosis, searchInputField) => {
-      if (searchInputField === 'primaryInputSearch') {
-        setSelectedPrimaryDiagnoses(
-          selectedPrimaryDiagnoses.filter(
-            (diagnosis) => diagnosis.diagnosis.coded !== diagnosisToRemove.diagnosis.coded,
-          ),
-        );
-      } else if (searchInputField === 'secondaryInputSearch') {
-        setSelectedSecondaryDiagnoses(
-          selectedSecondaryDiagnoses.filter(
-            (diagnosis) => diagnosis.diagnosis.coded !== diagnosisToRemove.diagnosis.coded,
-          ),
-        );
-      }
-      setCombinedDiagnoses(
-        combinedDiagnoses.filter((diagnosis) => diagnosis.diagnosis.coded !== diagnosisToRemove.diagnosis.coded),
+    (diagnosisToRemove: DiagnosisDraft) => {
+      setSelectedDiagnoses(
+        getValues('diagnoses').filter((diagnosis) => diagnosis.draftId !== diagnosisToRemove.draftId),
       );
+      // The focused remove button unmounts with its card; return focus to the search input
+      document.getElementById('diagnosisSearch')?.focus();
     },
-    [combinedDiagnoses, selectedPrimaryDiagnoses, selectedSecondaryDiagnoses],
+    [getValues, setSelectedDiagnoses],
   );
 
-  const isDiagnosisNotSelected = (diagnosis: Concept) => {
-    const isPrimaryDiagnosisSelected = selectedPrimaryDiagnoses.some(
-      (selectedDiagnosis) => diagnosis.uuid === selectedDiagnosis.diagnosis.coded,
-    );
-    const isSecondaryDiagnosisSelected = selectedSecondaryDiagnoses.some(
-      (selectedDiagnosis) => diagnosis.uuid === selectedDiagnosis.diagnosis.coded,
-    );
+  const handleUpdateDiagnosis = useCallback(
+    (diagnosisToUpdate: DiagnosisDraft, patch: Partial<Pick<DiagnosisDraft, 'rank' | 'certainty'>>) => {
+      setSelectedDiagnoses(
+        getValues('diagnoses').map((diagnosis) =>
+          diagnosis.draftId === diagnosisToUpdate.draftId ? { ...diagnosis, ...patch } : diagnosis,
+        ),
+      );
+    },
+    [getValues, setSelectedDiagnoses],
+  );
 
-    return !isPrimaryDiagnosisSelected && !isSecondaryDiagnosisSelected;
-  };
+  const isDiagnosisNotSelected = (diagnosis: Concept) =>
+    !selectedDiagnoses.some((selectedDiagnosis) => diagnosis.uuid === selectedDiagnosis.diagnosis.coded);
 
   const showImageCaptureModal = useCallback(() => {
     if (isImageCaptureDisabled) {
@@ -395,12 +388,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
   const onSubmit = useCallback(
     (data: VisitNotesFormData) => {
-      const { noteDate, clinicalNote, images, removedImageIds } = data;
+      const { noteDate, clinicalNote, images, removedImageIds, diagnoses } = data;
       setSaveError(undefined);
-
-      if (isPrimaryDiagnosisRequired && !selectedPrimaryDiagnoses.length) {
-        return;
-      }
 
       let finalNoteDate = dayjs(noteDate);
       const now = new Date();
@@ -452,10 +441,10 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
             if (response.status === 201 || response.status === 200) {
               const encounterUuid = encounter?.uuid || response.data.uuid;
 
-              // If editing, first delete existing diagnoses
-              if (isEditing && encounter?.diagnoses?.length) {
+              const storedDiagnoses = encounter?.diagnoses?.filter(hasDiagnosisContent) ?? [];
+              if (isEditing && storedDiagnoses.length) {
                 return Promise.all(
-                  encounter.diagnoses.map((diagnosis) => deletePatientDiagnosis(abortController, diagnosis.uuid)),
+                  storedDiagnoses.map((diagnosis) => deletePatientDiagnosis(abortController, diagnosis.uuid)),
                 ).then(() => encounterUuid);
               }
 
@@ -464,14 +453,12 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
           })
           .then((encounterUuid) =>
             Promise.all(
-              combinedDiagnoses.map((diagnosis) => {
+              diagnoses.map((diagnosis) => {
                 const diagnosesPayload: DiagnosisPayload = {
                   encounter: encounterUuid,
                   patient: patientUuid,
                   condition: null,
-                  diagnosis: {
-                    coded: diagnosis.diagnosis.coded,
-                  },
+                  diagnosis: diagnosis.diagnosis,
                   certainty: diagnosis.certainty,
                   rank: diagnosis.rank,
                 };
@@ -522,22 +509,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                 },
               );
             }
-            const diagnosesChanged =
-              combinedDiagnoses.length !== (encounter?.diagnoses?.length ?? 0) ||
-              combinedDiagnoses.some(
-                (diagnosis) =>
-                  !encounter?.diagnoses?.some(
-                    (saved) =>
-                      saved.diagnosis.coded?.uuid === diagnosis.diagnosis.coded &&
-                      saved.rank === diagnosis.rank &&
-                      saved.certainty === diagnosis.certainty,
-                  ),
-              );
-            if (
-              !isEditing ||
-              diagnosesChanged ||
-              Object.keys(dirtyFields).some((field) => field !== 'removedImageIds')
-            ) {
+            if (!isEditing || Object.keys(dirtyFields).some((field) => field !== 'removedImageIds')) {
               noteSaveAttempted = true;
               return await saveNote();
             }
@@ -608,7 +580,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       visitContext?.uuid,
       clinicianEncounterRole,
       closeWorkspace,
-      combinedDiagnoses,
       encounter?.diagnoses,
       encounter?.uuid,
       encounter?.obs,
@@ -617,20 +588,40 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       formConceptUuid,
       globalMutate,
       isEditing,
-      isPrimaryDiagnosisRequired,
       locationUuid,
       mutateAttachments,
       mutateVisitNotes,
       patientUuid,
       providerUuid,
-      selectedPrimaryDiagnoses.length,
       t,
     ],
   );
 
-  const onError = (errors) => console.error(errors);
+  const onError = useCallback(
+    (errors: FieldErrors<VisitNotesFormData>) => {
+      console.error(errors);
+      // A failed save lands focus on the first Primary checkbox so the missing primary can
+      // be fixed in place (or on the search input when nothing has been selected yet)
+      if (errors.diagnoses) {
+        const firstDraftId = getValues('diagnoses')[0]?.draftId;
+        const target =
+          firstDraftId === undefined
+            ? document.getElementById('diagnosisSearch')
+            : document.getElementById(`diagnosis-${firstDraftId}-primary`);
+        target?.focus();
+      }
+    },
+    [getValues],
+  );
 
   const hasUserUnsavedChanges = Object.keys(dirtyFields).length > 0;
+
+  // Show a live warning, escalating to an error after a blocked save.
+  const showPrimaryRequiredWarning =
+    isPrimaryDiagnosisRequired &&
+    !hasPrimaryDiagnosis(selectedDiagnoses) &&
+    (selectedDiagnoses.length > 0 || isSubmitted);
+  const primaryRequiredBlockedSave = showPrimaryRequiredWarning && isSubmitted;
 
   return (
     <Workspace2
@@ -680,81 +671,24 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                 </Column>
               </Row>
             )}
-            <div className={styles.diagnosesText}>
-              {selectedPrimaryDiagnoses.map((diagnosis) => (
-                <Tag
-                  className={styles.tag}
-                  filter
-                  key={diagnosis.diagnosis.coded}
-                  onClose={() => handleRemoveDiagnosis(diagnosis, 'primaryInputSearch')}
-                  type="red"
-                >
-                  {diagnosis.display}
-                </Tag>
-              ))}
-              {selectedSecondaryDiagnoses.map((diagnosis) => (
-                <Tag
-                  className={styles.tag}
-                  filter
-                  key={diagnosis.diagnosis.coded}
-                  onClose={() => handleRemoveDiagnosis(diagnosis, 'secondaryInputSearch')}
-                  type="blue"
-                >
-                  {diagnosis.display}
-                </Tag>
-              ))}
-              {!selectedPrimaryDiagnoses.length && !selectedSecondaryDiagnoses.length && (
-                <span>{t('emptyDiagnosisText', 'No diagnosis selected — Enter a diagnosis below')}</span>
-              )}
-            </div>
             <Row className={styles.row}>
               <Column sm={1}>
-                <span className={styles.columnLabel}>{t('primaryDiagnosis', 'Primary diagnosis')}</span>
+                <span className={styles.columnLabel}>
+                  {t('diagnosis', 'Diagnosis')}
+                  {isPrimaryDiagnosisRequired && (
+                    <span title={t('required', 'Required')} className={styles.required}>
+                      *
+                    </span>
+                  )}
+                </span>
               </Column>
               <Column sm={3}>
-                <FormGroup legendText={t('searchForPrimaryDiagnosis', 'Search for a primary diagnosis')}>
+                <FormGroup legendText="">
                   <DiagnosisSearch
-                    name="primaryDiagnosisSearch"
+                    name="diagnosisSearch"
                     control={control}
-                    labelText={t('enterPrimaryDiagnoses', 'Enter Primary diagnoses')}
-                    placeholder={t('primaryDiagnosisInputPlaceholder', 'Choose a primary diagnosis')}
-                    handleSearch={handleSearch}
-                    error={errors?.primaryDiagnosisSearch}
-                    setIsSearching={setIsSearching}
-                  />
-                  {error ? (
-                    <InlineNotification
-                      className={styles.errorNotification}
-                      lowContrast
-                      title={t('error', 'Error')}
-                      subtitle={t('errorFetchingConcepts', 'There was a problem fetching concepts') + '.'}
-                      onClose={() => setError(null)}
-                    />
-                  ) : null}
-                  <DiagnosesDisplay
-                    fieldName={'primaryDiagnosisSearch'}
-                    isDiagnosisNotSelected={isDiagnosisNotSelected}
-                    isLoading={isLoadingPrimaryDiagnoses}
-                    isSearching={isSearching}
-                    onAddDiagnosis={handleAddDiagnosis}
-                    searchResults={searchPrimaryResults}
-                    t={t}
-                    value={watch('primaryDiagnosisSearch')}
-                  />
-                </FormGroup>
-              </Column>
-            </Row>
-            <Row className={styles.row}>
-              <Column sm={1}>
-                <span className={styles.columnLabel}>{t('secondaryDiagnosis', 'Secondary diagnosis')}</span>
-              </Column>
-              <Column sm={3}>
-                <FormGroup legendText={t('searchForSecondaryDiagnosis', 'Search for a secondary diagnosis')}>
-                  <DiagnosisSearch
-                    name="secondaryDiagnosisSearch"
-                    control={control}
-                    labelText={t('enterSecondaryDiagnoses', 'Enter Secondary diagnoses')}
-                    placeholder={t('secondaryDiagnosisInputPlaceholder', 'Choose a secondary diagnosis')}
+                    labelText={t('searchForDiagnosis', 'Search for a diagnosis to add')}
+                    placeholder={t('diagnosisInputPlaceholder', 'Search for a diagnosis')}
                     handleSearch={handleSearch}
                     setIsSearching={setIsSearching}
                   />
@@ -768,15 +702,50 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                     />
                   ) : null}
                   <DiagnosesDisplay
-                    fieldName={'secondaryDiagnosisSearch'}
                     isDiagnosisNotSelected={isDiagnosisNotSelected}
-                    isLoading={isLoadingSecondaryDiagnoses}
+                    isLoading={isLoadingDiagnoses}
                     isSearching={isSearching}
                     onAddDiagnosis={handleAddDiagnosis}
-                    searchResults={searchSecondaryResults}
+                    searchResults={searchResults}
                     t={t}
-                    value={watch('secondaryDiagnosisSearch')}
+                    value={watch('diagnosisSearch')}
                   />
+                  {selectedDiagnoses.length > 0 && (
+                    <>
+                      <p className={styles.diagnosisHelperText}>
+                        {t(
+                          'diagnosisCertaintyHelperText',
+                          'Diagnoses are recorded as confirmed unless marked provisional.',
+                        )}
+                      </p>
+                      <DiagnosisListHeader />
+                      {selectedDiagnoses.map((diagnosis) => (
+                        <SelectedDiagnosisCard
+                          key={diagnosis.draftId}
+                          canMarkProvisional={canMarkProvisional(diagnosis)}
+                          diagnosis={diagnosis}
+                          onRemove={handleRemoveDiagnosis}
+                          onUpdate={handleUpdateDiagnosis}
+                        />
+                      ))}
+                    </>
+                  )}
+                  {showPrimaryRequiredWarning && (
+                    <p
+                      id="primary-diagnosis-requirement"
+                      className={classnames(styles.primaryRequiredWarning, {
+                        [styles.primaryRequiredError]: primaryRequiredBlockedSave,
+                      })}
+                      role={primaryRequiredBlockedSave ? 'alert' : 'status'}
+                    >
+                      {primaryRequiredBlockedSave ? (
+                        <WarningFilled aria-hidden="true" size={16} />
+                      ) : (
+                        <WarningAltFilled aria-hidden="true" size={16} />
+                      )}
+                      {t('atLeastOnePrimaryDiagnosis', 'At least one diagnosis must be selected as primary')}
+                    </p>
+                  )}
                 </FormGroup>
               </Column>
             </Row>
@@ -972,64 +941,45 @@ function DiagnosisSearch({
   labelText,
   placeholder,
   handleSearch,
-  error,
   setIsSearching,
 }: DiagnosisSearchProps) {
   const isTablet = useLayoutType() === 'tablet';
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const searchInputFocus = () => {
-    inputRef.current.focus();
-  };
-
-  useEffect(() => {
-    if (error) {
-      searchInputFocus();
-    }
-  }, [error]);
 
   return (
     <Controller
       name={name}
       control={control}
-      render={({ field: { value, onChange, onBlur }, fieldState }) => (
-        <>
-          <ResponsiveWrapper>
-            <Search
-              ref={inputRef}
-              size={isTablet ? 'lg' : 'md'}
-              id={name}
-              labelText={labelText}
-              className={error && styles.diagnoserrorOutline}
-              placeholder={placeholder}
-              renderIcon={error && ((props) => <WarningFilled fill="red" {...props} />)}
-              onChange={(e) => {
-                setIsSearching(true);
-                onChange(e);
-                handleSearch(name);
-              }}
-              onKeyDown={(event) => {
-                if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-                  const results = document.getElementById(`${name}-results`)?.querySelectorAll('button');
-                  if (results?.length) {
-                    event.preventDefault();
-                    results[event.key === 'ArrowDown' ? 0 : results.length - 1].focus();
-                  }
+      render={({ field: { value, onChange, onBlur } }) => (
+        <ResponsiveWrapper>
+          <Search
+            size={isTablet ? 'lg' : 'md'}
+            id={name}
+            labelText={labelText}
+            placeholder={placeholder}
+            onChange={(e) => {
+              setIsSearching(true);
+              onChange(e);
+              handleSearch();
+            }}
+            onKeyDown={(event) => {
+              if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                const results = document.getElementById(`${name}-results`)?.querySelectorAll('button');
+                if (results?.length) {
+                  event.preventDefault();
+                  results[event.key === 'ArrowDown' ? 0 : results.length - 1].focus();
                 }
-              }}
-              value={value instanceof Date ? value.toISOString() : value}
-              onBlur={onBlur}
-            />
-          </ResponsiveWrapper>
-          {fieldState?.error?.message && <p className={styles.errorMessage}>{fieldState?.error?.message}</p>}
-        </>
+              }
+            }}
+            value={value}
+            onBlur={onBlur}
+          />
+        </ResponsiveWrapper>
       )}
     />
   );
 }
 
 function DiagnosesDisplay({
-  fieldName,
   isDiagnosisNotSelected,
   isLoading,
   isSearching,
@@ -1039,15 +989,14 @@ function DiagnosesDisplay({
   value,
 }: DiagnosesDisplayProps) {
   const resultsRef = useRef<HTMLUListElement | null>(null);
-  const setResultsRef = useCallback(
-    (node: HTMLUListElement | null) => {
-      if (!node && resultsRef.current?.contains(document.activeElement)) {
-        document.getElementById(fieldName)?.focus();
-      }
-      resultsRef.current = node;
-    },
-    [fieldName],
-  );
+  // When loading unmounts a focused result, return focus to the search input rather than
+  // dropping it on <body>; leave focus alone when the user has moved elsewhere
+  const setResultsRef = useCallback((node: HTMLUListElement | null) => {
+    if (!node && resultsRef.current?.contains(document.activeElement)) {
+      document.getElementById('diagnosisSearch')?.focus();
+    }
+    resultsRef.current = node;
+  }, []);
   if (!value) {
     return null;
   }
@@ -1060,13 +1009,13 @@ function DiagnosesDisplay({
     return (
       <ul
         ref={setResultsRef}
-        id={`${fieldName}-results`}
+        id="diagnosisSearch-results"
         className={styles.diagnosisList}
         aria-label={t('diagnosisSearchResults', 'Diagnosis search results')}
         onKeyDown={(event) => {
           if (event.key === 'Escape') {
             event.preventDefault();
-            document.getElementById(fieldName)?.focus();
+            document.getElementById('diagnosisSearch')?.focus();
           } else if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
             const results = Array.from(event.currentTarget.querySelectorAll('button'));
             const index = results.findIndex((result) => result === document.activeElement);
@@ -1090,8 +1039,8 @@ function DiagnosesDisplay({
               type="button"
               className={styles.diagnosisButton}
               onClick={() => {
-                onAddDiagnosis(diagnosis, fieldName);
-                document.getElementById(fieldName)?.focus();
+                onAddDiagnosis(diagnosis);
+                document.getElementById('diagnosisSearch')?.focus();
               }}
             >
               {diagnosis.display}

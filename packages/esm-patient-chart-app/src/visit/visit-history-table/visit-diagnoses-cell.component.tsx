@@ -12,7 +12,7 @@ const VisitDiagnosisCell: React.FC<Props> = ({ visit }) => {
     visit.encounters.flatMap((encounter) => encounter.diagnoses).filter((diagnosis) => !diagnosis.voided),
   );
 
-  return <DiagnosisTags diagnoses={diagnoses} />;
+  return <DiagnosisTags diagnoses={diagnoses} showCertainty />;
 };
 
 export default VisitDiagnosisCell;
