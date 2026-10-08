@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonSet, ComboBox, FormLabel, InlineLoading, InlineNotification, Stack } from '@carbon/react';
+import { Button, ButtonSet, FormLabel, InlineLoading, InlineNotification } from '@carbon/react';
 import { useSWRConfig } from 'swr';
 import {
   Extension,
@@ -18,6 +18,8 @@ import {
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import {
+  ClinicianPicker,
+  EncounterDateTimePicker,
   invalidateVisitAndEncounterData,
   type Order,
   type OrderBasketExtensionProps,
@@ -25,11 +27,12 @@ import {
   postOrders,
   postOrdersOnNewEncounter,
   showOrderSuccessToast,
+  useEncounterProvider,
   useMutatePatientOrders,
   useOrderBasket,
 } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
-import { type Provider, useOrderEncounterForSystemWithVisitDisabled, useProviders } from '../api/api';
+import { useOrderEncounterForSystemWithVisitDisabled } from '../api/api';
 import GeneralOrderPanel from './general-order-type/general-order-panel.component';
 import styles from './order-basket.scss';
 
@@ -55,15 +58,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orderTypes, orderEncounterType, ordererProviderRoles, orderLocationTagName } = useConfig<ConfigObject>();
-  const {
-    currentProvider: _currentProvider,
-    sessionLocation,
-    user: { person },
-  } = useSession();
-  const currentProvider: Provider | null = useMemo(
-    () => (_currentProvider ? { ..._currentProvider, person } : null),
-    [_currentProvider, person],
-  );
+  const { sessionLocation } = useSession();
   const { orders, clearOrders } = useOrderBasket(patient);
   const [ordersWithErrors, setOrdersWithErrors] = useState<OrderBasketItem[]>([]);
   const {
@@ -80,25 +75,18 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
 
   const [orderLocationUuid, setOrderLocationUuid] = useState(sessionLocation.uuid);
 
-  const allowSelectingOrderer = ordererProviderRoles?.length > 0;
+  // Users who may act on behalf of others can pick the orderer (optionally limited to `ordererProviderRoles`);
+  // everyone else is the orderer themselves.
   const {
-    providers,
-    isLoading: isLoadingProviders,
-    error: errorLoadingProviders,
-  } = useProviders(allowSelectingOrderer ? ordererProviderRoles : null);
+    provider: orderer,
+    setProvider: setOrderer,
+    canChoose: canChooseOrderer,
+    encounterProviders,
+  } = useEncounterProvider({ providerRoles: ordererProviderRoles });
 
-  // If configured to allow selecting providers, we wait till we fetched the allowable providers
-  // before setting the orderer. If not configured, we assume the current user is the orderer.
-  const [orderer, setOrderer] = useState<Provider>(allowSelectingOrderer ? null : currentProvider);
-
-  useEffect(() => {
-    if (allowSelectingOrderer && providers?.length > 0 && currentProvider) {
-      // default orderer to current user if they have the right provider roles
-      if (providers.some((p) => p.uuid === currentProvider.uuid)) {
-        setOrderer(currentProvider);
-      }
-    }
-  }, [allowSelectingOrderer, providers, currentProvider]);
+  // `null` means "now": the encounter is stamped by the server
+  const [encounterDatetime, setEncounterDatetime] = useState<Date | null>(null);
+  const [encounterDatetimeError, setEncounterDatetimeError] = useState<string | undefined>();
 
   const handleSave = useCallback(async () => {
     const abortController = new AbortController();
@@ -117,6 +105,10 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
           orderLocationUuid,
           orderer.uuid,
           abortController,
+          {
+            encounterDatetime,
+            encounterProviders: canChooseOrderer ? encounterProviders : undefined,
+          },
         );
         await closeWorkspace({ discardUnsavedChanges: true });
         mutateEncounterUuid();
@@ -190,6 +182,9 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
     t,
     mutate,
     orderer,
+    canChooseOrderer,
+    encounterProviders,
+    encounterDatetime,
     orderLocationUuid,
     onOrderBasketSubmitted,
   ]);
@@ -203,9 +198,6 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
   }, [clearOrders, closeWorkspace]);
 
   const patientName = getPatientName(patient);
-  const filterItemsByProviderName = useCallback((menu) => {
-    return menu?.item?.person?.display?.toLowerCase().includes(menu?.inputValue?.toLowerCase());
-  }, []);
   const extensionProps = useMemo(() => ({ ...orderBasketExtensionProps }), [orderBasketExtensionProps]);
 
   return (
@@ -222,32 +214,24 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
           </div>
         )}
         <div className={styles.orderBasketContainer}>
-          {!isLoadingProviders &&
-            allowSelectingOrderer &&
-            (errorLoadingProviders ? (
-              <InlineNotification
-                kind="warning"
-                lowContrast
-                className={styles.inlineNotification}
-                title={t('errorLoadingClinicians', 'Error loading clinicians')}
-                subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
-              />
-            ) : (
-              <div className={styles.providerSelectorContainer}>
-                <ComboBox
-                  id="orderer-combobox"
-                  items={providers ?? []}
-                  onChange={({ selectedItem }) => {
-                    setOrderer(selectedItem);
-                  }}
-                  initialSelectedItem={orderer}
-                  shouldFilterItem={filterItemsByProviderName}
-                  itemToString={(item: Provider) => item?.person.display ?? ''}
-                  placeholder={t('searchFieldPlaceholder', 'Search for a Provider')}
-                  titleText={t('orderer', 'Orderer')}
-                />
-              </div>
-            ))}
+          {!orderEncounterUuid && (
+            <EncounterDateTimePicker
+              id="order-basket"
+              dateLabel={t('orderDate', 'Order date')}
+              timingLabel={t('theseOrdersAre', 'These orders are')}
+              visit={visitContext}
+              value={encounterDatetime}
+              onChange={setEncounterDatetime}
+              onValidityChange={setEncounterDatetimeError}
+            />
+          )}
+          <ClinicianPicker
+            id="order-basket"
+            labelText={t('orderer', 'Orderer')}
+            value={orderer}
+            onChange={setOrderer}
+            providerRoles={ordererProviderRoles}
+          />
           {orderLocationTagName && (
             <div className={styles.orderLocationOuterContainer}>
               <FormLabel>{t('orderLocation', 'Order location')}</FormLabel>
@@ -325,6 +309,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
                 (visitRequired && !visitContext) ||
                 orders?.some(({ isOrderIncomplete }) => isOrderIncomplete) ||
                 !orderer ||
+                Boolean(encounterDatetimeError) ||
                 !orderLocationUuid
               }
             >
