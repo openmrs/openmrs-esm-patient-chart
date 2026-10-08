@@ -71,7 +71,7 @@ export const configSchema = {
   ordererProviderRoles: {
     _type: Type.Array,
     _description:
-      'Array of provider roles uuids. If specified, the order basket shows the "Prescribing Clinician" dropdown listing all providers with one of the specified roles. (The dropdown is hidden if no providers match the role criteria.) This feature requires the providermanagement backend module. Note that, in any case, any user who can submit orders form may still do so with themselves as the prescriber.',
+      'Array of provider roles uuids. Users with the "Edit Encounters On Behalf Of Others" privilege see an "Orderer" dropdown in the order basket. If this is specified, the dropdown only lists providers with one of the specified roles; otherwise it lists all providers. Filtering by role requires the providermanagement backend module. Users without the privilege always submit orders as themselves.',
     _default: [],
   },
   orderLocationTagName: {

@@ -60,6 +60,13 @@ function earliestDateActivated(orders: ReadonlyArray<OrderPost>): Date | undefin
   return earliest;
 }
 
+export interface PostOrdersOnNewEncounterOptions {
+  /** A user-chosen (backdated) encounter datetime. When absent the datetime is derived or server-stamped. */
+  encounterDatetime?: Date | null;
+  /** Set when the encounter is placed on behalf of a clinician other than the logged-in user. */
+  encounterProviders?: Array<{ provider: string; encounterRole: string }>;
+}
+
 export async function postOrdersOnNewEncounter(
   patientUuid: string,
   orderEncounterType: string,
@@ -67,6 +74,7 @@ export async function postOrdersOnNewEncounter(
   orderLocationUuid: string,
   ordererUuid: string,
   abortController?: AbortController,
+  options?: PostOrdersOnNewEncounterOptions,
 ) {
   const orders = getOrdersPayloadFromOrderBasket(patientUuid, ordererUuid);
 
@@ -74,11 +82,13 @@ export async function postOrdersOnNewEncounter(
   // before the earliest explicitly-requested order activation. Orders without a `dateActivated`
   // are "start now": in a real-time (open) visit we leave encounterDatetime unset too, so the
   // server stamps the encounter and those orders at the same request-time clock.
-  let encounterDatetime = earliestDateActivated(orders);
+  // A datetime explicitly chosen by the user (backdating) takes precedence.
+  let encounterDatetime = options?.encounterDatetime ?? earliestDateActivated(orders);
 
   // A stopped (retrospective) visit ended in the past, so the server's "now" would fall outside
-  // the visit window. Pin the encounter to the visit start when nothing else set it.
-  const isRetrospective = Boolean(currentVisit?.stopDatetime);
+  // the visit window. Pin the encounter to the visit start when nothing else set it. Likewise, when the
+  // user backdated the encounter, "start now" orders belong at the encounter's datetime.
+  const isRetrospective = Boolean(currentVisit?.stopDatetime) || Boolean(options?.encounterDatetime);
   if (!encounterDatetime && isRetrospective) {
     encounterDatetime = assertValidDate(parseDate(currentVisit.startDatetime), currentVisit.startDatetime);
   }
@@ -120,6 +130,7 @@ export async function postOrdersOnNewEncounter(
     // Only send encounterDatetime when we need a specific time; otherwise let the server default it
     // to now (EncounterResource.newDelegate() stamps the request-time server clock).
     ...(encounterDatetime ? { encounterDatetime } : {}),
+    ...(options?.encounterProviders?.length ? { encounterProviders: options.encounterProviders } : {}),
     visit: currentVisit?.uuid,
     obs: [],
     orders,
@@ -138,6 +149,7 @@ export interface EncounterPost {
   location: string;
   encounterType: string;
   encounterDatetime?: Date;
+  encounterProviders?: Array<{ provider: string; encounterRole: string }>;
   visit?: string;
   obs: ObsPayload[];
   orders: OrderPost[];
