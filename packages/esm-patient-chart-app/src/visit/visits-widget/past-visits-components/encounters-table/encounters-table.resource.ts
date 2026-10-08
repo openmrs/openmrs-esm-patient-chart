@@ -32,18 +32,13 @@ export interface EncountersTableProps {
   isSelectable: boolean;
   canPrintEncounters: boolean;
   /**
-   * Called instead of launching the chart's own edit workspaces, with the encounter to edit and whether it is
-   * a visit note (as opposed to a form). Hosts embedding this table outside the chart need to supply this:
-   * the chart's edit workspaces belong to the `patient-chart` workspace group, which is scoped to chart URLs
-   * and whose group props only the chart populates.
+   * Called after an encounter has been edited or deleted from this table, so hosts can refresh any data
+   * of their own. The patient chart's visit and encounter data is already invalidated by the workspaces
+   * and by the deletion.
    */
-  onEditEncounter?: (encounter: Encounter, isVisitNote: boolean) => void;
-  /**
-   * The patient these encounters belong to, handed to the embedded form view. Inside the chart this comes
-   * from the patient chart store, which `usePatientChartStore` only populates for the chart's own patient,
-   * so hosts embedding this table elsewhere need to supply it for embedded forms to render.
-   */
-  patient?: fhir.Patient;
+  onEncounterSaved?: (encounter?: Encounter) => void;
+  /** The patient these encounters belong to */
+  patient: fhir.Patient;
 }
 
 export interface MappedEncounter {

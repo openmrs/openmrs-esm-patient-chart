@@ -1,7 +1,7 @@
 {
   "actions": "Actions",
   "activeVisitExists": "This patient already has an active visit",
-  "addingToVisit": "Adding to:",
+  "addingTo": "Adding to:",
   "additionalVisitInformationUpdatedSuccessfully": "Additional visit information updated successfully",
   "addVisit": "Add visit",
   "all": "All",
@@ -38,6 +38,7 @@
   "dose": "Dose",
   "dosingInstructions": "Dosing Instructions",
   "editEncounter": "Edit",
+  "editing": "Editing:",
   "editThisEncounter": "Edit this encounter",
   "editVisit": "Edit visit",
   "editVisitDetails": "Edit visit details",

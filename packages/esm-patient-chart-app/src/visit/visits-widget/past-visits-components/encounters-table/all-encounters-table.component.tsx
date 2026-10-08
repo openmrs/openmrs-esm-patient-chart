@@ -4,15 +4,16 @@ import { type EncountersTableProps, usePaginatedEncounters } from './encounters-
 import EncountersTable from './encounters-table.component';
 
 interface AllEncountersTableProps {
-  patientUuid: string;
+  patient: fhir.Patient;
 }
 
 /**
  * This component shows a table of all encounters (across all visits) of a patient
  */
-const AllEncountersTable: React.FC<AllEncountersTableProps> = ({ patientUuid }) => {
+const AllEncountersTable: React.FC<AllEncountersTableProps> = ({ patient }) => {
   const [encounterTypeToFilter, setEncounterTypeToFilter] = useState<EncounterType>(null);
   const [pageSize, setPageSize] = useState(20);
+  const patientUuid = patient.id;
 
   const {
     data: paginatedEncounters,
@@ -20,7 +21,6 @@ const AllEncountersTable: React.FC<AllEncountersTableProps> = ({ patientUuid }) 
     isLoading,
     totalCount,
     goTo,
-    mutate,
   } = usePaginatedEncounters(patientUuid, encounterTypeToFilter?.uuid, pageSize);
 
   const session = useSession();
@@ -41,6 +41,7 @@ const AllEncountersTable: React.FC<AllEncountersTableProps> = ({ patientUuid }) 
     totalCount,
     isSelectable: false,
     canPrintEncounters,
+    patient,
   };
 
   return <EncountersTable {...encountersTableProps} />;

@@ -6,8 +6,8 @@
   padding: layout.$spacing-03;
   font-size: layout.$spacing-04;
   grid-template-areas:
-    'addingTo visitType'
-    'addingTo visitInfo';
+    'addingTo    visitType'
+    'addingTo    visitInfo';
   grid-template-columns: max-content 1fr;
 }
 

@@ -6,6 +6,11 @@
   },
   "extensions": [
     {
+      "name": "encounter-vitals",
+      "component": "encounterVitals",
+      "slot": "encounter-workspace-slot"
+    },
+    {
       "name": "vitals-overview-widget",
       "component": "vitalsSummary",
       "slot": "patient-chart-summary-dashboard-slot",
