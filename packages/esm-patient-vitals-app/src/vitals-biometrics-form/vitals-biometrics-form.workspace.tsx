@@ -16,6 +16,7 @@ import {
 } from '@carbon/react';
 import {
   age,
+  type Encounter,
   ExtensionSlot,
   type OpenmrsResource,
   showSnackbar,
@@ -61,6 +62,8 @@ import styles from './vitals-biometrics-form.scss';
 export type VitalsAndBiometricsFormProps = {
   formContext: 'creating' | 'editing';
   editEncounterUuid?: string;
+  /** Called after the vitals and biometrics have been saved */
+  onEncounterSaved?: (encounter?: Encounter) => void;
 } & DeprecatedPatientWorkspaceProps;
 
 /**
@@ -73,7 +76,7 @@ export type VitalsAndBiometricsFormProps = {
 const VitalsAndBiometricsForm: React.FC<
   Workspace2DefinitionProps<VitalsAndBiometricsFormProps, PatientWorkspaceWindowProps, SharedWorkspaceGroupProps>
 > = ({ closeWorkspace, workspaceProps, windowProps, groupProps }) => {
-  const { editEncounterUuid, formContext = 'creating' } = workspaceProps;
+  const { editEncounterUuid, formContext = 'creating', onEncounterSaved } = workspaceProps;
   const {
     patient: patientProp,
     patientUuid,
@@ -253,6 +256,7 @@ const VitalsAndBiometricsForm: React.FC<
             }
             invalidateVisitAndEncounterData(globalMutate, patientUuid);
             invalidateCachedVitalsAndBiometrics();
+            onEncounterSaved?.();
             closeWorkspace({ discardUnsavedChanges: true });
             showSnackbar({
               isLowContrast: true,
@@ -290,6 +294,7 @@ const VitalsAndBiometricsForm: React.FC<
       formContext,
       initialFieldValuesMap,
       mutateEncounter,
+      onEncounterSaved,
       globalMutate,
       patientUuid,
       session?.sessionLocation?.uuid,
@@ -322,7 +327,6 @@ const VitalsAndBiometricsForm: React.FC<
   } else if (isLoadingConceptUnits || isLoadingInitialValues) {
     formElement = (
       <Form className={styles.form}>
-        <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
         <div className={styles.grid}>
           <Stack>
             <Column>
@@ -353,7 +357,6 @@ const VitalsAndBiometricsForm: React.FC<
   } else {
     formElement = (
       <Form className={styles.form} data-openmrs-role="Vitals and Biometrics Form">
-        <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
         <div className={styles.grid}>
           <Stack>
             <Column>

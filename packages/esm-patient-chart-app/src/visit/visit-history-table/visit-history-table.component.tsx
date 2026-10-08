@@ -110,7 +110,7 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, pati
                         </TableExpandRow>
                         {row.isExpanded ? (
                           <TableExpandedRow {...getExpandedRowProps({ row })} colSpan={headers.length + 2}>
-                            <VisitSummary visit={visit} patientUuid={patientUuid} />
+                            <VisitSummary visit={visit} patientUuid={patientUuid} patient={patient} />
                           </TableExpandedRow>
                         ) : (
                           <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />

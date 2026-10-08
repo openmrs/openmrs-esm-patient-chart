@@ -3,6 +3,13 @@
   "backendDependencies": {
     "webservices.rest": ">=2.12.0"
   },
+  "extensions": [
+    {
+      "name": "encounter-clinical-form",
+      "component": "encounterClinicalForm",
+      "slot": "encounter-workspace-slot"
+    }
+  ],
   "workspaces2": [
     {
       "name": "patient-form-entry-workspace",
