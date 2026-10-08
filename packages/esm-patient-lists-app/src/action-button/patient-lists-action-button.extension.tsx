@@ -12,6 +12,7 @@ function PatientListsActionButton() {
       workspaceToLaunch={{
         workspaceName: 'patient-lists',
       }}
+      // disabled={(openwindows) => openwindows.some(w => w.windowName === 'encounter-window')}
     />
   );
 }

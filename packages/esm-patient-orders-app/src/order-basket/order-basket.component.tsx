@@ -211,7 +211,6 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
   return (
     <Workspace2 title={t('orderBasketWorkspaceTitle', 'Order Basket')} hasUnsavedChanges={!!orders.length}>
       <div id="order-basket" className={styles.container}>
-        <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
         {showPatientBanner && (
           <div className={styles.patientBannerContainer}>
             <div className={styles.patientBanner}>

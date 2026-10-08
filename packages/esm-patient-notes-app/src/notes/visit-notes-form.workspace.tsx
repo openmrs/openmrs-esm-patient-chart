@@ -12,6 +12,8 @@ import VisitNotesForm from './visit-notes-form.component';
 export type VisitNotesFormWorkspaceProps = {
   encounter?: Encounter;
   formContext: 'creating' | 'editing';
+  /** Called after the visit note has been saved */
+  onEncounterSaved?: (encounter?: Encounter) => void;
 } & DeprecatedPatientWorkspaceProps;
 
 /**
@@ -24,7 +26,7 @@ export type VisitNotesFormWorkspaceProps = {
 const VisitNotesFormWorkspace: React.FC<
   Workspace2DefinitionProps<VisitNotesFormWorkspaceProps, PatientWorkspaceWindowProps, SharedWorkspaceGroupProps>
 > = ({ closeWorkspace, workspaceProps, windowProps, groupProps }) => {
-  const { encounter, formContext = 'creating' } = workspaceProps;
+  const { encounter, formContext = 'creating', onEncounterSaved } = workspaceProps;
   const { patient, patientUuid, visitContext } = getPatientAndVisitProps(windowProps, workspaceProps, groupProps);
   const showPatientBanner = useShowPatientBanner(groupProps);
 
@@ -37,6 +39,7 @@ const VisitNotesFormWorkspace: React.FC<
       visitContext={visitContext}
       closeWorkspace={closeWorkspace}
       showPatientBanner={showPatientBanner}
+      onEncounterSaved={onEncounterSaved}
     />
   );
 };

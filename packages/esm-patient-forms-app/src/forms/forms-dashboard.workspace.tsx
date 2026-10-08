@@ -49,7 +49,6 @@ const FormsDashboardWorkspace: React.FC<
         <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
       )}
       <div className={styles.container}>
-        <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
         <FormsDashboard {...{ patient, visitContext, handleFormOpen }} />
       </div>
     </Workspace2>

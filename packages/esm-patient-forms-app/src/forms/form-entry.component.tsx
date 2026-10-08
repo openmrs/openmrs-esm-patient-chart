@@ -189,7 +189,6 @@ const FormEntry: React.FC<FormEntryProps> = ({
             onClick={() => closeWorkspace()}
           />
         )}
-        <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
         {showFormAndLoadedData &&
           (isHtmlForm ? (
             <HtmlFormEntryWrapper
