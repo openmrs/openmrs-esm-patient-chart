@@ -5308,7 +5308,7 @@ __metadata:
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 11.x
-    "@openmrs/esm-patient-common-lib": 12.x
+    "@openmrs/esm-patient-common-lib": 13.x
     dayjs: 1.x
     react: 18.x
     react-dom: 18.x
@@ -5460,7 +5460,7 @@ __metadata:
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 11.x
-    "@openmrs/esm-patient-common-lib": 12.x
+    "@openmrs/esm-patient-common-lib": 13.x
     dayjs: 1.x
     react: 18.x
     react-dom: 18.x
@@ -5505,7 +5505,7 @@ __metadata:
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 11.x
-    "@openmrs/esm-patient-common-lib": 12.x
+    "@openmrs/esm-patient-common-lib": 13.x
     dayjs: 1.x
     react: 18.x
     react-dom: 18.x
@@ -5530,7 +5530,7 @@ __metadata:
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 11.x
-    "@openmrs/esm-patient-common-lib": 12.x
+    "@openmrs/esm-patient-common-lib": 13.x
     dayjs: 1.x
     react: 18.x
     react-dom: 18.x
@@ -5552,7 +5552,7 @@ __metadata:
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 11.x
-    "@openmrs/esm-patient-common-lib": 12.x
+    "@openmrs/esm-patient-common-lib": 13.x
     dayjs: 1.x
     react: 18.x
     react-dom: 18.x
@@ -5673,7 +5673,7 @@ __metadata:
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 11.x
-    "@openmrs/esm-patient-common-lib": 12.x
+    "@openmrs/esm-patient-common-lib": 13.x
     dayjs: 1.x
     react: 18.x
     react-dom: 18.x
@@ -5695,7 +5695,7 @@ __metadata:
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 11.x
-    "@openmrs/esm-patient-common-lib": 12.x
+    "@openmrs/esm-patient-common-lib": 13.x
     dayjs: 1.x
     react: 18.x
     react-dom: 18.x
@@ -5719,7 +5719,7 @@ __metadata:
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 11.x
-    "@openmrs/esm-patient-common-lib": 12.x
+    "@openmrs/esm-patient-common-lib": 13.x
     dayjs: 1.x
     react: 18.x
     react-dom: 18.x
@@ -5743,7 +5743,7 @@ __metadata:
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 11.x
-    "@openmrs/esm-patient-common-lib": 12.x
+    "@openmrs/esm-patient-common-lib": 13.x
     dayjs: 1.x
     react: 18.x
     react-dom: 18.x
@@ -5769,7 +5769,7 @@ __metadata:
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 11.x
-    "@openmrs/esm-patient-common-lib": 12.x
+    "@openmrs/esm-patient-common-lib": 13.x
     dayjs: 1.x
     react: 18.x
     react-dom: 18.x
@@ -5808,7 +5808,7 @@ __metadata:
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 11.x
-    "@openmrs/esm-patient-common-lib": 12.x
+    "@openmrs/esm-patient-common-lib": 13.x
     dayjs: 1.x
     react: 18.x
     react-dom: 18.x
@@ -5831,7 +5831,7 @@ __metadata:
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 11.x
-    "@openmrs/esm-patient-common-lib": 12.x
+    "@openmrs/esm-patient-common-lib": 13.x
     dayjs: 1.x
     react: 18.x
     react-dom: 18.x
@@ -5855,7 +5855,7 @@ __metadata:
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 11.x
-    "@openmrs/esm-patient-common-lib": 12.x
+    "@openmrs/esm-patient-common-lib": 13.x
     dayjs: 1.x
     react: 18.x
     react-dom: 18.x
@@ -5878,7 +5878,7 @@ __metadata:
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 11.x
-    "@openmrs/esm-patient-common-lib": 12.x
+    "@openmrs/esm-patient-common-lib": 13.x
     dayjs: 1.x
     react: 18.x
     react-dom: 18.x
@@ -5903,7 +5903,7 @@ __metadata:
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 11.x
-    "@openmrs/esm-patient-common-lib": 12.x
+    "@openmrs/esm-patient-common-lib": 13.x
     dayjs: 1.x
     react: 18.x
     react-dom: 18.x
@@ -5926,7 +5926,7 @@ __metadata:
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 11.x
-    "@openmrs/esm-patient-common-lib": 12.x
+    "@openmrs/esm-patient-common-lib": 13.x
     dayjs: 1.x
     react: 18.x
     react-dom: 18.x
@@ -5951,7 +5951,7 @@ __metadata:
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 11.x
-    "@openmrs/esm-patient-common-lib": 12.x
+    "@openmrs/esm-patient-common-lib": 13.x
     dayjs: 1.x
     react: 18.x
     react-dom: 18.x
@@ -5975,7 +5975,7 @@ __metadata:
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 11.x
-    "@openmrs/esm-patient-common-lib": 12.x
+    "@openmrs/esm-patient-common-lib": 13.x
     react: 18.x
     react-dom: 18.x
     react-i18next: 16.x
@@ -5997,7 +5997,7 @@ __metadata:
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 11.x
-    "@openmrs/esm-patient-common-lib": 12.x
+    "@openmrs/esm-patient-common-lib": 13.x
     dayjs: 1.x
     react: 18.x
     react-dom: 18.x
