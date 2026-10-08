@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import classnames from 'classnames';
-import dayjs from 'dayjs';
 import { debounce } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
@@ -28,11 +27,11 @@ import {
   createAttachment,
   createErrorHandler,
   ExtensionSlot,
-  OpenmrsDatePicker,
   ResponsiveWrapper,
   restBaseUrl,
   showModal,
   showSnackbar,
+  toOmrsIsoString,
   useConfig,
   useLayoutType,
   useSession,
@@ -42,7 +41,17 @@ import {
   type Visit,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
-import { invalidateVisitAndEncounterData, useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
+import {
+  ClinicianPicker,
+  EncounterDateTimePicker,
+  getEncounterClinician,
+  invalidateVisitAndEncounterData,
+  replaceEncounterClinician,
+  resolveNewEncounterDatetime,
+  useAllowedFileExtensions,
+  useEncounterProvider,
+  type Provider,
+} from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
 import type { Concept, DiagnosisCertainty, DiagnosisPayload, VisitNotePayload } from '../types';
 import {
@@ -88,9 +97,8 @@ interface DiagnosisSearchProps {
 
 const hasPrimaryDiagnosis = (diagnoses: Array<DiagnosisDraft>) => diagnoses.some((diagnosis) => diagnosis.rank === 1);
 
-const createSchema = (t: TFunction, isEditing: boolean, isPrimaryDiagnosisRequired: boolean) => {
+const createSchema = (t: TFunction, isPrimaryDiagnosisRequired: boolean) => {
   return z.object({
-    noteDate: isEditing ? z.date() : z.date().optional(),
     diagnosisSearch: z.string().optional(),
     diagnoses: z
       .array(z.custom<DiagnosisDraft>())
@@ -183,8 +191,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     isLoadingAllowedFileExtensions || Boolean(allowedFileExtensionsError) || allowedImageExtensions.length === 0;
 
   const visitNoteFormSchema = useMemo(
-    () => createSchema(t, isEditing, isPrimaryDiagnosisRequired),
-    [t, isEditing, isPrimaryDiagnosisRequired],
+    () => createSchema(t, isPrimaryDiagnosisRequired),
+    [t, isPrimaryDiagnosisRequired],
   );
 
   const [initialDiagnoses] = useState(() => toDiagnosisDrafts(encounter, patientUuid));
@@ -204,7 +212,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       removedImageIds: [],
       diagnosisSearch: '',
       diagnoses: initialDiagnoses,
-      noteDate: isEditing ? new Date(encounter.encounterDatetime) : new Date(),
       clinicalNote: isEditing
         ? String(encounter?.obs?.find((obs) => obs.concept.uuid === encounterNoteTextConceptUuid)?.value || '')
         : '',
@@ -232,7 +239,30 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   );
 
   const locationUuid = session?.sessionLocation?.uuid;
-  const providerUuid = session?.currentProvider?.uuid;
+
+  // `null` means "now": the server stamps the encounter. When editing, the existing datetime is kept unless changed.
+  const initialEncounterDatetime = useMemo(
+    () => (isEditing && encounter?.encounterDatetime ? new Date(encounter.encounterDatetime) : null),
+    [isEditing, encounter?.encounterDatetime],
+  );
+  const [encounterDatetime, setEncounterDatetime] = useState<Date | null>(initialEncounterDatetime);
+  const [encounterDatetimeError, setEncounterDatetimeError] = useState<string | undefined>();
+
+  const initialProvider = useMemo<Provider | null>(() => {
+    if (!isEditing) {
+      return null;
+    }
+    return getEncounterClinician(encounter?.encounterProviders, clinicianEncounterRole);
+  }, [isEditing, encounter?.encounterProviders, clinicianEncounterRole]);
+  const {
+    provider: clinician,
+    setProvider: setClinician,
+    hasChanged: hasClinicianChanged,
+  } = useEncounterProvider({
+    providerRoles: config.providerRoles,
+    initialProvider,
+    encounterRoleUuid: clinicianEncounterRole,
+  });
 
   const debouncedSearch = useMemo(
     () =>
@@ -385,34 +415,38 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     });
   };
 
+  // The datetime and clinician are not react-hook-form fields, so they are never part of `dirtyFields`
+  const hasDatetimeChanged = encounterDatetime?.getTime() !== initialEncounterDatetime?.getTime();
+
   const onSubmit = useCallback(
     (data: VisitNotesFormData) => {
-      const { noteDate, clinicalNote, images, removedImageIds, diagnoses } = data;
+      const { clinicalNote, images, removedImageIds, diagnoses } = data;
       setSaveError(undefined);
 
-      let finalNoteDate = dayjs(noteDate);
-      const now = new Date();
+      // Only send the datetime when the user chose one (and, when editing, changed it); otherwise the server
+      // stamps new encounters and existing ones keep their datetime.
+      // A new note of a past visit must be dated within the visit; the server would stamp "now"
+      const datetimeToSend = isEditing
+        ? hasDatetimeChanged
+          ? encounterDatetime
+          : null
+        : resolveNewEncounterDatetime(encounterDatetime, visitContext);
 
-      // The datepicker is only shown when editing a note. When creating one, noteDate defaults to new Date().
-      // This always falls within the 30-minute window, so encounterDatetime is intentionally
-      // omitted from the payload -> letting the server attach the correct timestamp.
-      if (finalNoteDate.diff(now, 'minute') <= 30) {
-        finalNoteDate = null;
-      }
+      // When editing, the clinician is replaced separately after the save (see `replaceEncounterClinician`),
+      // as posting `encounterProviders` to an existing encounter would only add to its providers
+      const encounterProviders =
+        clinician?.uuid && !isEditing
+          ? [{ encounterRole: clinicianEncounterRole, provider: clinician.uuid }]
+          : undefined;
 
       const existingClinicalNoteObs = encounter?.obs?.find((obs) => obs.concept.uuid === encounterNoteTextConceptUuid);
 
       const visitNotePayload: VisitNotePayload = {
-        encounterDatetime: finalNoteDate?.format(),
+        ...(datetimeToSend && { encounterDatetime: toOmrsIsoString(datetimeToSend) }),
         form: formConceptUuid,
         patient: patientUuid,
         location: locationUuid,
-        encounterProviders: [
-          {
-            encounterRole: clinicianEncounterRole,
-            provider: providerUuid,
-          },
-        ],
+        ...(encounterProviders && { encounterProviders }),
         encounterType: encounterTypeUuid,
         obs: clinicalNote
           ? [
@@ -449,6 +483,12 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
               return encounterUuid;
             }
+          })
+          .then(async (encounterUuid) => {
+            if (isEditing && hasClinicianChanged && clinician?.uuid) {
+              await replaceEncounterClinician(abortController, encounter.uuid, clinician.uuid, clinicianEncounterRole);
+            }
+            return encounterUuid;
           })
           .then((encounterUuid) =>
             Promise.all(
@@ -508,7 +548,12 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                 },
               );
             }
-            if (!isEditing || Object.keys(dirtyFields).some((field) => field !== 'removedImageIds')) {
+            if (
+              !isEditing ||
+              hasDatetimeChanged ||
+              hasClinicianChanged ||
+              Object.keys(dirtyFields).some((field) => field !== 'removedImageIds')
+            ) {
               noteSaveAttempted = true;
               return await saveNote();
             }
@@ -577,9 +622,13 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       dirtyFields,
       getValues,
       setValue,
-      visitContext?.uuid,
+      visitContext,
+      clinician?.uuid,
       clinicianEncounterRole,
       closeWorkspace,
+      encounterDatetime,
+      hasClinicianChanged,
+      hasDatetimeChanged,
       encounter?.diagnoses,
       encounter?.uuid,
       encounter?.obs,
@@ -593,7 +642,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       mutateVisitNotes,
       onEncounterSaved,
       patientUuid,
-      providerUuid,
       t,
     ],
   );
@@ -615,7 +663,10 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     [getValues],
   );
 
-  const hasUserUnsavedChanges = Object.keys(dirtyFields).length > 0;
+  const hasUserUnsavedChanges =
+    Object.keys(dirtyFields).length > 0 ||
+    encounterDatetime?.getTime() !== initialEncounterDatetime?.getTime() ||
+    hasClinicianChanged;
 
   // Show a live warning, escalating to an error after a blocked save.
   const showPrimaryRequiredWarning =
@@ -643,35 +694,22 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                 {isEditing ? t('editVisitNote', 'Edit visit note') : t('addVisitNote', 'Add visit note')}
               </h2>
             ) : null}
-            {isEditing && (
-              <Row className={styles.row}>
-                <Column sm={1}>
-                  <span className={styles.columnLabel}>{t('date', 'Date')}</span>
-                </Column>
-                <Column sm={3}>
-                  <Controller
-                    name="noteDate"
-                    control={control}
-                    render={({ field, fieldState }) => {
-                      return (
-                        <ResponsiveWrapper>
-                          <OpenmrsDatePicker
-                            {...field}
-                            data-testid="visitDateTimePicker"
-                            id="visitDateTimePicker"
-                            invalid={Boolean(fieldState?.error?.message)}
-                            invalidText={fieldState?.error?.message}
-                            isDisabled={isEditing}
-                            labelText={t('visitDate', 'Visit date')}
-                            maxDate={new Date()}
-                          />
-                        </ResponsiveWrapper>
-                      );
-                    }}
-                  />
-                </Column>
-              </Row>
-            )}
+            <EncounterDateTimePicker
+              id="visit-note"
+              dateLabel={t('visitNoteDate', 'Visit note date')}
+              timingLabel={t('thisVisitNoteIs', 'This visit note is')}
+              allowNow={initialEncounterDatetime === null}
+              visit={visitContext}
+              value={encounterDatetime}
+              onChange={setEncounterDatetime}
+              onValidityChange={setEncounterDatetimeError}
+            />
+            <ClinicianPicker
+              id="visit-note"
+              value={clinician}
+              onChange={setClinician}
+              providerRoles={config.providerRoles}
+            />
             <Row className={styles.row}>
               <Column sm={1}>
                 <span className={styles.columnLabel}>
@@ -921,7 +959,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
           <Button
             className={styles.button}
             kind="primary"
-            disabled={!hasUserUnsavedChanges || isSubmitting}
+            disabled={!hasUserUnsavedChanges || isSubmitting || Boolean(encounterDatetimeError)}
             type="submit"
           >
             {isSubmitting ? (

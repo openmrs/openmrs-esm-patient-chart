@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useSWR, { useSWRConfig } from 'swr';
 import {
@@ -11,9 +11,15 @@ import {
   type Encounter,
 } from '@openmrs/esm-framework';
 import {
+  ClinicianPicker,
+  EncounterDateTimePicker,
   type Form,
   type FormRendererProps,
+  getEncounterClinician,
   invalidateVisitAndEncounterData,
+  type Provider,
+  useClinicianEncounterRole,
+  useEncounterProvider,
   WorkspaceBackButton,
 } from '@openmrs/esm-patient-common-lib';
 import { type FormEntryConfigSchema } from '../config-schema';
@@ -21,7 +27,17 @@ import { toHtmlForm } from './form-entry.resources';
 import { useForms } from '../hooks/use-forms';
 import HtmlFormEntryWrapper from '../htmlformentry/html-form-entry-wrapper.component';
 
-const encounterVisitRep = 'custom:(visit:(uuid,startDatetime,stopDatetime,visitType:(uuid,name)))';
+const encounterVisitRep =
+  'custom:(encounterDatetime,encounterProviders:(encounterRole:(uuid),provider:(uuid,display,person:(display))),visit:(uuid,startDatetime,stopDatetime,visitType:(uuid,name)))';
+
+interface EncounterDetails {
+  encounterDatetime?: string;
+  encounterProviders?: Array<{
+    encounterRole?: { uuid: string };
+    provider?: { uuid: string; display?: string; person?: { display?: string } };
+  }>;
+  visit: FormEntryProps['visitContext'];
+}
 
 export interface FormEntryProps {
   form: Form;
@@ -57,10 +73,10 @@ const FormEntry: React.FC<FormEntryProps> = ({
 
   // When editing an existing encounter, fetch the encounter's own visit
   // so we use the correct visit context instead of the active visit.
-  const { data: encounterData, isLoading: isLoadingEncounterVisit } = useSWR<
-    FetchResponse<{ visit: FormEntryProps['visitContext'] }>,
-    Error
-  >(encounterUuid ? `/ws/rest/v1/encounter/${encounterUuid}?v=${encounterVisitRep}` : null, openmrsFetch);
+  const { data: encounterData, isLoading: isLoadingEncounterVisit } = useSWR<FetchResponse<EncounterDetails>, Error>(
+    encounterUuid ? `/ws/rest/v1/encounter/${encounterUuid}?v=${encounterVisitRep}` : null,
+    openmrsFetch,
+  );
   const encounterVisit = encounterData?.data?.visit ?? null;
 
   // For new encounters, use the active visit context.
@@ -84,6 +100,24 @@ const FormEntry: React.FC<FormEntryProps> = ({
 
   const { mutateForms } = useForms(patientUuid, visitUuid);
 
+  // `null` means "now": the server stamps new encounters. When editing, the existing datetime is kept unless changed.
+  const initialEncounterDatetime = useMemo(
+    () => (encounterData?.data?.encounterDatetime ? new Date(encounterData.data.encounterDatetime) : null),
+    [encounterData?.data?.encounterDatetime],
+  );
+  const [encounterDatetime, setEncounterDatetime] = useState<Date | null>(initialEncounterDatetime);
+  const [encounterDatetimeError, setEncounterDatetimeError] = useState<string | undefined>();
+  useEffect(() => {
+    setEncounterDatetime(initialEncounterDatetime);
+  }, [initialEncounterDatetime]);
+
+  const clinicianEncounterRole = useClinicianEncounterRole();
+  const initialProvider = useMemo<Provider | null>(
+    () => getEncounterClinician(encounterData?.data?.encounterProviders, clinicianEncounterRole),
+    [encounterData?.data?.encounterProviders, clinicianEncounterRole],
+  );
+  const { provider: clinician, setProvider: setClinician } = useEncounterProvider({ initialProvider });
+
   const state = useMemo(
     () => ({
       view: 'form',
@@ -101,6 +135,10 @@ const FormEntry: React.FC<FormEntryProps> = ({
       hideControls,
       hidePatientBanner,
       preFilledQuestions,
+      // The form's own encounter datetime and provider questions are replaced by the pickers above the form,
+      // which only show the options the user is allowed to use
+      encounterDatetime,
+      encounterProvider: clinician?.uuid ?? null,
       closeWorkspace: () => {
         return closeWorkspace();
       },
@@ -116,7 +154,9 @@ const FormEntry: React.FC<FormEntryProps> = ({
       setHasUnsavedChanges,
     }),
     [
+      clinician?.uuid,
       closeWorkspace,
+      encounterDatetime,
       encounterUuid,
       formUuid,
       globalMutate,
@@ -179,7 +219,20 @@ const FormEntry: React.FC<FormEntryProps> = ({
               closeWorkspaceWithSavedChanges={state.closeWorkspaceWithSavedChanges}
             />
           ) : (
-            <ExtensionSlot key={state.formUuid} name="form-widget-slot" state={state} />
+            <>
+              <EncounterDateTimePicker
+                id="clinical-form"
+                dateLabel={t('encounterDate', 'Encounter date')}
+                timingLabel={t('thisFormIs', 'This form is')}
+                allowNow={initialEncounterDatetime === null}
+                visit={effectiveVisitContext}
+                value={encounterDatetime}
+                onChange={setEncounterDatetime}
+                onValidityChange={setEncounterDatetimeError}
+              />
+              <ClinicianPicker id="clinical-form" value={clinician} onChange={setClinician} />
+              <ExtensionSlot key={state.formUuid} name="form-widget-slot" state={state} />
+            </>
           ))}
       </div>
     </Workspace2>
