@@ -91,6 +91,31 @@ export const configSchema = {
     _description: 'Maximum number of pinned drug orders per user',
     _validators: [validators.inRange(1, 50)],
   },
+  enableDrugOrderSuggestions: {
+    _type: Type.Boolean,
+    _default: true,
+    _description:
+      'Whether to suggest drugs for pinning, based on the drugs the logged-in provider has ordered most often in the recent past. Requires drug order favorites to be enabled.',
+  },
+  drugOrderSuggestionsWindowInDays: {
+    _type: Type.Number,
+    _default: 90,
+    _description: "How many days of the provider's ordering history to consider when suggesting drugs to pin",
+    _validators: [validators.inRange(1, 365)],
+  },
+  maxDrugOrderSuggestions: {
+    _type: Type.Number,
+    _default: 3,
+    _description: 'Maximum number of drug suggestions shown at once',
+    _validators: [validators.inRange(1, 3)],
+  },
+  minOrderCountForSuggestion: {
+    _type: Type.Number,
+    _default: 3,
+    _description:
+      'Minimum number of times the provider must have ordered a drug within the window for it to be suggested',
+    _validators: [validators.inRange(1, 100)],
+  },
 };
 
 export interface OrderTypeDefinition {
@@ -112,4 +137,8 @@ export interface ConfigObject {
   orderLocationTagName: string;
   enableDrugOrderFavorites: boolean;
   maxPinnedDrugOrders: number;
+  enableDrugOrderSuggestions: boolean;
+  drugOrderSuggestionsWindowInDays: number;
+  maxDrugOrderSuggestions: number;
+  minOrderCountForSuggestion: number;
 }
