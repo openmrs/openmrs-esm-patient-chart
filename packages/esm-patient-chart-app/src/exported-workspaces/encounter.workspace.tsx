@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { InlineNotification } from '@carbon/react';
 import {
   type Encounter,
   ExtensionSlot,
@@ -11,6 +13,7 @@ import {
   encounterWorkspaceSlotName,
   type EncounterWorkspaceSlotState,
   type PatientWorkspaceWindowProps,
+  useEncounterPrivileges,
 } from '@openmrs/esm-patient-common-lib';
 import VisitContextHeader from '../visit/visits-widget/visit-context/visit-context-header.extension';
 import styles from './encounter.workspace.scss';
@@ -29,6 +32,8 @@ const EncounterWorkspace: React.FC<Workspace2DefinitionProps<{}, WindowProps, {}
   windowProps: { patient, patientUuid, visitContext, encounter, onEncounterSaved, additionalProps },
   closeWorkspace,
 }) => {
+  const { t } = useTranslation();
+  const { canEditPastVisits } = useEncounterPrivileges();
   const { workspaceMeta } = useWorkspace2Context();
   const workspaceType = workspaceMeta?.type as string | undefined;
 
@@ -60,6 +65,8 @@ const EncounterWorkspace: React.FC<Workspace2DefinitionProps<{}, WindowProps, {}
   );
 
   const isEditing = !!encounter;
+  // Without the privilege, only the current active visit and its encounters can be edited
+  const isPastVisitLocked = Boolean(visitContext?.stopDatetime) && !canEditPastVisits;
 
   return (
     <Workspace2
@@ -72,7 +79,20 @@ const EncounterWorkspace: React.FC<Workspace2DefinitionProps<{}, WindowProps, {}
         </div>
         <div className={styles.content}>
           {/* TODO(O3-6087): show a message when no extension renders content for this encounter. */}
-          <ExtensionSlot name={encounterWorkspaceSlotName} state={slotState} />
+          {isPastVisitLocked ? (
+            <InlineNotification
+              kind="warning"
+              lowContrast
+              hideCloseButton
+              title={t('cannotEditPastVisit', 'You cannot edit past visits')}
+              subtitle={t(
+                'cannotEditPastVisitSubtitle',
+                'You do not have the privilege to add or edit encounters of a visit that has ended.',
+              )}
+            />
+          ) : (
+            <ExtensionSlot name={encounterWorkspaceSlotName} state={slotState} />
+          )}
         </div>
       </div>
     </Workspace2>

@@ -7,7 +7,6 @@ import {
   type OpenmrsResource,
   restBaseUrl,
   useConfig,
-  useOpenmrsFetchAll,
   type Visit,
 } from '@openmrs/esm-framework';
 import { useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
@@ -62,24 +61,4 @@ export function useOrderEncounterForSystemWithVisitDisabled(patientUuid: string)
     };
   }, [isLoadingSystemVisitSetting, errorFetchingSystemVisitSetting, todayEncounter, systemVisitEnabled]);
   return results;
-}
-
-export interface Provider {
-  uuid: string;
-  person: {
-    display?: string;
-  };
-}
-
-export function useProviders(providerRoles: Array<string>) {
-  const rep = 'custom:(uuid,person:(display)';
-  const { data, ...rest } = useOpenmrsFetchAll<Provider>(
-    providerRoles != null ? `${restBaseUrl}/provider?providerRoles=${providerRoles.join(',')}&v=${rep})` : null,
-  );
-
-  const providers = useMemo(() => {
-    return data?.sort((a, b) => (a.person?.display ?? '').localeCompare(b.person?.display ?? ''));
-  }, [data]);
-
-  return { providers, ...rest };
 }

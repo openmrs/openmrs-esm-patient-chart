@@ -9,13 +9,14 @@ import {
   userHasAccess,
   type Visit,
 } from '@openmrs/esm-framework';
-import { invalidateVisitAndEncounterData } from '@openmrs/esm-patient-common-lib';
+import { invalidateVisitAndEncounterData, PRIVILEGE_EDIT_PAST_VISITS } from '@openmrs/esm-patient-common-lib';
 import { type ChartConfig } from '../../../../config-schema';
 import { deleteEncounter, type MappedEncounter } from './encounters-table.resource';
 
 /**
  * An encounter can be modified by users holding its edit privilege, but only while it is within the
  * configured editable window, unless they hold one of the privileges that overrides that window.
+ * Encounters of past (ended) visits additionally require the privilege to edit past visits.
  */
 export function canModifyEncounter(
   encounter: MappedEncounter,
@@ -26,6 +27,10 @@ export function canModifyEncounter(
   }: Pick<ChartConfig, 'encounterEditableDuration' | 'encounterEditableDurationOverridePrivileges'>,
 ): boolean {
   if (!userHasAccess(encounter.editPrivilege, user)) {
+    return false;
+  }
+
+  if (encounter.visitStopDatetime && !userHasAccess(PRIVILEGE_EDIT_PAST_VISITS, user)) {
     return false;
   }
 
