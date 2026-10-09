@@ -17,11 +17,6 @@ vi.mock('../api/api', () => ({
     error: null,
     mutate: vi.fn(),
   }),
-  useProviders: vi.fn().mockReturnValue({
-    providers: [],
-    isLoading: false,
-    error: null,
-  }),
 }));
 
 vi.mock('@openmrs/esm-patient-common-lib', async () => ({

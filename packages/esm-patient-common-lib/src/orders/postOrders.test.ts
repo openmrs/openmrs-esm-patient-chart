@@ -150,6 +150,34 @@ describe('postOrdersOnNewEncounter', () => {
     expectOrdersActivatedAtOrAfterEncounter(body);
   });
 
+  it('uses the user-chosen (backdated) encounter datetime in an open visit and dates "start now" orders at it', async () => {
+    seedBasket([{ action: 'NEW' }, { action: 'NEW', dateActivated: '2026-05-10T08:00:00.000Z' }]);
+    const chosen = new Date('2026-05-12T09:30:00.000Z');
+
+    await postOrdersOnNewEncounter(patientUuid, encounterType, openVisit, locationUuid, ordererUuid, undefined, {
+      encounterDatetime: chosen,
+    });
+    const body = vi.mocked(openmrsFetch).mock.calls[0][1].body as EncounterPost;
+
+    expect(body.encounterDatetime).toEqual(chosen);
+    // "start now" orders belong at the encounter's datetime, and earlier explicit dates are raised to it
+    expect(body.orders[0].dateActivated).toBe(toOmrsIsoString(chosen));
+    expect(body.orders[1].dateActivated).toBe(toOmrsIsoString(chosen));
+    expectOrdersActivatedAtOrAfterEncounter(body);
+  });
+
+  it('sends the encounter providers when placing the encounter on behalf of another clinician', async () => {
+    seedBasket([{ action: 'NEW' }]);
+    const encounterProviders = [{ provider: 'other-provider-uuid', encounterRole: 'role-uuid' }];
+
+    await postOrdersOnNewEncounter(patientUuid, encounterType, openVisit, locationUuid, ordererUuid, undefined, {
+      encounterProviders,
+    });
+    const body = vi.mocked(openmrsFetch).mock.calls[0][1].body as EncounterPost;
+
+    expect(body.encounterProviders).toEqual(encounterProviders);
+  });
+
   it('throws with the offending value when an order carries an invalid dateActivated', async () => {
     seedBasket([{ action: 'NEW', dateActivated: 'not-a-date' }]);
 

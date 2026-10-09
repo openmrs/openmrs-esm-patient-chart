@@ -10,7 +10,7 @@ import {
   useLayoutType,
 } from '@openmrs/esm-framework';
 import { type VisitFormProps, type VisitFormWindowProps } from '../visit-form/visit-form.workspace';
-import { type PatientWorkspaceGroupProps } from '@openmrs/esm-patient-common-lib';
+import { type PatientWorkspaceGroupProps, useEncounterPrivileges } from '@openmrs/esm-patient-common-lib';
 
 interface EditVisitDetailsActionItemProps {
   visit: Visit;
@@ -28,6 +28,7 @@ interface EditVisitDetailsActionItemProps {
 const EditVisitDetailsActionItem: React.FC<EditVisitDetailsActionItemProps> = ({ visit, patient, compact }) => {
   const { t } = useTranslation();
 
+  const { canEditPastVisits } = useEncounterPrivileges();
   const isTablet = useLayoutType() === 'tablet';
   const responsiveSize = isTablet ? 'lg' : 'sm';
   const patientUuid = patient.id;
@@ -42,6 +43,11 @@ const EditVisitDetailsActionItem: React.FC<EditVisitDetailsActionItemProps> = ({
       { patient, patientUuid, activeVisit: visit },
     );
   };
+
+  // Past visits can only be modified by users who may edit past visits
+  if (visit?.stopDatetime && !canEditPastVisits) {
+    return null;
+  }
 
   return (
     <UserHasAccess privilege="Edit Visits">

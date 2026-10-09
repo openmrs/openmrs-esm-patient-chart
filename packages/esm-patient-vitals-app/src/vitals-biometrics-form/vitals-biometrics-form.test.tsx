@@ -7,6 +7,8 @@ import {
   showSnackbar,
   useConfig,
   getDefaultsFromConfigSchema,
+  type Visit,
+  userHasAccess,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { type PatientWorkspaceWindowProps } from '@openmrs/esm-patient-common-lib';
@@ -293,6 +295,8 @@ describe('VitalsBiometricsForm', () => {
         },
         abort: expect.any(Function),
       }),
+      // the encounter datetime and clinician were not changed, so they are left to the server
+      { encounterDatetime: null, encounterProviders: undefined, visitUuid: undefined },
     );
 
     expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
@@ -304,6 +308,34 @@ describe('VitalsBiometricsForm', () => {
         title: 'Vitals and Biometrics saved',
       }),
     );
+  });
+
+  it('dates a new encounter within a past visit and attaches it to that visit', async () => {
+    const user = userEvent.setup();
+    mockCreateOrUpdateVitalsAndBiometrics.mockResolvedValue({ status: 201 } as Awaited<
+      ReturnType<typeof createOrUpdateVitalsAndBiometrics>
+    >);
+    const pastVisit = {
+      uuid: 'past-visit-uuid',
+      startDatetime: '2024-03-01T08:00:00.000+0000',
+      stopDatetime: '2024-03-02T08:00:00.000+0000',
+    } as Visit;
+    vi.mocked(userHasAccess).mockReturnValue(true);
+
+    render(
+      <VitalsAndBiometricsForm
+        {...defaultProps}
+        windowProps={{ ...defaultProps.windowProps, visitContext: pastVisit }}
+      />,
+    );
+
+    await user.type(screen.getByRole('spinbutton', { name: /pulse/i }), '70');
+    await user.click(screen.getByRole('button', { name: /Save and close/i }));
+
+    expect(mockCreateOrUpdateVitalsAndBiometrics).toHaveBeenCalledTimes(1);
+    const options = mockCreateOrUpdateVitalsAndBiometrics.mock.calls[0][6];
+    expect(options.visitUuid).toBe('past-visit-uuid');
+    expect(options.encounterDatetime).toEqual(new Date('2024-03-01T08:00:00.000Z'));
   });
 
   it('correctly initializes the form with existing vitals and biometrics data while in edit mode', async () => {
@@ -380,6 +412,8 @@ describe('VitalsBiometricsForm', () => {
         },
         abort: expect.any(Function),
       }),
+      // the encounter datetime and clinician were not changed, so they are left to the server
+      { encounterDatetime: null, encounterProviders: undefined, visitUuid: undefined },
     );
 
     expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
