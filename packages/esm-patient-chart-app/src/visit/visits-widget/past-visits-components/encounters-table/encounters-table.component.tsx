@@ -73,6 +73,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   canPrintEncounters,
   onEncounterSaved,
   patient,
+  openedFrom,
 }) => {
   const { t } = useTranslation();
   const pageSizes = [10, 20, 30, 40, 50];
@@ -257,6 +258,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                           encounter: encounter.encounter,
                                           visitContext: encounter.encounter.visit,
                                           onEncounterSaved,
+                                          openedFrom,
                                         })
                                       }
                                     />
@@ -321,6 +323,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                         encounter: encounter.encounter,
                                         visitContext: encounter.encounter.visit,
                                         onEncounterSaved,
+                                        openedFrom,
                                       })
                                     }
                                     renderIcon={(props: ComponentProps<typeof EditIcon>) => (

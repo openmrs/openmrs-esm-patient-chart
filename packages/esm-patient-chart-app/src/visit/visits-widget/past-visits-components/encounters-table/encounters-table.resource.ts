@@ -39,6 +39,11 @@ export interface EncountersTableProps {
   onEncounterSaved?: (encounter?: Encounter) => void;
   /** The patient these encounters belong to */
   patient: fhir.Patient;
+  /**
+   * Where this table is rendered from. When `'RDE'`, the edit action opens the RDE page's own copy of
+   * the encounter workspace instead of the chart's. See `rdeOpenedFrom` in `constants.ts`.
+   */
+  openedFrom?: string;
 }
 
 export interface MappedEncounter {

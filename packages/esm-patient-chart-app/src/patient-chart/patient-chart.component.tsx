@@ -15,7 +15,11 @@ const PatientChart: React.FC = () => {
 
   // specify key to ensure that WrapPatientChart instance is re-created
   // when we switch patient
-  return <WrappedPatientChart key={patientUuid} patientUuid={patientUuid} encodedView={encodedView} />;
+  return (
+    <div key={patientUuid} className={styles.patientChartWrapper}>
+      <WrappedPatientChart patientUuid={patientUuid} encodedView={encodedView} />
+    </div>
+  );
 };
 
 interface WrappedPatientChartProps {

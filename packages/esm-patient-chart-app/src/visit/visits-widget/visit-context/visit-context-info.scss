@@ -1,12 +1,36 @@
 @use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .visitContextInfoContainer {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  justify-items: center;
+  column-gap: layout.$spacing-03;
+  row-gap: layout.$spacing-02;
+  color: $text-02;
+  @include type.type-style('label-01');
 }
 
-.separator,
+.dateRange {
+  white-space: nowrap;
+}
+
+.locationGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: layout.$spacing-02;
+  min-width: 0;
+  // Push the location to the right edge of the row.
+  margin-inline-start: auto;
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
 .visitLocation {
-  margin: layout.$spacing-02;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

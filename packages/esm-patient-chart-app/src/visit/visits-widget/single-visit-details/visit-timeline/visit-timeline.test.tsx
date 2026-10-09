@@ -198,6 +198,33 @@ describe('VisitTimeline', () => {
     );
   });
 
+  it("launches the RDE page's own encounter workspace when editing an encounter from RDE", async () => {
+    const onEncounterSaved = vi.fn();
+    const visit = { ...mockVisit, encounters: [admissionEncounter] } as Visit;
+    renderWithSwr(
+      <VisitTimeline
+        visit={visit}
+        patient={mockFhirPatient}
+        patientUuid={mockPatientAlice.uuid}
+        onEncounterSaved={onEncounterSaved}
+        openedFrom="RDE"
+      />,
+    );
+    await clickEditEncounter();
+
+    expect(mockLaunchWorkspace).toHaveBeenCalledTimes(1);
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith(
+      'rde-encounter-workspace',
+      {},
+      expect.objectContaining({
+        patient: mockFhirPatient,
+        encounter: expect.objectContaining({ uuid: admissionEncounter.uuid }),
+        visitContext: expect.objectContaining({ uuid: mockVisit.uuid }),
+        onEncounterSaved,
+      }),
+    );
+  });
+
   it('hides the actions menu when the user lacks the privilege to edit the encounter', () => {
     const privilegedEncounter = {
       ...admissionEncounter,
