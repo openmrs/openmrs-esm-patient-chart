@@ -5,7 +5,6 @@ export interface PatientChartStore {
   patientUuid: string;
   patient: fhir.Patient;
   visitContext: Visit;
-  mutateVisitContext: () => void;
   /**
    * The uuid of the visit context the patient-chart workspace group was last launched with.
    * Note that when the visit context is changed, the workspaces group (with stale visit context)
@@ -27,7 +26,6 @@ const patientChartStore = createGlobalStore<PatientChartStore>(patientChartStore
   patientUuid: null,
   patient: null,
   visitContext: null,
-  mutateVisitContext: null,
   workspaceGroupVisitUuid: null,
   workspaceGroupProps: null,
 });
@@ -36,8 +34,8 @@ const patientChartStoreActions = {
   setPatient(_, patient: fhir.Patient) {
     return { patient, patientUuid: patient?.id ?? null };
   },
-  setVisitContext(_, visitContext: Visit, mutateVisitContext: () => void) {
-    return { visitContext, mutateVisitContext };
+  setVisitContext(_, visitContext: Visit) {
+    return { visitContext };
   },
 } satisfies Actions<PatientChartStore>;
 
@@ -87,7 +85,6 @@ export function usePatientChartStore(patientUuid: string) {
   } else {
     const fakeStore: typeof store = {
       ...store,
-      mutateVisitContext: null,
       setVisitContext: () => {},
       patient: null,
       patientUuid: null,

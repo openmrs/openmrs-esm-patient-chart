@@ -7,7 +7,6 @@ interface VisitCompletedFormsTableProps {
   patientUuid: string;
   visit: Visit;
   onEditEncounter?: EncountersTableProps['onEditEncounter'];
-  mutateVisitContext?: EncountersTableProps['mutateVisitContext'];
   patient?: EncountersTableProps['patient'];
 }
 
@@ -18,7 +17,6 @@ const VisitCompletedFormsTable: React.FC<VisitCompletedFormsTableProps> = ({
   patientUuid,
   visit,
   onEditEncounter,
-  mutateVisitContext,
   patient,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -63,7 +61,6 @@ const VisitCompletedFormsTable: React.FC<VisitCompletedFormsTableProps> = ({
     isSelectable: false,
     canPrintEncounters,
     onEditEncounter,
-    mutateVisitContext,
     patient,
   };
 

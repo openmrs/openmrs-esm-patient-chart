@@ -85,7 +85,6 @@ function renderPatientListWorkspace() {
       workspaceProps={{}}
       windowProps={{}}
       groupProps={{
-        mutateVisitContext: vi.fn(),
         patient: null,
         patientUuid: null,
         visitContext: null,

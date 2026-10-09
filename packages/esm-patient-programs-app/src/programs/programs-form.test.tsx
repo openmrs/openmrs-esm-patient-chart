@@ -44,7 +44,6 @@ const testProps: PatientWorkspace2DefinitionProps<ProgramsFormProps, {}> = {
     patientUuid: mockPatient.id,
     patient: mockPatient,
     visitContext: null,
-    mutateVisitContext: null,
   },
   workspaceName: '',
   launchChildWorkspace: vi.fn(),
