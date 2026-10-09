@@ -34,7 +34,6 @@ import {
   showModal,
   showSnackbar,
   useConfig,
-  useFeatureFlag,
   useLayoutType,
   useSession,
   Workspace2,
@@ -89,9 +88,9 @@ interface DiagnosisSearchProps {
 
 const hasPrimaryDiagnosis = (diagnoses: Array<DiagnosisDraft>) => diagnoses.some((diagnosis) => diagnosis.rank === 1);
 
-const createSchema = (t: TFunction, isRetrospectiveDataEntryEnabled: boolean, isPrimaryDiagnosisRequired: boolean) => {
+const createSchema = (t: TFunction, isEditing: boolean, isPrimaryDiagnosisRequired: boolean) => {
   return z.object({
-    noteDate: isRetrospectiveDataEntryEnabled ? z.date() : z.date().optional(),
+    noteDate: isEditing ? z.date() : z.date().optional(),
     diagnosisSearch: z.string().optional(),
     diagnoses: z
       .array(z.custom<DiagnosisDraft>())
@@ -140,6 +139,7 @@ export interface VisitNotesFormProps {
   patient: fhir.Patient;
   visitContext: Visit;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
+  onEncounterSaved?: (encounter?: Encounter) => void;
 }
 
 /**
@@ -153,13 +153,13 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   patient,
   visitContext,
   closeWorkspace,
+  onEncounterSaved,
 }) => {
   const isEditing: boolean = Boolean(formContext === 'editing' && encounter?.uuid);
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const { isPrimaryDiagnosisRequired, ...config } = useConfig<ConfigObject>();
-  const visitContextHeaderState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const memoizedState = useMemo(() => ({ patientUuid, patient }), [patientUuid, patient]);
   const { clinicianEncounterRole, encounterNoteTextConceptUuid, encounterTypeUuid, formConceptUuid } =
     config.visitNoteConfig;
@@ -181,11 +181,10 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   }, [allowedFileExtensions]);
   const isImageCaptureDisabled =
     isLoadingAllowedFileExtensions || Boolean(allowedFileExtensionsError) || allowedImageExtensions.length === 0;
-  const isRetrospectiveDataEntryEnabled = useFeatureFlag('rde');
 
   const visitNoteFormSchema = useMemo(
-    () => createSchema(t, isRetrospectiveDataEntryEnabled, isPrimaryDiagnosisRequired),
-    [t, isRetrospectiveDataEntryEnabled, isPrimaryDiagnosisRequired],
+    () => createSchema(t, isEditing, isPrimaryDiagnosisRequired),
+    [t, isEditing, isPrimaryDiagnosisRequired],
   );
 
   const [initialDiagnoses] = useState(() => toDiagnosisDrafts(encounter, patientUuid));
@@ -394,7 +393,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       let finalNoteDate = dayjs(noteDate);
       const now = new Date();
 
-      // When RDE is off, the datepicker is hidden and noteDate defaults to new Date().
+      // The datepicker is only shown when editing a note. When creating one, noteDate defaults to new Date().
       // This always falls within the 30-minute window, so encounterDatetime is intentionally
       // omitted from the payload -> letting the server attach the correct timestamp.
       if (finalNoteDate.diff(now, 'minute') <= 30) {
@@ -524,6 +523,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
           }
         })
         .then((failedUploads = []) => {
+          onEncounterSaved?.();
           closeWorkspace({ discardUnsavedChanges: true });
 
           if (failedUploads.length) {
@@ -591,6 +591,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       locationUuid,
       mutateAttachments,
       mutateVisitNotes,
+      onEncounterSaved,
       patientUuid,
       providerUuid,
       t,
@@ -629,8 +630,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       hasUnsavedChanges={hasUserUnsavedChanges}
     >
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
-        <ExtensionSlot name="visit-context-header-slot" state={visitContextHeaderState} />
-
         {isTablet && (
           <Row className={styles.headerGridRow}>
             <ExtensionSlot name="visit-form-header-slot" className={styles.dataGridRow} state={memoizedState} />
@@ -644,7 +643,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                 {isEditing ? t('editVisitNote', 'Edit visit note') : t('addVisitNote', 'Add visit note')}
               </h2>
             ) : null}
-            {isRetrospectiveDataEntryEnabled && (
+            {isEditing && (
               <Row className={styles.row}>
                 <Column sm={1}>
                   <span className={styles.columnLabel}>{t('date', 'Date')}</span>
@@ -653,20 +652,22 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                   <Controller
                     name="noteDate"
                     control={control}
-                    render={({ field, fieldState }) => (
-                      <ResponsiveWrapper>
-                        <OpenmrsDatePicker
-                          {...field}
-                          data-testid="visitDateTimePicker"
-                          id="visitDateTimePicker"
-                          invalid={Boolean(fieldState?.error?.message)}
-                          invalidText={fieldState?.error?.message}
-                          isDisabled={isEditing}
-                          labelText={t('visitDate', 'Visit date')}
-                          maxDate={new Date()}
-                        />
-                      </ResponsiveWrapper>
-                    )}
+                    render={({ field, fieldState }) => {
+                      return (
+                        <ResponsiveWrapper>
+                          <OpenmrsDatePicker
+                            {...field}
+                            data-testid="visitDateTimePicker"
+                            id="visitDateTimePicker"
+                            invalid={Boolean(fieldState?.error?.message)}
+                            invalidText={fieldState?.error?.message}
+                            isDisabled={isEditing}
+                            labelText={t('visitDate', 'Visit date')}
+                            maxDate={new Date()}
+                          />
+                        </ResponsiveWrapper>
+                      );
+                    }}
                   />
                 </Column>
               </Row>

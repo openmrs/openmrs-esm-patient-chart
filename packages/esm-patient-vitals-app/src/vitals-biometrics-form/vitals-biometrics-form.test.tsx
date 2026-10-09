@@ -1,6 +1,6 @@
 import React from 'react';
 import { vi, describe, it, expect } from 'vitest';
-import { screen, render } from '@testing-library/react';
+import { screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
   type FetchResponse,
@@ -439,6 +439,42 @@ describe('VitalsBiometricsForm', () => {
     });
   });
 
+  it('calls onEncounterSaved once the vitals and biometrics have been saved', async () => {
+    const user = userEvent.setup();
+    const onEncounterSaved = vi.fn();
+    mockCreateOrUpdateVitalsAndBiometrics.mockResolvedValueOnce({
+      status: 201,
+      data: [],
+    } as unknown as Awaited<ReturnType<typeof createOrUpdateVitalsAndBiometrics>>);
+
+    renderVitalsAndBiometricsForm('creating', undefined, onEncounterSaved);
+    await user.type(screen.getByRole('spinbutton', { name: /pulse/i }), pulseValue.toString());
+    await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+    await waitFor(() => expect(onEncounterSaved).toHaveBeenCalledTimes(1));
+    expect(defaultProps.closeWorkspace).toHaveBeenCalledWith({ discardUnsavedChanges: true });
+  });
+
+  it('does not call onEncounterSaved when saving the vitals and biometrics fails', async () => {
+    const user = userEvent.setup();
+    const onEncounterSaved = vi.fn();
+    mockCreateOrUpdateVitalsAndBiometrics.mockRejectedValueOnce({
+      message: 'Some of the values entered are invalid',
+      response: { status: 500, statusText: 'Internal Server Error' },
+    });
+
+    renderVitalsAndBiometricsForm('creating', undefined, onEncounterSaved);
+    await user.type(screen.getByRole('spinbutton', { name: /pulse/i }), pulseValue.toString());
+    await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+    await waitFor(() =>
+      expect(mockShowSnackbar).toHaveBeenCalledWith(
+        expect.objectContaining({ title: 'Error saving Vitals and Biometrics' }),
+      ),
+    );
+    expect(onEncounterSaved).not.toHaveBeenCalled();
+  });
+
   it('hides BMI field when bmiMinimumAge is set and patient is under the minimum age', async () => {
     const minorPatient = {
       ...mockPatient,
@@ -476,13 +512,18 @@ describe('VitalsBiometricsForm', () => {
   });
 });
 
-function renderVitalsAndBiometricsForm(formContext?: 'creating' | 'editing', editEncounterUuid?: string) {
+function renderVitalsAndBiometricsForm(
+  formContext?: 'creating' | 'editing',
+  editEncounterUuid?: string,
+  onEncounterSaved?: VitalsFormWorkspaceDefinitionProps['workspaceProps']['onEncounterSaved'],
+) {
   const props: VitalsFormWorkspaceDefinitionProps = {
     ...defaultProps,
     workspaceProps: {
       ...defaultProps.workspaceProps,
       formContext: formContext ?? defaultProps.workspaceProps.formContext,
       editEncounterUuid: editEncounterUuid ?? defaultProps.workspaceProps.editEncounterUuid,
+      onEncounterSaved,
     },
   };
   return render(<VitalsAndBiometricsForm {...props} />);

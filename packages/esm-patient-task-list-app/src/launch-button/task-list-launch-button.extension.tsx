@@ -13,6 +13,7 @@ const TaskListActionButton: React.FC = () => {
         workspaceName: 'task-list',
         workspaceProps: {},
       }}
+      // disabled={(openwindows) => openwindows.some(w => w.windowName === 'encounter-window')}
     />
   );
 };

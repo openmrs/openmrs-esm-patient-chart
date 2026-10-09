@@ -6,8 +6,8 @@ import EncountersTable from './encounters-table.component';
 interface VisitCompletedFormsTableProps {
   patientUuid: string;
   visit: Visit;
-  onEditEncounter?: EncountersTableProps['onEditEncounter'];
-  patient?: EncountersTableProps['patient'];
+  patient: EncountersTableProps['patient'];
+  onEncounterSaved?: EncountersTableProps['onEncounterSaved'];
 }
 
 /**
@@ -16,8 +16,8 @@ interface VisitCompletedFormsTableProps {
 const VisitCompletedFormsTable: React.FC<VisitCompletedFormsTableProps> = ({
   patientUuid,
   visit,
-  onEditEncounter,
   patient,
+  onEncounterSaved,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -60,7 +60,7 @@ const VisitCompletedFormsTable: React.FC<VisitCompletedFormsTableProps> = ({
     setPageSize,
     isSelectable: false,
     canPrintEncounters,
-    onEditEncounter,
+    onEncounterSaved,
     patient,
   };
 

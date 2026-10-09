@@ -248,6 +248,11 @@
       "name": "patient-chart-appointments-form-workspace",
       "component": "@openmrs/esm-appointments-app#exportedAppointmentsFormWorkspace",
       "window": "patient-chart-appointment-form"
+    },
+    {
+      "name": "encounter-workspace",
+      "component": "encounterWorkspace",
+      "window": "encounter-window"
     }
   ],
   "workspaceWindows2": [
@@ -261,6 +266,11 @@
     },
     {
       "name": "patient-chart-appointment-form",
+      "group": "patient-chart"
+    },
+    {
+      "name": "encounter-window",
+      "icon": "encounterActionButton",
       "group": "patient-chart"
     }
   ],

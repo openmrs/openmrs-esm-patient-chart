@@ -17,13 +17,12 @@ import {
   useSession,
   type Visit,
 } from '@openmrs/esm-framework';
-import { EmptyState, PatientChartPagination, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { type ChartConfig, defaultVisitTimelinePageSize } from '../../../../config-schema';
 import {
   canModifyEncounter,
   confirmAndDeleteEncounter,
   editEncounter,
-  isVisitNoteEncounter,
 } from '../../past-visits-components/encounters-table/encounter-actions';
 import {
   downloadPdf,
@@ -36,8 +35,8 @@ import styles from './visit-timeline.scss';
 
 interface VisitTimelineProps {
   patientUuid: string;
-  onEditEncounter?: EncountersTableProps['onEditEncounter'];
-  patient?: EncountersTableProps['patient'];
+  patient: EncountersTableProps['patient'];
+  onEncounterSaved?: EncountersTableProps['onEncounterSaved'];
   /**
    * Rendered straight from `visit.encounters`, so the visit must be fetched with the fields
    * the visits widget's `customRepresentation` (in `visit.resource.tsx`) asks for. The framework's
@@ -48,12 +47,11 @@ interface VisitTimelineProps {
   visit: Visit;
 }
 
-function VisitTimeline({ onEditEncounter, patient, patientUuid, visit }: VisitTimelineProps) {
+function VisitTimeline({ onEncounterSaved, patient, patientUuid, visit }: VisitTimelineProps) {
   const { t } = useTranslation();
   const session = useSession();
   const responsiveSize = isDesktop(useLayoutType()) ? 'sm' : 'lg';
   const { mutate } = useSWRConfig();
-  const { patient: chartPatient } = usePatientChartStore(patientUuid);
   const config = useConfig<ChartConfig>();
   const enableEmbeddedFormView = useFeatureFlag('enable-embedded-form-view');
   const canPrintEncounters = userHasAccess('App: Print encounter forms', session?.user);
@@ -71,7 +69,7 @@ function VisitTimeline({ onEditEncounter, patient, patientUuid, visit }: VisitTi
 
           return {
             canDeleteEncounter,
-            canEditEncounter: canDeleteEncounter && Boolean(encounter.form?.uuid || isVisitNoteEncounter(encounter)),
+            canEditEncounter: canDeleteEncounter,
             canPrintEncounter: canPrintEncounters && hasJsonSchemaForm,
             encounter,
             hasJsonSchemaForm,
@@ -113,9 +111,10 @@ function VisitTimeline({ onEditEncounter, patient, patientUuid, visit }: VisitTi
         patientUuid,
         t,
         mutate,
+        onEncounterDeleted: onEncounterSaved,
       });
     },
-    [mutate, patientUuid, t],
+    [mutate, onEncounterSaved, patientUuid, t],
   );
 
   if (timelineEntries.length === 0) {
@@ -195,7 +194,14 @@ function VisitTimeline({ onEditEncounter, patient, patientUuid, visit }: VisitTi
                           <OverflowMenuItem
                             className={styles.menuItem}
                             itemText={t('editThisEncounter', 'Edit this encounter')}
-                            onClick={() => editEncounter(mappedEncounter.encounter, patientUuid, onEditEncounter)}
+                            onClick={() =>
+                              editEncounter({
+                                patient,
+                                encounter,
+                                visitContext: visit,
+                                onEncounterSaved,
+                              })
+                            }
                           />
                         )}
                         {canPrintEncounter && (
@@ -234,7 +240,7 @@ function VisitTimeline({ onEditEncounter, patient, patientUuid, visit }: VisitTi
                           visitStartDatetime: visit.startDatetime ?? null,
                           visitStopDatetime: visit.stopDatetime ?? null,
                           patientUuid,
-                          patient: patient ?? chartPatient,
+                          patient,
                           formUuid: encounter.form.uuid,
                           encounterUuid: encounter.uuid,
                           promptBeforeClosing: () => {},

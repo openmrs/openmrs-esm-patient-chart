@@ -13,7 +13,6 @@ import {
   type Encounter,
   type UploadedFile,
   createAttachment,
-  ExtensionSlot,
   showModal,
   getDefaultsFromConfigSchema,
   showSnackbar,
@@ -210,7 +209,9 @@ test('does not render the date picker when RDE is disabled', () => {
   expect(screen.queryByLabelText(/visit date/i)).not.toBeInTheDocument();
 });
 
-test('renders the date picker when RDE is enabled', () => {
+// TODO: re-renable when we have a more general way to backdate notes
+// for both active and past visits
+test.skip('renders the date picker when RDE is enabled', () => {
   mockedUseFeatureFlag.mockReturnValue(true);
 
   renderVisitNotesForm();
@@ -480,6 +481,45 @@ test('renders an error snackbar if there was a problem recording a condition', a
     subtitle: 'Internal Server Error',
     title: 'Error saving visit note',
   });
+});
+
+async function fillInAndSubmitVisitNote(user: ReturnType<typeof userEvent.setup>) {
+  allowNotesWithoutDiagnosis();
+
+  const clinicalNote = screen.getByRole('textbox', { name: /Write your notes/i });
+  await user.type(clinicalNote, 'Sample clinical note');
+  await user.click(screen.getByRole('button', { name: /Save and close/i }));
+}
+
+test('calls onEncounterSaved once the visit note has been saved', async () => {
+  const user = userEvent.setup();
+  const onEncounterSaved = vi.fn();
+  mockSaveVisitNote.mockResolvedValueOnce({ status: 201, data: { uuid: 'new-note-uuid' } } as unknown as Awaited<
+    ReturnType<typeof saveVisitNote>
+  >);
+
+  renderVisitNotesForm({ onEncounterSaved });
+  await fillInAndSubmitVisitNote(user);
+
+  await waitFor(() => expect(onEncounterSaved).toHaveBeenCalledTimes(1));
+  expect(defaultProps.closeWorkspace).toHaveBeenCalledWith({ discardUnsavedChanges: true });
+});
+
+test('does not call onEncounterSaved when saving the visit note fails', async () => {
+  const user = userEvent.setup();
+  const onEncounterSaved = vi.fn();
+  mockSaveVisitNote.mockRejectedValueOnce({
+    message: 'Internal Server Error',
+    response: { status: 500, statusText: 'Internal Server Error' },
+  });
+
+  renderVisitNotesForm({ onEncounterSaved });
+  await fillInAndSubmitVisitNote(user);
+
+  await waitFor(() =>
+    expect(mockShowSnackbar).toHaveBeenCalledWith(expect.objectContaining({ title: 'Error saving visit note' })),
+  );
+  expect(onEncounterSaved).not.toHaveBeenCalled();
 });
 
 test('initializes form with existing encounter data when in edit mode', () => {
@@ -1290,22 +1330,6 @@ test('retries failed removals without repeating successful removals or saving th
   await waitFor(() => expect(defaultProps.closeWorkspace).toHaveBeenCalledWith({ discardUnsavedChanges: true }));
   expect(vi.mocked(removeVisitNoteImage).mock.calls).toEqual([['att-1'], ['att-2'], ['att-2']]);
   expect(updateVisitNote).toHaveBeenCalledTimes(1);
-});
-
-test('keeps visit-context header state stable while staging and undoing an image removal', async () => {
-  const user = userEvent.setup();
-  setupSavedImages();
-  const headerStates = () =>
-    vi
-      .mocked(ExtensionSlot)
-      .mock.calls.filter(([props]) => props.name === 'visit-context-header-slot')
-      .map(([props]) => props.state);
-  const initialState = headerStates()[0];
-  expect(initialState).toEqual({ patientUuid: mockPatient.id });
-  await user.click(screen.getByRole('button', { name: 'Remove image: front.png' }));
-  await user.click(screen.getByRole('button', { name: 'Undo removal: front.png' }));
-  expect(headerStates().length).toBeGreaterThan(1);
-  expect(headerStates().every((state) => state === initialState)).toBe(true);
 });
 
 test('removing an image preserves saved diagnoses without rewriting the note', async () => {
