@@ -196,6 +196,38 @@ describe('usePatientChartPatientAndVisit', () => {
     expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(1);
   });
 
+  it('launches with no visit, and clears the store, when the stored visit is no longer the active visit', async () => {
+    const endedVisit = { ...visitA, stopDatetime: '2026-05-26T00:00:00.000Z' } as Visit;
+    mockUsePatientChartStore.mockReturnValue({
+      patientUuid: mockFhirPatient.id,
+      patient: mockFhirPatient,
+      activeVisit: endedVisit,
+      setPatient,
+      setActiveVisit,
+    });
+    mockUseVisit.mockImplementation(() => ({
+      activeVisit: null,
+      mutate: mutateVisit,
+      isValidating: false,
+      error: null,
+      currentVisit: null,
+      currentVisitIsRetrospective: false,
+      isLoading: false,
+    }));
+
+    renderHook(() => usePatientChartPatientAndVisit(mockFhirPatient.id));
+
+    await waitFor(() => expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(1));
+    expect(mockLaunchWorkspaceGroup).toHaveBeenLastCalledWith(
+      'patient-chart',
+      expect.objectContaining({ patientUuid: mockFhirPatient.id, activeVisit: null }),
+    );
+    expect(setActiveVisit).toHaveBeenLastCalledWith(null);
+    // The visit is always the patient's active visit; a stored visit is never looked up
+    expect(mockUseVisit).toHaveBeenCalledWith(mockFhirPatient.id);
+    expect(mockUseVisit).not.toHaveBeenCalledWith(null);
+  });
+
   it('relaunches when the patient changes and neither patient has an active visit', async () => {
     mockNoActiveVisitForPatientSwitch();
 

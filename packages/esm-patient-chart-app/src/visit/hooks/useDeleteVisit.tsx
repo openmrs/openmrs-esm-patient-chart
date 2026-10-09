@@ -2,10 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import { type Visit, showSnackbar } from '@openmrs/esm-framework';
-import {
-  invalidateVisitAndEncounterData,
-  usePatientChartStore,
-} from '@openmrs/esm-patient-common-lib';
+import { invalidateVisitAndEncounterData, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { deleteVisit, restoreVisit } from '../visits-widget/visit.resource';
 
 export function useDeleteVisit(activeVisit: Visit, onVisitDelete = () => {}, onVisitRestore = () => {}) {
