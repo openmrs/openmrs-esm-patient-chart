@@ -16,7 +16,7 @@ export function useInfiniteVisits(
   rep: string = customRepresentation,
 ) {
   const url = new URL(
-    `${window.openmrsBase}/${restBaseUrl}/visit?patient=${patientUuid}&v=${rep}`,
+    `${window.openmrsBase}${restBaseUrl}/visit?patient=${patientUuid}&v=${rep}`,
     window.location.toString(),
   );
   for (const key in params) {
@@ -34,7 +34,7 @@ export function usePaginatedVisits(
   params: Record<string, number | string> = {},
 ) {
   const url = new URL(
-    `${window.openmrsBase}/${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}`,
+    `${window.openmrsBase}${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}`,
     window.location.toString(),
   );
   for (const key in params) {
