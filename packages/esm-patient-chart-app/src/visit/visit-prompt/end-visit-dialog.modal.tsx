@@ -20,7 +20,7 @@ interface EndVisitDialogProps {
 const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal }) => {
   const { t } = useTranslation();
   const { activeVisit, mutate } = useVisit(patientUuid);
-  const { visitContext, setVisitContext } = usePatientChartStore(patientUuid);
+  const { activeVisit: storeActiveVisit, setActiveVisit } = usePatientChartStore(patientUuid);
 
   const handleEndVisit = () => {
     if (activeVisit) {
@@ -35,8 +35,8 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
           mutate();
           window.dispatchEvent(new CustomEvent('queue-entry-updated'));
           closeModal();
-          if (visitContext?.uuid == activeVisit.uuid) {
-            setVisitContext(null);
+          if (storeActiveVisit?.uuid == activeVisit.uuid) {
+            setActiveVisit(null);
           }
           showSnackbar({
             isLowContrast: true,

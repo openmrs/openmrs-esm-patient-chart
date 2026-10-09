@@ -35,7 +35,7 @@ describe('StartVisitButton', () => {
       {
         patient: mockPatient,
         patientUuid: mockPatient.id,
-        visitContext: null,
+        activeVisit: null,
       },
     );
   });
