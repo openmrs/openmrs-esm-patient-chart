@@ -7,7 +7,6 @@ import { ExtensionSlot, openmrsFetch, Workspace2 } from '@openmrs/esm-framework'
 import { mockPatient } from 'tools';
 import FormEntry, { type FormEntryProps } from './form-entry.component';
 import FormEntryWorkspace from './form-entry.workspace';
-import ExportedFormEntryWorkspace from './exported-form-entry.workspace';
 
 vi.mock('../htmlformentry/html-form-entry-wrapper.component', () => ({
   default: () => <iframe title="Legacy HTML form" />,
@@ -25,7 +24,6 @@ const defaultProps: FormEntryProps = {
   patientUuid: mockPatient.id,
   patient: mockPatient,
   visitContext: null,
-  mutateVisitContext: null,
   closeWorkspace: vi.fn(),
 };
 
@@ -154,40 +152,18 @@ describe('Form entry workspaces', () => {
     showActionMenu: true,
   };
 
-  it('offers Back in the patient chart workspace only when it has a parent', () => {
+  it('offers Back in the workspace only when it has a parent', () => {
     const props = {
       ...workspaceDefinitionProps,
       workspaceProps: { form: defaultProps.form },
-      windowProps: {},
-      groupProps: { patientUuid: mockPatient.id, patient: mockPatient, visitContext: null, mutateVisitContext: null },
+      windowProps: { patient: mockPatient, patientUuid: mockPatient.id, visitContext: null },
+      groupProps: {},
     };
     const { rerender } = render(<FormEntryWorkspace {...props} isRootWorkspace={false} />);
 
     expect(screen.getByRole('button', { name: /Back to clinical forms/ })).toBeInTheDocument();
 
     rerender(<FormEntryWorkspace {...props} isRootWorkspace />);
-
-    expect(screen.queryByRole('button', { name: /Back to clinical forms/ })).not.toBeInTheDocument();
-  });
-
-  it('offers Back in the exported workspace only when it has a parent', () => {
-    const props = {
-      ...workspaceDefinitionProps,
-      workspaceProps: { form: defaultProps.form, encounterUuid: null },
-      windowProps: {
-        formEntryWorkspaceName: 'exported-form-entry-workspace',
-        patient: mockPatient,
-        patientUuid: mockPatient.id,
-        visitContext: null,
-        mutateVisitContext: null,
-      },
-      groupProps: {},
-    };
-    const { rerender } = render(<ExportedFormEntryWorkspace {...props} isRootWorkspace={false} />);
-
-    expect(screen.getByRole('button', { name: /Back to clinical forms/ })).toBeInTheDocument();
-
-    rerender(<ExportedFormEntryWorkspace {...props} isRootWorkspace />);
 
     expect(screen.queryByRole('button', { name: /Back to clinical forms/ })).not.toBeInTheDocument();
   });

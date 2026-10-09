@@ -9,7 +9,7 @@ import {
   launchWorkspace2,
   useLayoutType,
 } from '@openmrs/esm-framework';
-import { type VisitFormProps } from '../visit-form/visit-form.workspace';
+import { type VisitFormProps, type VisitFormWindowProps } from '../visit-form/visit-form.workspace';
 import {
   invalidateVisitAndEncounterData,
   invalidateVisitByUuid,
@@ -39,14 +39,14 @@ const EditVisitDetailsActionItem: React.FC<EditVisitDetailsActionItemProps> = ({
   const patientUuid = patient.id;
 
   const editVisitDetails = () => {
-    launchWorkspace2<VisitFormProps, {}, PatientWorkspaceGroupProps>(
+    // For this workspace, the visit context is the visit to edit
+    const windowProps = { patient, patientUuid, visitContext: visit };
+    launchWorkspace2<VisitFormProps, VisitFormWindowProps, PatientWorkspaceGroupProps>(
       'start-visit-workspace-form',
       { openedFrom: 'patient-chart-edit-visit' },
-      {},
+      windowProps,
       {
-        patient,
-        patientUuid: patientUuid,
-        visitContext: visit,
+        ...windowProps,
         mutateVisitContext: () => {
           invalidateVisitByUuid(globalMutate, visit.uuid);
           invalidateVisitAndEncounterData(globalMutate, patientUuid);

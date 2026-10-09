@@ -24,11 +24,7 @@ import {
   type Visit,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
-import {
-  type PatientWorkspace2DefinitionProps,
-  type PatientWorkspaceGroupProps,
-  useAllowedFileExtensions,
-} from '@openmrs/esm-patient-common-lib';
+import { type PatientWorkspaceWindowProps, useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
 import {
   deletePatientDiagnosis,
   fetchDiagnosisConceptsByName,
@@ -49,24 +45,20 @@ import {
 } from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';
 import { mockPatient, getByTextWithMarkup } from 'tools';
-import ExportedVisitNotesFormWorkspace, {
-  type ExportedVisitNotesFormWorkspaceProps,
-} from './exported-visit-notes-form.workspace';
 import VisitNotesFormWorkspace, { type VisitNotesFormWorkspaceProps } from './visit-notes-form.workspace';
 
-const defaultProps: PatientWorkspace2DefinitionProps<VisitNotesFormWorkspaceProps, {}> = {
+const defaultProps: Workspace2DefinitionProps<VisitNotesFormWorkspaceProps, PatientWorkspaceWindowProps, object> = {
   closeWorkspace: vi.fn(),
   workspaceProps: {
     formContext: 'creating' as const,
   },
-  groupProps: {
+  windowProps: {
     patient: mockPatient,
     patientUuid: mockPatient.id,
     visitContext: null,
-    mutateVisitContext: null,
   },
+  groupProps: {},
   launchChildWorkspace: vi.fn(),
-  windowProps: {},
   workspaceName: '',
   windowName: '',
   isRootWorkspace: false,
@@ -75,20 +67,21 @@ const defaultProps: PatientWorkspace2DefinitionProps<VisitNotesFormWorkspaceProp
 
 function renderVisitNotesForm(
   workspaceProps: Partial<VisitNotesFormWorkspaceProps> = {},
-  groupProps: Partial<PatientWorkspaceGroupProps> = {},
+  windowProps: Partial<PatientWorkspaceWindowProps> = {},
 ) {
   const props = {
     ...defaultProps,
     workspaceProps: { ...defaultProps.workspaceProps, ...workspaceProps },
-    groupProps: { ...defaultProps.groupProps, ...groupProps },
+    windowProps: { ...defaultProps.windowProps, ...windowProps },
   };
   return render(<VisitNotesFormWorkspace {...props} />);
 }
 
-function renderExportedVisitNotesForm(workspaceProps: Partial<ExportedVisitNotesFormWorkspaceProps> = {}) {
-  const props: Workspace2DefinitionProps<ExportedVisitNotesFormWorkspaceProps, {}, {}> = {
+// Launchers that have not migrated to window props still pass the patient / visit as workspace props
+function renderVisitNotesFormWithDeprecatedWorkspaceProps(workspaceProps: Partial<VisitNotesFormWorkspaceProps> = {}) {
+  const props: Workspace2DefinitionProps<VisitNotesFormWorkspaceProps, PatientWorkspaceWindowProps, object> = {
     ...defaultProps,
-    groupProps: {},
+    windowProps: null,
     workspaceProps: {
       formContext: 'creating',
       patient: mockPatient,
@@ -97,7 +90,7 @@ function renderExportedVisitNotesForm(workspaceProps: Partial<ExportedVisitNotes
       ...workspaceProps,
     },
   };
-  render(<ExportedVisitNotesFormWorkspace {...props} />);
+  render(<VisitNotesFormWorkspace {...props} />);
 }
 
 function actionsMenuFor(card: HTMLElement) {
@@ -433,7 +426,7 @@ test('omits the visit when there is no visit context', async () => {
   );
 });
 
-test('attaches the visit supplied by an out-of-chart launcher to a newly created note', async () => {
+test('attaches the visit supplied as a (deprecated) workspace prop to a newly created note', async () => {
   const user = userEvent.setup();
 
   mockSaveVisitNote.mockResolvedValueOnce({ status: 201, body: 'Condition created' } as unknown as Awaited<
@@ -441,7 +434,7 @@ test('attaches the visit supplied by an out-of-chart launcher to a newly created
   >);
   mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
 
-  renderExportedVisitNotesForm({ visitContext: { uuid: 'visit-context-uuid' } as Visit });
+  renderVisitNotesFormWithDeprecatedWorkspaceProps({ visitContext: { uuid: 'visit-context-uuid' } as Visit });
 
   await addDiagnosis(user, 'Diabetes Mellitus', { primary: true });
 

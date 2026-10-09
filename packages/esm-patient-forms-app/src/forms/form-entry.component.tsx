@@ -29,7 +29,6 @@ export interface FormEntryProps {
   patientUuid;
   patient;
   visitContext;
-  mutateVisitContext;
   additionalProps?: Record<string, any>;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   handlePostResponse?: (encounter: Encounter) => void;
@@ -45,7 +44,6 @@ const FormEntry: React.FC<FormEntryProps> = ({
   patientUuid,
   patient,
   visitContext,
-  mutateVisitContext,
   closeWorkspace,
   handlePostResponse,
   showBackButton = false,
@@ -107,10 +105,7 @@ const FormEntry: React.FC<FormEntryProps> = ({
         return closeWorkspace();
       },
       closeWorkspaceWithSavedChanges: () => {
-        // Update current visit data for critical components
-        mutateVisitContext?.();
-
-        // Also invalidate visit history and encounter tables since form submission may create/update encounters
+        // Invalidate visit history and encounter tables since form submission may create/update encounters
         invalidateVisitAndEncounterData(globalMutate, patientUuid);
 
         mutateForms?.();
@@ -129,7 +124,6 @@ const FormEntry: React.FC<FormEntryProps> = ({
       hideControls,
       hidePatientBanner,
       mutateForms,
-      mutateVisitContext,
       patient,
       patientUuid,
       preFilledQuestions,

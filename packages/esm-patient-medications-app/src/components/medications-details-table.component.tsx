@@ -24,6 +24,7 @@ import { useSWRConfig } from 'swr';
 import {
   CardHeader,
   compare,
+  getPatientChartWindowProps,
   invalidateVisitAndEncounterData,
   invalidateVisitByUuid,
   PatientChartPagination,
@@ -424,15 +425,20 @@ function OrderBasketItemActions({
     }),
     [patient, medication, globalMutate],
   );
+  // The workspaces read the patient / visit from their window props, not from the group props
+  const workspaceWindowProps = useMemo(
+    () => ({ patient, patientUuid: patient.id, visitContext: medication.encounter.visit }),
+    [patient, medication.encounter.visit],
+  );
   const handleDiscontinueClick = useCallback(() => {
     setItems([...items, buildMedicationOrder(medication, 'DISCONTINUE')]);
     launchWorkspace2<{}, OrderBasketWindowProps, PatientWorkspaceGroupProps>(
       'order-basket',
       {},
-      { encounterUuid: medication.encounter.uuid },
+      workspaceWindowProps,
       workspaceGroupProps,
     );
-  }, [items, setItems, medication, workspaceGroupProps]);
+  }, [items, setItems, medication, workspaceWindowProps, workspaceGroupProps]);
 
   const handleModifyClick = useCallback(() => {
     launchWorkspace2<AddDrugOrderWorkspaceProps, OrderBasketWindowProps, PatientWorkspaceGroupProps>(
@@ -441,10 +447,10 @@ function OrderBasketItemActions({
         order: buildMedicationOrder(medication, 'REVISE'),
         orderToEditOrdererUuid: medication.orderer.uuid,
       },
-      { encounterUuid: medication.encounter.uuid },
+      workspaceWindowProps,
       workspaceGroupProps,
     );
-  }, [medication, workspaceGroupProps]);
+  }, [medication, workspaceWindowProps, workspaceGroupProps]);
 
   const handleRenewClick = useCallback(async () => {
     const canProceed = await startVisitIfNeeded();
@@ -453,9 +459,9 @@ function OrderBasketItemActions({
     }
 
     setItems([...itemsRef.current, buildMedicationOrder(medication, 'RENEW')]);
-    // Launched without window or group props so that the basket uses the chart's current visit
-    launchWorkspace2('order-basket');
-  }, [startVisitIfNeeded, setItems, medication]);
+    // Launched without group props so that the basket uses the chart's current visit
+    launchWorkspace2('order-basket', {}, getPatientChartWindowProps(patient.id));
+  }, [startVisitIfNeeded, setItems, medication, patient.id]);
 
   return (
     <OverflowMenu

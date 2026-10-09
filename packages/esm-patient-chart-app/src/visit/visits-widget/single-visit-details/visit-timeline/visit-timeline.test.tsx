@@ -192,10 +192,14 @@ describe('VisitTimeline', () => {
     await clickEditEncounter();
 
     expect(mockLaunchWorkspace).toHaveBeenCalledTimes(1);
-    expect(mockLaunchWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
-      form: admissionEncounter.form,
-      encounterUuid: admissionEncounter.uuid,
-    });
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith(
+      'patient-form-entry-workspace',
+      {
+        form: admissionEncounter.form,
+        encounterUuid: admissionEncounter.uuid,
+      },
+      expect.objectContaining({ patientUuid: mockPatientAlice.uuid }),
+    );
   });
 
   it('hides the actions menu when the user lacks the privilege to edit the encounter', () => {
