@@ -48,7 +48,7 @@
     "@angular/material": "^20.2.14",
     "@angular/platform-browser": "^20.3.27",
     "@angular/platform-browser-dynamic": "^20.3.27",
-    "@angular/router": "^20.3.27",
+    "@angular/router": "^20.3.32",
     "@carbon/icons": "^11.73.0",
     "@carbon/styles": "^1.98.0",
     "@ng-select/ng-select": "^15.1.3",
