@@ -33,6 +33,9 @@ jobs:
 
   release:
     needs: build
+    permissions:
+      contents: write
+      id-token: write
     uses: openmrs/openmrs-contrib-gha-workflows/.github/workflows/release-frontend-module.yml@main
     with:
       support_patch_branches: true
@@ -40,6 +43,6 @@ jobs:
       release_version: ${{ inputs.custom_version }}
       publish_only: ${{ inputs.publish_only || false }}
       verify_command: yarn verify
+      publish_environment: npm-publish
     secrets:
-      NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
       BOT_PAT: ${{ secrets.OMRS_BOT_GH_TOKEN }}
