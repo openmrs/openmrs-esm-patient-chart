@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconButton, InlineNotification, SkeletonText, Tag } from '@carbon/react';
 import { ChevronDown, ChevronUp, PinFilled } from '@carbon/react/icons';
@@ -7,7 +7,10 @@ import type { ConfigObject } from '../config-schema';
 import type { DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { getFavoriteKey } from './drug-favorites.resource';
 import { useFavoritesActions } from './useFavoritesActions';
-import { createDrugFromFavorite, buildBasketItem } from './helpers';
+import { useDismissedSuggestions } from './useDismissedSuggestions';
+import { findSwapCandidate, type SwapCandidate, useDrugOrderSuggestions } from './drug-suggestions.resource';
+import DrugSuggestions from './drug-suggestions.component';
+import { createDrugFromFavorite, buildBasketItem, buildFavoriteOrder } from './helpers';
 import type { DrugFavoriteOrder } from './types';
 import styles from './drug-favorites-list.scss';
 
@@ -77,9 +80,28 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
   ordersError,
 }) => {
   const { t } = useTranslation();
-  const { enableDrugOrderFavorites } = useConfig<ConfigObject>();
+  const { enableDrugOrderFavorites, enableDrugOrderSuggestions, maxPinnedDrugOrders } = useConfig<ConfigObject>();
   const isTablet = useLayoutType() === 'tablet';
-  const { favorites, error, isLoading, deleteMultipleFavorites } = useFavoritesActions();
+  const { favorites, error, isLoading, deleteMultipleFavorites, persistFavorites } = useFavoritesActions();
+  const { hiddenOrDismissedDrugUuids, isSwapPromptHidden, hideSuggestion, hideSwapPrompt, dismissSuggestion } =
+    useDismissedSuggestions();
+
+  const excludedDrugUuids = useMemo(
+    () => new Set([...hiddenOrDismissedDrugUuids, ...favorites.map((favorite) => favorite.drugUuid)]),
+    [hiddenOrDismissedDrugUuids, favorites],
+  );
+  const canSuggest = enableDrugOrderFavorites && enableDrugOrderSuggestions && !isLoading && !error;
+  const { suggestions, orderCounts, windowInDays, scannedOrderCount, totalOrderCount } = useDrugOrderSuggestions(
+    excludedDrugUuids,
+    canSuggest,
+  );
+  const isPinnedListFull = favorites.length >= maxPinnedDrugOrders;
+  // When pins are full, suggestions can't be pinned, so we offer to swap out the least-ordered pin instead
+  const visibleSuggestions = canSuggest && !isPinnedListFull ? suggestions : [];
+  const swapCandidate =
+    canSuggest && isPinnedListFull && !isSwapPromptHidden
+      ? findSwapCandidate(favorites, orderCounts, suggestions[0])
+      : null;
 
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -98,6 +120,29 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
       openOrderForm(buildBasketItem(drug, visit, daysDurationUnit));
     },
     [openOrderForm, visit, daysDurationUnit, prescribedDrugUuids, ordersError],
+  );
+
+  const [isSwapping, setIsSwapping] = useState(false);
+
+  const handleSwap = useCallback(
+    async ({ suggestion, favorite }: SwapCandidate) => {
+      const newFavorite = buildFavoriteOrder(suggestion.drug);
+      setIsSwapping(true);
+      await persistFavorites(
+        favorites.map((current) => (current.id === favorite.id ? newFavorite : current)),
+        {
+          successTitle: t('pinnedOrdersSwapped', 'Pinned orders updated'),
+          successSubtitle: t('pinnedOrderSwappedSubtitle', '{{added}} replaced {{removed}} in your pinned orders', {
+            added: newFavorite.displayName,
+            removed: favorite.displayName,
+            interpolation: { escapeValue: false },
+          }),
+          errorTitle: t('errorPinningOrder', 'Error pinning order'),
+        },
+      );
+      setIsSwapping(false);
+    },
+    [favorites, persistFavorites, t],
   );
 
   const handleUnpin = useCallback(
@@ -137,7 +182,10 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
     );
   }
 
-  if (favorites.length === 0) {
+  const hasFavorites = favorites.length > 0;
+  const hasSuggestions = !isSearching && (visibleSuggestions.length > 0 || Boolean(swapCandidate));
+
+  if (!hasFavorites && !hasSuggestions) {
     return null;
   }
 
@@ -155,23 +203,33 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <span className={styles.headerTitle}>{t('myPinnedDrugOrders', 'My pinned drug orders')}</span>
-        <IconButton
-          kind="ghost"
-          size="sm"
-          align="left"
-          label={
-            isCollapsed
-              ? t('expandPinnedOrders', 'Expand pinned orders')
-              : t('collapsePinnedOrders', 'Collapse pinned orders')
-          }
-          onClick={toggleCollapsed}
-        >
-          {isCollapsed ? <ChevronDown /> : <ChevronUp />}
-        </IconButton>
-      </div>
-      {ordersError && (
+      {hasFavorites && (
+        <div className={styles.header}>
+          <span className={styles.headerTitle}>{t('myPinnedDrugOrders', 'My pinned drug orders')}</span>
+          {isPinnedListFull && (
+            <Tag type="gray" size="sm">
+              {t('pinnedOrdersFull', '{{pinned}} / {{max}} full', {
+                pinned: favorites.length,
+                max: maxPinnedDrugOrders,
+              })}
+            </Tag>
+          )}
+          <IconButton
+            kind="ghost"
+            size="sm"
+            align="left"
+            label={
+              isCollapsed
+                ? t('expandPinnedOrders', 'Expand pinned orders')
+                : t('collapsePinnedOrders', 'Collapse pinned orders')
+            }
+            onClick={toggleCollapsed}
+          >
+            {isCollapsed ? <ChevronDown /> : <ChevronUp />}
+          </IconButton>
+        </div>
+      )}
+      {ordersError && hasFavorites && (
         <InlineNotification
           kind="error"
           lowContrast
@@ -179,7 +237,7 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
           hideCloseButton
         />
       )}
-      {!isCollapsed && (
+      {!isCollapsed && hasFavorites && (
         <div className={styles.listContainer}>
           {favorites.map((favorite) => (
             <FavoriteListItem
@@ -193,6 +251,22 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
             />
           ))}
         </div>
+      )}
+      {hasSuggestions && (
+        <DrugSuggestions
+          suggestions={visibleSuggestions}
+          swapCandidate={swapCandidate}
+          isSwapping={isSwapping}
+          hasPinnedOrders={hasFavorites}
+          windowInDays={windowInDays}
+          scannedOrderCount={scannedOrderCount}
+          totalOrderCount={totalOrderCount}
+          isTablet={isTablet}
+          onHide={hideSuggestion}
+          onDismiss={dismissSuggestion}
+          onSwap={handleSwap}
+          onKeepCurrent={hideSwapPrompt}
+        />
       )}
     </div>
   );
