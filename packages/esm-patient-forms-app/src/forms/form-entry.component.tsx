@@ -30,7 +30,7 @@ export interface FormEntryProps {
   patient;
   visitContext;
   mutateVisitContext;
-  additionalProps?: Record<string, any>;
+  additionalProps?: Record<string, unknown>;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   handlePostResponse?: (encounter: Encounter) => void;
   showBackButton?: boolean;
