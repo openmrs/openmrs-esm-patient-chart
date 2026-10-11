@@ -26,7 +26,7 @@ function renderStatus({
   showUploadSnackbar,
 }: {
   filesToUpload?: Array<UploadedFile>;
-  saveFile?: ReturnType<typeof vi.fn>;
+  saveFile?: (file: UploadedFile) => Promise<any>;
   showUploadSnackbar?: boolean;
 } = {}) {
   const onCompletion = vi.fn();
@@ -74,7 +74,7 @@ test('stays quiet when the caller only stages the file', async () => {
 test('does not report the batch complete when one upload fails', async () => {
   const uploadError = new Error('Network unavailable');
   const saveFile = vi
-    .fn()
+    .fn<(file: UploadedFile) => Promise<any>>()
     .mockResolvedValueOnce({})
     .mockRejectedValueOnce(uploadError);
 
@@ -100,7 +100,7 @@ test('does not report the batch complete when one upload fails', async () => {
 test('retries only failed files and completes the batch after recovery', async () => {
   const user = userEvent.setup();
   const saveFile = vi
-    .fn()
+    .fn<(file: UploadedFile) => Promise<any>>()
     .mockResolvedValueOnce({})
     .mockRejectedValueOnce(new Error('Temporary failure'))
     .mockResolvedValueOnce({});
@@ -122,7 +122,7 @@ test('retries only failed files and completes the batch after recovery', async (
 });
 
 test('does not start a duplicate upload batch after rerendering', async () => {
-  const saveFile = vi.fn().mockResolvedValue({});
+  const saveFile = vi.fn<(file: UploadedFile) => Promise<any>>().mockResolvedValue({});
   const onCompletion = vi.fn();
   const contextValue = {
     filesToUpload: [firstFile],
@@ -141,7 +141,9 @@ test('does not start a duplicate upload batch after rerendering', async () => {
   await waitFor(() => expect(onCompletion).toHaveBeenCalledTimes(1));
 
   rerender(
-    <CameraMediaUploaderContext.Provider value={{ ...contextValue }}>
+    <CameraMediaUploaderContext.Provider
+      value={{ ...contextValue, filesToUpload: [...contextValue.filesToUpload] }}
+    >
       <UploadStatusComponent />
     </CameraMediaUploaderContext.Provider>,
   );
