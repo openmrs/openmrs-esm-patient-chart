@@ -2,7 +2,7 @@ import React from 'react';
 import { beforeEach, expect, test, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { showSnackbar, type UploadedFile } from '@openmrs/esm-framework';
+import { showSnackbar, type FetchResponse, type UploadedFile } from '@openmrs/esm-framework';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 import UploadStatusComponent from './upload-status.component';
 
@@ -13,6 +13,8 @@ const firstFile: UploadedFile = {
   fileDescription: 'Scan',
 };
 
+type SaveFile = (file: UploadedFile) => Promise<FetchResponse<any>>;
+
 const secondFile: UploadedFile = {
   fileName: 'results.pdf',
   fileType: 'pdf',
@@ -22,11 +24,11 @@ const secondFile: UploadedFile = {
 
 function renderStatus({
   filesToUpload = [firstFile],
-  saveFile = vi.fn().mockResolvedValue({}),
+  saveFile = vi.fn<SaveFile>().mockResolvedValue({} as FetchResponse<any>),
   showUploadSnackbar,
 }: {
   filesToUpload?: Array<UploadedFile>;
-  saveFile?: (file: UploadedFile) => Promise<any>;
+  saveFile?: SaveFile;
   showUploadSnackbar?: boolean;
 } = {}) {
   const onCompletion = vi.fn();
@@ -75,7 +77,7 @@ test('does not report the batch complete when one upload fails', async () => {
   const uploadError = new Error('Network unavailable');
   const saveFile = vi
     .fn<(file: UploadedFile) => Promise<any>>()
-    .mockResolvedValueOnce({})
+    .mockResolvedValueOnce({} as FetchResponse<any>)
     .mockRejectedValueOnce(uploadError);
 
   const { onCompletion } = renderStatus({
@@ -101,9 +103,9 @@ test('retries only failed files and completes the batch after recovery', async (
   const user = userEvent.setup();
   const saveFile = vi
     .fn<(file: UploadedFile) => Promise<any>>()
-    .mockResolvedValueOnce({})
+    .mockResolvedValueOnce({} as FetchResponse<any>)
     .mockRejectedValueOnce(new Error('Temporary failure'))
-    .mockResolvedValueOnce({});
+    .mockResolvedValueOnce({} as FetchResponse<any>);
 
   const { onCompletion } = renderStatus({
     filesToUpload: [firstFile, secondFile],
@@ -121,8 +123,36 @@ test('retries only failed files and completes the batch after recovery', async (
   expect(screen.queryByRole('button', { name: 'Retry failed uploads' })).not.toBeInTheDocument();
 });
 
+test('does not complete while another upload is still pending during retry', async () => {
+  const user = userEvent.setup();
+  let resolvePendingUpload: (value: FetchResponse<any>) => void;
+  const pendingUpload = new Promise<FetchResponse<any>>((resolve) => {
+    resolvePendingUpload = resolve;
+  });
+  const saveFile = vi
+    .fn<SaveFile>()
+    .mockRejectedValueOnce(new Error('Temporary failure'))
+    .mockImplementationOnce(() => pendingUpload)
+    .mockResolvedValueOnce({} as FetchResponse<any>);
+
+  const { onCompletion } = renderStatus({
+    filesToUpload: [firstFile, secondFile],
+    saveFile,
+  });
+
+  const retryButton = await screen.findByRole('button', { name: 'Retry failed uploads' });
+  await user.click(retryButton);
+
+  await waitFor(() => expect(saveFile).toHaveBeenCalledTimes(3));
+  expect(onCompletion).not.toHaveBeenCalled();
+
+  resolvePendingUpload({} as FetchResponse<any>);
+
+  await waitFor(() => expect(onCompletion).toHaveBeenCalledTimes(1));
+});
+
 test('does not start a duplicate upload batch after rerendering', async () => {
-  const saveFile = vi.fn<(file: UploadedFile) => Promise<any>>().mockResolvedValue({});
+  const saveFile = vi.fn<SaveFile>().mockResolvedValue({} as FetchResponse<any>);
   const onCompletion = vi.fn();
   const contextValue = {
     filesToUpload: [firstFile],
