@@ -28,6 +28,7 @@ const UploadStatusComponent: React.FC<UploadStatusComponentProps> = ({ title }) 
   );
   const [isRetrying, setIsRetrying] = useState(false);
   const startedUpload = useRef(false);
+  const completionNotified = useRef(false);
 
   const uploadFiles = useCallback(
     async (indexes: Array<number>) => {
@@ -89,12 +90,19 @@ const UploadStatusComponent: React.FC<UploadStatusComponentProps> = ({ title }) 
 
     startedUpload.current = true;
     const indexes = filesToUpload.map((_, index) => index);
-    void uploadFiles(indexes).then((allSucceeded) => {
-      if (allSucceeded) {
-        onCompletion?.();
-      }
-    });
-  }, [filesToUpload, onCompletion, uploadFiles]);
+    void uploadFiles(indexes);
+  }, [filesToUpload, uploadFiles]);
+
+  useEffect(() => {
+    if (
+      !completionNotified.current &&
+      filesUploading.length > 0 &&
+      filesUploading.every((file) => file.status === 'complete')
+    ) {
+      completionNotified.current = true;
+      onCompletion?.();
+    }
+  }, [filesUploading, onCompletion]);
 
   const failedIndexes = useMemo(
     () =>
@@ -114,14 +122,11 @@ const UploadStatusComponent: React.FC<UploadStatusComponentProps> = ({ title }) 
 
     setIsRetrying(true);
     try {
-      const allSucceeded = await uploadFiles(failedIndexes);
-      if (allSucceeded) {
-        onCompletion?.();
-      }
+      await uploadFiles(failedIndexes);
     } finally {
       setIsRetrying(false);
     }
-  }, [failedIndexes, isRetrying, onCompletion, uploadFiles]);
+  }, [failedIndexes, isRetrying, uploadFiles]);
 
   return (
     <div className={styles.cameraSection}>
