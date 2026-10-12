@@ -978,8 +978,8 @@ const ControlledFieldInput = ({
           ref={ref}
           // @ts-ignore
           size={isTablet ? 'md' : 'sm'}
-          labelA={t('on', 'On')}
-          labelB={t('off', 'Off')}
+          labelA={t('off', 'Off')}
+          labelB={t('on', 'On')}
           {...restProps}
         />
       );
