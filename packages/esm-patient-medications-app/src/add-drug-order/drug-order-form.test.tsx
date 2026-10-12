@@ -321,6 +321,22 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
     expect(screen.queryByText(/auto-calculated/i)).not.toBeInTheDocument();
   });
 
+  it('labels the free-text dosage toggle with its current state', async () => {
+    const user = userEvent.setup();
+    renderDrugOrderForm(createNewOrderBasketItem());
+
+    const freeTextToggle = screen.getByRole('switch', { name: /free text dosage/i });
+    expect(freeTextToggle).not.toBeChecked();
+    expect(screen.getByText('Off')).toBeInTheDocument();
+    expect(screen.queryByText('On')).not.toBeInTheDocument();
+
+    await user.click(freeTextToggle);
+
+    expect(freeTextToggle).toBeChecked();
+    expect(screen.getByText('On')).toBeInTheDocument();
+    expect(screen.queryByText('Off')).not.toBeInTheDocument();
+  });
+
   it('submits only free-text dosage fields while preserving the structured frequency draft', async () => {
     const user = userEvent.setup();
     const onSave = vi.fn().mockResolvedValue(undefined);
