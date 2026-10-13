@@ -1,5 +1,5 @@
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { formatDate, getDefaultsFromConfigSchema, useConfig, useVisit } from '@openmrs/esm-framework';
 import { type ChartConfig, esmPatientChartSchema } from '../config-schema';
@@ -37,7 +37,11 @@ function renderWithDateAttribute(savedValue: string) {
 }
 
 describe('VisitAttributeTags', () => {
-  const savedDay = formatDate(new Date(2026, 9, 20), { mode: 'wide' });
+  const savedDay = formatDate(new Date(2026, 9, 20), { mode: 'wide', time: false });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
 
   // The REST API returns a saved date at midnight in the server's offset. Tests run in UTC,
   // so a server at +05:30 is ahead of the browser, as a UTC server is ahead of a browser in America.
@@ -51,5 +55,14 @@ describe('VisitAttributeTags', () => {
     renderWithDateAttribute('2026-10-20T00:00:00.000+0000');
 
     expect(screen.getByText(savedDay)).toBeInTheDocument();
+  });
+
+  it('shows a date attribute for today without a time', () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date(2026, 9, 20, 10, 0));
+
+    renderWithDateAttribute('2026-10-20T00:00:00.000+0000');
+
+    expect(screen.getByText('Today')).toBeInTheDocument();
   });
 });
