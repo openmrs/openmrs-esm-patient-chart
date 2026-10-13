@@ -72,7 +72,7 @@ export function useVisitByUuid(visitUuid: string | null, representation: string 
  */
 export function usePatientChartPatientAndVisit(patientUuid: string) {
   const { t } = useTranslation();
-  const { isLoading: isLoadingPatient, patient } = usePatient(patientUuid);
+  const { isLoading: isLoadingPatient, patient, error } = usePatient(patientUuid);
   const {
     patientUuid: storePatientUuid,
     setPatient,
@@ -225,13 +225,14 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
   const state = useMemo(
     () => ({
       patientUuid,
-      patient: patient ?? {},
+      patient,
       visitContext,
       mutateVisitContext,
       isLoadingPatient,
+      error,
       setPatient,
     }),
-    [patient, patientUuid, visitContext, mutateVisitContext, isLoadingPatient, setPatient],
+    [patient, patientUuid, visitContext, mutateVisitContext, isLoadingPatient, error, setPatient],
   );
 
   return state;

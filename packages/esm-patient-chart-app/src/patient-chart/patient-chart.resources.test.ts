@@ -76,6 +76,36 @@ describe('usePatientChartPatientAndVisit', () => {
     });
   });
 
+  it('preserves the patient-load error for an unavailable patient', () => {
+    const error = Object.assign(new Error('Gone'), { response: { status: 410, statusText: 'Gone' } });
+    mockUsePatient.mockReturnValue({
+      isLoading: false,
+      patient: undefined,
+      patientUuid: mockFhirPatient.id,
+      error,
+    });
+
+    const { result } = renderHook(() => usePatientChartPatientAndVisit(mockFhirPatient.id));
+
+    expect(result.current).toEqual(expect.objectContaining({ error }));
+    expect(result.current.patient).toBeUndefined();
+    expect(mockLaunchWorkspaceGroup).not.toHaveBeenCalled();
+  });
+
+  it('preserves missing patient data when loading completes without an error', () => {
+    mockUsePatient.mockReturnValue({
+      isLoading: false,
+      patient: null,
+      patientUuid: mockFhirPatient.id,
+      error: null,
+    });
+
+    const { result } = renderHook(() => usePatientChartPatientAndVisit(mockFhirPatient.id));
+
+    expect(result.current.patient).toBeNull();
+    expect(mockLaunchWorkspaceGroup).not.toHaveBeenCalled();
+  });
+
   it('relaunches the patient-chart workspace group when the visit context changes', async () => {
     let activeVisit = visitA;
     mockUseVisit.mockImplementation(() => ({
