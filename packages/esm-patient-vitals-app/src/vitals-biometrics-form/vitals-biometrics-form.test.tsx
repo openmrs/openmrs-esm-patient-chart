@@ -1,6 +1,6 @@
 import React from 'react';
 import { vi, describe, it, expect } from 'vitest';
-import { screen, render } from '@testing-library/react';
+import { act, screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type FetchResponse, showSnackbar, useConfig, getDefaultsFromConfigSchema } from '@openmrs/esm-framework';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
@@ -293,6 +293,76 @@ describe('VitalsBiometricsForm', () => {
         title: 'Vitals and Biometrics saved',
       }),
     );
+  });
+
+  it('saves only once when Save and close is double-clicked while the request is pending', async () => {
+    const user = userEvent.setup();
+    let resolveSave: (response: Awaited<ReturnType<typeof createOrUpdateVitalsAndBiometrics>>) => void;
+    const savePromise = new Promise<Awaited<ReturnType<typeof createOrUpdateVitalsAndBiometrics>>>((resolve) => {
+      resolveSave = resolve;
+    });
+    mockCreateOrUpdateVitalsAndBiometrics.mockReturnValue(savePromise);
+
+    renderVitalsAndBiometricsForm();
+
+    await user.type(screen.getByRole('spinbutton', { name: /temperature/i }), '37');
+    const saveButton = screen.getByRole('button', { name: /save and close/i });
+
+    await user.dblClick(saveButton);
+
+    expect(mockCreateOrUpdateVitalsAndBiometrics).toHaveBeenCalledTimes(1);
+    expect(saveButton).toBeDisabled();
+    expect(defaultProps.closeWorkspace).not.toHaveBeenCalled();
+    expect(mockShowSnackbar).not.toHaveBeenCalled();
+
+    await act(async () => {
+      resolveSave({ status: 201, statusText: 'Created', data: [] } as Awaited<
+        ReturnType<typeof createOrUpdateVitalsAndBiometrics>
+      >);
+      await savePromise;
+    });
+
+    expect(mockCreateOrUpdateVitalsAndBiometrics).toHaveBeenCalledTimes(1);
+    expect(defaultProps.closeWorkspace).toHaveBeenCalledExactlyOnceWith({ discardUnsavedChanges: true });
+    expect(mockShowSnackbar).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ kind: 'success' }));
+  });
+
+  it('allows retrying a failed save without losing the entered measurements', async () => {
+    const user = userEvent.setup();
+    let rejectSave: (error: Error) => void;
+    const savePromise = new Promise<Awaited<ReturnType<typeof createOrUpdateVitalsAndBiometrics>>>((_, reject) => {
+      rejectSave = reject;
+    });
+    mockCreateOrUpdateVitalsAndBiometrics.mockReturnValueOnce(savePromise).mockResolvedValueOnce({
+      status: 201,
+      statusText: 'Created',
+      data: [],
+    } as Awaited<ReturnType<typeof createOrUpdateVitalsAndBiometrics>>);
+
+    renderVitalsAndBiometricsForm();
+
+    const temperatureInput = screen.getByRole('spinbutton', { name: /temperature/i });
+    await user.type(temperatureInput, '37');
+    const saveButton = screen.getByRole('button', { name: /save and close/i });
+    await user.click(saveButton);
+
+    expect(saveButton).toBeDisabled();
+    expect(defaultProps.closeWorkspace).not.toHaveBeenCalled();
+
+    await act(async () => {
+      rejectSave(new Error('Save failed'));
+    });
+
+    await waitFor(() => expect(saveButton).toBeEnabled());
+    expect(temperatureInput).toHaveValue(37);
+    expect(defaultProps.closeWorkspace).not.toHaveBeenCalled();
+    expect(mockShowSnackbar).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ kind: 'error' }));
+
+    await user.click(saveButton);
+
+    await waitFor(() => expect(defaultProps.closeWorkspace).toHaveBeenCalledTimes(1));
+    expect(mockCreateOrUpdateVitalsAndBiometrics).toHaveBeenCalledTimes(2);
+    expect(mockShowSnackbar).toHaveBeenLastCalledWith(expect.objectContaining({ kind: 'success' }));
   });
 
   it('correctly initializes the form with existing vitals and biometrics data while in edit mode', async () => {

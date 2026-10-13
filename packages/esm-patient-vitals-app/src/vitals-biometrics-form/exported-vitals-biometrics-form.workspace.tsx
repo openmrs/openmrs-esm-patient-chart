@@ -222,7 +222,7 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
           }
         }
 
-        createOrUpdateVitalsAndBiometrics(
+        return createOrUpdateVitalsAndBiometrics(
           patientUuid,
           config.vitals.encounterTypeUuid,
           editEncounterUuid,
