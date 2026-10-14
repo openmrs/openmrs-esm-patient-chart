@@ -195,6 +195,24 @@ describe('LabResultsForm', () => {
     );
   });
 
+  test('renders the patient header slot before the results form', () => {
+    const renderSlot = ({ name }) => {
+      if (name === 'patient-header-slot') {
+        return <div data-testid="patient-header-slot" />;
+      }
+      return null;
+    };
+    mockExtensionSlot.mockImplementationOnce(renderSlot).mockImplementationOnce(renderSlot);
+
+    const { container } = render(<ExportedLabResultsForm {...exportedTestProps} />);
+    const headerSlot = screen.getByTestId('patient-header-slot');
+    // eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+    const formElement = container.querySelector('form');
+
+    expect(formElement).toBeInTheDocument();
+    expect(headerSlot.compareDocumentPosition(formElement!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   test('does not render the patient header slot while patient is loading', () => {
     mockUsePatient.mockReturnValue({
       patient: null,
