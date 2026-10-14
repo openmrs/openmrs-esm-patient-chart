@@ -15,6 +15,7 @@ import {
 } from '@openmrs/esm-framework';
 import {
   useOrderType,
+  usePatientIdentifier,
   type OrderBasketItem,
   type TestOrderBasketItem,
   WorkspaceBackButton,
@@ -86,6 +87,7 @@ const AddLabOrder: React.FC<AddLabOrderProps> = ({
   }, [additionalTestOrderTypes, resolvedOrderTypeUuid, orders.labOrderTypeUuid, orders.labOrderableConcepts, t]);
 
   const patientName = patient ? getPatientName(patient) : '';
+  const patientIdentifier = usePatientIdentifier(patient);
 
   return (
     <Workspace2 title={title} hasUnsavedChanges={hasUnsavedChanges}>
@@ -94,6 +96,7 @@ const AddLabOrder: React.FC<AddLabOrderProps> = ({
           <div className={styles.patientHeader}>
             <span className={styles.bodyShort02}>{patientName}</span>
             <span className={classNames(styles.text02, styles.bodyShort01)}>
+              {patientIdentifier && <>{patientIdentifier} &middot; </>}
               {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
               <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
             </span>

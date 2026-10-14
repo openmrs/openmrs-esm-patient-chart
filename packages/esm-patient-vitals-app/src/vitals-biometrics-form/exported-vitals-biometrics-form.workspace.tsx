@@ -21,6 +21,7 @@ import {
   useAbortController,
   useConfig,
   useLayoutType,
+  usePatient,
   useSession,
   type Visit,
   Workspace2,
@@ -63,8 +64,17 @@ export interface VitalsAndBiometricsFormProps {
  */
 const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<VitalsAndBiometricsFormProps, {}, {}>> = ({
   closeWorkspace,
-  workspaceProps: { editEncounterUuid, formContext = 'creating', patientUuid, patient, visitContext },
+  workspaceProps: {
+    editEncounterUuid,
+    formContext = 'creating',
+    patientUuid: propPatientUuid,
+    patient: patientProp,
+    visitContext,
+  },
 }) => {
+  const patientUuid = propPatientUuid ?? patientProp?.id;
+  const { patient: fetchedPatient } = usePatient(patientUuid);
+  const patient = patientProp ?? fetchedPatient;
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig<ConfigObject>();
@@ -682,20 +692,23 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
         </ButtonSet>
       </Form>
     );
-
-    return (
-      <Workspace2
-        title={
-          editEncounterUuid
-            ? t('editVitalsAndBiometrics', 'Edit Vitals and Biometrics')
-            : t('recordVitalsAndBiometrics', 'Record Vitals and Biometrics')
-        }
-        hasUnsavedChanges={hasUserUnsavedChanges}
-      >
-        {formElement}
-      </Workspace2>
-    );
   }
+
+  return (
+    <Workspace2
+      title={
+        editEncounterUuid
+          ? t('editVitalsAndBiometrics', 'Edit Vitals and Biometrics')
+          : t('recordVitalsAndBiometrics', 'Record Vitals and Biometrics')
+      }
+      hasUnsavedChanges={hasUserUnsavedChanges}
+    >
+      {isTablet && patient && patientUuid && (
+        <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
+      )}
+      {formElement}
+    </Workspace2>
+  );
 };
 
 export default ExportedVitalsAndBiometricsForm;
