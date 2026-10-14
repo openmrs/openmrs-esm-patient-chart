@@ -1,6 +1,10 @@
 import React, { useMemo, useState } from 'react';
-import { userHasAccess, useSession, type Visit } from '@openmrs/esm-framework';
-import { type EncountersTableProps, encounterHasJsonSchemaForm } from './encounters-table.resource';
+import { type Visit } from '@openmrs/esm-framework';
+import {
+  type EncountersTableProps,
+  encounterHasJsonSchemaForm,
+  useCanPrintEncounters,
+} from './encounters-table.resource';
 import EncountersTable from './encounters-table.component';
 
 interface VisitCompletedFormsTableProps {
@@ -46,8 +50,7 @@ const VisitCompletedFormsTable: React.FC<VisitCompletedFormsTableProps> = ({
     setCurrentPage(pageNumber);
   };
 
-  const session = useSession();
-  const canPrintEncounters = userHasAccess('App: Print encounter forms', session?.user);
+  const canPrintEncounters = useCanPrintEncounters();
 
   const encountersTableProps: EncountersTableProps = {
     patientUuid,
