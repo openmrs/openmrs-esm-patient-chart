@@ -1,6 +1,7 @@
 import { ErrorState, ExtensionSlot, useLeftNav } from '@openmrs/esm-framework';
 import classNames from 'classnames';
 import React, { useMemo, useState } from 'react';
+import { InlineNotification } from '@carbon/react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { spaBasePath } from '../constants';
@@ -33,20 +34,31 @@ const WrappedPatientChart: React.FC<WrappedPatientChartProps> = ({ patientUuid, 
 
   const leftNavBasePath = useMemo(() => spaBasePath.replace(':patientUuid', patientUuid), [patientUuid]);
 
-  useLeftNav({ name: 'patient-chart-dashboard-slot', basePath: leftNavBasePath });
-
   // A voided (FHIR 410) or non-existent patient resolves to `error` set, or to loading finishing
   // with no patient. In either case we must not render the chart: doing so would show a blank
   // banner and working write affordances for a patient whose identity is unknown (O3-6113).
   const isPatientUnavailable = Boolean(error) || (!isLoadingPatient && !patient);
 
-  // Suppress the dashboard navigation (left nav) alongside the chart content so that no dashboards
-  // or write affordances are reachable for an unavailable patient.
+  // The navigation owner below unmounts alongside unavailable chart content, clearing the
+  // framework registration as well as the chart's local side menu.
   if (isPatientUnavailable) {
     return (
       <main className={classNames('omrs-main-content', styles.chartContainer)}>
         <div className={classNames(styles.innerChartContainer)}>
-          <ErrorState error={error} headerTitle={t('patientChartUnavailable', 'Patient record unavailable')} />
+          {error ? (
+            <ErrorState error={error} headerTitle={t('patientChartUnavailable', 'Patient record unavailable')} />
+          ) : (
+            <InlineNotification
+              kind="error"
+              lowContrast
+              hideCloseButton
+              title={t('patientChartUnavailable', 'Patient record unavailable')}
+              subtitle={t(
+                'patientChartUnavailableMessage',
+                'The patient record could not be loaded. Please try again.',
+              )}
+            />
+          )}
         </div>
       </main>
     );
@@ -54,6 +66,7 @@ const WrappedPatientChart: React.FC<WrappedPatientChartProps> = ({ patientUuid, 
 
   return (
     <>
+      <PatientChartNavigation basePath={leftNavBasePath} />
       <SideMenuPanel />
       <main className={classNames('omrs-main-content', styles.chartContainer)}>
         <>
@@ -86,5 +99,11 @@ const WrappedPatientChart: React.FC<WrappedPatientChartProps> = ({ patientUuid, 
     </>
   );
 };
+
+function PatientChartNavigation({ basePath }: { basePath: string }) {
+  const params = useMemo(() => ({ name: 'patient-chart-dashboard-slot', basePath }), [basePath]);
+  useLeftNav(params);
+  return null;
+}
 
 export default PatientChart;

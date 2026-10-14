@@ -6,10 +6,14 @@ import {
   ErrorState,
   ExtensionSlot,
   launchWorkspaceGroup2,
+  useLeftNav,
   useLayoutType,
   usePatient,
   useVisit,
 } from '@openmrs/esm-framework';
+import { leftNavStore } from '@openmrs/esm-extensions';
+import { useLeftNav as useRealLeftNav, useLeftNavStore } from '@openmrs/esm-react-utils';
+import { ErrorState as RealErrorState } from '@openmrs/esm-styleguide/src/public';
 import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { mockFhirPatient } from '__mocks__';
 import { renderWithSwr } from 'tools';
@@ -36,12 +40,19 @@ const setPatient = vi.fn();
 const setVisitContext = vi.fn();
 const mutateVisitContext = vi.fn();
 
+// This consumer lives outside the chart, as the framework's navigation does.
+function FrameworkNavigation() {
+  const { slotName, basePath } = useLeftNavStore();
+  return slotName ? <a href={`${basePath}/Patient%20Summary`}>Framework patient summary</a> : null;
+}
+
 function patientChartRoute() {
   return (
     <MemoryRouter initialEntries={[`/patient/${mockFhirPatient.id}/chart/Patient%20Summary`]}>
       <Routes>
         <Route path="/patient/:patientUuid/chart/:view" element={<PatientChart />} />
       </Routes>
+      <FrameworkNavigation />
     </MemoryRouter>
   );
 }
@@ -53,8 +64,10 @@ function renderPatientChart() {
 describe('PatientChart', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // Render on a large-desktop layout so SideMenuPanel mounts the dashboard LeftNavMenu; this lets
-    // us assert the dashboard navigation is suppressed when the patient is unavailable (O3-6113).
+    leftNavStore.setState(leftNavStore.getInitialState(), true);
+    vi.mocked(useLeftNav).mockImplementation(useRealLeftNav);
+    mockErrorState.mockImplementation(() => <div>Error State</div>);
+    // Keep the chart's local navigation visible in healthy-patient controls.
     mockUseLayoutType.mockReturnValue('large-desktop');
     mockUsePatient.mockReturnValue({
       isLoading: false,
@@ -99,6 +112,8 @@ describe('PatientChart', () => {
     expect(mockChartReview).not.toHaveBeenCalled();
     expect(mockExtensionSlot).not.toHaveBeenCalled();
     expect(screen.queryByText('Left Nav Menu')).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Framework patient summary' })).not.toBeInTheDocument();
+    expect(leftNavStore.getState().slotName).toBeNull();
     expect(screen.getByText('Error State')).toBeInTheDocument();
     expect(mockErrorState.mock.calls[0][0]).toEqual(
       expect.objectContaining({ error, headerTitle: 'Patient record unavailable' }),
@@ -109,6 +124,7 @@ describe('PatientChart', () => {
   it('removes the chart when a cached patient becomes unavailable', () => {
     const { rerender } = renderPatientChart();
     expect(screen.getByText('Patient dashboard')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Framework patient summary' })).toBeInTheDocument();
     mockChartReview.mockClear();
     mockExtensionSlot.mockClear();
 
@@ -126,6 +142,8 @@ describe('PatientChart', () => {
     expect(mockChartReview).not.toHaveBeenCalled();
     expect(mockExtensionSlot).not.toHaveBeenCalled();
     expect(screen.queryByText('Left Nav Menu')).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Framework patient summary' })).not.toBeInTheDocument();
+    expect(leftNavStore.getState().slotName).toBeNull();
     expect(screen.getByText('Error State')).toBeInTheDocument();
     expect(mockErrorState.mock.calls[0][0]).toEqual(
       expect.objectContaining({ error, headerTitle: 'Patient record unavailable' }),
@@ -141,19 +159,71 @@ describe('PatientChart', () => {
         patientUuid: mockFhirPatient.id,
         error: null,
       });
+      mockErrorState.mockImplementation(RealErrorState);
 
       renderPatientChart();
 
       expect(mockChartReview).not.toHaveBeenCalled();
       expect(mockExtensionSlot).not.toHaveBeenCalled();
       expect(screen.queryByText('Left Nav Menu')).not.toBeInTheDocument();
-      expect(screen.getByText('Error State')).toBeInTheDocument();
-      expect(mockErrorState.mock.calls[0][0]).toEqual(
-        expect.objectContaining({ headerTitle: 'Patient record unavailable' }),
-      );
+      expect(screen.getByText('Patient record unavailable')).toBeInTheDocument();
+      expect(screen.getByText('The patient record could not be loaded. Please try again.')).toBeInTheDocument();
+      expect(screen.queryByText(/undefined/i)).not.toBeInTheDocument();
+      expect(mockErrorState).not.toHaveBeenCalled();
+      expect(screen.queryByRole('link', { name: 'Framework patient summary' })).not.toBeInTheDocument();
+      expect(leftNavStore.getState().slotName).toBeNull();
       expect(launchWorkspaceGroup2).not.toHaveBeenCalled();
     },
   );
+
+  it('restores framework navigation after the patient becomes available again and clears it on unmount', () => {
+    const { rerender, unmount } = renderPatientChart();
+    const basePath = `/spa/patient/${mockFhirPatient.id}/chart`;
+    expect(leftNavStore.getState()).toEqual(
+      expect.objectContaining({ slotName: 'patient-chart-dashboard-slot', basePath }),
+    );
+
+    mockUsePatient.mockReturnValue({
+      isLoading: false,
+      patient: undefined,
+      patientUuid: mockFhirPatient.id,
+      error: Object.assign(new Error('Gone'), { response: { status: 410, statusText: 'Gone' } }),
+    });
+    rerender(patientChartRoute());
+    expect(leftNavStore.getState().slotName).toBeNull();
+
+    mockUsePatient.mockReturnValue({
+      isLoading: false,
+      patient: mockFhirPatient,
+      patientUuid: mockFhirPatient.id,
+      error: null,
+    });
+    rerender(patientChartRoute());
+    expect(screen.getByRole('link', { name: 'Framework patient summary' })).toHaveAttribute(
+      'href',
+      `${basePath}/Patient%20Summary`,
+    );
+    expect(leftNavStore.getState().slotName).toBe('patient-chart-dashboard-slot');
+
+    unmount();
+    expect(leftNavStore.getState().slotName).toBeNull();
+  });
+
+  it('retains the real HTTP error status when the patient request fails', () => {
+    mockErrorState.mockImplementation(RealErrorState);
+    mockUsePatient.mockReturnValue({
+      isLoading: false,
+      patient: undefined,
+      patientUuid: mockFhirPatient.id,
+      error: Object.assign(new Error('Not Found'), { response: { status: 404, statusText: 'Not Found' } }),
+    });
+
+    renderPatientChart();
+
+    expect(screen.getByText('Patient record unavailable')).toBeInTheDocument();
+    expect(screen.getByText(/404: Not Found/)).toBeInTheDocument();
+    expect(screen.queryByText(/undefined/i)).not.toBeInTheDocument();
+  });
 
   it('shows the loader while the patient is loading', () => {
     mockUsePatient.mockReturnValue({

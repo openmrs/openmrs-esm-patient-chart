@@ -132,6 +132,7 @@
   "pastVisits": "Past visits",
   "Patient Summary": "Patient summary",
   "patientChartUnavailable": "Patient record unavailable",
+  "patientChartUnavailableMessage": "The patient record could not be loaded. Please try again.",
   "pdfDownloaded": "PDF downloaded",
   "PM": "PM",
   "previousPage": "Previous page",
