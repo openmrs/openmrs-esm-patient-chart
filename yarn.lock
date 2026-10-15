@@ -740,17 +740,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/router@npm:^20.3.27":
-  version: 20.3.27
-  resolution: "@angular/router@npm:20.3.27"
+"@angular/router@npm:^20.3.32":
+  version: 20.3.32
+  resolution: "@angular/router@npm:20.3.32"
   dependencies:
     tslib: "npm:^2.3.0"
   peerDependencies:
-    "@angular/common": 20.3.27
-    "@angular/core": 20.3.27
-    "@angular/platform-browser": 20.3.27
+    "@angular/common": 20.3.32
+    "@angular/core": 20.3.32
+    "@angular/platform-browser": 20.3.32
     rxjs: ^6.5.3 || ^7.4.0
-  checksum: 10/6e11ae837e55a406a0e650321509b3a464091f288cc8ca219450d4dc9af0545ee0822cd94bc36258b0fd4b7dcfb2c258a25674f24c6d4158feb2d596dfcb8ff1
+  checksum: 10/4531312a2202547f4803ab2d34a5b40430c3303d7a704d655d43b35263878f4dbfb1891e5463e66df5f228d94d6c150ee242860b1eca39f081f202446e64ce8a
   languageName: node
   linkType: hard
 
@@ -5368,7 +5368,7 @@ __metadata:
     "@angular/material": "npm:^20.2.14"
     "@angular/platform-browser": "npm:^20.3.27"
     "@angular/platform-browser-dynamic": "npm:^20.3.27"
-    "@angular/router": "npm:^20.3.27"
+    "@angular/router": "npm:^20.3.32"
     "@carbon/icons": "npm:^11.73.0"
     "@carbon/styles": "npm:^1.98.0"
     "@ng-select/ng-select": "npm:^15.1.3"
