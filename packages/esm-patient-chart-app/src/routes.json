@@ -6,7 +6,7 @@
   },
   "optionalBackendDependencies": {
     "emrapi": {
-      "version": ">=2.1.0 <4.0.0",
+      "version": ">=2.1.0 <5.0.0-0",
       "feature": {
         "flagName": "emrapi-module",
         "label": "EMR API Module",
