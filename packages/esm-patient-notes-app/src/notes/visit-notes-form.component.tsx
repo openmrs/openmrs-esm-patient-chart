@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import classnames from 'classnames';
 import dayjs from 'dayjs';
 import { debounce } from 'lodash-es';
@@ -36,6 +36,7 @@ import {
   useConfig,
   useFeatureFlag,
   useLayoutType,
+  usePatient,
   useSession,
   Workspace2,
   type Encounter,
@@ -69,6 +70,7 @@ type VisitNotesFormData = Omit<z.infer<ReturnType<typeof createSchema>>, 'images
 };
 
 interface DiagnosesDisplayProps {
+  isDisabled: boolean;
   isDiagnosisNotSelected: (diagnosis: Concept) => boolean;
   isLoading: boolean;
   isSearching: boolean;
@@ -79,8 +81,10 @@ interface DiagnosesDisplayProps {
 }
 
 interface DiagnosisSearchProps {
+  canEdit: () => boolean;
   control: Control<VisitNotesFormData>;
   handleSearch: () => void;
+  isDisabled: boolean;
   labelText: string;
   name: 'diagnosisSearch';
   placeholder: string;
@@ -154,6 +158,20 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   visitContext,
   closeWorkspace,
 }) => {
+  const openingPatientUuid = useRef(patientUuid).current;
+  const livePatient = usePatient(openingPatientUuid);
+  const isPatientUnavailable = Boolean(
+    livePatient.isLoading ||
+      livePatient.error ||
+      !livePatient.patient ||
+      livePatient.patientUuid !== openingPatientUuid ||
+      livePatient.patient?.id !== openingPatientUuid ||
+      patientUuid !== openingPatientUuid,
+  );
+  const availabilityRef = useRef(!isPatientUnavailable);
+  availabilityRef.current = !isPatientUnavailable;
+  const canEdit = useCallback(() => availabilityRef.current, []);
+  const activeAttempt = useRef<{ controller: AbortController; cancelled: boolean } | null>(null);
   const isEditing: boolean = Boolean(formContext === 'editing' && encounter?.uuid);
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -169,6 +187,18 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   const [rows, setRows] = useState<number>();
   const [removedImages, setRemovedImages] = useState<string[]>([]);
   const [saveError, setSaveError] = useState<string>();
+  useEffect(() => {
+    if (isPatientUnavailable && activeAttempt.current) {
+      activeAttempt.current.cancelled = true;
+      activeAttempt.current.controller.abort();
+      setSaveError(
+        t(
+          'visitNoteSaveInterrupted',
+          'Saving stopped because the patient record is unavailable. Some changes may already be saved. Your draft is retained.',
+        ),
+      );
+    }
+  }, [isPatientUnavailable, t]);
   const [error, setError] = useState<Error>(null);
   const {
     allowedFileExtensions,
@@ -238,12 +268,14 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   const debouncedSearch = useMemo(
     () =>
       debounce((fieldQuery) => {
-        if (fieldQuery) {
+        if (canEdit() && fieldQuery) {
           setIsLoadingDiagnoses(true);
 
           fetchDiagnosisConceptsByName(fieldQuery, config.diagnosisConceptClass)
             .then((matchingConceptDiagnoses: Array<Concept>) => {
-              setSearchResults(matchingConceptDiagnoses);
+              if (canEdit()) {
+                setSearchResults(matchingConceptDiagnoses);
+              }
               setIsLoadingDiagnoses(false);
             })
             .catch((e) => {
@@ -252,16 +284,19 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
             });
         }
       }, SEARCH_TIMEOUT_MS),
-    [config.diagnosisConceptClass],
+    [canEdit, config.diagnosisConceptClass],
   );
 
   const handleSearch = useCallback(() => {
+    if (!canEdit()) {
+      return;
+    }
     const fieldQuery = watch('diagnosisSearch');
     if (fieldQuery) {
       debouncedSearch(fieldQuery);
     }
     setIsSearching(false);
-  }, [debouncedSearch, watch]);
+  }, [canEdit, debouncedSearch, watch]);
 
   const createDiagnosis = useCallback(
     (concept: Concept): DiagnosisDraft => ({
@@ -270,12 +305,12 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       diagnosis: {
         coded: concept.uuid,
       },
-      patient: patientUuid,
+      patient: openingPatientUuid,
       rank: 2,
       certainty: 'CONFIRMED',
       conceptClassUuid: config.diagnosisConceptClass,
     }),
-    [config.diagnosisConceptClass, patientUuid],
+    [config.diagnosisConceptClass, openingPatientUuid],
   );
 
   const prefilledCodedConceptUuids = useMemo(
@@ -311,6 +346,9 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
   const handleAddDiagnosis = useCallback(
     (conceptDiagnosisToAdd: Concept) => {
+      if (!canEdit()) {
+        return;
+      }
       setValue('diagnosisSearch', '', { shouldDirty: true });
       setSearchResults([]);
       const diagnoses = getValues('diagnoses');
@@ -320,41 +358,50 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       }
       setSelectedDiagnoses([createDiagnosis(conceptDiagnosisToAdd), ...diagnoses]);
     },
-    [createDiagnosis, getValues, setSelectedDiagnoses, setValue],
+    [canEdit, createDiagnosis, getValues, setSelectedDiagnoses, setValue],
   );
 
   const handleRemoveDiagnosis = useCallback(
     (diagnosisToRemove: DiagnosisDraft) => {
+      if (!canEdit()) {
+        return;
+      }
       setSelectedDiagnoses(
         getValues('diagnoses').filter((diagnosis) => diagnosis.draftId !== diagnosisToRemove.draftId),
       );
       // The focused remove button unmounts with its card; return focus to the search input
       document.getElementById('diagnosisSearch')?.focus();
     },
-    [getValues, setSelectedDiagnoses],
+    [canEdit, getValues, setSelectedDiagnoses],
   );
 
   const handleUpdateDiagnosis = useCallback(
     (diagnosisToUpdate: DiagnosisDraft, patch: Partial<Pick<DiagnosisDraft, 'rank' | 'certainty'>>) => {
+      if (!canEdit()) {
+        return;
+      }
       setSelectedDiagnoses(
         getValues('diagnoses').map((diagnosis) =>
           diagnosis.draftId === diagnosisToUpdate.draftId ? { ...diagnosis, ...patch } : diagnosis,
         ),
       );
     },
-    [getValues, setSelectedDiagnoses],
+    [canEdit, getValues, setSelectedDiagnoses],
   );
 
   const isDiagnosisNotSelected = (diagnosis: Concept) =>
     !selectedDiagnoses.some((selectedDiagnosis) => diagnosis.uuid === selectedDiagnosis.diagnosis.coded);
 
   const showImageCaptureModal = useCallback(() => {
-    if (isImageCaptureDisabled) {
+    if (!canEdit() || isImageCaptureDisabled) {
       return;
     }
 
     const close = showModal('capture-photo-modal', {
       saveFile: (file: UploadedFile) => {
+        if (!canEdit()) {
+          return Promise.resolve();
+        }
         if (file.capturedFromWebcam && !file.fileName.includes('.')) {
           file.fileName = `${file.fileName}.png`;
         }
@@ -372,9 +419,12 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       // Files are only staged here; they upload when the note is saved.
       showUploadSnackbar: false,
     });
-  }, [allowedImageExtensions, getValues, isImageCaptureDisabled, setValue]);
+  }, [allowedImageExtensions, canEdit, getValues, isImageCaptureDisabled, setValue]);
 
   const handleRemoveImage = (index: number) => {
+    if (!canEdit()) {
+      return;
+    }
     const updatedImages = [...currentImages];
     updatedImages.splice(index, 1);
     setValue('images', updatedImages, { shouldDirty: true });
@@ -388,6 +438,9 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
   const onSubmit = useCallback(
     (data: VisitNotesFormData) => {
+      if (!canEdit() || activeAttempt.current) {
+        return;
+      }
       const { noteDate, clinicalNote, images, removedImageIds, diagnoses } = data;
       setSaveError(undefined);
 
@@ -430,30 +483,47 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       };
 
       const abortController = new AbortController();
+      const attempt = { controller: abortController, cancelled: false };
+      activeAttempt.current = attempt;
+      // Recovery permits another explicit save, never continuation of this attempt.
+      const ensureActive = () => {
+        if (!canEdit() || attempt.cancelled) {
+          attempt.cancelled = true;
+          abortController.abort();
+          throw new Error('Visit note save interrupted');
+        }
+      };
 
       const saveNote = () => {
+        ensureActive();
         const savePromise = isEditing
           ? updateVisitNote(abortController, encounter.uuid, visitNotePayload)
           : saveVisitNote(abortController, visitNotePayload);
 
         return savePromise
           .then((response) => {
+            ensureActive();
             if (response.status === 201 || response.status === 200) {
               const encounterUuid = encounter?.uuid || response.data.uuid;
 
               const storedDiagnoses = encounter?.diagnoses?.filter(hasDiagnosisContent) ?? [];
               if (isEditing && storedDiagnoses.length) {
                 return Promise.all(
-                  storedDiagnoses.map((diagnosis) => deletePatientDiagnosis(abortController, diagnosis.uuid)),
+                  storedDiagnoses.map((diagnosis) => {
+                    ensureActive();
+                    return deletePatientDiagnosis(abortController, diagnosis.uuid);
+                  }),
                 ).then(() => encounterUuid);
               }
 
               return encounterUuid;
             }
           })
-          .then((encounterUuid) =>
-            Promise.all(
+          .then((encounterUuid) => {
+            ensureActive();
+            return Promise.all(
               diagnoses.map((diagnosis) => {
+                ensureActive();
                 const diagnosesPayload: DiagnosisPayload = {
                   encounter: encounterUuid,
                   patient: patientUuid,
@@ -464,9 +534,10 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                 };
                 return savePatientDiagnosis(abortController, diagnosesPayload);
               }),
-            ).then(() => encounterUuid),
-          )
+            ).then(() => encounterUuid);
+          })
           .then((encounterUuid) => {
+            ensureActive();
             // Only images added in this session are in the form state. Images already saved on the
             // note are shown from the server and never re-uploaded.
             if (!images?.length) {
@@ -476,6 +547,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
             // fail the whole save: every image that can upload does, and the rest are reported.
             return Promise.allSettled(
               images.map((image) => {
+                ensureActive();
                 const imageToUpload: UploadedFile = {
                   base64Content: image.base64Content,
                   file: image.file,
@@ -498,7 +570,9 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
           let noteSaveAttempted = false;
           try {
             for (const imageId of removedImageIds) {
-              await removeVisitNoteImage(imageId);
+              ensureActive();
+              await removeVisitNoteImage(imageId, abortController.signal);
+              ensureActive();
               removedAny = true;
               setRemovedImages((removed) => [...removed, imageId]);
               setValue(
@@ -509,6 +583,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                 },
               );
             }
+            ensureActive();
             if (!isEditing || Object.keys(dirtyFields).some((field) => field !== 'removedImageIds')) {
               noteSaveAttempted = true;
               return await saveNote();
@@ -524,6 +599,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
           }
         })
         .then((failedUploads = []) => {
+          ensureActive();
           closeWorkspace({ discardUnsavedChanges: true });
 
           if (failedUploads.length) {
@@ -557,6 +633,15 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
           });
         })
         .catch((err) => {
+          if (attempt.cancelled) {
+            setSaveError(
+              t(
+                'visitNoteSaveInterrupted',
+                'Saving stopped because the patient record is unavailable. Some changes may already be saved. Your draft is retained.',
+              ),
+            );
+            return;
+          }
           setSaveError(
             t(
               'visitNotePartialSaveError',
@@ -571,9 +656,15 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
             isLowContrast: false,
             subtitle: err?.responseBody?.error?.message ?? err.message,
           });
+        })
+        .finally(() => {
+          if (activeAttempt.current === attempt) {
+            activeAttempt.current = null;
+          }
         });
     },
     [
+      canEdit,
       dirtyFields,
       getValues,
       setValue,
@@ -628,7 +719,25 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       title={isEditing ? t('editVisitNote', 'Edit visit note') : t('addVisitNote', 'Add visit note')}
       hasUnsavedChanges={hasUserUnsavedChanges}
     >
-      <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
+      <Form
+        className={styles.form}
+        onSubmit={(event) => {
+          if (!canEdit()) {
+            event.preventDefault();
+            return;
+          }
+          return handleSubmit(onSubmit, onError)(event);
+        }}
+      >
+        {isPatientUnavailable && (
+          <InlineNotification
+            kind="warning"
+            lowContrast
+            hideCloseButton
+            title={t('patientRecordUnavailable', 'Patient record unavailable')}
+            subtitle={t('visitNoteDraftRetained', 'Your draft is retained. Editing and saving are paused.')}
+          />
+        )}
         <ExtensionSlot name="visit-context-header-slot" state={visitContextHeaderState} />
 
         {isTablet && (
@@ -661,7 +770,12 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                           id="visitDateTimePicker"
                           invalid={Boolean(fieldState?.error?.message)}
                           invalidText={fieldState?.error?.message}
-                          isDisabled={isEditing}
+                          isDisabled={isEditing || isPatientUnavailable}
+                          onChange={(date) => {
+                            if (canEdit()) {
+                              field.onChange(date);
+                            }
+                          }}
                           labelText={t('visitDate', 'Visit date')}
                           maxDate={new Date()}
                         />
@@ -685,11 +799,13 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
               <Column sm={3}>
                 <FormGroup legendText="">
                   <DiagnosisSearch
+                    canEdit={canEdit}
                     name="diagnosisSearch"
                     control={control}
                     labelText={t('searchForDiagnosis', 'Search for a diagnosis to add')}
                     placeholder={t('diagnosisInputPlaceholder', 'Search for a diagnosis')}
                     handleSearch={handleSearch}
+                    isDisabled={isPatientUnavailable}
                     setIsSearching={setIsSearching}
                   />
                   {error ? (
@@ -702,6 +818,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                     />
                   ) : null}
                   <DiagnosesDisplay
+                    isDisabled={isPatientUnavailable}
                     isDiagnosisNotSelected={isDiagnosisNotSelected}
                     isLoading={isLoadingDiagnoses}
                     isSearching={isSearching}
@@ -724,6 +841,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                           key={diagnosis.draftId}
                           canMarkProvisional={canMarkProvisional(diagnosis)}
                           diagnosis={diagnosis}
+                          disabled={isPatientUnavailable}
                           onRemove={handleRemoveDiagnosis}
                           onUpdate={handleUpdateDiagnosis}
                         />
@@ -765,8 +883,12 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                         labelText={t('clinicalNoteLabel', 'Write your notes')}
                         placeholder={t('clinicalNotePlaceholder', 'Write any notes here')}
                         value={value}
+                        disabled={isPatientUnavailable}
                         onBlur={onBlur}
                         onChange={(event) => {
+                          if (!canEdit()) {
+                            return;
+                          }
                           onChange(event);
                           const textareaLineHeight = 24; // This is the default line height for Carbon's TextArea component
                           const newRows = Math.ceil(event.target.scrollHeight / textareaLineHeight);
@@ -789,7 +911,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                   </p>
                   <Button
                     className={styles.uploadButton}
-                    disabled={isImageCaptureDisabled}
+                    disabled={isPatientUnavailable || isImageCaptureDisabled}
                     kind={isTablet ? 'ghost' : 'tertiary'}
                     onClick={showImageCaptureModal}
                     renderIcon={(props) => <Add size={16} {...props} />}
@@ -845,7 +967,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                             <Button
                               kind={isMarkedForRemoval ? 'ghost' : 'secondary'}
                               size="sm"
-                              disabled={isSubmitting}
+                              disabled={isPatientUnavailable || isSubmitting}
                               aria-label={
                                 isMarkedForRemoval
                                   ? t('undoRemoveImage', 'Undo removal: {{name}}', {
@@ -856,15 +978,18 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                                     })
                               }
                               className={isMarkedForRemoval ? styles.undoButton : styles.removeButton}
-                              onClick={() =>
+                              onClick={() => {
+                                if (!canEdit()) {
+                                  return;
+                                }
                                 setValue(
                                   'removedImageIds',
                                   isMarkedForRemoval
                                     ? removedImageIds.filter((id) => id !== image.id)
                                     : [...removedImageIds, image.id],
                                   { shouldDirty: true },
-                                )
-                              }
+                                );
+                              }}
                             >
                               {isMarkedForRemoval ? t('undo', 'Undo') : <Close size={16} />}
                             </Button>
@@ -881,6 +1006,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                           />
                         </div>
                         <Button
+                          disabled={isPatientUnavailable}
                           kind="secondary"
                           size="sm"
                           aria-label={t('removeImage', 'Remove image: {{name}}', {
@@ -920,7 +1046,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
           <Button
             className={styles.button}
             kind="primary"
-            disabled={!hasUserUnsavedChanges || isSubmitting}
+            disabled={isPatientUnavailable || !hasUserUnsavedChanges || isSubmitting}
             type="submit"
           >
             {isSubmitting ? (
@@ -936,11 +1062,13 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 };
 
 function DiagnosisSearch({
+  canEdit,
   name,
   control,
   labelText,
   placeholder,
   handleSearch,
+  isDisabled,
   setIsSearching,
 }: DiagnosisSearchProps) {
   const isTablet = useLayoutType() === 'tablet';
@@ -952,11 +1080,15 @@ function DiagnosisSearch({
       render={({ field: { value, onChange, onBlur } }) => (
         <ResponsiveWrapper>
           <Search
+            disabled={isDisabled}
             size={isTablet ? 'lg' : 'md'}
             id={name}
             labelText={labelText}
             placeholder={placeholder}
             onChange={(e) => {
+              if (!canEdit()) {
+                return;
+              }
               setIsSearching(true);
               onChange(e);
               handleSearch();
@@ -980,6 +1112,7 @@ function DiagnosisSearch({
 }
 
 function DiagnosesDisplay({
+  isDisabled,
   isDiagnosisNotSelected,
   isLoading,
   isSearching,
@@ -1036,6 +1169,7 @@ function DiagnosesDisplay({
         {searchResults.filter(isDiagnosisNotSelected).map((diagnosis) => (
           <li className={styles.diagnosis} key={diagnosis.uuid}>
             <button
+              disabled={isDisabled}
               type="button"
               className={styles.diagnosisButton}
               onClick={() => {
