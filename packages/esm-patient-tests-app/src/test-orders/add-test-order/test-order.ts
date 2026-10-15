@@ -3,11 +3,23 @@ import { type TestType } from './useTestTypes';
 
 type LabOrderRequest = Pick<TestOrderBasketItem, 'action' | 'testType'>;
 
-export function createEmptyLabOrder(testType: TestType, orderer: string, visit): TestOrderBasketItem {
+/**
+ * A test order plus the clinician's "Notify me when resulted" choice.
+ *
+ * The flag is local to this app rather than added to the shared `TestOrderBasketItem`: it never
+ * reaches the server. OpenMRS core has no order-level notify field, so the opt-in is recorded
+ * client-side against patient + concept when the basket is submitted.
+ */
+export interface SmartTestOrderBasketItem extends TestOrderBasketItem {
+  notifyWhenResulted?: boolean;
+}
+
+export function createEmptyLabOrder(testType: TestType, orderer: string, visit): SmartTestOrderBasketItem {
   return {
     action: 'NEW',
     urgency: priorityOptions[0].value as OrderUrgency,
     display: testType.label,
+    notifyWhenResulted: false,
     testType,
     visit,
   };
