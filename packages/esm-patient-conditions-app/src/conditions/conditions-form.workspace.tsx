@@ -43,7 +43,8 @@ const createSchema = (formContext: 'creating' | 'editing', t: TFunction) => {
 };
 
 function getErrorMessage(error: { responseBody?: { error?: { message?: string } } } | null, fallback: string): string {
-  return error?.responseBody?.error?.message ?? fallback;
+  const message = error?.responseBody?.error?.message;
+  return typeof message === 'string' && message.trim() ? message : fallback;
 }
 
 export type ConditionsFormSchema = z.infer<ReturnType<typeof createSchema>>;
