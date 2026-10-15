@@ -1,13 +1,18 @@
 import { renderHook } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { useAllEncounters, encounterHasJsonSchemaForm } from './encounters-table.resource';
+import { useAllEncounters, encounterHasJsonSchemaForm, useCanPrintEncounters } from './encounters-table.resource';
 
 const mockUseOpenmrsFetchAll = vi.fn();
+const mockUseFeatureFlag = vi.fn();
+const mockUserHasAccess = vi.fn();
 
 vi.mock('@openmrs/esm-framework', () => ({
   makeUrl: vi.fn((path: string) => `http://localhost/${path}`),
   restBaseUrl: '/ws/rest/v1',
   useOpenmrsFetchAll: (...args: unknown[]) => mockUseOpenmrsFetchAll(...args),
+  useFeatureFlag: (...args: unknown[]) => mockUseFeatureFlag(...args),
+  userHasAccess: (...args: unknown[]) => mockUserHasAccess(...args),
+  useSession: () => ({ user: { uuid: 'user-uuid' } }),
 }));
 
 describe('encounterHasJsonSchemaForm', () => {
@@ -153,4 +158,29 @@ describe('useAllEncounters', () => {
     expect(callArg).toContain('obs');
     expect(callArg).toContain('encounterProviders');
   });
+});
+
+describe('useCanPrintEncounters', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it.each([
+    [true, true, true],
+    [true, false, false],
+    [false, true, false],
+    [false, false, false],
+  ])(
+    'with the print privilege %s and the patientdocuments module installed %s, returns %s',
+    (hasPrivilege, isModuleInstalled, expected) => {
+      mockUserHasAccess.mockReturnValue(hasPrivilege);
+      mockUseFeatureFlag.mockReturnValue(isModuleInstalled);
+
+      const { result } = renderHook(() => useCanPrintEncounters());
+
+      expect(result.current).toBe(expected);
+      expect(mockUserHasAccess).toHaveBeenCalledWith('App: Print encounter forms', { uuid: 'user-uuid' });
+      expect(mockUseFeatureFlag).toHaveBeenCalledWith('patientdocuments-module');
+    },
+  );
 });
