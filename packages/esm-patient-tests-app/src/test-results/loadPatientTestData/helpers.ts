@@ -1,4 +1,4 @@
-import { restBaseUrl } from '@openmrs/esm-framework';
+import { fhirBaseUrl, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import {
   type PatientData,
   type ObsRecord,
@@ -77,7 +77,7 @@ export function getUserDataFromCache(patientUuid: string): [PatientData | undefi
  * @param queries
  */
 function* fhirObservationRequests(queries: Record<string, string>) {
-  const fhirPathname = `${window.openmrsBase}/ws/fhir2/R4/Observation`;
+  const fhirPathname = `${fhirBaseUrl}/Observation`;
   const path =
     fhirPathname +
     '?' +
@@ -88,7 +88,7 @@ function* fhirObservationRequests(queries: Record<string, string>) {
   const pathWithPageOffset = (offset) => path + '&_getpagesoffset=' + offset * PAGE_SIZE;
   let offsetCounter = 0;
   while (true) {
-    yield fetch(pathWithPageOffset(offsetCounter++)).then((res) => res.json());
+    yield openmrsFetch(pathWithPageOffset(offsetCounter++)).then(({ data }) => data);
   }
 }
 

@@ -31,7 +31,7 @@ const usePatientResultsData = (patientUuid: string): LoadingState => {
         })
         .catch((error) => {
           if (isMountedRef.current) {
-            setState({ sortedObs: {}, loaded: true, error });
+            setState({ sortedObs: data ?? {}, loaded: true, error });
           }
         });
     }
