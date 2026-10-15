@@ -1,6 +1,6 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, test, type Mock } from 'vitest';
-import { getDefaultsFromConfigSchema, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, openmrsFetch, reportError, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from '../../../esm-patient-tests-app/src/config-schema';
 import { useOrderableConceptSets } from './useOrderableConceptSets';
 
@@ -62,5 +62,26 @@ describe('useOrderableConceptSets is configurable', () => {
       // expect.objectContaining({ display: 'Configured concept' }),
     ]);
     expect(result.current.error).toBeFalsy();
+  });
+});
+
+describe('useOrderableConceptSets error reporting', () => {
+  it('reports a failed fetch once, however often the component re-renders', async () => {
+    // The framework mock rethrows reported errors; here we only count the calls
+    const mockReportError = vi
+      .mocked(reportError)
+      .mockClear()
+      .mockImplementation(() => {});
+    mockOpenrsFetch.mockRejectedValueOnce(new Error('Network error'));
+
+    // A concept set no other test has loaded, so nothing comes from the SWR cache
+    const { result, rerender } = renderHook(() => useOrderableConceptSets('', ['failing-concept-set-uuid']));
+    await waitFor(() => expect(result.current.error).toBeTruthy());
+
+    rerender();
+    rerender();
+    rerender();
+
+    expect(mockReportError).toHaveBeenCalledTimes(1);
   });
 });
