@@ -29,6 +29,16 @@ const UploadStatusComponent: React.FC<UploadStatusComponentProps> = ({ title }) 
   const [isRetrying, setIsRetrying] = useState(false);
   const startedUpload = useRef(false);
   const completionNotified = useRef(false);
+  // Keep upload outcomes available to async work even after the modal unmounts.
+  const uploadStates = useRef<Array<UploadState>>(filesToUpload.map(() => 'uploading'));
+
+  const finishIfComplete = useCallback(() => {
+    if (!completionNotified.current && uploadStates.current.length > 0 &&
+        uploadStates.current.every((status) => status === 'complete')) {
+      completionNotified.current = true;
+      onCompletion?.();
+    }
+  }, [onCompletion]);
 
   const uploadFiles = useCallback(
     async (indexes: Array<number>) => {
@@ -36,6 +46,7 @@ const UploadStatusComponent: React.FC<UploadStatusComponentProps> = ({ title }) 
         return true;
       }
 
+      indexes.forEach((index) => { uploadStates.current[index] = 'uploading'; });
       setFilesUploading((previous) =>
         previous.map((file, index) => (indexes.includes(index) ? { ...file, status: 'uploading' } : file)),
       );
@@ -56,13 +67,16 @@ const UploadStatusComponent: React.FC<UploadStatusComponentProps> = ({ title }) 
               });
             }
 
+            uploadStates.current[index] = 'complete';
             setFilesUploading((previous) =>
               previous.map((upload, uploadIndex) =>
                 uploadIndex === index ? { ...upload, status: 'complete' } : upload,
               ),
             );
+            finishIfComplete();
             return true;
           } catch (error) {
+            uploadStates.current[index] = 'failed';
             setFilesUploading((previous) =>
               previous.map((upload, uploadIndex) =>
                 uploadIndex === index ? { ...upload, status: 'failed' } : upload,
@@ -80,7 +94,7 @@ const UploadStatusComponent: React.FC<UploadStatusComponentProps> = ({ title }) 
 
       return results.every(Boolean);
     },
-    [filesToUpload, saveFile, showUploadSnackbar, t],
+    [filesToUpload, saveFile, showUploadSnackbar, t, finishIfComplete],
   );
 
   useEffect(() => {
@@ -92,17 +106,6 @@ const UploadStatusComponent: React.FC<UploadStatusComponentProps> = ({ title }) 
     const indexes = filesToUpload.map((_, index) => index);
     void uploadFiles(indexes);
   }, [filesToUpload, uploadFiles]);
-
-  useEffect(() => {
-    if (
-      !completionNotified.current &&
-      filesUploading.length > 0 &&
-      filesUploading.every((file) => file.status === 'complete')
-    ) {
-      completionNotified.current = true;
-      onCompletion?.();
-    }
-  }, [filesUploading, onCompletion]);
 
   const failedIndexes = useMemo(
     () =>
