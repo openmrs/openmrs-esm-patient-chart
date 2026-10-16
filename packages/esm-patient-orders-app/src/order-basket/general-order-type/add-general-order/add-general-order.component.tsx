@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Button, Search } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import {
+  ExtensionSlot,
   ResponsiveWrapper,
   useConfig,
   useDebounce,
@@ -26,6 +27,7 @@ interface AddGeneralOrderProps {
   initialOrder: OrderBasketItem;
   orderTypeUuid: string;
   patient: fhir.Patient;
+  patientUuid: string;
   visitContext: Visit;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
 }
@@ -37,6 +39,7 @@ const AddGeneralOrder: React.FC<AddGeneralOrderProps> = ({
   initialOrder,
   orderTypeUuid,
   patient,
+  patientUuid,
   visitContext,
   closeWorkspace,
 }) => {
@@ -85,6 +88,9 @@ const AddGeneralOrder: React.FC<AddGeneralOrderProps> = ({
 
   return (
     <Workspace2 title={title} hasUnsavedChanges={hasUnsavedChanges}>
+      {isTablet && patient && patientUuid && (
+        <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
+      )}
       <div className={styles.workspaceWrapper}>
         {!isTablet && (
           <WorkspaceBackButton

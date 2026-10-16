@@ -45,6 +45,7 @@ import {
   Workspace2,
   type Visit,
 } from '@openmrs/esm-framework';
+import { usePatientIdentifier } from '@openmrs/esm-patient-common-lib';
 import { useMedicationOrders, useRequireOutpatientQuantity } from '../api';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
@@ -417,6 +418,7 @@ export function DrugOrderForm({
 
   const [showStickyMedicationHeader, setShowMedicationHeader] = useState(false);
   const patientName = patient ? getPatientName(patient) : '';
+  const patientIdentifier = usePatientIdentifier(patient);
 
   const observer = useRef(null);
   const medicationInfoHeaderRef = useCallback(
@@ -470,6 +472,7 @@ export function DrugOrderForm({
         <div className={styles.patientHeader}>
           <span className={styles.bodyShort02}>{patientName}</span>
           <span className={classNames(styles.text02, styles.bodyShort01)}>
+            {isTablet && patientIdentifier && <>{patientIdentifier} &middot; </>}
             {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
             <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
           </span>

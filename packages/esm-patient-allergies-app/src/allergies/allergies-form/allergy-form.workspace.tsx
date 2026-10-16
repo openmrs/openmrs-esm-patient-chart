@@ -411,6 +411,9 @@ export function AllergyForm({ allergy, closeWorkspace, formContext, patient, pat
       title={allergy ? t('editAllergy', 'Edit an allergy') : t('recordNewAllergy', 'Record a new allergy')}
       hasUnsavedChanges={isDirty}
     >
+      {isTablet && patient && patientUuid && (
+        <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
+      )}
       <Form className={styles.formContainer} onSubmit={handleSubmit(onSubmit)}>
         {isTablet ? (
           <Row className={styles.header}>

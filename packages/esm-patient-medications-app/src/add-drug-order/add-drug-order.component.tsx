@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
 import {
+  ExtensionSlot,
   SearchIcon,
   ListCheckedIcon,
   showSnackbar,
@@ -196,6 +197,9 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
   if (!currentOrder) {
     return (
       <Workspace2 title={workspaceTitle}>
+        {isTablet && patient && patientUuid && (
+          <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
+        )}
         {!isTablet && (
           <WorkspaceBackButton
             label={t('backToOrderBasket', 'Back to order basket')}

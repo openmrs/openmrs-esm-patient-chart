@@ -6,6 +6,7 @@ import {
   openmrsFetch,
   type FetchResponse,
   useConfig,
+  useLayoutType,
   Workspace2,
   type Workspace2DefinitionProps,
   type Encounter,
@@ -82,6 +83,7 @@ const FormEntry: React.FC<FormEntryProps> = ({
   const isHtmlForm = htmlForm != null;
   const { mutate: globalMutate } = useSWRConfig();
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const { mutateForms } = useForms(patientUuid, visitUuid);
@@ -101,7 +103,10 @@ const FormEntry: React.FC<FormEntryProps> = ({
       additionalProps: additionalProps ?? {},
       handlePostResponse,
       hideControls,
-      hidePatientBanner,
+      // On tablet the panel is full-screen, so this workspace renders the patient banner itself and
+      // suppresses the form engine's own banner (which only shows when the panel is ultra-wide) to
+      // avoid duplicates. On desktop the engine's banner is left untouched.
+      hidePatientBanner: hidePatientBanner || isTablet,
       preFilledQuestions,
       closeWorkspace: () => {
         return closeWorkspace();
@@ -128,6 +133,7 @@ const FormEntry: React.FC<FormEntryProps> = ({
       handlePostResponse,
       hideControls,
       hidePatientBanner,
+      isTablet,
       mutateForms,
       mutateVisitContext,
       patient,
@@ -167,9 +173,14 @@ const FormEntry: React.FC<FormEntryProps> = ({
   }, [encounterUuid, htmlForm, patientUuid, visitUuid]);
 
   const showFormAndLoadedData = form && patientUuid && !isLoadingEncounterVisit;
+  const showPatientBanner =
+    isTablet && !hidePatientBanner && patient && patientUuid && additionalProps?.mode !== 'embedded-view';
 
   return (
     <Workspace2 title={form.display ?? t('clinicalForm', 'Clinical form')} hasUnsavedChanges={hasUnsavedChanges}>
+      {showPatientBanner && (
+        <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
+      )}
       <div>
         {/* Legacy HTML forms do not report unsaved changes to the workspace. */}
         {showBackButton && !isHtmlForm && (

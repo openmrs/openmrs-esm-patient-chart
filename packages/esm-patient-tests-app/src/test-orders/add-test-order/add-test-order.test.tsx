@@ -279,13 +279,20 @@ describe('AddLabOrder', () => {
     expect(mockCloseWorkspace).toHaveBeenCalled();
   });
 
-  test('should display a patient header on tablet', () => {
+  test('should display the patient header and identifier on tablet only', () => {
     mockUseLayoutType.mockReturnValue('tablet');
-    renderAddLabOrderWorkspace();
+    const { unmount } = renderAddLabOrderWorkspace();
     expect(screen.getByText(/john wilson/i)).toBeInTheDocument();
+    expect(screen.getByText(/100732HE/)).toBeInTheDocument();
     expect(screen.getByText(/male/i)).toBeInTheDocument();
     expect(screen.getByText(new RegExp(age(mockPatient.birthDate), 'i'))).toBeInTheDocument();
     expect(screen.getByText('04 — Apr — 1972')).toBeInTheDocument();
+    unmount();
+
+    mockUseLayoutType.mockReturnValue('large-desktop');
+    renderAddLabOrderWorkspace();
+    expect(screen.queryByText(/john wilson/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/100732HE/)).not.toBeInTheDocument();
   });
 
   test('should fall back to the configured lab order type UUID when orderTypeUuid is not provided', () => {
