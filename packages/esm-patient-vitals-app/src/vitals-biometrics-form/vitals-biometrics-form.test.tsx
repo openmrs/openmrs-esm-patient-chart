@@ -456,7 +456,11 @@ describe('VitalsBiometricsForm', () => {
     const user = userEvent.setup();
 
     const error = {
-      message: 'Some of the values entered are invalid',
+      responseBody: {
+        error: {
+          message: 'Internal Server Error',
+        },
+      },
       response: {
         status: 500,
         statusText: 'Internal Server Error',
@@ -493,8 +497,41 @@ describe('VitalsBiometricsForm', () => {
     expect(mockShowSnackbar).toHaveBeenCalledWith({
       isLowContrast: false,
       kind: 'error',
-      subtitle: 'Some of the values entered are invalid',
+      subtitle: "Couldn't save vitals. Please try again.",
       title: 'Error saving Vitals and Biometrics',
+    });
+  });
+
+  it('shows the server permission error when saving vitals fails with a 403', async () => {
+    const user = userEvent.setup();
+
+    const error = {
+      responseBody: {
+        error: {
+          message: "User is logged in but doesn't have the relevant privilege [Privileges required: Edit Encounters]",
+        },
+      },
+      response: {
+        status: 403,
+        statusText: 'Forbidden',
+      },
+    };
+
+    mockCreateOrUpdateVitalsAndBiometrics.mockRejectedValueOnce(error);
+
+    renderVitalsAndBiometricsForm();
+
+    await user.type(screen.getByRole('spinbutton', { name: /temperature/i }), '37');
+
+    await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+    await waitFor(() => {
+      expect(mockShowSnackbar).toHaveBeenCalledWith(
+        expect.objectContaining({
+          kind: 'error',
+          subtitle: "User is logged in but doesn't have the relevant privilege [Privileges required: Edit Encounters]",
+        }),
+      );
     });
   });
 

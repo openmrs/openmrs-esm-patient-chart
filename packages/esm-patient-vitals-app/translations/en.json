@@ -72,6 +72,7 @@
   "vitalsAndBiometricsNowAvailable": "They are now visible on the Vitals and Biometrics page",
   "vitalsAndBiometricsSaved": "Vitals and Biometrics saved",
   "vitalsAndBiometricsSaveError": "Error saving vitals and biometrics",
+  "vitalsAndBiometricsSaveFailure": "Couldn't save vitals. Please try again.",
   "vitalsAndBiometricsUpdated": "Vitals and Biometrics updated",
   "vitalsAndBiometricsUpdateError": "Error updating Vitals and Biometrics",
   "vitalsHistory": "Vitals history",
