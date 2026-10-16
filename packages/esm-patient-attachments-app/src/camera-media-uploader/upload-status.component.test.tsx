@@ -181,3 +181,25 @@ test('does not start a duplicate upload batch after rerendering', async () => {
   await waitFor(() => expect(saveFile).toHaveBeenCalledTimes(1));
   expect(onCompletion).toHaveBeenCalledTimes(1);
 });
+
+
+test('notifies completion after uploads settle even when the modal is closed', async () => {
+  let resolveUpload!: (value: FetchResponse<any>) => void;
+  const pendingUpload = new Promise<FetchResponse<any>>((resolve) => {
+    resolveUpload = resolve;
+  });
+  const saveFile = vi.fn<SaveFile>().mockImplementation(() => pendingUpload);
+  const onCompletion = vi.fn();
+  const { unmount } = render(
+    <CameraMediaUploaderContext.Provider
+      value={{ filesToUpload: [firstFile], saveFile, onCompletion, closeModal: vi.fn(), clearData: vi.fn() }}
+    >
+      <UploadStatusComponent />
+    </CameraMediaUploaderContext.Provider>,
+  );
+
+  await waitFor(() => expect(saveFile).toHaveBeenCalledTimes(1));
+  unmount();
+  resolveUpload({} as FetchResponse<any>);
+  await waitFor(() => expect(onCompletion).toHaveBeenCalledTimes(1));
+});
