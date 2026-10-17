@@ -255,6 +255,37 @@ describe('Conditions form', () => {
     expect(document.body).not.toHaveTextContent(developerOnlyText);
   });
 
+  it.each([
+    ['an empty string', ''],
+    ['a whitespace-only string', '   '],
+    ['a non-string value', { detail: 'Not a message string' }],
+  ])('renders the fallback error message when the server message is %s', async (_, message) => {
+    const user = userEvent.setup();
+
+    mockUseConditionsSearch.mockReturnValue({
+      searchResults: searchedCondition,
+      error: null,
+      isSearching: false,
+    });
+    mockCreateCondition.mockRejectedValueOnce({
+      ...fhirPermissionError,
+      responseBody: { error: { message } },
+    });
+
+    renderConditionsForm();
+
+    await user.type(screen.getByRole('searchbox', { name: /enter condition/i }), 'Headache');
+    await user.click(screen.getByRole('button', { name: /headache/i }));
+    await user.click(screen.getByRole('button', { name: /save & close/i }));
+
+    expect(await screen.findByText('Error creating condition')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'The condition could not be saved. You may not have permission to do this. Contact your system administrator if the problem continues.',
+      ),
+    ).toBeInTheDocument();
+  });
+
   it('renders a human-readable error notification if there was a problem updating a condition', async () => {
     const user = userEvent.setup();
 
