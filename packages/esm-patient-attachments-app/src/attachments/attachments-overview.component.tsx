@@ -83,17 +83,65 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({ patientUuid }
   );
 
   const openAttachment = useCallback(
-    (attachment: Attachment) => {
+    async (attachment: Attachment) => {
+      const orthancUrl = attachment.description ?? '';
+      // Recognise the viewer link by what it IS, not by where it happens to be hosted. Testing
+      // for ':8889' (Orthanc's loopback debug port) only ever matches a local dev stack; on a
+      // real deployment the stored link is the public one, so that check alone is never true.
+      const isOrthancViewerUrl =
+        orthancUrl.includes('stone-webviewer') || orthancUrl.includes('orthancId=') || orthancUrl.includes(':8889');
+      if (isOrthancViewerUrl) {
+        const normalizedUrl = orthancUrl.replace(/&amp;/g, '&');
+        const studyIdMatch = normalizedUrl.match(/[?&]study=([^&#+]+)/) || normalizedUrl.match(/#\/studies\/([^?&]+)/);
+        const orthancIdMatch = normalizedUrl.match(/[?&]orthancId=([^&]+)/);
+        const studyId = orthancIdMatch ? orthancIdMatch[1] : studyIdMatch ? studyIdMatch[1] : null;
+        if (!studyId) {
+          showSnackbar({
+            title: t('dicomError', 'DICOM Viewer Error'),
+            subtitle: t('dicomStudyIdError', 'Could not extract study ID from DICOM attachment.'),
+            kind: 'error',
+          });
+          return;
+        }
+        try {
+          const response = await fetch(`/openmrs/ws/rest/v1/orthanc/token?studyId=${encodeURIComponent(studyId)}`, {
+            credentials: 'include',
+            headers: { Accept: 'application/json' },
+          });
+
+          if (response.status === 401) {
+            // Session expired — redirect to login and come back to this page after
+            const returnUrl = encodeURIComponent(window.location.href);
+            // /openmrs/oauth2login, not the legacy /openmrs/login.htm: this deployment sits behind
+            // Keycloak, and the legacy form would be redirected anyway, losing the return path.
+            window.location.href = `/openmrs/oauth2login?redirect=${returnUrl}`;
+            return;
+          }
+
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const data = await response.json();
+          window.open(data.url, '_blank', 'noopener,noreferrer');
+        } catch (err) {
+          showSnackbar({
+            title: t('dicomError', 'DICOM Viewer Error'),
+            subtitle: t('dicomTokenError', 'Could not open DICOM viewer: {{error}}', { error: (err as Error).message }),
+            kind: 'error',
+          });
+        }
+        return;
+      }
+
       if (attachment.bytesContentFamily === 'IMAGE' || attachment.bytesContentFamily === 'PDF') {
         setAttachmentToPreview(attachment);
-      } else {
-        const anchor = document.createElement('a');
-        anchor.setAttribute('href', attachment.src);
-        anchor.setAttribute('download', attachment.filename);
-        anchor.click();
+        return;
       }
+
+      const anchor = document.createElement('a');
+      anchor.setAttribute('href', attachment.src);
+      anchor.setAttribute('download', attachment.filename);
+      anchor.click();
     },
-    [setAttachmentToPreview],
+    [setAttachmentToPreview, t],
   );
 
   const showAddAttachmentModal = useCallback(() => {
