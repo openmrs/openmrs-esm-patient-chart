@@ -4,16 +4,24 @@ import userEvent from '@testing-library/user-event';
 import { render, renderHook, screen, waitFor } from '@testing-library/react';
 import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 import { type PostDataPrepLabOrderFunction } from '../api';
-import { age, getDefaultsFromConfigSchema, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
+import {
+  ExtensionSlot,
+  getDefaultsFromConfigSchema,
+  useConfig,
+  useLayoutType,
+  useSession,
+} from '@openmrs/esm-framework';
 import { type PostDataPrepFunction, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
 import { configSchema, type ConfigObject } from '../../config-schema';
 import { mockSessionDataResponse } from '__mocks__';
 import { mockPatient } from 'tools';
 import { createEmptyLabOrder } from './test-order';
 import AddTestOrderWorkspace from './add-test-order.workspace';
+import ExportedAddTestOrderWorkspace from './exported-add-test-order.workspace';
 
 const mockCloseWorkspace = vi.fn();
 const mockUseLayoutType = vi.mocked(useLayoutType);
+const mockExtensionSlot = vi.mocked(ExtensionSlot);
 const mockUseSession = vi.mocked(useSession);
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const mockUseOrderType = vi.mocked(useOrderType);
@@ -279,20 +287,54 @@ describe('AddLabOrder', () => {
     expect(mockCloseWorkspace).toHaveBeenCalled();
   });
 
-  test('should display the patient header and identifier on tablet only', () => {
+  test('should display the patient header in the chart on tablet only', () => {
     mockUseLayoutType.mockReturnValue('tablet');
     const { unmount } = renderAddLabOrderWorkspace();
-    expect(screen.getByText(/john wilson/i)).toBeInTheDocument();
-    expect(screen.getByText(/100732HE/)).toBeInTheDocument();
-    expect(screen.getByText(/male/i)).toBeInTheDocument();
-    expect(screen.getByText(new RegExp(age(mockPatient.birthDate), 'i'))).toBeInTheDocument();
-    expect(screen.getByText('04 — Apr — 1972')).toBeInTheDocument();
+    expect(
+      mockExtensionSlot.mock.calls.some(
+        ([props]) => props.name === 'patient-header-slot' && props.state.patientUuid === mockPatient.id,
+      ),
+    ).toBe(true);
     unmount();
 
+    mockExtensionSlot.mockClear();
     mockUseLayoutType.mockReturnValue('large-desktop');
     renderAddLabOrderWorkspace();
-    expect(screen.queryByText(/john wilson/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/100732HE/)).not.toBeInTheDocument();
+    expect(mockExtensionSlot.mock.calls.some(([props]) => props.name === 'patient-header-slot')).toBe(false);
+  });
+
+  test('should display the patient header at every width outside the chart', () => {
+    mockUseLayoutType.mockReturnValue('large-desktop');
+    render(
+      <ExportedAddTestOrderWorkspace
+        closeWorkspace={mockCloseWorkspace}
+        workspaceProps={{
+          orderTypeUuid: 'test-lab-order-type-uuid',
+          orderToEditOrdererUuid: '',
+        }}
+        windowProps={{
+          encounterUuid: '',
+          drugOrderWorkspaceName: '',
+          labOrderWorkspaceName: '',
+          generalOrderWorkspaceName: '',
+          patient: mockPatient,
+          patientUuid: mockPatient.id,
+          visitContext: null,
+          mutateVisitContext: vi.fn(),
+        }}
+        workspaceName={''}
+        launchChildWorkspace={vi.fn()}
+        windowName={''}
+        isRootWorkspace={false}
+        showActionMenu={true}
+      />,
+    );
+
+    expect(
+      mockExtensionSlot.mock.calls.some(
+        ([props]) => props.name === 'patient-header-slot' && props.state.patientUuid === mockPatient.id,
+      ),
+    ).toBe(true);
   });
 
   test('should fall back to the configured lab order type UUID when orderTypeUuid is not provided', () => {

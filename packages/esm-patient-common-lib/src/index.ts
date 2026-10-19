@@ -16,6 +16,7 @@ export * from './time-helper';
 export * from './types';
 export * from './useAllowedFileExtensions';
 export * from './useMaxAttachmentFileSize';
+export * from './usePatientForBanner';
 export * from './usePatientIdentifier';
 export * from './useSystemVisitSetting';
 export * from './visit';

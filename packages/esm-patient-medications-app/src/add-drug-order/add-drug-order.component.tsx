@@ -48,6 +48,7 @@ export interface AddDrugOrderProps {
   patientUuid: string;
   visitContext: Visit;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
+  showPatientBanner?: boolean;
 
   /**
    * Optional launcher for the allergy form, provided when this workspace runs outside the patient
@@ -70,10 +71,12 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
   patientUuid,
   visitContext,
   closeWorkspace,
+  showPatientBanner: showPatientBannerProp,
   launchAllergyForm,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
+  const showPatientBanner = showPatientBannerProp ?? isTablet;
   const { orders, setOrders, clearOrders } = useOrderBasket<DrugOrderBasketItem>(
     patient,
     'medications',
@@ -197,7 +200,7 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
   if (!currentOrder) {
     return (
       <Workspace2 title={workspaceTitle}>
-        {isTablet && patient && patientUuid && (
+        {showPatientBanner && patient && patientUuid && (
           <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
         )}
         {!isTablet && (
@@ -267,9 +270,11 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
         onSave={currentOrder?.action === 'REVISE' ? submitDrugOrderToServer : saveDrugOrderToBasket}
         onCancel={isEditingExistingOrder ? closeWorkspace : () => setCurrentOrder(undefined)}
         patient={patient}
+        patientUuid={patientUuid}
         visitContext={visitContext}
         saveButtonText={t('saveOrder', 'Save order')}
         workspaceTitle={workspaceTitle}
+        showPatientBanner={showPatientBanner}
         launchAllergyForm={launchAllergyForm}
       />
     );

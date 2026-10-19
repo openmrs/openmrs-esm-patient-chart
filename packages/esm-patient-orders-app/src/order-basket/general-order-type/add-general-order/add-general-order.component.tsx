@@ -30,6 +30,7 @@ interface AddGeneralOrderProps {
   patientUuid: string;
   visitContext: Visit;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
+  showPatientBanner?: boolean;
 }
 
 /**
@@ -42,9 +43,11 @@ const AddGeneralOrder: React.FC<AddGeneralOrderProps> = ({
   patientUuid,
   visitContext,
   closeWorkspace,
+  showPatientBanner: showPatientBannerProp,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
+  const showPatientBanner = showPatientBannerProp ?? isTablet;
   const { orders } = useOrderBasket<OrderBasketItem>(patient, orderTypeUuid, prepOrderPostData);
   const { orderTypes } = useConfig<ConfigObject>();
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
@@ -88,7 +91,7 @@ const AddGeneralOrder: React.FC<AddGeneralOrderProps> = ({
 
   return (
     <Workspace2 title={title} hasUnsavedChanges={hasUnsavedChanges}>
-      {isTablet && patient && patientUuid && (
+      {showPatientBanner && patient && patientUuid && (
         <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
       )}
       <div className={styles.workspaceWrapper}>

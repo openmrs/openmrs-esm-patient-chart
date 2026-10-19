@@ -21,13 +21,16 @@ import {
   useAbortController,
   useConfig,
   useLayoutType,
-  usePatient,
   useSession,
   type Visit,
   Workspace2,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
-import { useOptimisticVisitMutations } from '@openmrs/esm-patient-common-lib';
+import {
+  hasPatientBannerData,
+  useOptimisticVisitMutations,
+  usePatientForBanner,
+} from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 import {
   calculateBodyMassIndex,
@@ -56,6 +59,7 @@ export interface VitalsAndBiometricsFormProps {
   patientUuid: string;
   patient: fhir.Patient;
   visitContext: Visit;
+  showPatientBanner?: boolean;
 }
 
 /**
@@ -70,11 +74,11 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
     patientUuid: propPatientUuid,
     patient: patientProp,
     visitContext,
+    showPatientBanner = true,
   },
 }) => {
   const patientUuid = propPatientUuid ?? patientProp?.id;
-  const { patient: fetchedPatient } = usePatient(patientUuid);
-  const patient = patientProp ?? fetchedPatient;
+  const patient = usePatientForBanner(patientProp, patientUuid);
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig<ConfigObject>();
@@ -703,7 +707,7 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
       }
       hasUnsavedChanges={hasUserUnsavedChanges}
     >
-      {isTablet && patient && patientUuid && (
+      {showPatientBanner && hasPatientBannerData(patient) && patientUuid && (
         <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
       )}
       {formElement}

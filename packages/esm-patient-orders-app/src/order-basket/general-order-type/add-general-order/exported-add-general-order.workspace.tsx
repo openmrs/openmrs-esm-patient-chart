@@ -29,6 +29,7 @@ const ExportedAddGeneralOrderWorkspace: React.FC<
       patientUuid={patientUuid}
       visitContext={visitContext}
       closeWorkspace={closeWorkspace}
+      showPatientBanner
     />
   );
 };

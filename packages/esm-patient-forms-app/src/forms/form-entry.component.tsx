@@ -14,6 +14,7 @@ import {
 import {
   type Form,
   type FormRendererProps,
+  hasPatientBannerData,
   invalidateVisitAndEncounterData,
   WorkspaceBackButton,
 } from '@openmrs/esm-patient-common-lib';
@@ -37,6 +38,7 @@ export interface FormEntryProps {
   showBackButton?: boolean;
   hideControls?: boolean;
   hidePatientBanner?: boolean;
+  showPatientBanner?: boolean;
   preFilledQuestions?: Record<string, string>;
 }
 
@@ -52,6 +54,7 @@ const FormEntry: React.FC<FormEntryProps> = ({
   showBackButton = false,
   hideControls,
   hidePatientBanner,
+  showPatientBanner: showPatientBannerProp,
   preFilledQuestions,
   additionalProps,
 }) => {
@@ -85,6 +88,12 @@ const FormEntry: React.FC<FormEntryProps> = ({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const showPatientBanner =
+    (showPatientBannerProp ?? isTablet) &&
+    !hidePatientBanner &&
+    hasPatientBannerData(patient) &&
+    patientUuid &&
+    additionalProps?.mode !== 'embedded-view';
 
   const { mutateForms } = useForms(patientUuid, visitUuid);
 
@@ -103,10 +112,9 @@ const FormEntry: React.FC<FormEntryProps> = ({
       additionalProps: additionalProps ?? {},
       handlePostResponse,
       hideControls,
-      // On tablet the panel is full-screen, so this workspace renders the patient banner itself and
-      // suppresses the form engine's own banner (which only shows when the panel is ultra-wide) to
-      // avoid duplicates. On desktop the engine's banner is left untouched.
-      hidePatientBanner: hidePatientBanner || isTablet,
+      // When this workspace renders the patient banner itself, suppress the form engine's own
+      // banner (which only shows when the panel is ultra-wide) to avoid duplicates.
+      hidePatientBanner: hidePatientBanner || showPatientBanner,
       preFilledQuestions,
       closeWorkspace: () => {
         return closeWorkspace();
@@ -133,7 +141,7 @@ const FormEntry: React.FC<FormEntryProps> = ({
       handlePostResponse,
       hideControls,
       hidePatientBanner,
-      isTablet,
+      showPatientBanner,
       mutateForms,
       mutateVisitContext,
       patient,
@@ -173,8 +181,6 @@ const FormEntry: React.FC<FormEntryProps> = ({
   }, [encounterUuid, htmlForm, patientUuid, visitUuid]);
 
   const showFormAndLoadedData = form && patientUuid && !isLoadingEncounterVisit;
-  const showPatientBanner =
-    isTablet && !hidePatientBanner && patient && patientUuid && additionalProps?.mode !== 'embedded-view';
 
   return (
     <Workspace2 title={form.display ?? t('clinicalForm', 'Clinical form')} hasUnsavedChanges={hasUnsavedChanges}>
