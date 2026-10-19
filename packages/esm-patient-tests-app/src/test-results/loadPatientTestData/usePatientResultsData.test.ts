@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { type PatientData } from '@openmrs/esm-patient-common-lib';
@@ -69,4 +69,67 @@ describe('Laboratory results refresh failures', () => {
     expect(result.current.sortedObs).toEqual({});
     expect(result.current.loaded).toBe(true);
   });
+  it('ignores a late failure from patient A after switching to patient B', async () => {
+    const patientA = 'patient-a-pending-refresh';
+    const patientB = 'patient-b-after-switch';
+    const patientBData: PatientData = {
+      Sodium: { entries: [], type: 'Test', uuid: 'sodium-concept' },
+    };
+    let rejectPatientA!: (reason: Error) => void;
+    const patientAPending = new Promise<never>((_resolve, reject) => {
+      rejectPatientA = reject;
+    });
+    addUserDataToCache(patientA, cachedData, 'cached-observation');
+    addUserDataToCache(patientB, patientBData, 'cached-observation');
+    mockOpenmrsFetch
+      .mockImplementationOnce(() => patientAPending)
+      .mockResolvedValueOnce({ data: { entry: [{ resource: { id: 'cached-observation' } }] } } as any);
+
+    const { result, rerender } = renderHook(({ uuid }) => usePatientResultsData(uuid), {
+      initialProps: { uuid: patientA },
+    });
+    await waitFor(() => expect(result.current.sortedObs).toBe(cachedData));
+
+    rerender({ uuid: patientB });
+    await waitFor(() => expect(result.current.sortedObs).toBe(patientBData));
+
+    await act(async () => {
+      rejectPatientA(new Error('Late failure from patient A'));
+      await patientAPending.catch(() => undefined);
+    });
+
+    expect(result.current.sortedObs).toBe(patientBData);
+    expect(result.current.error).toBeUndefined();
+    expect(result.current.loaded).toBe(true);
+  });
+
+  it('ignores a late success from patient A after switching to patient B', async () => {
+    const patientA = 'patient-a-pending-success';
+    const patientB = 'patient-b-no-cache';
+    let resolvePatientA!: (value: any) => void;
+    const patientAPending = new Promise<any>((resolve) => {
+      resolvePatientA = resolve;
+    });
+    addUserDataToCache(patientA, cachedData, 'cached-observation');
+    mockOpenmrsFetch
+      .mockImplementationOnce(() => patientAPending)
+      .mockResolvedValueOnce({ data: { total: 0 } } as any);
+
+    const { result, rerender } = renderHook(({ uuid }) => usePatientResultsData(uuid), {
+      initialProps: { uuid: patientA },
+    });
+    await waitFor(() => expect(result.current.sortedObs).toBe(cachedData));
+
+    rerender({ uuid: patientB });
+    await waitFor(() => expect(result.current.sortedObs).toEqual({}));
+
+    await act(async () => {
+      resolvePatientA({ data: { entry: [{ resource: { id: 'stale-observation' } }] } });
+      await patientAPending;
+    });
+
+    expect(result.current.sortedObs).toEqual({});
+    expect(result.current.error).toBeUndefined();
+  });
+
 });
