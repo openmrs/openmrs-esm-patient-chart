@@ -6,6 +6,8 @@ import hfaBoys5Above from './tables/hfa_boys_5_above.json';
 import hfaBoysBelow5 from './tables/hfa_boys_below5.json';
 import hfaGirls5Above from './tables/hfa_girls_5_above.json';
 import hfaGirlsBelow5 from './tables/hfa_girls_below5.json';
+import wfhBoysBelow5 from './tables/wfh_boys_below5.json';
+import wfhGirlsBelow5 from './tables/wfh_girls_below5.json';
 import wflBoysBelow5 from './tables/wfl_boys_below5.json';
 import wflGirlsBelow5 from './tables/wfl_girls_below5.json';
 
@@ -47,12 +49,69 @@ describe('loadZScoreReferences', () => {
     expect(await loadZScoreReferences(schema, 'F', '2023-08-27', referenceDate)).toEqual({});
   });
 
-  it('returns the weight-for-length table and the height-for-age row for the day of age for a child under 5', async () => {
+  it('returns the weight-for-height table and the height-for-age row for the day of age for a child aged 2 to 4', async () => {
     const references = await loadZScoreReferences(allReferences, 'F', '2023-08-27', referenceDate);
 
-    expect(references.weightForHeightRef).toEqual(wflGirlsBelow5);
+    expect(references.weightForHeightRef).toEqual(wfhGirlsBelow5);
     expect(references.heightForAgeRef).toEqual([jasmine.objectContaining({ Day: 1136, SD0: 95.96 })]);
     expect(references.bmiForAgeRef).toBeNull();
+  });
+
+  it('returns the weight-for-length table for a child under 2', async () => {
+    expect((await loadZScoreReferences(allReferences, 'F', '2025-08-27', referenceDate)).weightForHeightRef).toEqual(
+      wflGirlsBelow5,
+    );
+    expect((await loadZScoreReferences(allReferences, 'M', '2025-08-27', referenceDate)).weightForHeightRef).toEqual(
+      wflBoysBelow5,
+    );
+  });
+
+  it('switches from weight-for-length to weight-for-height on the second birthday', async () => {
+    // The reference date is 2026-10-06: a day short of 2 years, then exactly 2 years
+    const dayShort = await loadZScoreReferences(allReferences, 'M', '2024-10-07', referenceDate);
+    const exactly = await loadZScoreReferences(allReferences, 'M', '2024-10-06', referenceDate);
+
+    expect(dayShort.weightForHeightRef).toEqual(wflBoysBelow5);
+    expect(exactly.weightForHeightRef).toEqual(wfhBoysBelow5);
+  });
+
+  it('returns the weight-for-height table for a boy aged 4', async () => {
+    const references = await loadZScoreReferences(allReferences, 'M', '2022-10-17', referenceDate);
+
+    expect(references.weightForHeightRef).toEqual(wfhBoysBelow5);
+  });
+
+  it('returns no weight-for-height table from age 5', async () => {
+    const references = await loadZScoreReferences(allReferences, 'M', '2021-10-06', referenceDate);
+
+    expect(references.weightForHeightRef).toBeNull();
+  });
+
+  it('has weight-for-height tables covering 65 to 120 cm in 0.1 cm steps', () => {
+    for (const table of [wfhBoysBelow5, wfhGirlsBelow5]) {
+      expect(table.length).toBe(551);
+      expect(table[0].Length).toBe(65);
+      expect(table[table.length - 1].Length).toBe(120);
+    }
+    // The weight-for-length tables stop at 110 cm, so heights above that need the weight-for-height tables
+    expect(wflBoysBelow5[wflBoysBelow5.length - 1].Length).toBe(110);
+  });
+
+  it('matches the WHO weight-for-height medians', () => {
+    const median = (table: Array<{ Length: number; SD0: number }>, length: number) =>
+      table.find((row) => row.Length === length)?.SD0;
+
+    expect(median(wfhBoysBelow5, 65)).toBe(7.433);
+    expect(median(wfhBoysBelow5, 100)).toBe(15.358);
+    expect(median(wfhBoysBelow5, 120)).toBe(22.353);
+    expect(median(wfhGirlsBelow5, 65)).toBe(7.24);
+    expect(median(wfhGirlsBelow5, 100)).toBe(15.225);
+    expect(median(wfhGirlsBelow5, 120)).toBe(22.817);
+  });
+
+  it('uses a different table for weight-for-height than for weight-for-length', () => {
+    expect(wfhBoysBelow5).not.toEqual(wflBoysBelow5);
+    expect(wfhGirlsBelow5).not.toEqual(wflGirlsBelow5);
   });
 
   it('returns the height-for-age and BMI-for-age rows for the month of age for a child aged 5 to 17', async () => {
