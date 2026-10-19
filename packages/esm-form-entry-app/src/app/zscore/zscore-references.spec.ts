@@ -76,9 +76,16 @@ describe('loadZScoreReferences', () => {
   });
 
   it('returns the weight-for-height table for a boy aged 4', async () => {
-    const references = await loadZScoreReferences(allReferences, 'M', '2022-10-17', referenceDate);
+    // The reference date is 2026-10-06, so this boy turned 4 today
+    const references = await loadZScoreReferences(allReferences, 'M', '2022-10-06', referenceDate);
 
     expect(references.weightForHeightRef).toEqual(wfhBoysBelow5);
+  });
+
+  it('returns the weight-for-height table for a child a day short of 5', async () => {
+    const references = await loadZScoreReferences(allReferences, 'F', '2021-10-07', referenceDate);
+
+    expect(references.weightForHeightRef).toEqual(wfhGirlsBelow5);
   });
 
   it('returns no weight-for-height table from age 5', async () => {
