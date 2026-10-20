@@ -124,19 +124,28 @@ export interface AllergyFormProps {
   formContext: 'creating' | 'editing';
   patient: fhir.Patient;
   patientUuid: string;
+  showPatientBanner?: boolean;
 }
 
 // Presentational form, decoupled from how the patient context is sourced. The patient chart and
 // the exported (out-of-chart) workspace each resolve `patient`/`patientUuid` their own way and
 // render this. We never call `usePatient()` here: per O3-4505, only the root chart component loads
 // the patient, to avoid an SWR re-render cascade.
-export function AllergyForm({ allergy, closeWorkspace, formContext, patient, patientUuid }: AllergyFormProps) {
+export function AllergyForm({
+  allergy,
+  closeWorkspace,
+  formContext,
+  patient,
+  patientUuid,
+  showPatientBanner: showPatientBannerProp,
+}: AllergyFormProps) {
   const { allergens } = useAllergens();
   const { allergicReactions, isLoading: isLoadingReactions } = useAllergicReactions();
   const { concepts } = useConfig<AllergiesConfigObject>();
   const { allergies, mutate } = useAllergies(patientUuid);
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
+  const showPatientBanner = showPatientBannerProp ?? isTablet;
   const formValuesLoadedRef = useRef(false);
   const { mildReactionUuid, moderateReactionUuid, otherConceptUuid, severeReactionUuid } = useMemo(
     () => concepts,
@@ -411,7 +420,7 @@ export function AllergyForm({ allergy, closeWorkspace, formContext, patient, pat
       title={allergy ? t('editAllergy', 'Edit an allergy') : t('recordNewAllergy', 'Record a new allergy')}
       hasUnsavedChanges={isDirty}
     >
-      {isTablet && patient && patientUuid && (
+      {showPatientBanner && patient && patientUuid && (
         <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
       )}
       <Form className={styles.formContainer} onSubmit={handleSubmit(onSubmit)}>
