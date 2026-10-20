@@ -308,6 +308,7 @@ describe('AddLabOrder', () => {
     render(
       <ExportedAddTestOrderWorkspace
         closeWorkspace={mockCloseWorkspace}
+        groupProps={{}}
         workspaceProps={{
           orderTypeUuid: 'test-lab-order-type-uuid',
           orderToEditOrdererUuid: '',
