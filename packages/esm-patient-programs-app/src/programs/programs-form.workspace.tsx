@@ -20,6 +20,7 @@ import { z } from 'zod';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
+  ExtensionSlot,
   getCoreTranslation,
   LocationPicker,
   OpenmrsDatePicker,
@@ -75,7 +76,7 @@ export type ProgramsFormData = z.infer<ReturnType<typeof createProgramsFormSchem
 
 const ProgramsForm: React.FC<PatientWorkspace2DefinitionProps<ProgramsFormProps, {}>> = ({
   closeWorkspace,
-  groupProps: { patientUuid },
+  groupProps: { patient, patientUuid },
   workspaceProps: { programEnrollmentId },
 }) => {
   const { t } = useTranslation();
@@ -357,6 +358,9 @@ const ProgramsForm: React.FC<PatientWorkspace2DefinitionProps<ProgramsFormProps,
       }
       hasUnsavedChanges={isDirty}
     >
+      {isTablet && patient && patientUuid && (
+        <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
+      )}
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
         <Stack className={styles.formContainer} gap={7}>
           {!availablePrograms.length && (

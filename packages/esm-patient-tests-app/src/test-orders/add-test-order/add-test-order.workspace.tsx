@@ -25,13 +25,14 @@ export interface AddTestOrderWorkspaceProps {
  * @see exported-add-test-order.workspace.tsx
  */
 export default function AddTestOrderWorkspace({
-  groupProps: { patient, visitContext },
+  groupProps: { patient, patientUuid, visitContext },
   workspaceProps: { order: initialOrder, orderTypeUuid, orderToEditOrdererUuid },
   closeWorkspace,
 }: PatientWorkspace2DefinitionProps<AddTestOrderWorkspaceProps, OrderBasketWindowProps>) {
   return (
     <AddLabOrder
       patient={patient}
+      patientUuid={patientUuid}
       orderToEditOrdererUuid={orderToEditOrdererUuid}
       visitContext={visitContext}
       initialOrder={initialOrder}

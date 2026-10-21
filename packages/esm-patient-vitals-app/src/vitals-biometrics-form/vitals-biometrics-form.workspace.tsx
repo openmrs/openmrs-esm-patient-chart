@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLayoutType } from '@openmrs/esm-framework';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import ExportedVitalsAndBiometricsForm from './exported-vitals-biometrics-form.workspace';
 
@@ -18,9 +19,18 @@ const VitalsAndBiometricsForm: React.FC<PatientWorkspace2DefinitionProps<VitalsA
   groupProps: { patientUuid, patient, visitContext },
   ...rest
 }) => {
+  const isTablet = useLayoutType() === 'tablet';
+
   return (
     <ExportedVitalsAndBiometricsForm
-      workspaceProps={{ editEncounterUuid, formContext, patientUuid, patient, visitContext }}
+      workspaceProps={{
+        editEncounterUuid,
+        formContext,
+        patientUuid,
+        patient,
+        visitContext,
+        showPatientBanner: isTablet,
+      }}
       windowProps={null}
       groupProps={null}
       {...rest}
