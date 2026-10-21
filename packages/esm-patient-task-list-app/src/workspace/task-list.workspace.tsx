@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { Add, ArrowLeft } from '@carbon/react/icons';
-import { Workspace2, type Visit } from '@openmrs/esm-framework';
+import { ExtensionSlot, useLayoutType, Workspace2 } from '@openmrs/esm-framework';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import { type Task } from './task-list.resource';
 import AddTaskForm from './add-task-form.component';
@@ -13,8 +13,11 @@ import styles from './task-list.scss';
 type View = 'list' | 'form' | 'details' | 'edit';
 
 const TaskListWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({ groupProps }) => {
-  const { patientUuid, visitContext } = groupProps ?? { patientUuid: '', visitContext: undefined as unknown as Visit };
+  const patient = groupProps?.patient;
+  const patientUuid = groupProps?.patientUuid ?? '';
+  const visitContext = groupProps?.visitContext;
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const [view, setView] = useState<View>('list');
   const [selectedTaskUuid, setSelectedTaskUuid] = useState<string | null>(null);
 
@@ -60,6 +63,9 @@ const TaskListWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
 
   return (
     <Workspace2 title={title}>
+      {isTablet && patient && patientUuid && (
+        <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
+      )}
       <div className={styles.workspaceContainer}>
         {['form', 'details', 'edit'].includes(view) && (
           <div className={styles.backButton}>

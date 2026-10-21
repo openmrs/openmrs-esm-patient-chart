@@ -26,7 +26,11 @@ import {
   Workspace2,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
-import { useOptimisticVisitMutations } from '@openmrs/esm-patient-common-lib';
+import {
+  hasPatientBannerData,
+  useOptimisticVisitMutations,
+  usePatientForBanner,
+} from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 import {
   calculateBodyMassIndex,
@@ -55,6 +59,7 @@ export interface VitalsAndBiometricsFormProps {
   patientUuid: string;
   patient: fhir.Patient;
   visitContext: Visit;
+  showPatientBanner?: boolean;
 }
 
 /**
@@ -63,8 +68,18 @@ export interface VitalsAndBiometricsFormProps {
  */
 const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<VitalsAndBiometricsFormProps, {}, {}>> = ({
   closeWorkspace,
-  workspaceProps: { editEncounterUuid, formContext = 'creating', patientUuid, patient, visitContext },
+  workspaceProps: {
+    editEncounterUuid,
+    formContext = 'creating',
+    patientUuid: propPatientUuid,
+    patient: patientProp,
+    visitContext,
+    showPatientBanner = true,
+  },
 }) => {
+  const patientUuid = propPatientUuid ?? patientProp?.id;
+  const patient = usePatientForBanner(patientProp, patientUuid);
+  const showWorkspacePatientBanner = Boolean(showPatientBanner && hasPatientBannerData(patient) && patientUuid);
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig<ConfigObject>();
@@ -294,6 +309,9 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
           patientUuid: patientUuid ?? null,
           patient,
           encounterUuid,
+          // When this workspace renders the patient banner itself, suppress the form engine's own
+          // banner (which only shows when the panel is ultra-wide) to avoid duplicates.
+          hidePatientBanner: showWorkspacePatientBanner,
           closeWorkspaceWithSavedChanges: () => {
             closeWorkspace({ discardUnsavedChanges: true });
           },
@@ -682,20 +700,23 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
         </ButtonSet>
       </Form>
     );
-
-    return (
-      <Workspace2
-        title={
-          editEncounterUuid
-            ? t('editVitalsAndBiometrics', 'Edit Vitals and Biometrics')
-            : t('recordVitalsAndBiometrics', 'Record Vitals and Biometrics')
-        }
-        hasUnsavedChanges={hasUserUnsavedChanges}
-      >
-        {formElement}
-      </Workspace2>
-    );
   }
+
+  return (
+    <Workspace2
+      title={
+        editEncounterUuid
+          ? t('editVitalsAndBiometrics', 'Edit Vitals and Biometrics')
+          : t('recordVitalsAndBiometrics', 'Record Vitals and Biometrics')
+      }
+      hasUnsavedChanges={hasUserUnsavedChanges}
+    >
+      {showWorkspacePatientBanner && (
+        <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
+      )}
+      {formElement}
+    </Workspace2>
+  );
 };
 
 export default ExportedVitalsAndBiometricsForm;

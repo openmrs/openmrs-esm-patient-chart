@@ -26,6 +26,7 @@ export default function ExportedAllergyFormWorkspace({
       formContext={formContext}
       patient={patient}
       patientUuid={patientUuid}
+      showPatientBanner
     />
   );
 }
