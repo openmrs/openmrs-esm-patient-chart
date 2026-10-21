@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSWRConfig } from 'swr';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -66,6 +67,7 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
   workspaceProps: { editEncounterUuid, formContext = 'creating', patientUuid, patient, visitContext },
 }) => {
   const { t } = useTranslation();
+  const { mutate } = useSWRConfig();
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig<ConfigObject>();
   const biometricsUnitsSymbols = config.biometrics;
@@ -236,7 +238,7 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
             }
             // Only invalidate observations data since we created new vitals/biometrics observations
             invalidateVisitRelatedData({ observations: true, encounters: true });
-            invalidateCachedVitalsAndBiometrics();
+            invalidateCachedVitalsAndBiometrics(patientUuid, mutate);
             closeWorkspace({ discardUnsavedChanges: true });
             showSnackbar({
               isLowContrast: true,
@@ -273,6 +275,7 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
       conceptRanges,
       formContext,
       initialFieldValuesMap,
+      mutate,
       mutateEncounter,
       invalidateVisitRelatedData,
       patientUuid,
