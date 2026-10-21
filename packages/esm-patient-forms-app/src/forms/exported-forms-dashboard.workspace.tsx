@@ -24,7 +24,7 @@ const ExportedFormsDashboardWorkspace: React.FC<
   windowProps: { formEntryWorkspaceName, patient: patientProp, patientUuid, visitContext },
 }) => {
   const { t } = useTranslation();
-  const patient = usePatientForBanner(patientProp, patientUuid) ?? patientProp;
+  const patient = usePatientForBanner(patientProp, patientUuid);
   const handleFormOpen = useCallback(
     (form: Form, encounterUuid: string) => {
       launchChildWorkspace(formEntryWorkspaceName, {

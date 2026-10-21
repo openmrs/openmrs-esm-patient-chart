@@ -79,6 +79,7 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
 }) => {
   const patientUuid = propPatientUuid ?? patientProp?.id;
   const patient = usePatientForBanner(patientProp, patientUuid);
+  const showWorkspacePatientBanner = Boolean(showPatientBanner && hasPatientBannerData(patient) && patientUuid);
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig<ConfigObject>();
@@ -308,6 +309,9 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
           patientUuid: patientUuid ?? null,
           patient,
           encounterUuid,
+          // When this workspace renders the patient banner itself, suppress the form engine's own
+          // banner (which only shows when the panel is ultra-wide) to avoid duplicates.
+          hidePatientBanner: showWorkspacePatientBanner,
           closeWorkspaceWithSavedChanges: () => {
             closeWorkspace({ discardUnsavedChanges: true });
           },
@@ -707,7 +711,7 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
       }
       hasUnsavedChanges={hasUserUnsavedChanges}
     >
-      {showPatientBanner && hasPatientBannerData(patient) && patientUuid && (
+      {showWorkspacePatientBanner && (
         <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
       )}
       {formElement}
