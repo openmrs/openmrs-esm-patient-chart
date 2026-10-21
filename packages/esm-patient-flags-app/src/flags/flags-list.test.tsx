@@ -79,6 +79,43 @@ describe('flags list', () => {
     expect(screen.queryByRole('button', { name: /edit flags/i })).not.toBeInTheDocument();
   });
 
+  it('shows the Edit button when all flags have been voided', async () => {
+    const user = userEvent.setup();
+
+    mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema));
+    mockUsePatientFlags.mockReturnValue({
+      error: null,
+      flags: mockPatientFlags.map((flag) => ({ ...flag, voided: true })) as FlagWithPriority[],
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+
+    render(<FlagsList patientUuid={mockPatient.id} />);
+
+    expect(screen.queryAllByRole('listitem')).toHaveLength(0);
+
+    const editButton = screen.getByRole('button', { name: /edit flags/i });
+    await user.click(editButton);
+
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith('patient-flags-workspace');
+  });
+
+  it('hides the Edit button when the patient has no flags', () => {
+    mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema));
+    mockUsePatientFlags.mockReturnValue({
+      error: null,
+      flags: [],
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+
+    render(<FlagsList patientUuid={mockPatient.id} />);
+
+    expect(screen.queryByRole('button', { name: /edit flags/i })).not.toBeInTheDocument();
+  });
+
   it('filters flags by tag display name when filterByTags is provided', () => {
     mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema));
     mockUsePatientFlags.mockReturnValue({
