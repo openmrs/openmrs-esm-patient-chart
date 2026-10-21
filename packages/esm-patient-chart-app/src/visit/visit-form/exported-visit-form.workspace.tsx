@@ -36,11 +36,7 @@ import {
   type Visit,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
-import {
-  invalidateCurrentVisit,
-  invalidateVisitAndEncounterData,
-  useActivePatientEnrollment,
-} from '@openmrs/esm-patient-common-lib';
+import { invalidateVisitAndEncounterData, useActivePatientEnrollment } from '@openmrs/esm-patient-common-lib';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import {
   convertToDate,
@@ -362,7 +358,6 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
           // This will invalidate visit history and encounter tables for this patient
           // (if visitContext is updated, it should have been invalidated with mutateSavedOrUpdatedVisit)
           invalidateVisitAndEncounterData(globalMutate, patientUuid);
-          invalidateCurrentVisit(globalMutate, patientUuid);
 
           const visitAttributesRequest = visitToEdit
             ? handleVisitAttributes(visitAttributes, response.data.uuid).then((visitAttributesResponses) => {
