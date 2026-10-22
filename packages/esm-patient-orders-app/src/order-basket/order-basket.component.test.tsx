@@ -1,10 +1,11 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type LayoutType, useSession, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import {
   type OrderBasketItem,
+  postOrders,
   postOrdersOnNewEncounter,
   setOrderBasketItemErrors,
   useOrderBasket,
@@ -21,6 +22,7 @@ const mockUseOrderBasket = vi.mocked(useOrderBasket);
 const mockUseMutatePatientOrders = vi.mocked(useMutatePatientOrders);
 const mockUseOrderEncounterForSystemWithVisitDisabled = vi.mocked(useOrderEncounterForSystemWithVisitDisabled);
 const mockUseProviders = vi.mocked(useProviders);
+const mockPostOrders = vi.mocked(postOrders);
 const mockPostOrdersOnNewEncounter = vi.mocked(postOrdersOnNewEncounter);
 const mockSetOrderBasketItemErrors = vi.mocked(setOrderBasketItemErrors);
 
@@ -28,6 +30,7 @@ vi.mock('@openmrs/esm-patient-common-lib', async () => ({
   ...((await vi.importActual('@openmrs/esm-patient-common-lib')) as object),
   useOrderBasket: vi.fn(),
   useMutatePatientOrders: vi.fn(),
+  postOrders: vi.fn(),
   postOrdersOnNewEncounter: vi.fn(),
   setOrderBasketItemErrors: vi.fn(),
 }));
@@ -163,5 +166,54 @@ describe('OrderBasket', () => {
     const getOrderError = mockSetOrderBasketItemErrors.mock.calls.at(-1)[1];
     expect(mockSetOrderBasketItemErrors).toHaveBeenLastCalledWith(mockPatientUuid, expect.any(Function));
     expect(getOrderError(aspirinOrder)).toBe(forbiddenError);
+  });
+
+  it('only marks the order that failed when another order in the basket has the same name', async () => {
+    const user = userEvent.setup();
+    const signedOrder = { action: 'NEW', display: 'Malaria test', concept: { uuid: 'concept-1' } } as OrderBasketItem;
+    const rejectedOrder = { action: 'NEW', display: 'Malaria test', concept: { uuid: 'concept-2' } } as OrderBasketItem;
+    const forbiddenError = Object.assign(new Error('Forbidden'), {
+      responseBody: { error: { message: 'Privileges required: Add Orders' } },
+    });
+    const mockClearOrders = vi.fn();
+    mockUseSession.mockReturnValue(mockSessionDataResponse.data as any);
+    mockUseOrderBasket.mockReturnValue({
+      orders: [signedOrder, rejectedOrder],
+      clearOrders: mockClearOrders,
+      setOrders: vi.fn(),
+    } as any);
+    mockUseOrderEncounterForSystemWithVisitDisabled.mockReturnValue({
+      visitRequired: false,
+      isLoading: false,
+      encounterUuid: 'order-encounter-uuid',
+      error: null,
+      mutate: vi.fn(),
+    } as any);
+    mockPostOrders.mockResolvedValue({
+      postedOrders: [],
+      erroredItems: [{ ...rejectedOrder, orderError: forbiddenError }],
+    });
+
+    render(
+      <OrderBasket
+        patientUuid={mockPatientUuid}
+        patient={mockPatient}
+        visitContext={mockVisitContext}
+        mutateVisitContext={mockMutateVisitContext}
+        closeWorkspace={mockCloseWorkspace}
+        orderBasketExtensionProps={mockOrderBasketExtensionProps}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: /sign and close/i }));
+    await waitFor(() => expect(mockSetOrderBasketItemErrors).toHaveBeenCalledTimes(2));
+
+    const { exceptThoseMatching } = mockClearOrders.mock.calls.at(-1)[0];
+    expect(exceptThoseMatching(signedOrder)).toBe(false);
+    expect(exceptThoseMatching(rejectedOrder)).toBe(true);
+
+    const getOrderError = mockSetOrderBasketItemErrors.mock.calls.at(-1)[1];
+    expect(getOrderError(signedOrder)).toBeUndefined();
+    expect(getOrderError(rejectedOrder)).toBe(forbiddenError);
   });
 });

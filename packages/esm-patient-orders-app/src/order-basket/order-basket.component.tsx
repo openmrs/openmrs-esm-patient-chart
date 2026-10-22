@@ -45,6 +45,18 @@ interface OrderBasketProps {
   onOrderBasketSubmitted?: (encounterUuid: string, postedOrders: Array<Order>) => void;
 }
 
+/**
+ * `postOrders` returns each failed order as a copy of its basket item with the error added, so the basket item
+ * it came from is the one whose own fields all match. Matching on `display` alone would mix up different orders
+ * that share a name.
+ */
+function isErroredCopyOf(erroredItem: OrderBasketItem, item: OrderBasketItem) {
+  return Object.entries(item).every(
+    ([key, value]) =>
+      key === 'orderError' || key === 'extractedOrderError' || erroredItem[key as keyof OrderBasketItem] === value,
+  );
+}
+
 const OrderBasket: React.FC<OrderBasketProps> = ({
   patientUuid,
   patient,
@@ -163,7 +175,9 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
           abortController,
           orderer.uuid,
         );
-        clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
+        const findErroredItem = (item: OrderBasketItem) =>
+          erroredItems.find((erroredItem) => isErroredCopyOf(erroredItem, item));
+        clearOrders({ exceptThoseMatching: (item) => !!findErroredItem(item) });
         await mutateOrders();
         invalidateVisitAndEncounterData(mutate, patientUuid);
 
@@ -173,11 +187,8 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
         } else {
           setOrdersWithErrors(erroredItems);
         }
-        clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
-        setOrderBasketItemErrors(
-          patientUuid,
-          (item) => erroredItems.find((erroredItem) => erroredItem.display === item.display)?.orderError,
-        );
+        clearOrders({ exceptThoseMatching: (item) => !!findErroredItem(item) });
+        setOrderBasketItemErrors(patientUuid, (item) => findErroredItem(item)?.orderError);
         // Only revalidate current visit since orders create new encounters
         mutateVisitContext?.();
         await mutateOrders();
