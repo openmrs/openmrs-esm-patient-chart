@@ -438,11 +438,16 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
             />
           )}
           <div>
-            {isTablet && !showWorkspacePatientHeader && (
+            {isTablet && (
               <Row className={styles.headerGridRow}>
                 <ExtensionSlot
                   name="visit-form-header-slot"
                   className={styles.dataGridRow}
+                  select={
+                    showWorkspacePatientHeader
+                      ? (extensions) => extensions.filter((extension) => extension.name !== 'patient-details-tile')
+                      : undefined
+                  }
                   state={visitHeaderSlotState}
                 />
               </Row>

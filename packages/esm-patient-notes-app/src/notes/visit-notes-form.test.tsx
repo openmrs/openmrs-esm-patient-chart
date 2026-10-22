@@ -6,11 +6,12 @@
  * fails the cross-realm equality check used here.
  */
 import React from 'react';
-import { vi, expect, test, beforeEach, afterEach } from 'vitest';
+import { vi, describe, it, expect, test, beforeEach, afterEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, render, waitFor, within, act } from '@testing-library/react';
 import {
   type Encounter,
+  type AssignedExtension,
   type UploadedFile,
   createAttachment,
   ExtensionSlot,
@@ -18,6 +19,8 @@ import {
   getDefaultsFromConfigSchema,
   showSnackbar,
   useConfig,
+  useLayoutType,
+  usePatient,
   useSession,
   useFeatureFlag,
   Workspace2,
@@ -97,7 +100,7 @@ function renderExportedVisitNotesForm(workspaceProps: Partial<ExportedVisitNotes
       ...workspaceProps,
     },
   };
-  render(<ExportedVisitNotesFormWorkspace {...props} />);
+  return render(<ExportedVisitNotesFormWorkspace {...props} />);
 }
 
 function actionsMenuFor(card: HTMLElement) {
@@ -159,6 +162,9 @@ const mockShowSnackbar = vi.mocked(showSnackbar);
 const mockUpdateVisitNote = vi.mocked(updateVisitNote);
 const mockUseDiagnosisConceptClasses = vi.mocked(useDiagnosisConceptClasses);
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockExtensionSlot = vi.mocked(ExtensionSlot);
+const mockUseLayoutType = vi.mocked(useLayoutType);
+const mockUsePatient = vi.mocked(usePatient);
 
 const { diagnosisConceptClass } = getDefaultsFromConfigSchema(configSchema) as ConfigObject;
 const symptomConceptClass = 'symptom-concept-class-uuid';
@@ -1862,4 +1868,66 @@ test('describes every Primary checkbox with the primary-required message while i
   // Once a primary exists the message unmounts and the reference points at nothing
   await user.click(checkbox);
   expect(checkbox).not.toHaveAccessibleDescription();
+});
+
+describe('Patient header banner', () => {
+  beforeEach(() => {
+    mockUseLayoutType.mockReturnValue('large-desktop');
+    mockUsePatient.mockReturnValue({ patient: null, patientUuid: null, isLoading: false, error: null });
+  });
+
+  it('shows the patient header by default in the exported visit notes form', () => {
+    renderExportedVisitNotesForm();
+
+    expect(
+      mockExtensionSlot.mock.calls.some(
+        ([props]) => props.name === 'patient-header-slot' && props.state.patientUuid === mockPatient.id,
+      ),
+    ).toBe(true);
+  });
+
+  it('does not show the patient header in the in-chart visit notes form', () => {
+    renderVisitNotesForm();
+
+    expect(mockExtensionSlot.mock.calls.some(([props]) => props.name === 'patient-header-slot')).toBe(false);
+  });
+
+  it('does not show the patient header until the full patient is available', () => {
+    const partialPatient = { id: mockPatient.id, birthDate: mockPatient.birthDate } as fhir.Patient;
+
+    renderExportedVisitNotesForm({ patient: partialPatient });
+
+    expect(mockExtensionSlot.mock.calls.some(([props]) => props.name === 'patient-header-slot')).toBe(false);
+  });
+
+  it('shows the patient header once the full patient is fetched for a partial patient', () => {
+    const partialPatient = { id: mockPatient.id, birthDate: mockPatient.birthDate } as fhir.Patient;
+    mockUsePatient.mockReturnValue({
+      patient: mockPatient,
+      patientUuid: mockPatient.id,
+      isLoading: false,
+      error: null,
+    });
+
+    renderExportedVisitNotesForm({ patient: partialPatient });
+
+    expect(
+      mockExtensionSlot.mock.calls.some(
+        ([props]) => props.name === 'patient-header-slot' && props.state.patientUuid === mockPatient.id,
+      ),
+    ).toBe(true);
+  });
+
+  it('keeps the weight tile while hiding the duplicate patient details on tablet', () => {
+    mockUseLayoutType.mockReturnValue('tablet');
+
+    renderExportedVisitNotesForm();
+
+    const headerSlot = mockExtensionSlot.mock.calls.find(([props]) => props.name === 'visit-form-header-slot')?.[0];
+    expect(headerSlot).toBeDefined();
+
+    const extensions = [{ name: 'patient-details-tile' }, { name: 'weight-tile' }] as Array<AssignedExtension>;
+
+    expect(headerSlot.select(extensions).map((extension) => extension.name)).toEqual(['weight-tile']);
+  });
 });

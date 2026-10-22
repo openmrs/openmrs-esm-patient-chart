@@ -4,7 +4,9 @@ import dayjs from 'dayjs';
 import { fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
+  type AssignedExtension,
   type FetchResponse,
+  ExtensionSlot,
   getDefaultsFromConfigSchema,
   OpenmrsDatePicker,
   saveVisit,
@@ -12,11 +14,14 @@ import {
   updateVisit,
   useConfig,
   useEmrConfiguration,
+  useLayoutType,
   useLocations,
+  usePatient,
   useVisit,
   useVisitTypes,
   Workspace2,
   type Visit,
+  type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { mockLocations, mockPastVisitWithEncounters, mockVisitTypes, mockVisitWithAttributes } from '__mocks__';
 import { mockPatient } from 'tools';
@@ -34,6 +39,7 @@ import {
   useVisitFormSchemaAndDefaultValues,
 } from './visit-form.resource';
 import VisitForm, { type VisitFormProps } from './visit-form.workspace';
+import ExportedVisitForm, { type ExportedVisitFormProps } from './exported-visit-form.workspace';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib/src';
 
 const visitUuid = 'test_visit_uuid';
@@ -107,6 +113,9 @@ const mockUseVisitTypes = vi.mocked(useVisitTypes);
 const mockUseLocations = vi.mocked(useLocations);
 const mockUseEmrConfiguration = vi.mocked(useEmrConfiguration);
 const mockOpenmrsDatePicker = vi.mocked(OpenmrsDatePicker);
+const mockExtensionSlot = vi.mocked(ExtensionSlot);
+const mockUseLayoutType = vi.mocked(useLayoutType);
+const mockUsePatient = vi.mocked(usePatient);
 
 // from ./visit-form.resource
 const mockOnVisitCreatedOrUpdatedCallback = vi.fn();
@@ -1515,4 +1524,102 @@ function renderVisitForm(visitToEdit?: Visit) {
     },
   };
   return render(<VisitForm {...props} />);
+}
+
+describe('Visit form patient header banner', () => {
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientChartSchema),
+      visitAttributeTypes: [],
+    });
+    mockUseVisitTypes.mockReturnValue(mockVisitTypes);
+    mockUseLocations.mockReturnValue(mockLocations);
+    mockUseEmrConfiguration.mockReturnValue({
+      emrConfiguration: {
+        atFacilityVisitType: null,
+      },
+      isLoadingEmrConfiguration: false,
+      errorFetchingEmrConfiguration: null,
+      mutateEmrConfiguration: null,
+    });
+    mockUseDefaultVisitLocation.mockReturnValue(defaultVisitLocation);
+    mockUseLayoutType.mockReturnValue('large-desktop');
+    mockUsePatient.mockReturnValue({ patient: null, patientUuid: null, isLoading: false, error: null });
+  });
+
+  it('shows the patient header by default in the exported visit form', () => {
+    renderExportedVisitForm();
+
+    expect(
+      mockExtensionSlot.mock.calls.some(
+        ([props]) => props.name === 'patient-header-slot' && props.state.patientUuid === mockPatient.id,
+      ),
+    ).toBe(true);
+  });
+
+  it('does not show the patient header in the in-chart visit form', () => {
+    renderVisitForm();
+
+    expect(mockExtensionSlot.mock.calls.some(([props]) => props.name === 'patient-header-slot')).toBe(false);
+  });
+
+  it('does not show the patient header until the full patient is available', () => {
+    const partialPatient = { id: mockPatient.id, birthDate: mockPatient.birthDate } as fhir.Patient;
+
+    renderExportedVisitForm({ patient: partialPatient });
+
+    expect(mockExtensionSlot.mock.calls.some(([props]) => props.name === 'patient-header-slot')).toBe(false);
+  });
+
+  it('shows the patient header once the full patient is fetched for a partial patient', () => {
+    const partialPatient = { id: mockPatient.id, birthDate: mockPatient.birthDate } as fhir.Patient;
+    mockUsePatient.mockReturnValue({
+      patient: mockPatient,
+      patientUuid: mockPatient.id,
+      isLoading: false,
+      error: null,
+    });
+
+    renderExportedVisitForm({ patient: partialPatient });
+
+    expect(
+      mockExtensionSlot.mock.calls.some(
+        ([props]) => props.name === 'patient-header-slot' && props.state.patientUuid === mockPatient.id,
+      ),
+    ).toBe(true);
+  });
+
+  it('keeps the weight tile while hiding the duplicate patient details on tablet', () => {
+    mockUseLayoutType.mockReturnValue('tablet');
+
+    renderExportedVisitForm();
+
+    const headerSlot = mockExtensionSlot.mock.calls.find(([props]) => props.name === 'visit-form-header-slot')?.[0];
+    expect(headerSlot).toBeDefined();
+
+    const extensions = [{ name: 'patient-details-tile' }, { name: 'weight-tile' }] as Array<AssignedExtension>;
+
+    expect(headerSlot.select(extensions).map((extension) => extension.name)).toEqual(['weight-tile']);
+  });
+});
+
+function renderExportedVisitForm(workspaceProps: Partial<ExportedVisitFormProps> = {}) {
+  const props: Workspace2DefinitionProps<ExportedVisitFormProps, {}, {}> = {
+    closeWorkspace: vi.fn(),
+    workspaceProps: {
+      openedFrom: 'test',
+      patient: mockPatient,
+      patientUuid: mockPatient.id,
+      visitContext: null,
+      ...workspaceProps,
+    },
+    windowProps: {},
+    groupProps: {},
+    workspaceName: '',
+    launchChildWorkspace: vi.fn(),
+    windowName: '',
+    isRootWorkspace: false,
+    showActionMenu: true,
+  };
+  return render(<ExportedVisitForm {...props} />);
 }

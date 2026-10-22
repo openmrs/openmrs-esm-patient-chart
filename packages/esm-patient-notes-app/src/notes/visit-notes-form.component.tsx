@@ -651,9 +651,18 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
         <ExtensionSlot name="visit-context-header-slot" state={visitContextHeaderState} />
 
-        {isTablet && !showWorkspacePatientHeader && (
+        {isTablet && (
           <Row className={styles.headerGridRow}>
-            <ExtensionSlot name="visit-form-header-slot" className={styles.dataGridRow} state={memoizedState} />
+            <ExtensionSlot
+              name="visit-form-header-slot"
+              className={styles.dataGridRow}
+              select={
+                showWorkspacePatientHeader
+                  ? (extensions) => extensions.filter((extension) => extension.name !== 'patient-details-tile')
+                  : undefined
+              }
+              state={memoizedState}
+            />
           </Row>
         )}
 
