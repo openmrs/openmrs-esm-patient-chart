@@ -61,6 +61,39 @@ function clearOrders(patientUuid: string, options?: ClearOrdersOptions) {
   }));
 }
 
+/**
+ * Attaches an error to each of the patient's order basket items for which `getOrderError` returns one,
+ * so that the basket shows those items as failed. Items for which it returns `undefined` have any
+ * previous error removed.
+ */
+export function setOrderBasketItemErrors(
+  patientUuid: string,
+  getOrderError: (order: OrderBasketItem) => OrderBasketItem['orderError'] | undefined,
+) {
+  const items = orderBasketStore.getState().items;
+  const patientItems = items[patientUuid] ?? {};
+  const newPatientItems = Object.fromEntries(
+    Object.entries(patientItems).map(([grouping, orders]) => [
+      grouping,
+      orders.map((order) => {
+        const orderError = getOrderError(order);
+        if (orderError) {
+          return { ...order, orderError };
+        }
+        return order.orderError || order.extractedOrderError
+          ? { ...order, orderError: undefined, extractedOrderError: undefined }
+          : order;
+      }),
+    ]),
+  );
+  orderBasketStore.setState((state) => ({
+    items: {
+      ...state.items,
+      [patientUuid]: newPatientItems,
+    },
+  }));
+}
+
 type UseOrderBasketReturn<T, U> = {
   orders: Array<T>;
   clearOrders: (options?: ClearOrdersOptions) => void;

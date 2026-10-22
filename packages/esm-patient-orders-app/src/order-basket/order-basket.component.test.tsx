@@ -1,8 +1,15 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { type LayoutType, useSession, useConfig, useLayoutType } from '@openmrs/esm-framework';
-import { useOrderBasket, useMutatePatientOrders } from '@openmrs/esm-patient-common-lib';
+import {
+  type OrderBasketItem,
+  postOrdersOnNewEncounter,
+  setOrderBasketItemErrors,
+  useOrderBasket,
+  useMutatePatientOrders,
+} from '@openmrs/esm-patient-common-lib';
 import { mockSessionDataResponse } from '__mocks__';
 import { useOrderEncounterForSystemWithVisitDisabled, useProviders } from '../api/api';
 import OrderBasket from './order-basket.component';
@@ -14,11 +21,15 @@ const mockUseOrderBasket = vi.mocked(useOrderBasket);
 const mockUseMutatePatientOrders = vi.mocked(useMutatePatientOrders);
 const mockUseOrderEncounterForSystemWithVisitDisabled = vi.mocked(useOrderEncounterForSystemWithVisitDisabled);
 const mockUseProviders = vi.mocked(useProviders);
+const mockPostOrdersOnNewEncounter = vi.mocked(postOrdersOnNewEncounter);
+const mockSetOrderBasketItemErrors = vi.mocked(setOrderBasketItemErrors);
 
 vi.mock('@openmrs/esm-patient-common-lib', async () => ({
   ...((await vi.importActual('@openmrs/esm-patient-common-lib')) as object),
   useOrderBasket: vi.fn(),
   useMutatePatientOrders: vi.fn(),
+  postOrdersOnNewEncounter: vi.fn(),
+  setOrderBasketItemErrors: vi.fn(),
 }));
 
 vi.mock('../api/api', () => ({
@@ -114,5 +125,43 @@ describe('OrderBasket', () => {
     );
 
     expect(screen.getByText('Order Basket')).toBeInTheDocument();
+  });
+
+  it('shows why signing failed and marks the orders as failed when the server rejects them', async () => {
+    const user = userEvent.setup();
+    const aspirinOrder = { action: 'NEW', display: 'Aspirin' } as OrderBasketItem;
+    const forbiddenError = Object.assign(new Error('Forbidden'), {
+      response: { status: 403 },
+      responseBody: { error: { message: 'Privileges required: Add Orders' } },
+    });
+    mockUseSession.mockReturnValue(mockSessionDataResponse.data as any);
+    mockUseOrderBasket.mockReturnValue({
+      orders: [aspirinOrder],
+      clearOrders: vi.fn(),
+      setOrders: vi.fn(),
+    } as any);
+    mockPostOrdersOnNewEncounter.mockRejectedValue(forbiddenError);
+
+    render(
+      <OrderBasket
+        patientUuid={mockPatientUuid}
+        patient={mockPatient}
+        visitContext={mockVisitContext}
+        mutateVisitContext={mockMutateVisitContext}
+        closeWorkspace={mockCloseWorkspace}
+        orderBasketExtensionProps={mockOrderBasketExtensionProps}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: /sign and close/i }));
+
+    expect(await screen.findByText("Couldn't sign orders")).toBeInTheDocument();
+    expect(screen.getByText('Privileges required: Add Orders')).toBeInTheDocument();
+    expect(screen.queryByText('Please try launching the workspace again')).not.toBeInTheDocument();
+    expect(mockCloseWorkspace).not.toHaveBeenCalled();
+
+    const getOrderError = mockSetOrderBasketItemErrors.mock.calls.at(-1)[1];
+    expect(mockSetOrderBasketItemErrors).toHaveBeenLastCalledWith(mockPatientUuid, expect.any(Function));
+    expect(getOrderError(aspirinOrder)).toBe(forbiddenError);
   });
 });

@@ -149,6 +149,19 @@ function OrderActionLabel({ orderBasketItem }: { orderBasketItem: DrugOrderBaske
     );
   }
 
+  if (orderBasketItem.orderError) {
+    return (
+      <span
+        className={styles.orderActionFailedLabel}
+        role="status"
+        aria-atomic
+        aria-label={t('orderActionFailed', 'Failed')}
+      >
+        {t('orderActionFailed', 'Failed')}
+      </span>
+    );
+  }
+
   switch (orderBasketItem.action) {
     case 'NEW':
       return (

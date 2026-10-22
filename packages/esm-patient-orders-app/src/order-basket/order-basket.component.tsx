@@ -24,6 +24,7 @@ import {
   type OrderBasketItem,
   postOrders,
   postOrdersOnNewEncounter,
+  setOrderBasketItemErrors,
   showOrderSuccessToast,
   useMutatePatientOrders,
   useOrderBasket,
@@ -105,6 +106,9 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
   const handleSave = useCallback(async () => {
     const abortController = new AbortController();
     setCreatingEncounterError('');
+    setOrdersWithErrors([]);
+    // Clear errors left over from a previous attempt so retried orders don't stay marked as failed
+    setOrderBasketItemErrors(patientUuid, () => undefined);
 
     setIsSavingOrders(true);
     // orderEncounterUuid should only be preset if the system does not support visits, and the user has an order encounter today.
@@ -144,6 +148,8 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
         showOrderSuccessToast('@openmrs/esm-patient-orders-app', orders);
       } catch (e) {
         console.error(e);
+        // The orders are saved together with the new encounter, so if that request fails none of them were saved
+        setOrderBasketItemErrors(patientUuid, () => e);
         setCreatingEncounterError(
           e.responseBody?.error?.message ||
             t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again'),
@@ -168,6 +174,10 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
           setOrdersWithErrors(erroredItems);
         }
         clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
+        setOrderBasketItemErrors(
+          patientUuid,
+          (item) => erroredItems.find((erroredItem) => erroredItem.display === item.display)?.orderError,
+        );
         // Only revalidate current visit since orders create new encounters
         mutateVisitContext?.();
         await mutateOrders();
@@ -303,7 +313,11 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
           {(creatingEncounterError || errorFetchingEncounterUuid) && (
             <InlineNotification
               kind="error"
-              title={t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again')}
+              title={
+                creatingEncounterError
+                  ? t('couldNotSignOrders', "Couldn't sign orders")
+                  : t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again')
+              }
               subtitle={creatingEncounterError}
               lowContrast={true}
               className={styles.inlineNotification}
