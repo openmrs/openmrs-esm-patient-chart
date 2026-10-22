@@ -27,6 +27,7 @@ const VisitNotesFormWorkspace: React.FC<PatientWorkspace2DefinitionProps<VisitNo
       patient={patient}
       visitContext={visitContext}
       closeWorkspace={closeWorkspace}
+      showPatientHeader={false}
     />
   );
 };

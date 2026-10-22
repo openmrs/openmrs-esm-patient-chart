@@ -43,7 +43,12 @@ import {
   type Visit,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
-import { invalidateVisitAndEncounterData, useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
+import {
+  hasPatientBannerData,
+  invalidateVisitAndEncounterData,
+  useAllowedFileExtensions,
+  usePatientForBanner,
+} from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
 import type { Concept, DiagnosisCertainty, DiagnosisPayload, VisitNotePayload } from '../types';
 import {
@@ -140,6 +145,7 @@ export interface VisitNotesFormProps {
   patient: fhir.Patient;
   visitContext: Visit;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
+  showPatientHeader?: boolean;
 }
 
 /**
@@ -149,16 +155,20 @@ export interface VisitNotesFormProps {
 const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   encounter,
   formContext,
-  patientUuid,
-  patient,
+  patientUuid: propPatientUuid,
+  patient: patientProp,
   visitContext,
   closeWorkspace,
+  showPatientHeader = true,
 }) => {
   const isEditing: boolean = Boolean(formContext === 'editing' && encounter?.uuid);
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const { isPrimaryDiagnosisRequired, ...config } = useConfig<ConfigObject>();
+  const patientUuid = propPatientUuid ?? patientProp?.id;
+  const patient = usePatientForBanner(patientProp, patientUuid);
+  const showWorkspacePatientHeader = Boolean(showPatientHeader && hasPatientBannerData(patient) && patientUuid);
   const visitContextHeaderState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const memoizedState = useMemo(() => ({ patientUuid, patient }), [patientUuid, patient]);
   const { clinicianEncounterRole, encounterNoteTextConceptUuid, encounterTypeUuid, formConceptUuid } =
@@ -628,10 +638,20 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       title={isEditing ? t('editVisitNote', 'Edit visit note') : t('addVisitNote', 'Add visit note')}
       hasUnsavedChanges={hasUserUnsavedChanges}
     >
+      {showWorkspacePatientHeader && patientUuid && patient && (
+        <ExtensionSlot
+          name="patient-header-slot"
+          state={{
+            patient,
+            patientUuid,
+            hideActionsOverflow: true,
+          }}
+        />
+      )}
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
         <ExtensionSlot name="visit-context-header-slot" state={visitContextHeaderState} />
 
-        {isTablet && (
+        {isTablet && !showWorkspacePatientHeader && (
           <Row className={styles.headerGridRow}>
             <ExtensionSlot name="visit-form-header-slot" className={styles.dataGridRow} state={memoizedState} />
           </Row>
