@@ -12,6 +12,7 @@ import {
   useAbortController,
   useConfig,
   useLayoutType,
+  usePatient,
   Workspace2,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
@@ -39,6 +40,7 @@ import orderStyles from '../order-basket/order-basket.scss';
 
 export interface LabResultsFormProps {
   patient: fhir.Patient;
+  patientUuid?: string;
   order: Order;
   launchLabOrderForm?: (orderTypeUuid: string, order?: OrderBasketItem) => void;
   labOrderWorkspaceName?: string;
@@ -61,7 +63,14 @@ function findConceptName(concepts: Array<LabOrderConcept>, conceptUuid: string):
 }
 
 const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormProps, {}, {}>> = ({
-  workspaceProps: { patient, order, invalidateLabOrders, launchLabOrderForm, labOrderWorkspaceName },
+  workspaceProps: {
+    patient: patientProp,
+    patientUuid: propPatientUuid,
+    order,
+    invalidateLabOrders,
+    launchLabOrderForm,
+    labOrderWorkspaceName,
+  },
   launchChildWorkspace,
   closeWorkspace,
 }) => {
@@ -70,12 +79,15 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
   const abortController = useAbortController();
   const isTablet = useLayoutType() === 'tablet';
   const isEditMode = order.fulfillerStatus === 'COMPLETED';
+  const patientUuid =
+    propPatientUuid ?? (patientProp as { uuid?: string })?.uuid ?? patientProp?.id ?? order?.patient?.uuid;
+  const { patient } = usePatient(patientUuid);
   const [orderConceptUuids, setOrderConceptUuids] = useState([order.concept.uuid]);
   const { isLoading: isLoadingResultConcepts, concepts: conceptArray } = useOrderConceptsByUuids(orderConceptUuids);
   const [showEmptyFormErrorNotification, setShowEmptyFormErrorNotification] = useState(false);
   const compositeSchema = useMemo(() => createLabResultsFormCompositeSchema(conceptArray), [conceptArray]);
   const { mutate } = useSWRConfig();
-  const { orders, clearOrders } = useOrderBasket(patient);
+  const { orders, clearOrders } = useOrderBasket(patientProp);
   const [isSavingOrders, setIsSavingOrders] = useState(false);
   const { isLoading, completeLabResults, mutate: mutateResults } = useCompletedLabResultsArray(order);
   // Results saved by an earlier attempt that failed before the order was marked as fulfilled
@@ -149,10 +161,10 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
 
   const extensionProps = useMemo(
     () => ({
-      patient,
+      patient: patientProp,
       launchLabOrderForm: resolvedLaunchLabOrderForm,
     }),
-    [patient, resolvedLaunchLabOrderForm],
+    [patientProp, resolvedLaunchLabOrderForm],
   );
   const canUseResultEntryAddTests =
     enableAddTestsDuringResultEntry && !isEditMode && !hasSavedResults && !!resolvedLaunchLabOrderForm;
@@ -365,6 +377,9 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
       title={isEditMode ? t('editTestResults', 'Edit test results') : t('enterTestResults', 'Enter test results')}
       hasUnsavedChanges={isDirty}
     >
+      {patient && patientUuid && (
+        <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
+      )}
       <Form className={styles.form} onSubmit={handleSubmit(saveLabResults)}>
         <Layer level={isTablet ? 1 : 0}>
           <div className={styles.grid}>
