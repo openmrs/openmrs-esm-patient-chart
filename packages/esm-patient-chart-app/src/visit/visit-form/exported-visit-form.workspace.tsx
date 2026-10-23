@@ -37,9 +37,11 @@ import {
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import {
+  hasPatientBannerData,
   invalidateCurrentVisit,
   invalidateVisitAndEncounterData,
   useActivePatientEnrollment,
+  usePatientForBanner,
 } from '@openmrs/esm-patient-common-lib';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import {
@@ -116,10 +118,10 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
   closeWorkspace,
   workspaceProps: {
     openedFrom,
-    showPatientHeader = false,
+    showPatientHeader = true,
     onVisitStarted,
-    patient,
-    patientUuid,
+    patient: patientProp,
+    patientUuid: propPatientUuid,
     visitContext: visitToEdit,
   },
 }) => {
@@ -127,6 +129,9 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig<ChartConfig>();
   const { emrConfiguration } = useEmrConfiguration();
+  const patientUuid = propPatientUuid ?? patientProp?.id;
+  const patient = usePatientForBanner(patientProp, patientUuid);
+  const showWorkspacePatientHeader = Boolean(showPatientHeader && hasPatientBannerData(patient) && patientUuid);
   const [visitTypeContentSwitcherIndex, setVisitTypeContentSwitcherIndex] = useState(
     config.showRecommendedVisitTypeTab ? 0 : 1,
   );
@@ -413,7 +418,7 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
     >
       <FormProvider {...methods}>
         <Form className={styles.form} onSubmit={handleSubmit(onSubmit)} data-openmrs-role="Start Visit Form">
-          {showPatientHeader && patient && (
+          {showWorkspacePatientHeader && patient && (
             <ExtensionSlot
               name="patient-header-slot"
               state={{
@@ -438,6 +443,11 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
                 <ExtensionSlot
                   name="visit-form-header-slot"
                   className={styles.dataGridRow}
+                  select={
+                    showWorkspacePatientHeader
+                      ? (extensions) => extensions.filter((extension) => extension.name !== 'patient-details-tile')
+                      : undefined
+                  }
                   state={visitHeaderSlotState}
                 />
               </Row>
