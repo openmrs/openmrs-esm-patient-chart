@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { useSWRConfig } from 'swr';
 import { useConfig } from '@openmrs/esm-framework';
 import { useLaunchWorkspaceRequiringVisit, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from './config-schema';
@@ -11,6 +12,7 @@ import { invalidateCachedVitalsAndBiometrics } from './common';
  * @param config - The configuration object.
  */
 export function useLaunchVitalsAndBiometricsForm(patientUuid: string) {
+  const { mutate } = useSWRConfig();
   const { mutateVisitContext, visitContext, patient } = usePatientChartStore(patientUuid);
   const config = useConfig<ConfigObject>();
   const { useFormEngine, formName, formUuid } = config.vitals;
@@ -34,7 +36,7 @@ export function useLaunchVitalsAndBiometricsForm(patientUuid: string) {
       visitContext,
       mutateVisitContext: () => {
         mutateVisitContext?.();
-        invalidateCachedVitalsAndBiometrics();
+        invalidateCachedVitalsAndBiometrics(patientUuid, mutate);
       },
     };
 
@@ -45,6 +47,7 @@ export function useLaunchVitalsAndBiometricsForm(patientUuid: string) {
     formUuid,
     launchVitalsAndBiometricsForm,
     visitContext,
+    mutate,
     mutateVisitContext,
     patient,
     patientUuid,

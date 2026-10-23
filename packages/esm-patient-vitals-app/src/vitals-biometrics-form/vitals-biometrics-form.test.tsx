@@ -4,7 +4,11 @@ import { act, screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type FetchResponse, showSnackbar, useConfig, getDefaultsFromConfigSchema } from '@openmrs/esm-framework';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
-import { createOrUpdateVitalsAndBiometrics, useEncounterVitalsAndBiometrics } from '../common';
+import {
+  createOrUpdateVitalsAndBiometrics,
+  invalidateCachedVitalsAndBiometrics,
+  useEncounterVitalsAndBiometrics,
+} from '../common';
 import { type ConfigObject, configSchema } from '../config-schema';
 import { mockConceptUnits, mockVitalsConceptMetadata, mockVitalsConfig } from '__mocks__';
 import { mockPatient } from 'tools';
@@ -42,6 +46,7 @@ const mockShowSnackbar = vi.mocked(showSnackbar);
 const mockCreateOrUpdateVitalsAndBiometrics = vi.mocked(createOrUpdateVitalsAndBiometrics);
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const mockUseEncounterVitalsAndBiometrics = vi.mocked(useEncounterVitalsAndBiometrics);
+const mockInvalidateCachedVitalsAndBiometrics = vi.mocked(invalidateCachedVitalsAndBiometrics);
 
 vi.mock('../common', () => ({
   assessValue: vi.fn(),
@@ -324,6 +329,10 @@ describe('VitalsBiometricsForm', () => {
 
     expect(mockCreateOrUpdateVitalsAndBiometrics).toHaveBeenCalledTimes(1);
     expect(defaultProps.closeWorkspace).toHaveBeenCalledExactlyOnceWith({ discardUnsavedChanges: true });
+    expect(mockInvalidateCachedVitalsAndBiometrics).toHaveBeenCalledExactlyOnceWith(
+      mockPatient.id,
+      expect.any(Function),
+    );
     expect(mockShowSnackbar).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ kind: 'success' }));
   });
 
@@ -357,11 +366,16 @@ describe('VitalsBiometricsForm', () => {
     expect(temperatureInput).toHaveValue(37);
     expect(defaultProps.closeWorkspace).not.toHaveBeenCalled();
     expect(mockShowSnackbar).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ kind: 'error' }));
+    expect(mockInvalidateCachedVitalsAndBiometrics).not.toHaveBeenCalled();
 
     await user.click(saveButton);
 
     await waitFor(() => expect(defaultProps.closeWorkspace).toHaveBeenCalledTimes(1));
     expect(mockCreateOrUpdateVitalsAndBiometrics).toHaveBeenCalledTimes(2);
+    expect(mockInvalidateCachedVitalsAndBiometrics).toHaveBeenCalledExactlyOnceWith(
+      mockPatient.id,
+      expect.any(Function),
+    );
     expect(mockShowSnackbar).toHaveBeenLastCalledWith(expect.objectContaining({ kind: 'success' }));
   });
 

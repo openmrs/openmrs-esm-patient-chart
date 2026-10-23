@@ -8,7 +8,7 @@ import {
   useConfig,
   type OpenmrsResource,
 } from '@openmrs/esm-framework';
-import useSWR from 'swr';
+import useSWR, { type ScopedMutator } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import useSWRInfinite from 'swr/infinite';
 import { type ConfigObject } from '../config-schema';
@@ -566,8 +566,14 @@ function extractEncounterUuid(encounter: FHIRResource['resource']['encounter']):
 }
 
 /**
- * Invalidate all useVitalsAndBiometrics hooks data, to force them to reload
+ * Reload vitals hooks and the patient's FHIR observation queries, including the growth chart.
  */
-export async function invalidateCachedVitalsAndBiometrics() {
-  vitalsHooksMutates.forEach((mutate) => mutate());
+export async function invalidateCachedVitalsAndBiometrics(patientUuid: string, mutate: ScopedMutator) {
+  vitalsHooksMutates.forEach((mutateVitals) => mutateVitals());
+  await mutate(
+    (key) =>
+      typeof key === 'string' &&
+      key.startsWith(`${fhirBaseUrl}/Observation?`) &&
+      new URLSearchParams(key.split('?')[1]).get('patient') === patientUuid,
+  );
 }
