@@ -5,6 +5,7 @@ import { Button, DataTableSkeleton } from '@carbon/react';
 import { ArrowRightIcon, navigate } from '@openmrs/esm-framework';
 import {
   EmptyState,
+  ErrorState,
   type ExternalOverviewProps,
   type PanelFilterProps,
   type PatientData,
@@ -44,7 +45,7 @@ function useFilteredOverviewData(patientUuid: string, filter: (filterProps: Pane
 
 const ExternalOverview: React.FC<ExternalOverviewProps> = ({ patientUuid, filter }) => {
   const { t } = useTranslation();
-  const { overviewData, loaded } = useFilteredOverviewData(patientUuid, filter);
+  const { overviewData, loaded, error } = useFilteredOverviewData(patientUuid, filter);
   const cardTitle = t('recentResults', 'Recent Results');
 
   const handleSeeAll = useCallback(() => {
@@ -80,6 +81,8 @@ const ExternalOverview: React.FC<ExternalOverviewProps> = ({ patientUuid, filter
                   )}
                 </div>
               );
+            } else if (error) {
+              return <ErrorState error={error} headerTitle={cardTitle} />;
             } else {
               return <EmptyState headerTitle={cardTitle} displayText={t('recentTestResults', 'recent test results')} />;
             }
