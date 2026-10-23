@@ -6,9 +6,11 @@
  * fails the cross-realm equality check used here.
  */
 import React from 'react';
-import { vi, expect, test, beforeEach, afterEach } from 'vitest';
+import { useTranslation } from 'react-i18next';
+import { vi, expect, test, describe, beforeEach, afterEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { screen, render, waitFor, within, act } from '@testing-library/react';
+import { Button, Checkbox, OverflowMenuItem, type CheckboxProps } from '@carbon/react';
+import { screen, render, waitFor, within, act, fireEvent } from '@testing-library/react';
 import {
   type Encounter,
   type UploadedFile,
@@ -16,8 +18,10 @@ import {
   ExtensionSlot,
   showModal,
   getDefaultsFromConfigSchema,
+  OpenmrsDatePicker,
   showSnackbar,
   useConfig,
+  usePatient,
   useSession,
   useFeatureFlag,
   Workspace2,
@@ -48,6 +52,7 @@ import {
   mockSessionDataResponse,
 } from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';
+import enTranslations from '../../translations/en.json';
 import { mockPatient, getByTextWithMarkup } from 'tools';
 import ExportedVisitNotesFormWorkspace, {
   type ExportedVisitNotesFormWorkspaceProps,
@@ -201,7 +206,17 @@ mockUseConfig.mockReturnValue({
   ...ConfigMock,
 });
 
+type PatientState = ReturnType<typeof usePatient>;
+
+const availablePatient: PatientState = {
+  isLoading: false,
+  patient: mockPatient,
+  patientUuid: mockPatient.id,
+  error: null,
+};
+
 beforeEach(() => {
+  vi.mocked(usePatient).mockReturnValue(availablePatient);
   mockedUseFeatureFlag.mockReturnValue(false);
   // The edit-mode tests prefill concept '789' (Diabetes Mellitus); treat it as a true diagnosis
   mockUseDiagnosisConceptClasses.mockReturnValue({
@@ -1275,7 +1290,7 @@ test('saving only image removals does not rewrite the note or upload images', as
   await user.click(screen.getByRole('button', { name: 'Remove image: front.png' }));
   await user.click(screen.getByRole('button', { name: /save and close/i }));
   await waitFor(() => expect(defaultProps.closeWorkspace).toHaveBeenCalledWith({ discardUnsavedChanges: true }));
-  expect(removeVisitNoteImage).toHaveBeenCalledExactlyOnceWith('att-1');
+  expect(vi.mocked(removeVisitNoteImage).mock.calls.map(([imageId]) => imageId)).toEqual(['att-1']);
   expect(updateVisitNote).not.toHaveBeenCalled();
   expect(createAttachment).not.toHaveBeenCalled();
 });
@@ -1295,7 +1310,7 @@ test('retries failed removals without repeating successful removals or saving th
   expect(screen.queryByRole('button', { name: 'Undo removal: front.png' })).not.toBeInTheDocument();
   await user.click(screen.getByRole('button', { name: /save and close/i }));
   await waitFor(() => expect(defaultProps.closeWorkspace).toHaveBeenCalledWith({ discardUnsavedChanges: true }));
-  expect(vi.mocked(removeVisitNoteImage).mock.calls).toEqual([['att-1'], ['att-2'], ['att-2']]);
+  expect(vi.mocked(removeVisitNoteImage).mock.calls.map(([imageId]) => imageId)).toEqual(['att-1', 'att-2', 'att-2']);
   expect(updateVisitNote).toHaveBeenCalledTimes(1);
 });
 
@@ -1345,7 +1360,7 @@ test('removing an image preserves saved diagnoses without rewriting the note', a
   await user.click(screen.getByRole('button', { name: 'Remove image: front.png' }));
   await user.click(screen.getByRole('button', { name: /save and close/i }));
   await waitFor(() => expect(defaultProps.closeWorkspace).toHaveBeenCalledWith({ discardUnsavedChanges: true }));
-  expect(removeVisitNoteImage).toHaveBeenCalledExactlyOnceWith('att-1');
+  expect(vi.mocked(removeVisitNoteImage).mock.calls.map(([imageId]) => imageId)).toEqual(['att-1']);
   expect(updateVisitNote).not.toHaveBeenCalled();
 });
 
@@ -1489,7 +1504,7 @@ test('keeps a saved image removal when a replacement upload fails and closes wit
   await addImage(user, newImage);
   await user.click(screen.getByRole('button', { name: /save and close/i }));
   await waitFor(() => expect(defaultProps.closeWorkspace).toHaveBeenCalledWith({ discardUnsavedChanges: true }));
-  expect(removeVisitNoteImage).toHaveBeenCalledExactlyOnceWith('att-1');
+  expect(vi.mocked(removeVisitNoteImage).mock.calls.map(([imageId]) => imageId)).toEqual(['att-1']);
   expect(mockUpdateVisitNote).toHaveBeenCalledTimes(1);
   expect(createAttachment).toHaveBeenCalledTimes(1);
   expect(mockShowSnackbar).toHaveBeenCalledWith(expect.objectContaining({ kind: 'warning' }));
@@ -1862,4 +1877,882 @@ test('describes every Primary checkbox with the primary-required message while i
   // Once a primary exists the message unmounts and the reference points at nothing
   await user.click(checkbox);
   expect(checkbox).not.toHaveAccessibleDescription();
+});
+
+describe('when the patient record becomes unavailable while the form is open', () => {
+  const otherPatient = { ...mockPatient, id: 'other-patient-uuid' };
+  const missingPatient: PatientState = {
+    isLoading: false,
+    patient: null,
+    patientUuid: mockPatient.id,
+    error: null,
+  };
+  const blockedPatientStates: Array<[string, PatientState]> = [
+    ['is still loading', { isLoading: true, patient: null, patientUuid: mockPatient.id, error: null }],
+    [
+      'failed to load while a cached patient is still present',
+      { isLoading: false, patient: mockPatient, patientUuid: mockPatient.id, error: new Error('Patient not found') },
+    ],
+    [
+      'failed to load',
+      { isLoading: false, patient: null, patientUuid: mockPatient.id, error: new Error('Patient not found') },
+    ],
+    ['settled with no patient', missingPatient],
+    [
+      'returned a different hook UUID while the cached opening patient is still present',
+      { isLoading: false, patient: mockPatient, patientUuid: otherPatient.id, error: null },
+    ],
+    [
+      'switched to a different patient',
+      { isLoading: false, patient: otherPatient, patientUuid: otherPatient.id, error: null },
+    ],
+    [
+      'returned a patient other than the one the form was opened for',
+      { isLoading: false, patient: otherPatient, patientUuid: mockPatient.id, error: null },
+    ],
+  ];
+
+  const createdNote = { status: 201, data: { uuid: 'new-note' } } as unknown as Awaited<
+    ReturnType<typeof saveVisitNote>
+  >;
+
+  function deferred<T>() {
+    let resolve: (value: T) => void;
+    let reject: (reason: unknown) => void;
+    const promise = new Promise<T>((res, rej) => {
+      resolve = res;
+      reject = rej;
+    });
+    return { promise, resolve, reject };
+  }
+
+  const flush = () =>
+    act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
+  function renderOwnedForm({
+    exported = false,
+    workspaceProps = {},
+  }: { exported?: boolean; workspaceProps?: Partial<VisitNotesFormWorkspaceProps> } = {}) {
+    const element = (launcherPatientUuid: string) =>
+      exported ? (
+        <ExportedVisitNotesFormWorkspace
+          {...defaultProps}
+          groupProps={{}}
+          workspaceProps={{
+            formContext: 'creating',
+            patient: mockPatient,
+            patientUuid: launcherPatientUuid,
+            visitContext: null,
+            ...workspaceProps,
+          }}
+        />
+      ) : (
+        <VisitNotesFormWorkspace
+          {...defaultProps}
+          workspaceProps={{ ...defaultProps.workspaceProps, ...workspaceProps }}
+          groupProps={{ ...defaultProps.groupProps, patientUuid: launcherPatientUuid }}
+        />
+      );
+    const view = render(element(mockPatient.id));
+    return {
+      setPatient(state: PatientState, launcherPatientUuid = mockPatient.id) {
+        vi.mocked(usePatient).mockReturnValue(state);
+        view.rerender(element(launcherPatientUuid));
+      },
+    };
+  }
+
+  function expectPausedForUnavailablePatient() {
+    expect(screen.getByText(/patient record unavailable/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/your draft is retained/i).length).toBeGreaterThan(0);
+    expect(screen.getByRole('button', { name: /save and close/i })).toBeDisabled();
+    expect(screen.getByRole('textbox', { name: /write your notes/i })).toBeDisabled();
+    expect(screen.getByRole('searchbox', { name: /search for a diagnosis to add/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /add image/i })).toBeDisabled();
+  }
+
+  function expectNoCompletion() {
+    expect(defaultProps.closeWorkspace).not.toHaveBeenCalled();
+    expect(mockShowSnackbar).not.toHaveBeenCalledWith(
+      expect.objectContaining({ title: expect.stringMatching(/^visit note saved/i) }),
+    );
+  }
+
+  beforeEach(() => {
+    vi.mocked(showModal).mockReturnValue(vi.fn());
+    mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
+  });
+
+  // R2
+  test('reads the live patient record for the patient the form was opened for', () => {
+    renderOwnedForm();
+
+    expect(usePatient).toHaveBeenCalledWith(mockPatient.id);
+    expect(screen.queryByText(/patient record unavailable/i)).not.toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /write your notes/i })).toBeEnabled();
+  });
+
+  // R2, R3
+  test.each(blockedPatientStates)('pauses editing and saving when the patient record %s', async (_, state) => {
+    const user = userEvent.setup();
+    const { setPatient } = renderOwnedForm();
+    await user.type(screen.getByRole('textbox', { name: /write your notes/i }), 'Draft note');
+
+    setPatient(state);
+
+    expectPausedForUnavailablePatient();
+    expect(screen.getByRole('textbox', { name: /write your notes/i })).toHaveValue('Draft note');
+  });
+
+  // R2
+  test('stays paused when the launcher follows a different patient while the draft is open', async () => {
+    const user = userEvent.setup();
+    const { setPatient } = renderOwnedForm();
+    await user.type(screen.getByRole('textbox', { name: /write your notes/i }), 'Draft note');
+
+    setPatient({ isLoading: false, patient: otherPatient, patientUuid: otherPatient.id, error: null }, otherPatient.id);
+
+    expectPausedForUnavailablePatient();
+  });
+
+  // R3
+  test('translates the unavailable and draft-retained notification with keys defined in en.json', () => {
+    const translate = vi.spyOn(useTranslation(), 't');
+    try {
+      const { setPatient } = renderOwnedForm();
+      setPatient(missingPatient);
+
+      const translations = translate.mock.calls as unknown as Array<[string, unknown]>;
+      for (const shownText of [/patient record unavailable/i, /your draft is retained/i]) {
+        const translation = translations.find(([, defaultValue]) => shownText.test(String(defaultValue)));
+        expect(translation, `no translation renders ${shownText}`).toBeDefined();
+        const [key, defaultValue] = translation;
+        expect(enTranslations).toHaveProperty([key], defaultValue);
+      }
+    } finally {
+      translate.mockRestore();
+    }
+  });
+
+  // R1, R8
+  test.each([false, true])(
+    'keeps the same form, note, diagnoses, staged images and unsaved status through unavailability and recovery (exported: %s)',
+    async (exported) => {
+      const user = userEvent.setup();
+      const { setPatient } = renderOwnedForm({ exported });
+      const note = screen.getByRole('textbox', { name: /write your notes/i });
+      await user.type(note, 'Draft note');
+      const availableCard = await addDiagnosis(user, 'Diabetes Mellitus', { primary: true });
+      expect(actionsMenuFor(availableCard)).toBeEnabled();
+      await addImage(user, newImage);
+
+      setPatient(missingPatient);
+
+      expectPausedForUnavailablePatient();
+      expect(screen.getByRole('textbox', { name: /write your notes/i })).toBe(note);
+      expect(note).toHaveValue('Draft note');
+      const card = screen.getByRole('group', { name: 'Diabetes Mellitus' });
+      expect(within(card).getByRole('checkbox', { name: 'Primary' })).toBeChecked();
+      expect(within(card).getByRole('checkbox', { name: 'Primary' })).toBeDisabled();
+      expect(within(card).getByRole('button', { name: /remove diabetes mellitus/i })).toBeDisabled();
+      expect(actionsMenuFor(card)).toBeDisabled();
+      expect(screen.getByRole('img', { name: 'Wound photo' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Remove image: Wound photo' })).toBeDisabled();
+      expect(vi.mocked(Workspace2).mock.lastCall?.[0].hasUnsavedChanges).toBe(true);
+      expect(defaultProps.closeWorkspace).not.toHaveBeenCalled();
+
+      setPatient(availablePatient);
+
+      expect(screen.queryByText(/patient record unavailable/i)).not.toBeInTheDocument();
+      expect(screen.getByRole('textbox', { name: /write your notes/i })).toBe(note);
+      expect(note).toBeEnabled();
+      expect(note).toHaveValue('Draft note');
+      const recoveredCard = screen.getByRole('group', { name: 'Diabetes Mellitus' });
+      expect(within(recoveredCard).getByRole('checkbox', { name: 'Primary' })).toBeChecked();
+      expect(within(recoveredCard).getByRole('checkbox', { name: 'Primary' })).toBeEnabled();
+      expect(actionsMenuFor(recoveredCard)).toBeEnabled();
+      expect(screen.getByRole('img', { name: 'Wound photo' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Remove image: Wound photo' })).toBeEnabled();
+      expect(vi.mocked(Workspace2).mock.lastCall?.[0].hasUnsavedChanges).toBe(true);
+      expect(screen.getByRole('button', { name: /save and close/i })).toBeEnabled();
+      expect(defaultProps.closeWorkspace).not.toHaveBeenCalled();
+    },
+  );
+
+  // R4
+  test('ignores a native form submission while paused', async () => {
+    const user = userEvent.setup();
+    allowNotesWithoutDiagnosis();
+    mockSaveVisitNote.mockResolvedValue(createdNote);
+    const { setPatient } = renderOwnedForm();
+    const note = screen.getByRole('textbox', { name: /write your notes/i });
+    await user.type(note, 'Draft note');
+
+    setPatient(missingPatient);
+    fireEvent.submit(note);
+    await flush();
+
+    expect(mockSaveVisitNote).not.toHaveBeenCalled();
+    expect(mockSavePatientDiagnosis).not.toHaveBeenCalled();
+    expect(createAttachment).not.toHaveBeenCalled();
+    expectNoCompletion();
+    // The submit event bypasses the disabled Save button, so only the submit handler can refuse it
+    expect(screen.getByRole('button', { name: /save and close/i })).toBeDisabled();
+  });
+
+  // R3/R4: retain the DOM interaction checks. Captured public callbacks below independently
+  // exercise escaped handlers without depending on dispatch to disabled or detached elements.
+  test('the note handler refuses a change delivered while paused', async () => {
+    const user = userEvent.setup();
+    const { setPatient } = renderOwnedForm();
+    const note = screen.getByRole('textbox', { name: /write your notes/i });
+    await user.type(note, 'Draft note');
+
+    setPatient(missingPatient);
+    fireEvent.change(note, { target: { value: 'Changed while paused' } });
+
+    expect(note).toHaveValue('Draft note');
+    expect(note).toBeDisabled();
+  });
+
+  // R4
+  test('the diagnosis search handler refuses a query delivered while paused', () => {
+    const { setPatient } = renderOwnedForm();
+    const searchBox = screen.getByRole('searchbox', { name: /search for a diagnosis to add/i });
+
+    setPatient(missingPatient);
+    fireEvent.change(searchBox, { target: { value: 'Diabetes' } });
+
+    expect(searchBox).toHaveValue('');
+    expect(mockFetchDiagnosisConceptsByName).not.toHaveBeenCalled();
+    expect(screen.queryByRole('button', { name: 'Diabetes Mellitus' })).not.toBeInTheDocument();
+    expect(searchBox).toBeDisabled();
+  });
+
+  // R4
+  test('the Primary handler refuses a toggle delivered while paused', async () => {
+    const user = userEvent.setup();
+    const { setPatient } = renderOwnedForm();
+    const card = await addDiagnosis(user, 'Diabetes Mellitus');
+    const primary = within(card).getByRole('checkbox', { name: 'Primary' });
+
+    setPatient(missingPatient);
+    fireEvent.click(primary);
+
+    expect(
+      within(screen.getByRole('group', { name: 'Diabetes Mellitus' })).getByRole('checkbox', { name: 'Primary' }),
+    ).not.toBeChecked();
+    expect(primary).toBeDisabled();
+  });
+
+  // R4
+  test('ignores a diagnosis result, Primary toggle or removal clicked after the patient became unavailable', async () => {
+    const user = userEvent.setup();
+    const { setPatient } = renderOwnedForm();
+    const card = await addDiagnosis(user, 'Diabetes Mellitus');
+    await user.type(screen.getByPlaceholderText('Search for a diagnosis'), 'Diabetes');
+    const openResult = await screen.findByRole('button', { name: 'Diabetes Mellitus, Type II' });
+    const primary = within(card).getByRole('checkbox', { name: 'Primary' });
+    const remove = within(card).getByRole('button', { name: /remove diabetes mellitus/i });
+
+    setPatient(missingPatient);
+    fireEvent.click(openResult);
+    fireEvent.click(primary);
+    fireEvent.click(remove);
+
+    expect(screen.queryByRole('group', { name: 'Diabetes Mellitus, Type II' })).not.toBeInTheDocument();
+    expect(
+      within(screen.getByRole('group', { name: 'Diabetes Mellitus' })).getByRole('checkbox', { name: 'Primary' }),
+    ).not.toBeChecked();
+  });
+
+  // R4
+  test('ignores a certainty change chosen from an actions menu opened before the patient became unavailable', async () => {
+    const user = userEvent.setup();
+    const { setPatient } = renderOwnedForm();
+    const card = await addDiagnosis(user, 'Diabetes Mellitus');
+    await user.click(actionsMenuFor(card));
+    const markProvisional = screen.getByText(/mark as provisional/i);
+
+    setPatient(missingPatient);
+    fireEvent.click(markProvisional);
+
+    expect(isMarkedProvisional(screen.getByRole('group', { name: 'Diabetes Mellitus' }))).toBe(false);
+  });
+
+  // R4
+  test('ignores an image staged from a photo dialog opened before the patient became unavailable', async () => {
+    const user = userEvent.setup();
+    const { setPatient } = renderOwnedForm();
+    await user.click(screen.getByRole('button', { name: /add image/i }));
+    const modal = vi.mocked(showModal).mock.lastCall[1] as { saveFile: (file: UploadedFile) => Promise<void> };
+
+    setPatient(missingPatient);
+    await act(async () => {
+      await modal.saveFile(newImage).catch(() => {});
+    });
+
+    expect(screen.queryByRole('img', { name: 'Wound photo' })).not.toBeInTheDocument();
+  });
+
+  // R4
+  test('ignores a date picked after the patient became unavailable', () => {
+    mockedUseFeatureFlag.mockReturnValue(true);
+    const { setPatient } = renderOwnedForm();
+    const dateInput = screen.getByLabelText(/visit date/i);
+    const dateBefore = (dateInput as HTMLInputElement).value;
+
+    setPatient(missingPatient);
+    expect(vi.mocked(OpenmrsDatePicker).mock.lastCall?.[0].isDisabled).toBe(true);
+    // The framework mock's input ignores isDisabled, so this reaches the onChange handler itself
+    expect(dateInput).toBeEnabled();
+    fireEvent.change(dateInput, { target: { value: '2024-01-15' } });
+
+    expect(dateInput).toHaveValue(dateBefore);
+  });
+
+  // R4
+  test('ignores image removal and undo while paused', async () => {
+    const user = userEvent.setup();
+    allowNotesWithoutDiagnosis();
+    vi.mocked(useVisitNoteImages).mockReturnValue({
+      images: [
+        { id: 'att-1', src: '/front.png', filename: 'front.png' },
+        { id: 'att-2', src: '/side.png', filename: 'side.png' },
+      ],
+      isLoading: false,
+      error: null,
+    });
+    const { setPatient } = renderOwnedForm({ workspaceProps: { formContext: 'editing', encounter: existingNote } });
+    await user.click(screen.getByRole('button', { name: 'Remove image: front.png' }));
+    await addImage(user, newImage);
+
+    setPatient(missingPatient);
+    expect(screen.getByRole('button', { name: 'Undo removal: front.png' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Remove image: side.png' })).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: 'Undo removal: front.png' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Remove image: side.png' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Remove image: Wound photo' }));
+
+    expect(screen.getAllByText('Marked for removal')).toHaveLength(1);
+    expect(screen.getByRole('button', { name: 'Undo removal: front.png' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Wound photo' })).toBeInTheDocument();
+  });
+
+  // Record only public props at React's classic JSX factory, forwarding every element unchanged.
+  // Real Carbon controls remain mounted for the existing integration and disabled-state assertions.
+  function observeEditCallbacks() {
+    const clicks = new Map<string, React.MouseEventHandler<HTMLButtonElement>>();
+    const primaryChanges = new Map<string, CheckboxProps['onChange']>();
+    const certaintyChanges = new Map<string, React.MouseEventHandler<HTMLElement>>();
+    const createElement = React.createElement;
+    const observer = vi.spyOn(React, 'createElement').mockImplementation((type, props, ...children) => {
+      if (type === Button || (type === 'button' && children[0] === 'Diabetes Mellitus, Type II')) {
+        const buttonProps = props as React.ButtonHTMLAttributes<HTMLButtonElement> & { iconDescription?: string };
+        const name = buttonProps?.['aria-label'] ?? buttonProps?.iconDescription ?? children[0];
+        if (typeof name === 'string' && buttonProps?.onClick) {
+          clicks.set(name, buttonProps.onClick);
+        }
+      } else if (type === Checkbox) {
+        const checkboxProps = props as CheckboxProps;
+        primaryChanges.set(checkboxProps.id, checkboxProps.onChange);
+      } else if (type === OverflowMenuItem) {
+        const itemProps = props as React.ComponentProps<typeof OverflowMenuItem>;
+        if (typeof itemProps.itemText === 'string') {
+          certaintyChanges.set(itemProps.itemText, itemProps.onClick);
+        }
+      }
+      return createElement(type, props, ...children);
+    });
+    return { clicks, primaryChanges, certaintyChanges, restore: () => observer.mockRestore() };
+  }
+
+  const escapedEdits = [
+    'diagnosis result',
+    'diagnosis removal',
+    'diagnosis certainty',
+    'Primary',
+    'stored-image removal',
+    'stored-image undo',
+    'staged-image removal',
+    'date selection',
+  ] as const;
+
+  async function prepareEscapedEdit(edit: (typeof escapedEdits)[number]) {
+    const user = userEvent.setup();
+    const callbacks = observeEditCallbacks();
+    let invoke: () => void | Promise<unknown>;
+    let expectChanged: (changed: boolean) => void;
+    let setPatient: ReturnType<typeof renderOwnedForm>['setPatient'];
+    const click = (name: string) => {
+      const callback = callbacks.clicks.get(name);
+      expect(callback).toEqual(expect.any(Function));
+      return () => callback({} as React.MouseEvent<HTMLButtonElement>);
+    };
+    try {
+      if (edit === 'diagnosis result') {
+        ({ setPatient } = renderOwnedForm());
+        await user.type(screen.getByPlaceholderText('Search for a diagnosis'), 'Diabetes');
+        await screen.findByRole('button', { name: 'Diabetes Mellitus, Type II' });
+        invoke = click('Diabetes Mellitus, Type II');
+        expectChanged = (changed) => {
+          expect(screen.queryByRole('group', { name: 'Diabetes Mellitus, Type II' }) !== null).toBe(changed);
+          expect(screen.getByPlaceholderText('Search for a diagnosis')).toHaveValue(changed ? '' : 'Diabetes');
+        };
+      } else if (edit === 'diagnosis removal' || edit === 'diagnosis certainty' || edit === 'Primary') {
+        ({ setPatient } = renderOwnedForm());
+        const card = await addDiagnosis(user, 'Diabetes Mellitus');
+        if (edit === 'diagnosis removal') {
+          invoke = click('Remove Diabetes Mellitus');
+          expectChanged = (changed) =>
+            expect(screen.queryByRole('group', { name: 'Diabetes Mellitus' }) === null).toBe(changed);
+        } else if (edit === 'Primary') {
+          const primary = within(card).getByRole('checkbox', { name: 'Primary' });
+          const callback = callbacks.primaryChanges.get(primary.id);
+          expect(callback).toEqual(expect.any(Function));
+          invoke = () => callback({} as React.ChangeEvent<HTMLInputElement>, { checked: true, id: primary.id });
+          expectChanged = (changed) => {
+            if (changed) {
+              expect(
+                within(screen.getByRole('group', { name: 'Diabetes Mellitus' })).getByRole('checkbox', {
+                  name: 'Primary',
+                }),
+              ).toBeChecked();
+            } else {
+              expect(
+                within(screen.getByRole('group', { name: 'Diabetes Mellitus' })).getByRole('checkbox', {
+                  name: 'Primary',
+                }),
+              ).not.toBeChecked();
+            }
+          };
+        } else {
+          await user.click(actionsMenuFor(card));
+          const callback = callbacks.certaintyChanges.get('Mark as provisional');
+          expect(callback).toEqual(expect.any(Function));
+          invoke = () => callback({} as React.MouseEvent<HTMLElement>);
+          expectChanged = (changed) =>
+            expect(isMarkedProvisional(screen.getByRole('group', { name: 'Diabetes Mellitus' }))).toBe(changed);
+        }
+      } else if (edit === 'stored-image removal' || edit === 'stored-image undo') {
+        vi.mocked(useVisitNoteImages).mockReturnValue({
+          images: [{ id: 'att-1', src: '/front.png', filename: 'front.png' }],
+          isLoading: false,
+          error: null,
+        });
+        ({ setPatient } = renderOwnedForm({ workspaceProps: { formContext: 'editing', encounter: existingNote } }));
+        if (edit === 'stored-image undo') {
+          await user.click(screen.getByRole('button', { name: 'Remove image: front.png' }));
+        }
+        invoke = click(edit === 'stored-image undo' ? 'Undo removal: front.png' : 'Remove image: front.png');
+        expectChanged = (changed) => {
+          const removed = edit === 'stored-image undo' ? !changed : changed;
+          expect(screen.queryByText('Marked for removal') !== null).toBe(removed);
+          expect(
+            screen.getByRole('button', { name: removed ? 'Undo removal: front.png' : 'Remove image: front.png' }),
+          ).toBeInTheDocument();
+          expect(screen.getByRole('img', { name: 'front.png' })).toBeInTheDocument();
+        };
+      } else if (edit === 'staged-image removal') {
+        ({ setPatient } = renderOwnedForm());
+        await addImage(user, newImage);
+        invoke = click('Remove image: Wound photo');
+        expectChanged = (changed) => expect(screen.queryByRole('img', { name: 'Wound photo' }) === null).toBe(changed);
+      } else {
+        mockedUseFeatureFlag.mockReturnValue(true);
+        ({ setPatient } = renderOwnedForm());
+        const dateInput = screen.getByLabelText(/visit date/i) as HTMLInputElement;
+        const initialDate = dateInput.value;
+        const callback = vi.mocked(OpenmrsDatePicker).mock.lastCall[0].onChange;
+        expect(callback).toEqual(expect.any(Function));
+        invoke = () => callback(new Date('2024-01-15T12:00:00Z'));
+        expectChanged = (changed) =>
+          expect(screen.getByLabelText(/visit date/i)).toHaveValue(changed ? '15/01/2024' : initialDate);
+      }
+      expectChanged(false);
+      // Freeze the available-state references before the blocked rerender can replace any handler.
+      return { invoke, expectChanged, setPatient };
+    } finally {
+      callbacks.restore();
+    }
+  }
+
+  // R4 positive controls: each exact public callback path must perform its intended edit while available.
+  test.each(escapedEdits)('the captured %s callback edits the available draft', async (edit) => {
+    const { invoke, expectChanged } = await prepareEscapedEdit(edit);
+
+    await act(async () => {
+      await invoke();
+    });
+
+    expectChanged(true);
+  });
+
+  // R4: call the same captured function after invalidation; no DOM event dispatch can suppress it.
+  test.each(escapedEdits)('ignores the captured %s callback after the patient becomes unavailable', async (edit) => {
+    const { invoke, expectChanged, setPatient } = await prepareEscapedEdit(edit);
+
+    setPatient(missingPatient);
+    const snackbarCountBeforeCallback = mockShowSnackbar.mock.calls.length;
+    await act(async () => {
+      await invoke();
+    });
+
+    expectChanged(false);
+    if (edit === 'staged-image removal') {
+      const callbackNotifications = mockShowSnackbar.mock.calls
+        .slice(snackbarCountBeforeCallback)
+        .map(([notification]) => notification);
+      expect(callbackNotifications).not.toContainEqual(expect.objectContaining({ title: 'Image removed' }));
+    }
+    expect(mockSaveVisitNote).not.toHaveBeenCalled();
+    expect(mockUpdateVisitNote).not.toHaveBeenCalled();
+    expect(mockDeletePatientDiagnosis).not.toHaveBeenCalled();
+    expect(mockSavePatientDiagnosis).not.toHaveBeenCalled();
+    expect(removeVisitNoteImage).not.toHaveBeenCalled();
+    expect(createAttachment).not.toHaveBeenCalled();
+    expectNoCompletion();
+  });
+
+  // R5, R6, R8
+  test('aborts a pending note save and starts no later step when its response arrives after unavailability', async () => {
+    const user = userEvent.setup();
+    const pendingSave = deferred<Awaited<ReturnType<typeof saveVisitNote>>>();
+    mockSaveVisitNote.mockReturnValueOnce(pendingSave.promise as ReturnType<typeof saveVisitNote>);
+    const { setPatient } = renderOwnedForm();
+    await addDiagnosis(user, 'Diabetes Mellitus', { primary: true });
+    await addImage(user, newImage);
+    await user.type(screen.getByRole('textbox', { name: /write your notes/i }), 'Draft note');
+    await user.click(screen.getByRole('button', { name: /save and close/i }));
+    await waitFor(() => expect(mockSaveVisitNote).toHaveBeenCalledTimes(1));
+    const [controller] = mockSaveVisitNote.mock.calls[0];
+
+    setPatient(missingPatient);
+    expect(controller.signal.aborted).toBe(true);
+    await act(async () => pendingSave.resolve(createdNote));
+    await flush();
+
+    expect(mockSavePatientDiagnosis).not.toHaveBeenCalled();
+    expect(createAttachment).not.toHaveBeenCalled();
+    expectNoCompletion();
+    expect(await screen.findByText(/some changes may already be saved/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/your draft is retained/i).length).toBeGreaterThan(0);
+    expect(screen.getByRole('textbox', { name: /write your notes/i })).toHaveValue('Draft note');
+
+    setPatient(availablePatient);
+    await flush();
+
+    expect(screen.getByRole('textbox', { name: /write your notes/i })).toBeEnabled();
+    expect(screen.getByRole('textbox', { name: /write your notes/i })).toHaveValue('Draft note');
+    expect(screen.getByRole('group', { name: 'Diabetes Mellitus' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Wound photo' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /save and close/i })).toBeEnabled();
+    expect(mockSavePatientDiagnosis).not.toHaveBeenCalled();
+    expect(createAttachment).not.toHaveBeenCalled();
+    expectNoCompletion();
+  });
+
+  // R5, R6
+  test('aborts a pending note update and removes or saves no diagnosis when it resolves after unavailability', async () => {
+    const user = userEvent.setup();
+    const storedNote = {
+      uuid: 'stored-note',
+      encounterDatetime: '2024-03-20T10:00:00.000Z',
+      obs: [],
+      diagnoses: [
+        {
+          uuid: 'stored-dx',
+          diagnosis: { coded: { uuid: '789', display: 'Diabetes Mellitus' } },
+          certainty: 'CONFIRMED',
+          rank: 1,
+          display: 'Diabetes Mellitus',
+        },
+      ],
+    } as unknown as Encounter;
+    const pendingUpdate = deferred<Awaited<ReturnType<typeof updateVisitNote>>>();
+    mockUpdateVisitNote.mockReturnValueOnce(pendingUpdate.promise as ReturnType<typeof updateVisitNote>);
+    const { setPatient } = renderOwnedForm({ workspaceProps: { formContext: 'editing', encounter: storedNote } });
+    await user.type(screen.getByRole('textbox', { name: /write your notes/i }), 'Updated note');
+    await user.click(screen.getByRole('button', { name: /save and close/i }));
+    await waitFor(() => expect(mockUpdateVisitNote).toHaveBeenCalledTimes(1));
+    const [controller] = mockUpdateVisitNote.mock.calls[0];
+
+    setPatient(missingPatient);
+    expect(controller.signal.aborted).toBe(true);
+    await act(async () => pendingUpdate.resolve({ status: 200 } as Awaited<ReturnType<typeof updateVisitNote>>));
+    await flush();
+
+    expect(mockDeletePatientDiagnosis).not.toHaveBeenCalled();
+    expect(mockSavePatientDiagnosis).not.toHaveBeenCalled();
+    expectNoCompletion();
+    expect(await screen.findByText(/some changes may already be saved/i)).toBeInTheDocument();
+  });
+
+  // R5, R6
+  test('aborts a pending removal of stored diagnoses and saves no diagnosis when it resolves after unavailability', async () => {
+    const user = userEvent.setup();
+    const storedNote = {
+      uuid: 'stored-note',
+      encounterDatetime: '2024-03-20T10:00:00.000Z',
+      obs: [],
+      diagnoses: [
+        {
+          uuid: 'stored-dx',
+          diagnosis: { coded: { uuid: '789', display: 'Diabetes Mellitus' } },
+          certainty: 'CONFIRMED',
+          rank: 1,
+          display: 'Diabetes Mellitus',
+        },
+      ],
+    } as unknown as Encounter;
+    mockUpdateVisitNote.mockResolvedValueOnce({ status: 200 } as Awaited<ReturnType<typeof updateVisitNote>>);
+    const pendingDelete = deferred<Awaited<ReturnType<typeof deletePatientDiagnosis>>>();
+    mockDeletePatientDiagnosis.mockReturnValueOnce(pendingDelete.promise as ReturnType<typeof deletePatientDiagnosis>);
+    const { setPatient } = renderOwnedForm({ workspaceProps: { formContext: 'editing', encounter: storedNote } });
+    await user.type(screen.getByRole('textbox', { name: /write your notes/i }), 'Updated note');
+    await user.click(screen.getByRole('button', { name: /save and close/i }));
+    await waitFor(() => expect(mockDeletePatientDiagnosis).toHaveBeenCalledTimes(1));
+    const [controller] = mockDeletePatientDiagnosis.mock.calls[0];
+
+    setPatient(missingPatient);
+    expect(controller.signal.aborted).toBe(true);
+    await act(async () => pendingDelete.resolve(undefined));
+    await flush();
+
+    expect(mockSavePatientDiagnosis).not.toHaveBeenCalled();
+    expectNoCompletion();
+  });
+
+  // R5, R6
+  test('aborts a pending diagnosis save and starts no image upload when it resolves after unavailability', async () => {
+    const user = userEvent.setup();
+    mockSaveVisitNote.mockResolvedValueOnce(createdNote);
+    const pendingDiagnosis = deferred<Awaited<ReturnType<typeof savePatientDiagnosis>>>();
+    mockSavePatientDiagnosis.mockReturnValueOnce(pendingDiagnosis.promise as ReturnType<typeof savePatientDiagnosis>);
+    const { setPatient } = renderOwnedForm();
+    await addDiagnosis(user, 'Diabetes Mellitus', { primary: true });
+    await addImage(user, newImage);
+    await user.click(screen.getByRole('button', { name: /save and close/i }));
+    await waitFor(() => expect(mockSavePatientDiagnosis).toHaveBeenCalledTimes(1));
+    const [controller] = mockSavePatientDiagnosis.mock.calls[0];
+
+    setPatient(missingPatient);
+    expect(controller.signal.aborted).toBe(true);
+    await act(async () => pendingDiagnosis.resolve(undefined));
+    await flush();
+
+    expect(createAttachment).not.toHaveBeenCalled();
+    expectNoCompletion();
+  });
+
+  // R5, R6
+  test('aborts a pending image deletion and starts neither another deletion nor a note save', async () => {
+    const user = userEvent.setup();
+    allowNotesWithoutDiagnosis();
+    vi.mocked(useVisitNoteImages).mockReturnValue({
+      images: [
+        { id: 'att-1', src: '/front.png', filename: 'front.png' },
+        { id: 'att-2', src: '/side.png', filename: 'side.png' },
+      ],
+      isLoading: false,
+      error: null,
+    });
+    const pendingRemoval = deferred<Awaited<ReturnType<typeof removeVisitNoteImage>>>();
+    vi.mocked(removeVisitNoteImage).mockReturnValueOnce(
+      pendingRemoval.promise as ReturnType<typeof removeVisitNoteImage>,
+    );
+    const { setPatient } = renderOwnedForm({ workspaceProps: { formContext: 'editing', encounter: existingNote } });
+    await user.type(screen.getByRole('textbox', { name: /write your notes/i }), ' updated');
+    await user.click(screen.getByRole('button', { name: 'Remove image: front.png' }));
+    await user.click(screen.getByRole('button', { name: 'Remove image: side.png' }));
+    await user.click(screen.getByRole('button', { name: /save and close/i }));
+    await waitFor(() => expect(removeVisitNoteImage).toHaveBeenCalledTimes(1));
+    const signal = vi.mocked(removeVisitNoteImage).mock.calls[0][1] as AbortSignal | undefined;
+
+    setPatient(missingPatient);
+    expect(signal?.aborted).toBe(true);
+    await act(async () => pendingRemoval.resolve(undefined));
+    await flush();
+
+    expect(removeVisitNoteImage).toHaveBeenCalledTimes(1);
+    expect(mockUpdateVisitNote).not.toHaveBeenCalled();
+    expectNoCompletion();
+  });
+
+  // R5, R6: the final deletion is a separate boundary from the next-deletion case above.
+  test('aborts the final pending image deletion and starts no encounter update for a dirty note', async () => {
+    const user = userEvent.setup();
+    allowNotesWithoutDiagnosis();
+    mockUpdateVisitNote.mockResolvedValueOnce({ status: 200 } as Awaited<ReturnType<typeof updateVisitNote>>);
+    vi.mocked(useVisitNoteImages).mockReturnValue({
+      images: [{ id: 'att-1', src: '/front.png', filename: 'front.png' }],
+      isLoading: false,
+      error: null,
+    });
+    const pendingRemoval = deferred<Awaited<ReturnType<typeof removeVisitNoteImage>>>();
+    vi.mocked(removeVisitNoteImage).mockReturnValueOnce(
+      pendingRemoval.promise as ReturnType<typeof removeVisitNoteImage>,
+    );
+    const { setPatient } = renderOwnedForm({ workspaceProps: { formContext: 'editing', encounter: existingNote } });
+    const note = screen.getByRole('textbox', { name: /write your notes/i });
+    await user.type(note, ' updated');
+    expect(note).toHaveValue('Existing clinical note updated');
+    await addImage(user, newImage);
+    await user.click(screen.getByRole('button', { name: 'Remove image: front.png' }));
+    await user.click(screen.getByRole('button', { name: /save and close/i }));
+    await waitFor(() => expect(removeVisitNoteImage).toHaveBeenCalledTimes(1));
+    expect(mockUpdateVisitNote).not.toHaveBeenCalled();
+    const signal = vi.mocked(removeVisitNoteImage).mock.calls[0][1] as AbortSignal | undefined;
+
+    setPatient(missingPatient);
+    await act(async () => pendingRemoval.resolve(undefined));
+    await flush();
+
+    expect(mockUpdateVisitNote).not.toHaveBeenCalled();
+    expect(mockSaveVisitNote).not.toHaveBeenCalled();
+    expect(mockDeletePatientDiagnosis).not.toHaveBeenCalled();
+    expect(mockSavePatientDiagnosis).not.toHaveBeenCalled();
+    expect(createAttachment).not.toHaveBeenCalled();
+    expect(removeVisitNoteImage).toHaveBeenCalledTimes(1);
+    expect(signal?.aborted).toBe(true);
+    expectNoCompletion();
+  });
+
+  // R7
+  test('does not resume an interrupted save when the same patient recovers, and a new save then completes', async () => {
+    const user = userEvent.setup();
+    const pendingSave = deferred<Awaited<ReturnType<typeof saveVisitNote>>>();
+    mockSaveVisitNote.mockReturnValueOnce(pendingSave.promise as ReturnType<typeof saveVisitNote>);
+    const { setPatient } = renderOwnedForm();
+    await addDiagnosis(user, 'Diabetes Mellitus', { primary: true });
+    await user.click(screen.getByRole('button', { name: /save and close/i }));
+    await waitFor(() => expect(mockSaveVisitNote).toHaveBeenCalledTimes(1));
+
+    setPatient(missingPatient);
+    setPatient(availablePatient);
+    await act(async () => pendingSave.resolve(createdNote));
+    await flush();
+
+    expect(mockSavePatientDiagnosis).not.toHaveBeenCalled();
+    expectNoCompletion();
+
+    mockSaveVisitNote.mockResolvedValueOnce({ status: 201, data: { uuid: 'second-note' } } as unknown as Awaited<
+      ReturnType<typeof saveVisitNote>
+    >);
+    await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+    await waitFor(() => expect(defaultProps.closeWorkspace).toHaveBeenCalledWith({ discardUnsavedChanges: true }));
+    expect(mockSaveVisitNote).toHaveBeenCalledTimes(2);
+    expect(mockSavePatientDiagnosis).toHaveBeenCalledExactlyOnceWith(
+      expect.any(AbortController),
+      expect.objectContaining({ encounter: 'second-note' }),
+    );
+  });
+
+  // R7
+  test.each([false, true])(
+    'late image upload results cannot complete an interrupted save (upload fails: %s)',
+    async (uploadFails) => {
+      const user = userEvent.setup();
+      allowNotesWithoutDiagnosis();
+      mockSaveVisitNote.mockResolvedValueOnce(createdNote);
+      const pendingUpload = deferred<Awaited<ReturnType<typeof createAttachment>>>();
+      vi.mocked(createAttachment).mockReturnValueOnce(pendingUpload.promise as ReturnType<typeof createAttachment>);
+      const { setPatient } = renderOwnedForm();
+      await addImage(user, newImage);
+      await user.click(screen.getByRole('button', { name: /save and close/i }));
+      await waitFor(() => expect(createAttachment).toHaveBeenCalledTimes(1));
+
+      setPatient(missingPatient);
+      await act(async () =>
+        uploadFails ? pendingUpload.reject(new Error('Upload rejected')) : pendingUpload.resolve(undefined),
+      );
+      await flush();
+
+      expectNoCompletion();
+      expect(await screen.findByText(/some changes may already be saved/i)).toBeInTheDocument();
+    },
+  );
+
+  // R7, R8: current availability alone cannot authorize completion of a canceled attempt.
+  test.each([false, true])(
+    'same-owner recovery before a late image upload settles still requires a new save (upload fails: %s)',
+    async (uploadFails) => {
+      const user = userEvent.setup();
+      allowNotesWithoutDiagnosis();
+      mockSaveVisitNote.mockResolvedValueOnce(createdNote);
+      const pendingUpload = deferred<Awaited<ReturnType<typeof createAttachment>>>();
+      vi.mocked(createAttachment).mockReturnValueOnce(pendingUpload.promise as ReturnType<typeof createAttachment>);
+      const { setPatient } = renderOwnedForm();
+      const note = screen.getByRole('textbox', { name: /write your notes/i });
+      await user.type(note, 'Retained upload draft');
+      await addImage(user, newImage);
+      await user.click(screen.getByRole('button', { name: /save and close/i }));
+      await waitFor(() => expect(createAttachment).toHaveBeenCalledTimes(1));
+
+      setPatient(missingPatient);
+      setPatient(availablePatient);
+      await act(async () =>
+        uploadFails ? pendingUpload.reject(new Error('Upload rejected')) : pendingUpload.resolve(undefined),
+      );
+      await flush();
+
+      expectNoCompletion();
+      expect(await screen.findByText(/some changes may already be saved/i)).toBeInTheDocument();
+      expect(screen.getByRole('textbox', { name: /write your notes/i })).toBe(note);
+      expect(note).toHaveValue('Retained upload draft');
+      expect(note).toBeEnabled();
+      expect(screen.getByRole('img', { name: 'Wound photo' })).toBeInTheDocument();
+      expect(vi.mocked(Workspace2).mock.lastCall?.[0].hasUnsavedChanges).toBe(true);
+      expect(mockSaveVisitNote).toHaveBeenCalledTimes(1);
+      expect(createAttachment).toHaveBeenCalledTimes(1);
+      expect(mockSavePatientDiagnosis).not.toHaveBeenCalled();
+      const save = screen.getByRole('button', { name: /save and close/i });
+      expect(save).toBeEnabled();
+
+      // A later user save is allowed; encounter reuse after partial persistence is deliberately unspecified.
+      mockSaveVisitNote.mockResolvedValueOnce(createdNote);
+      mockUpdateVisitNote.mockResolvedValueOnce({ status: 200 } as Awaited<ReturnType<typeof updateVisitNote>>);
+      vi.mocked(createAttachment).mockResolvedValueOnce(undefined);
+      await user.click(save);
+
+      await waitFor(() =>
+        expect(defaultProps.closeWorkspace).toHaveBeenCalledExactlyOnceWith({ discardUnsavedChanges: true }),
+      );
+      expect(mockShowSnackbar).toHaveBeenCalledWith(
+        expect.objectContaining({ kind: 'success', title: 'Visit note saved' }),
+      );
+    },
+  );
+
+  // R9
+  test.each([false, true])(
+    'saves and closes normally while the patient stays available (exported: %s)',
+    async (exported) => {
+      const user = userEvent.setup();
+      mockSaveVisitNote.mockResolvedValueOnce(createdNote);
+      renderOwnedForm({ exported });
+      await addDiagnosis(user, 'Diabetes Mellitus', { primary: true });
+      await addImage(user, newImage);
+      await user.type(screen.getByRole('textbox', { name: /write your notes/i }), 'Draft note');
+      await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+      await waitFor(() => expect(defaultProps.closeWorkspace).toHaveBeenCalledWith({ discardUnsavedChanges: true }));
+      expect(mockSaveVisitNote).toHaveBeenCalledTimes(1);
+      expect(mockSavePatientDiagnosis).toHaveBeenCalledExactlyOnceWith(
+        expect.any(AbortController),
+        expect.objectContaining({ encounter: 'new-note' }),
+      );
+      expect(createAttachment).toHaveBeenCalledExactlyOnceWith(
+        mockPatient.id,
+        expect.objectContaining({ fileName: 'wound.png' }),
+        'new-note',
+      );
+      expect(mockShowSnackbar).toHaveBeenCalledWith(
+        expect.objectContaining({ kind: 'success', title: 'Visit note saved' }),
+      );
+    },
+  );
 });
