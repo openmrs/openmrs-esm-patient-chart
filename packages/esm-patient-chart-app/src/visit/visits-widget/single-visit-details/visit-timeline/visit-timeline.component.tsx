@@ -13,7 +13,6 @@ import {
   useFeatureFlag,
   useLayoutType,
   usePagination,
-  userHasAccess,
   useSession,
   type Visit,
 } from '@openmrs/esm-framework';
@@ -29,6 +28,7 @@ import {
   downloadPdf,
   encounterHasJsonSchemaForm,
   mapEncounter,
+  useCanPrintEncounters,
   type EncountersTableProps,
 } from '../../past-visits-components/encounters-table/encounters-table.resource';
 import EncounterObservations from '../../encounter-observations';
@@ -57,7 +57,7 @@ function VisitTimeline({ onEditEncounter, mutateVisitContext, patient, patientUu
   const { mutateVisitContext: chartMutateVisitContext, patient: chartPatient } = usePatientChartStore(patientUuid);
   const config = useConfig<ChartConfig>();
   const enableEmbeddedFormView = useFeatureFlag('enable-embedded-form-view');
-  const canPrintEncounters = userHasAccess('App: Print encounter forms', session?.user);
+  const canPrintEncounters = useCanPrintEncounters();
   const [expandedEncounters, setExpandedEncounters] = useState<Set<string>>(new Set());
   const [isPrinting, setIsPrinting] = useState(false);
 
