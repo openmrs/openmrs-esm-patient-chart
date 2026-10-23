@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { getChartOptions, getPatientSeries } from './growth-chart.utils';
+import { getAgeTickStep, getChartOptions, getPatientSeries } from './growth-chart.utils';
 import { getReferenceSeries, type Observation } from './growth-chart.resource';
 import type { TFunction } from 'i18next';
 import { describe, expect, it } from 'vitest';
@@ -104,6 +104,35 @@ describe('growth-chart.utils', () => {
       expect(options).toHaveProperty('title');
       expect(options).toHaveProperty('axes');
       expect(options).toHaveProperty('toolbar');
+    });
+
+    it('labels every second month by default', () => {
+      const t = (key: string, defaultValue: string) => defaultValue;
+      const ticks = getChartOptions(t as unknown as TFunction).axes?.bottom?.ticks?.values;
+      expect(ticks).toHaveLength(31);
+      expect(ticks?.[ticks.length - 1]).toBe(60);
+    });
+
+    it('labels the age axis at the given step', () => {
+      const t = (key: string, defaultValue: string) => defaultValue;
+      const options = getChartOptions(t as unknown as TFunction, 12);
+      expect(options.axes?.bottom?.ticks?.values).toEqual([0, 12, 24, 36, 48, 60]);
+    });
+  });
+
+  describe('getAgeTickStep', () => {
+    it('keeps a label every second month when there is room for them', () => {
+      expect(getAgeTickStep(1200)).toBe(2);
+    });
+
+    it('labels fewer months as the chart gets narrower', () => {
+      expect(getAgeTickStep(600)).toBe(4);
+      expect(getAgeTickStep(400)).toBe(6);
+      expect(getAgeTickStep(200)).toBe(12);
+    });
+
+    it('still labels each year on a very narrow chart', () => {
+      expect(getAgeTickStep(100)).toBe(12);
     });
   });
 });
