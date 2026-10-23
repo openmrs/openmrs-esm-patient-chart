@@ -42,6 +42,11 @@ const createSchema = (formContext: 'creating' | 'editing', t: TFunction) => {
   });
 };
 
+function getErrorMessage(error: { responseBody?: { error?: { message?: string } } } | null, fallback: string): string {
+  const message = error?.responseBody?.error?.message;
+  return typeof message === 'string' && message.trim() ? message : fallback;
+}
+
 export type ConditionsFormSchema = z.infer<ReturnType<typeof createSchema>>;
 
 const ConditionsForm: React.FC<PatientWorkspace2DefinitionProps<ConditionFormProps, {}>> = ({
@@ -119,7 +124,13 @@ const ConditionsForm: React.FC<PatientWorkspace2DefinitionProps<ConditionFormPro
                   kind="error"
                   lowContrast
                   title={t('errorCreatingCondition', 'Error creating condition')}
-                  subtitle={errorCreating?.message}
+                  subtitle={getErrorMessage(
+                    errorCreating,
+                    t(
+                      'conditionSaveErrorFallback',
+                      'The condition could not be saved. You may not have permission to do this. Contact your system administrator if the problem continues.',
+                    ),
+                  )}
                 />
               </div>
             ) : null}
@@ -131,7 +142,13 @@ const ConditionsForm: React.FC<PatientWorkspace2DefinitionProps<ConditionFormPro
                   kind="error"
                   lowContrast
                   title={t('errorUpdatingCondition', 'Error updating condition')}
-                  subtitle={errorUpdating?.message}
+                  subtitle={getErrorMessage(
+                    errorUpdating,
+                    t(
+                      'conditionUpdateErrorFallback',
+                      'The condition could not be updated. You may not have permission to do this. Contact your system administrator if the problem continues.',
+                    ),
+                  )}
                 />
               </div>
             ) : null}
