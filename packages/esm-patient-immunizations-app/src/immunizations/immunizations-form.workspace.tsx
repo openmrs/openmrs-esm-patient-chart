@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button, ButtonSet, Dropdown, Form, InlineLoading, Stack, TextArea, TextInput } from '@carbon/react';
 import {
+  ExtensionSlot,
   getCoreTranslation,
   OpenmrsDatePicker,
   parseDate,
@@ -220,6 +221,9 @@ const ImmunizationsForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
       }
       hasUnsavedChanges={isDirty}
     >
+      {isTablet && patient && patientUuid && (
+        <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
+      )}
       <FormProvider {...formProps}>
         <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
           <Stack gap={5} className={styles.container}>
