@@ -154,6 +154,11 @@ export async function postEncounter(encounterPostData: EncounterPost, abortContr
   }).then((res) => res?.data);
 }
 
+/**
+ * Posts every order in the patient's basket to the given encounter. `postedItems` are the basket items that were
+ * saved, as the same objects that are in the basket, and `erroredItems` are copies of the ones that failed with the
+ * error added.
+ */
 export async function postOrders(
   patientUuid: string,
   encounterUuid: string,
@@ -165,6 +170,7 @@ export async function postOrders(
 
   const erroredItems: Array<OrderBasketItem> = [];
   const postedOrders: Array<Order> = [];
+  const postedItems: Array<OrderBasketItem> = [];
   const promises: Array<Promise<void>> = [];
 
   for (const grouping in patientItems) {
@@ -182,6 +188,7 @@ export async function postOrders(
       const promise = postOrder(dataPrepFn(order, patientUuid, encounterUuid, ordererUuid), abortController)
         .then((response) => {
           postedOrders.push(response.data);
+          postedItems.push(order);
         })
         .catch((error) => {
           erroredItems.push({
@@ -196,7 +203,7 @@ export async function postOrders(
   }
   await Promise.allSettled(promises);
 
-  return { postedOrders, erroredItems };
+  return { postedOrders, postedItems, erroredItems };
 }
 
 export function postOrder(body: OrderPost, abortController?: AbortController) {

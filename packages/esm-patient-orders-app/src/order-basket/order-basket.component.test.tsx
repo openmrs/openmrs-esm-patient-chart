@@ -191,6 +191,7 @@ describe('OrderBasket', () => {
     } as any);
     mockPostOrders.mockResolvedValue({
       postedOrders: [],
+      postedItems: [signedOrder],
       erroredItems: [{ ...rejectedOrder, orderError: forbiddenError }],
     });
 
@@ -215,5 +216,56 @@ describe('OrderBasket', () => {
     const getOrderError = mockSetOrderBasketItemErrors.mock.calls.at(-1)[1];
     expect(getOrderError(signedOrder)).toBeUndefined();
     expect(getOrderError(rejectedOrder)).toBe(forbiddenError);
+  });
+
+  it('keeps orders that were edited while they were being signed', async () => {
+    const user = userEvent.setup();
+    const signedOrder = { action: 'NEW', display: 'Aspirin', instructions: 'with food' } as OrderBasketItem;
+    const rejectedOrder = { action: 'NEW', display: 'Malaria test', urgency: 'ROUTINE' } as OrderBasketItem;
+    const forbiddenError = Object.assign(new Error('Forbidden'), {
+      responseBody: { error: { message: 'Privileges required: Add Orders' } },
+    });
+    const mockClearOrders = vi.fn();
+    mockUseSession.mockReturnValue(mockSessionDataResponse.data as any);
+    mockUseOrderBasket.mockReturnValue({
+      orders: [signedOrder, rejectedOrder],
+      clearOrders: mockClearOrders,
+      setOrders: vi.fn(),
+    } as any);
+    mockUseOrderEncounterForSystemWithVisitDisabled.mockReturnValue({
+      visitRequired: false,
+      isLoading: false,
+      encounterUuid: 'order-encounter-uuid',
+      error: null,
+      mutate: vi.fn(),
+    } as any);
+    mockPostOrders.mockResolvedValue({
+      postedOrders: [],
+      postedItems: [signedOrder],
+      erroredItems: [{ ...rejectedOrder, orderError: forbiddenError }],
+    });
+
+    render(
+      <OrderBasket
+        patientUuid={mockPatientUuid}
+        patient={mockPatient}
+        visitContext={mockVisitContext}
+        mutateVisitContext={mockMutateVisitContext}
+        closeWorkspace={mockCloseWorkspace}
+        orderBasketExtensionProps={mockOrderBasketExtensionProps}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: /sign and close/i }));
+    await waitFor(() => expect(mockSetOrderBasketItemErrors).toHaveBeenCalledTimes(2));
+
+    // Saving an edit replaces the basket item with a new object, so these are not the items that were sent.
+    const editedSignedOrder = { ...signedOrder, instructions: 'after food' };
+    const editedRejectedOrder = { ...rejectedOrder, urgency: 'STAT' } as OrderBasketItem;
+    const { exceptThoseMatching } = mockClearOrders.mock.calls.at(-1)[0];
+    expect(exceptThoseMatching(signedOrder)).toBe(false);
+    expect(exceptThoseMatching(rejectedOrder)).toBe(true);
+    expect(exceptThoseMatching(editedSignedOrder)).toBe(true);
+    expect(exceptThoseMatching(editedRejectedOrder)).toBe(true);
   });
 });

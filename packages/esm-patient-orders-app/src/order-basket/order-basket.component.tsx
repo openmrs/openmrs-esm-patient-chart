@@ -169,7 +169,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
       }
     } else {
       try {
-        const { postedOrders, erroredItems } = await postOrders(
+        const { postedOrders, postedItems, erroredItems } = await postOrders(
           patientUuid,
           orderEncounterUuid,
           abortController,
@@ -177,7 +177,10 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
         );
         const findErroredItem = (item: OrderBasketItem) =>
           erroredItems.find((erroredItem) => isErroredCopyOf(erroredItem, item));
-        clearOrders({ exceptThoseMatching: (item) => !!findErroredItem(item) });
+        // Only remove the basket items that were saved. Editing or adding an order while signing replaces it with a
+        // new object, so those orders stay in the basket with the failed ones.
+        const wasNotSaved = (item: OrderBasketItem) => !postedItems.includes(item);
+        clearOrders({ exceptThoseMatching: wasNotSaved });
         await mutateOrders();
         invalidateVisitAndEncounterData(mutate, patientUuid);
 
@@ -187,7 +190,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
         } else {
           setOrdersWithErrors(erroredItems);
         }
-        clearOrders({ exceptThoseMatching: (item) => !!findErroredItem(item) });
+        clearOrders({ exceptThoseMatching: wasNotSaved });
         setOrderBasketItemErrors(patientUuid, (item) => findErroredItem(item)?.orderError);
         // Only revalidate current visit since orders create new encounters
         mutateVisitContext?.();
