@@ -159,7 +159,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   patient: patientProp,
   visitContext,
   closeWorkspace,
-  showPatientHeader = true,
+  showPatientHeader = false,
 }) => {
   const isEditing: boolean = Boolean(formContext === 'editing' && encounter?.uuid);
   const { t } = useTranslation();

@@ -1913,7 +1913,10 @@ describe('Patient header banner', () => {
 
     expect(
       mockExtensionSlot.mock.calls.some(
-        ([props]) => props.name === 'patient-header-slot' && props.state.patientUuid === mockPatient.id,
+        ([props]) =>
+          props.name === 'patient-header-slot' &&
+          props.state.patientUuid === mockPatient.id &&
+          props.state.patient === mockPatient,
       ),
     ).toBe(true);
   });
@@ -1929,5 +1932,14 @@ describe('Patient header banner', () => {
     const extensions = [{ name: 'patient-details-tile' }, { name: 'weight-tile' }] as Array<AssignedExtension>;
 
     expect(headerSlot.select(extensions).map((extension) => extension.name)).toEqual(['weight-tile']);
+  });
+
+  it('keeps the patient details tile on tablet when the patient header is not shown', () => {
+    mockUseLayoutType.mockReturnValue('tablet');
+
+    renderVisitNotesForm();
+
+    const headerSlot = mockExtensionSlot.mock.calls.find(([props]) => props.name === 'visit-form-header-slot')?.[0];
+    expect(headerSlot.select).toBeUndefined();
   });
 });
