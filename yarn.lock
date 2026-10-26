@@ -5786,7 +5786,7 @@ __metadata:
     dayjs: "npm:^1.11.10"
     dotenv: "npm:^16.3.1"
     eslint: "npm:^9.39.0"
-    happy-dom: "npm:^20.0.0"
+    happy-dom: "npm:^21.0.4"
     husky: "npm:^8.0.3"
     i18next: "npm:^25.0.0"
     i18next-parser: "npm:^9.3.0"
@@ -11210,6 +11210,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"buffer-image-size@npm:^0.6.4":
+  version: 0.6.4
+  resolution: "buffer-image-size@npm:0.6.4"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10/82d4ca9bc8e71c9c0cbc74191d3613100d0a20dd21da018c6f373d7dc88ec4a9225eebe06c44a982de074f695402e81ab8a8daa40afce36b915042fa9fb32c52
+  languageName: node
+  linkType: hard
+
 "buffer@npm:^5.2.0":
   version: 5.7.1
   resolution: "buffer@npm:5.7.1"
@@ -15483,17 +15492,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"happy-dom@npm:^20.0.0":
-  version: 20.9.0
-  resolution: "happy-dom@npm:20.9.0"
+"happy-dom@npm:^21.0.4":
+  version: 21.0.4
+  resolution: "happy-dom@npm:21.0.4"
   dependencies:
     "@types/node": "npm:>=20.0.0"
     "@types/whatwg-mimetype": "npm:^3.0.2"
     "@types/ws": "npm:^8.18.1"
+    buffer-image-size: "npm:^0.6.4"
     entities: "npm:^7.0.1"
     whatwg-mimetype: "npm:^3.0.0"
-    ws: "npm:^8.18.3"
-  checksum: 10/5b54d641b467a8826de995a4541e55d79f58e3513e78209c5ff7ef8aa598c201550a8c2975aad465d5605bcf2788314164402f350eaa9014c0d6d6f896cc30c7
+    ws: "npm:^8.21.0"
+  checksum: 10/708a07432283cab0a29a10571b06cf27c0e30a933bf5f7fe948e18f78ce3875127b09fbed9aa7c6c5d23b06f4dad824eb73bc7a0cbe356febf5f66efb36aabce
   languageName: node
   linkType: hard
 
@@ -25325,7 +25335,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ws@npm:8.21.0, ws@npm:^8.18.0, ws@npm:^8.18.3":
+"ws@npm:8.21.0, ws@npm:^8.18.0":
   version: 8.21.0
   resolution: "ws@npm:8.21.0"
   peerDependencies:
@@ -25352,6 +25362,21 @@ __metadata:
     utf-8-validate:
       optional: true
   checksum: 10/9c796b84ba80ffc2c2adcdfc9c8e9a219ba99caa435c9a8d45f9ac593bba325563b3f83edc5eb067cc6d21b9a6bf2c930adf76dd40af5f58a5ca6859e81858f0
+  languageName: node
+  linkType: hard
+
+"ws@npm:^8.21.0":
+  version: 8.22.0
+  resolution: "ws@npm:8.22.0"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ">=5.0.2"
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: 10/ed771c2766bdb5724a66872f60ffc1a39f06e1a5bc8849f453c273e97c91a40ed5a224f06dc0e22f44b4a9e03938bf746fc5938d6887433cc0f4c416237d3b10
   languageName: node
   linkType: hard
 
