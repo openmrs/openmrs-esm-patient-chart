@@ -123,11 +123,12 @@ describe('growth-chart.utils', () => {
   describe('getAgeTickStep', () => {
     it('keeps a label every second month when there is room for them', () => {
       expect(getAgeTickStep(1200)).toBe(2);
+      expect(getAgeTickStep(900)).toBe(2);
     });
 
     it('labels fewer months as the chart gets narrower', () => {
       expect(getAgeTickStep(600)).toBe(4);
-      expect(getAgeTickStep(400)).toBe(6);
+      expect(getAgeTickStep(300)).toBe(6);
       expect(getAgeTickStep(200)).toBe(12);
     });
 

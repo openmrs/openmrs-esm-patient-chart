@@ -42,7 +42,7 @@ const maxAgeInMonths = 60;
 // Each step divides 12, so every whole year keeps its label
 const ageTickStepsInMonths = [2, 4, 6, 12];
 // With less room than this per label, the age labels run into each other
-const minAgeLabelWidthPx = 32;
+const minAgeLabelWidthPx = 24;
 
 export const getAgeTickStep = (chartWidth: number) =>
   ageTickStepsInMonths.find((step) => chartWidth / (maxAgeInMonths / step + 1) >= minAgeLabelWidthPx) ??
