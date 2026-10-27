@@ -94,7 +94,6 @@ beforeEach(() => {
     patientUuid: mockPatientAlice.uuid,
     patient: mockFhirPatient,
     visitContext: null,
-    mutateVisitContext: vi.fn(),
     setPatient: vi.fn(),
     setVisitContext: vi.fn(),
   } as any);

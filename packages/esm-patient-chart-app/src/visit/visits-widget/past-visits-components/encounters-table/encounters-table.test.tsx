@@ -10,7 +10,7 @@ import {
   useFeatureFlag,
   userHasAccess,
 } from '@openmrs/esm-framework';
-import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { invalidateVisitAndEncounterData, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockEncountersAlice, mockEncounterTypes, mockFhirPatient, mockPatientAlice } from '__mocks__';
@@ -66,6 +66,7 @@ vi.mock('./encounters-table.resource', async () => ({
 
 vi.mock('@openmrs/esm-patient-common-lib', async () => ({
   ...((await vi.importActual('@openmrs/esm-patient-common-lib')) as object),
+  invalidateVisitAndEncounterData: vi.fn(),
   usePatientChartStore: vi.fn(),
 }));
 
@@ -75,7 +76,6 @@ beforeEach(() => {
     patientUuid: mockPatientAlice.uuid,
     patient: mockFhirPatient,
     visitContext: null,
-    mutateVisitContext: vi.fn(),
     setPatient: vi.fn(),
     setVisitContext: vi.fn(),
   } as any);
@@ -455,49 +455,10 @@ describe('Delete Encounter', () => {
     );
   });
 
-  it('revalidates through the mutateVisitContext prop rather than the chart store when one is supplied', async () => {
+  it('deletes the encounter once the deletion is confirmed', async () => {
     const user = userEvent.setup();
-    const mutateVisitContext = vi.fn();
-    const chartMutateVisitContext = vi.fn();
-    mockUsePatientChartStore.mockReturnValue({
-      patientUuid: mockPatientAlice.uuid,
-      patient: mockFhirPatient,
-      visitContext: null,
-      mutateVisitContext: chartMutateVisitContext,
-      setPatient: vi.fn(),
-      setVisitContext: vi.fn(),
-    } as any);
     mockDeleteEncounter.mockResolvedValue({});
     // confirmAndDeleteEncounter calls the disposer showModal hands back.
-    mockShowModal.mockReturnValue(vi.fn());
-
-    renderEncountersTable({ mutateVisitContext });
-
-    const row = screen.getByRole('row', {
-      name: /Select row 18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Encounter table actions menu/i,
-    });
-    await user.click(within(row).getByRole('button', { name: /expand current row/i }));
-    await user.click(screen.getByRole('button', { name: /danger\s*Delete this encounter/i }));
-
-    const [, modalProps] = mockShowModal.mock.calls[0];
-    (modalProps as { onConfirmation: () => void }).onConfirmation();
-
-    await waitFor(() => expect(mutateVisitContext).toHaveBeenCalledTimes(1));
-    expect(chartMutateVisitContext).not.toHaveBeenCalled();
-  });
-
-  it('falls back to the chart store when no mutateVisitContext prop is supplied', async () => {
-    const user = userEvent.setup();
-    const chartMutateVisitContext = vi.fn();
-    mockUsePatientChartStore.mockReturnValue({
-      patientUuid: mockPatientAlice.uuid,
-      patient: mockFhirPatient,
-      visitContext: null,
-      mutateVisitContext: chartMutateVisitContext,
-      setPatient: vi.fn(),
-      setVisitContext: vi.fn(),
-    } as any);
-    mockDeleteEncounter.mockResolvedValue({});
     mockShowModal.mockReturnValue(vi.fn());
 
     renderEncountersTable();
@@ -511,7 +472,11 @@ describe('Delete Encounter', () => {
     const [, modalProps] = mockShowModal.mock.calls[0];
     (modalProps as { onConfirmation: () => void }).onConfirmation();
 
-    await waitFor(() => expect(chartMutateVisitContext).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(mockDeleteEncounter).toHaveBeenCalledTimes(1));
+    // The visit and encounter data (including the visit shown in the current visit summary) must be refetched
+    await waitFor(() =>
+      expect(invalidateVisitAndEncounterData).toHaveBeenCalledWith(expect.any(Function), testProps.patientUuid),
+    );
   });
 });
 

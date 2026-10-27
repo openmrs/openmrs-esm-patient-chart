@@ -33,7 +33,6 @@ describe('VisitContextHeader', () => {
       patientUuid: mockPatient.id,
       patient: mockPatient,
       visitContext: null,
-      mutateVisitContext: null,
       setPatient: vi.fn(),
       setVisitContext: vi.fn(),
     });
@@ -47,7 +46,6 @@ describe('VisitContextHeader', () => {
       patientUuid: mockPatient.id,
       patient: mockPatient,
       visitContext: mockCurrentVisit,
-      mutateVisitContext: null,
       setPatient: vi.fn(),
       setVisitContext: vi.fn(),
     });

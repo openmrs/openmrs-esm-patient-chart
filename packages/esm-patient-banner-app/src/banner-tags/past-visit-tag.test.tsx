@@ -31,7 +31,6 @@ describe('PastVisitTag', () => {
       patientUuid: mockPatient.id,
       patient: mockPatient,
       visitContext: mockVisit,
-      mutateVisitContext: null,
       setPatient: vi.fn(),
       setVisitContext: vi.fn(),
     });
@@ -50,7 +49,6 @@ describe('PastVisitTag', () => {
       patientUuid: mockPatient.id,
       patient: mockPatient,
       visitContext: { ...mockVisit, stopDatetime: null },
-      mutateVisitContext: null,
       setPatient: vi.fn(),
       setVisitContext: vi.fn(),
     });
@@ -66,7 +64,6 @@ describe('PastVisitTag', () => {
       patientUuid: mockPatient.id,
       patient: mockPatient,
       visitContext: mockVisit,
-      mutateVisitContext: null,
       setPatient: vi.fn(),
       setVisitContext: vi.fn(),
     });

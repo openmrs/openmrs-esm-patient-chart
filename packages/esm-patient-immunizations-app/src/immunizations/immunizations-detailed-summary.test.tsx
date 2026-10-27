@@ -102,7 +102,6 @@ describe('ImmunizationsDetailedSummary', () => {
       patientUuid: 'patient-123',
       patient: null,
       visitContext: null,
-      mutateVisitContext: vi.fn(),
       setPatient: vi.fn(),
       setVisitContext: vi.fn(),
     });
@@ -194,7 +193,6 @@ describe('ImmunizationsDetailedSummary', () => {
       patientUuid: 'patient-123',
       patient: null,
       visitContext: mockCurrentVisit,
-      mutateVisitContext: vi.fn(),
       setPatient: vi.fn(),
       setVisitContext: vi.fn(),
     });
@@ -230,7 +228,6 @@ describe('ImmunizationsDetailedSummary', () => {
       patientUuid: mockPatient.id,
       patient: mockPatient,
       visitContext: null,
-      mutateVisitContext: null,
       setPatient: vi.fn(),
       setVisitContext: vi.fn(),
     });

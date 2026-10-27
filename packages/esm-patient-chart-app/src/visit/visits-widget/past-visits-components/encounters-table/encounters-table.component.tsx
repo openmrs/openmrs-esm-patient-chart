@@ -78,14 +78,13 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   isSelectable,
   canPrintEncounters,
   onEditEncounter,
-  mutateVisitContext,
   patient,
 }) => {
   const { t } = useTranslation();
   const pageSizes = [10, 20, 30, 40, 50];
   const desktopLayout = isDesktop(useLayoutType());
   const session = useSession();
-  const { mutateVisitContext: chartMutateVisitContext, patient: chartPatient } = usePatientChartStore(patientUuid);
+  const { patient: chartPatient } = usePatientChartStore(patientUuid);
   const { mutate } = useSWRConfig();
   const responsiveSize = desktopLayout ? 'sm' : 'lg';
   const { data: encounterTypes, isLoading: isLoadingEncounterTypes } = useEncounterTypes();
@@ -138,10 +137,9 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
         patientUuid,
         t,
         mutate,
-        mutateVisitContext: mutateVisitContext ?? chartMutateVisitContext,
       });
     },
-    [chartMutateVisitContext, mutate, mutateVisitContext, patientUuid, t],
+    [mutate, patientUuid, t],
   );
 
   const handlePrintSelected = (selectedRows: Array<any>) => {

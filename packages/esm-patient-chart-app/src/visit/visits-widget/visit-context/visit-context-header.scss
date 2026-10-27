@@ -6,9 +6,9 @@
   padding: layout.$spacing-03;
   font-size: layout.$spacing-04;
   grid-template-areas:
-    'addingTo    visitType    changeVisitButton'
-    'addingTo    visitInfo    visitInfo';
-  grid-template-columns: max-content 1fr min-content;
+    'addingTo visitType'
+    'addingTo visitInfo';
+  grid-template-columns: max-content 1fr;
 }
 
 .activeVisit {
@@ -27,14 +27,6 @@
   font-size: 14px;
   font-weight: 600;
   grid-area: visitType;
-}
-
-.changeVisitButton {
-  grid-area: changeVisitButton;
-  :global(.cds--btn) {
-    min-height: 0;
-    padding: 0;
-  }
 }
 
 .visitInfo {

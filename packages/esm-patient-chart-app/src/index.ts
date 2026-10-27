@@ -190,11 +190,6 @@ export const encounterListTableTabs = getAsyncLifecycle(
   { featureName: 'encounter-list-table-tabs', moduleName },
 );
 
-export const visitContextSwitcherModal = getAsyncLifecycle(
-  () => import('./visit/visits-widget/visit-context/visit-context-switcher.modal'),
-  { featureName: 'visit-context-switcher', moduleName },
-);
-
 export const visitContextHeader = getAsyncLifecycle(
   () => import('./visit/visits-widget/visit-context/visit-context-header.extension'),
   { featureName: 'visit-context-header', moduleName },
