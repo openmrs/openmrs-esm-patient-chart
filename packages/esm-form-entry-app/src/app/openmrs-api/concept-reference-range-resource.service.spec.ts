@@ -63,6 +63,21 @@ describe('Service: ConceptReferenceRangeResourceService', () => {
     httpMock.expectNone(() => true);
   });
 
+  [{ date: '2020-01-01T00:00:00Z' }, { encounter: 'encounter-uuid' }, { obs: 'observation-uuid' }].forEach(
+    (context) => {
+      it(`passes the measurement context to the backend (${JSON.stringify(context)})`, (done) => {
+        conceptReferenceRangeResourceService
+          .getConceptReferenceRanges('patient-uuid', ['temperature-uuid'], context)
+          .subscribe(() => done());
+        const request = httpMock.expectOne((req) => req.url === conceptReferenceRangeResourceService.getUrl());
+        for (const [key, value] of Object.entries(context)) {
+          expect(request.request.params.get(key)).toBe(value);
+        }
+        request.flush({ results: [] });
+      });
+    },
+  );
+
   it('should follow the next link until the backend runs out of pages', (done) => {
     conceptReferenceRangeResourceService
       .getConceptReferenceRanges('patient-uuid', ['temperature-uuid', 'pulse-uuid'])
