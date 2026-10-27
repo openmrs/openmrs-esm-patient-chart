@@ -9,6 +9,7 @@ import {
   useLayoutType,
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
+import { useEncounterPrivileges } from '@openmrs/esm-patient-common-lib';
 
 interface DeleteVisitActionItemProps {
   patientUuid: string;
@@ -22,6 +23,7 @@ interface DeleteVisitActionItemProps {
 
 const DeleteVisitActionItem: React.FC<DeleteVisitActionItemProps> = ({ visit, compact }) => {
   const { t } = useTranslation();
+  const { canEditPastVisits } = useEncounterPrivileges();
   const isTablet = useLayoutType() === 'tablet';
   const responsiveSize = isTablet ? 'lg' : 'sm';
 
@@ -32,7 +34,8 @@ const DeleteVisitActionItem: React.FC<DeleteVisitActionItemProps> = ({ visit, co
     });
   };
 
-  if (visit?.encounters?.length) {
+  // Past visits can only be modified by users who may edit past visits
+  if (visit?.encounters?.length || (visit?.stopDatetime && !canEditPastVisits)) {
     return null;
   }
 
