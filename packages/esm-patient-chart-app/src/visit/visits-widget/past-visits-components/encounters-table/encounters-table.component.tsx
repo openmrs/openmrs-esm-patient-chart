@@ -38,15 +38,9 @@ import {
   useFeatureFlag,
   PrinterIcon,
 } from '@openmrs/esm-framework';
-import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { type ChartConfig } from '../../../../config-schema';
 import { jsonSchemaResourceName } from '../../../../constants';
-import {
-  canModifyEncounter,
-  confirmAndDeleteEncounter,
-  editEncounter,
-  isVisitNoteEncounter,
-} from './encounter-actions';
+import { canModifyEncounter, confirmAndDeleteEncounter, editEncounter } from './encounter-actions';
 import {
   downloadPdf,
   mapEncounter,
@@ -77,14 +71,13 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   totalCount,
   isSelectable,
   canPrintEncounters,
-  onEditEncounter,
+  onEncounterSaved,
   patient,
 }) => {
   const { t } = useTranslation();
   const pageSizes = [10, 20, 30, 40, 50];
   const desktopLayout = isDesktop(useLayoutType());
   const session = useSession();
-  const { patient: chartPatient } = usePatientChartStore(patientUuid);
   const { mutate } = useSWRConfig();
   const responsiveSize = desktopLayout ? 'sm' : 'lg';
   const { data: encounterTypes, isLoading: isLoadingEncounterTypes } = useEncounterTypes();
@@ -137,9 +130,10 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
         patientUuid,
         t,
         mutate,
+        onEncounterDeleted: onEncounterSaved,
       });
     },
-    [mutate, patientUuid, t],
+    [mutate, onEncounterSaved, patientUuid, t],
   );
 
   const handlePrintSelected = (selectedRows: Array<any>) => {
@@ -232,10 +226,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                       encounter.form?.uuid &&
                       encounter.form.resources?.some((resource) => resource.name === jsonSchemaResourceName);
 
-                    const canDeleteEncounter = canModifyEncounter(encounter, session?.user, config);
-
-                    const canEditEncounter =
-                      canDeleteEncounter && (encounter.form?.uuid || isVisitNoteEncounter(encounter.encounter));
+                    const canEditOrDeleteEncounter = canModifyEncounter(encounter, session?.user, config);
 
                     const canPrintEncounter = canPrintEncounters && supportsEmbeddedFormView(encounter);
 
@@ -248,7 +239,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                           ))}
                           <TableCell className="cds--table-column-menu">
                             <Layer className={styles.layer}>
-                              {(canDeleteEncounter || canPrintEncounter) && (
+                              {(canEditOrDeleteEncounter || canPrintEncounter) && (
                                 <OverflowMenu
                                   aria-label={t('encounterTableActionsMenu', 'Encounter table actions menu')}
                                   iconDescription={t('encounterTableActionsMenu', 'Encounter table actions menu')}
@@ -256,11 +247,18 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                   size={responsiveSize}
                                   align="left"
                                 >
-                                  {canEditEncounter && (
+                                  {canEditOrDeleteEncounter && (
                                     <OverflowMenuItem
                                       className={styles.menuItem}
                                       itemText={t('editThisEncounter', 'Edit this encounter')}
-                                      onClick={() => editEncounter(encounter.encounter, patientUuid, onEditEncounter)}
+                                      onClick={() =>
+                                        editEncounter({
+                                          patient,
+                                          encounter: encounter.encounter,
+                                          visitContext: encounter.encounter.visit,
+                                          onEncounterSaved,
+                                        })
+                                      }
                                     />
                                   )}
                                   {canPrintEncounter && (
@@ -274,7 +272,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                       }}
                                     />
                                   )}
-                                  {canDeleteEncounter && (
+                                  {canEditOrDeleteEncounter && (
                                     <OverflowMenuItem
                                       className={styles.menuItem}
                                       hasDivider
@@ -304,7 +302,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                     visitStartDatetime: encounter.visitStartDatetime ?? null,
                                     visitStopDatetime: encounter.visitStopDatetime ?? null,
                                     patientUuid: patientUuid,
-                                    patient: patient ?? chartPatient,
+                                    patient,
                                     formUuid: encounter.form.uuid,
                                     encounterUuid: encounter.id,
                                     promptBeforeClosing: () => {},
@@ -314,10 +312,17 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                 <EncounterObservations observations={encounter.obs} />
                               )}
                               <>
-                                {canEditEncounter && (
+                                {canEditOrDeleteEncounter && (
                                   <Button
                                     kind="ghost"
-                                    onClick={() => editEncounter(encounter.encounter, patientUuid, onEditEncounter)}
+                                    onClick={() =>
+                                      editEncounter({
+                                        patient,
+                                        encounter: encounter.encounter,
+                                        visitContext: encounter.encounter.visit,
+                                        onEncounterSaved,
+                                      })
+                                    }
                                     renderIcon={(props: ComponentProps<typeof EditIcon>) => (
                                       <EditIcon size={16} {...props} />
                                     )}
@@ -325,7 +330,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                     {t('editThisEncounter', 'Edit this encounter')}
                                   </Button>
                                 )}
-                                {canDeleteEncounter && (
+                                {canEditOrDeleteEncounter && (
                                   <Button
                                     kind="danger--ghost"
                                     onClick={() => handleDeleteEncounter(encounter.id, encounter.form?.display)}
