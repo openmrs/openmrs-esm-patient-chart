@@ -45,4 +45,20 @@ describe('PatientDetailsTile', () => {
 
     expect(screen.getByText('100732HE')).toBeInTheDocument();
   });
+
+  it.each([
+    { label: 'an exact birthdate', birthDate: '1993-10-14', expected: '14 — Oct — 1993' },
+    { label: 'an estimated birthdate known to the year', birthDate: '1993', expected: '1993' },
+    { label: 'an estimated birthdate known to the month', birthDate: '2024-03', expected: 'Mar — 2024' },
+  ])('shows $label at its recorded precision', ({ birthDate, expected }) => {
+    mockUsePrimaryIdentifierCode.mockReturnValue({
+      primaryIdentifierCode: 'OpenMRS ID',
+      isLoading: false,
+      error: null,
+    });
+
+    render(<PatientDetailsTile patient={{ ...mockPatient, birthDate }} />);
+
+    expect(screen.getByText(expected)).toBeInTheDocument();
+  });
 });
