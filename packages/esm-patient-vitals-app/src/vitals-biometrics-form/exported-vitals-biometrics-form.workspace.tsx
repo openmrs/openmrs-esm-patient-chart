@@ -30,7 +30,6 @@ import {
 import {
   hasPatientBannerData,
   invalidateVisitAndEncounterData,
-  useOptimisticVisitMutations,
   usePatientForBanner,
 } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
