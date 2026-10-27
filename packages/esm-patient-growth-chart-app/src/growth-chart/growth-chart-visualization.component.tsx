@@ -45,7 +45,8 @@ const GrowthChartVisualization: React.FC<GrowthChartVisualizationProps> = ({ dat
 
   return (
     <div className={styles.chartContainer} ref={chartContainerRef}>
-      <LineChart data={chartData} options={chartOptions} />
+      {/* Remount when the step changes, since Carbon can leave the old ticks behind if their exit animation is cut short */}
+      <LineChart key={ageTickStep} data={chartData} options={chartOptions} />
     </div>
   );
 };
