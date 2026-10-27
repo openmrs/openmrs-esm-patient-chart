@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { useSWRConfig } from 'swr';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { deleteEncounter, invalidateCachedVitalsAndBiometrics } from '../../common';
@@ -11,10 +12,12 @@ interface DeleteVitalsAndBiometricsModalProps {
 }
 
 const DeleteVitalsAndBiometricsModal: React.FC<DeleteVitalsAndBiometricsModalProps> = ({
+  patientUuid,
   encounterUuid,
   closeDeleteModal,
 }) => {
   const { t } = useTranslation();
+  const { mutate } = useSWRConfig();
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = useCallback(async () => {
@@ -31,7 +34,7 @@ const DeleteVitalsAndBiometricsModal: React.FC<DeleteVitalsAndBiometricsModalPro
     setIsDeleting(true);
     deleteEncounter(encounterUuid)
       .then(() => {
-        invalidateCachedVitalsAndBiometrics();
+        invalidateCachedVitalsAndBiometrics(patientUuid, mutate);
         closeDeleteModal();
         showSnackbar({
           isLowContrast: true,
@@ -49,7 +52,7 @@ const DeleteVitalsAndBiometricsModal: React.FC<DeleteVitalsAndBiometricsModalPro
         });
       })
       .finally(() => setIsDeleting(false));
-  }, [encounterUuid, t, closeDeleteModal]);
+  }, [patientUuid, encounterUuid, mutate, t, closeDeleteModal]);
 
   return (
     <>
