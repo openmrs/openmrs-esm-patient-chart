@@ -18,6 +18,12 @@ interface ConceptReferenceRangeResponse {
  */
 const conceptsPerRequest = 25;
 
+export interface ReferenceRangeContext {
+  date?: string;
+  encounter?: string;
+  obs?: string;
+}
+
 @Injectable()
 export class ConceptReferenceRangeResourceService {
   constructor(
@@ -42,13 +48,16 @@ export class ConceptReferenceRangeResourceService {
   public getConceptReferenceRanges(
     patientUuid: string,
     concepts: Array<string>,
+    context: ReferenceRangeContext = {},
   ): Observable<Map<string, ConceptReferenceRange>> {
     if (!patientUuid || !concepts?.length) {
       return of(new Map<string, ConceptReferenceRange>());
     }
 
     return forkJoin(
-      chunk(concepts, conceptsPerRequest).map((batch) => this.getConceptReferenceRangesOfBatch(patientUuid, batch)),
+      chunk(concepts, conceptsPerRequest).map((batch) =>
+        this.getConceptReferenceRangesOfBatch(patientUuid, batch, context),
+      ),
     ).pipe(
       map(
         (batches) =>
@@ -73,11 +82,18 @@ export class ConceptReferenceRangeResourceService {
   private getConceptReferenceRangesOfBatch(
     patientUuid: string,
     concepts: Array<string>,
+    context: ReferenceRangeContext,
   ): Observable<Array<ConceptReferenceRange>> {
-    const params: HttpParams = new HttpParams()
+    let params: HttpParams = new HttpParams()
       .set('patient', patientUuid)
       .set('concept', concepts.join(','))
       .set('v', 'full');
+
+    for (const [name, value] of Object.entries(context)) {
+      if (value) {
+        params = params.set(name, value);
+      }
+    }
 
     return this.http.get<ConceptReferenceRangeResponse>(this.getUrl(), { params }).pipe(
       expand((response) => {

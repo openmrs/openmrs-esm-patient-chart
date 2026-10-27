@@ -7,7 +7,7 @@ import { OpenmrsEsmApiService } from '../openmrs-api/openmrs-esm-api.service';
 import { FormSchemaService } from '../form-schema/form-schema.service';
 import { FormSubmissionService } from '../form-submission/form-submission.service';
 import { EncounterResourceService } from '../openmrs-api/encounter-resource.service';
-import { ConceptReferenceRange, Encounter, EncounterCreate, FormSchema, Identifier, Order } from '../types';
+import { Encounter, EncounterCreate, FormSchema, Identifier, Order } from '../types';
 import { showSnackbar, createGlobalStore, showModal } from '@openmrs/esm-framework';
 
 import { PatientPreviousEncounterService } from '../openmrs-api/patient-previous-encounter.service';
@@ -19,8 +19,7 @@ import { ProgramResourceService } from '../openmrs-api/program-resource.service'
 import { FormDataSourceService } from '../form-data-source/form-data-source.service';
 import { PatientResourceService } from '../openmrs-api/patient-resource.service';
 import { VisitResourceService } from '../openmrs-api/visit-resource.service';
-import { ConceptReferenceRangeResourceService } from '../openmrs-api/concept-reference-range-resource.service';
-import { getNumericQuestionConcepts } from '../form-schema/concept-reference-ranges';
+import { ConceptReferenceRangeFormService } from '../form-creation/concept-reference-range-form.service';
 
 type FormState =
   | 'initial'
@@ -43,6 +42,8 @@ const store = createGlobalStore<Record<string, FormState>>('ampath-form-state', 
 export class FeWrapperComponent implements OnInit, OnDestroy {
   private launchFormSubscription?: Subscription;
   private workspaceDirtyStateListenerSubscription: Subscription;
+  private referenceRangesSubscription?: Subscription;
+  private pendingSubmitSubscription?: Subscription;
   private unsubscribeStore: () => void | undefined;
 
   public formUuid: string;
@@ -67,7 +68,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     private readonly formDataSourceService: FormDataSourceService,
     private readonly patientResourceService: PatientResourceService,
     private readonly visitResourceService: VisitResourceService,
-    private readonly conceptReferenceRangeResourceService: ConceptReferenceRangeResourceService,
+    private readonly conceptReferenceRangeFormService: ConceptReferenceRangeFormService,
   ) {}
 
   public ngOnInit() {
@@ -82,6 +83,8 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     this.unsubscribeStore && this.unsubscribeStore();
     this.launchFormSubscription?.unsubscribe();
     this.workspaceDirtyStateListenerSubscription?.unsubscribe();
+    this.referenceRangesSubscription?.unsubscribe();
+    this.pendingSubmitSubscription?.unsubscribe();
   }
 
   public launchForm() {
@@ -92,6 +95,8 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     this.changeState('loading');
     this.showDiscardSubmitButtons = this.singleSpaPropsService.getProp('showDiscardSubmitButtons') ?? true;
     this.launchFormSubscription?.unsubscribe();
+    this.referenceRangesSubscription?.unsubscribe();
+    this.pendingSubmitSubscription?.unsubscribe();
     this.launchFormSubscription = this.loadAllFormDependencies()
       .pipe(
         take(1),
@@ -101,6 +106,10 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (form) => {
           this.form = form;
+          this.referenceRangesSubscription = this.conceptReferenceRangeFormService.connect(
+            form,
+            this.singleSpaPropsService.getPropOrThrow('patientUuid'),
+          );
           if (Boolean(form.schema?.conceptReferences)) {
             this.labelMap = Object.entries(
               form.schema?.conceptReferences as {
@@ -155,7 +164,6 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
       mergeMap((result) =>
         forkJoin({
           previousEncounter: this.loadPatientPreviousEncounters(result.formSchema).pipe(take(1)),
-          conceptReferenceRanges: this.loadConceptReferenceRanges(result.formSchema).pipe(take(1)),
         }).pipe(map((schemaDependentData) => ({ ...result, ...schemaDependentData }))),
       ),
       catchError((err) =>
@@ -179,15 +187,6 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     const patientUuid = this.singleSpaPropsService.getProp('patientUuid');
 
     return from(this.patientPreviousEncounter.getPreviousEncounter(formSchema.encounterType?.uuid, patientUuid));
-  }
-
-  private loadConceptReferenceRanges(formSchema: FormSchema): Observable<Map<string, ConceptReferenceRange>> {
-    const patientUuid = this.singleSpaPropsService.getProp('patientUuid');
-
-    return this.conceptReferenceRangeResourceService.getConceptReferenceRanges(
-      patientUuid,
-      getNumericQuestionConcepts(formSchema),
-    );
   }
 
   private handleFormSubmission() {
@@ -276,6 +275,17 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
   }
 
   public onSubmit() {
+    if (this.conceptReferenceRangeFormService.isLoading(this.form)) {
+      const previousState = this.formState;
+      this.changeState('submitting');
+      this.pendingSubmitSubscription?.unsubscribe();
+      this.pendingSubmitSubscription = this.conceptReferenceRangeFormService.whenLoaded(this.form).subscribe(() => {
+        this.changeState(previousState);
+        this.onSubmit();
+      });
+      return;
+    }
+
     if (!this.validateForm()) {
       return;
     }
@@ -295,6 +305,10 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
    * @returns `true` if the form is valid; `false` if not.
    */
   private validateForm(): boolean {
+    if (this.conceptReferenceRangeFormService.isLoading(this.form)) {
+      this.onValidate(false);
+      return false;
+    }
     if (!this.form.valid) {
       this.form.markInvalidControls(this.form.rootNode);
       this.form.showErrors = true;
