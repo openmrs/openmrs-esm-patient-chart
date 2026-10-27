@@ -26,7 +26,7 @@ describe('VisitNoteActionButton', () => {
           showPatientBanner: 'tabletOnly',
           patientUuid: 'patient-uuid',
           patient: null,
-          visitContext: null,
+          activeVisit: null,
         }}
       />,
     );
@@ -41,7 +41,7 @@ describe('VisitNoteActionButton', () => {
           showPatientBanner: 'tabletOnly',
           patientUuid: mockPatient.id,
           patient: mockPatient,
-          visitContext: null,
+          activeVisit: null,
         }}
       />,
     );

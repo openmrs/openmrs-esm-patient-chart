@@ -88,7 +88,7 @@ function renderPatientListWorkspace() {
         showPatientBanner: 'tabletOnly',
         patient: null,
         patientUuid: null,
-        visitContext: null,
+        activeVisit: null,
       }}
       windowName={''}
       isRootWorkspace={false}

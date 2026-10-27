@@ -15,13 +15,13 @@ interface CurrentVisitSummaryProps {
  */
 const CurrentVisitSummary: React.FC<CurrentVisitSummaryProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { patientUuid: storePatientUuid, visitContext } = usePatientChartStore(patientUuid);
+  const { patientUuid: storePatientUuid, activeVisit } = usePatientChartStore(patientUuid);
 
   if (patientUuid !== storePatientUuid) {
     return null;
   }
 
-  if (!visitContext) {
+  if (!activeVisit) {
     return (
       <EmptyState
         headerTitle={t('currentVisit', 'Current visit')}
@@ -37,7 +37,7 @@ const CurrentVisitSummary: React.FC<CurrentVisitSummaryProps> = ({ patientUuid }
         <span />
       </CardHeader>
       <div className={styles.visitSummaryCard}>
-        <VisitSummary visit={visitContext} patientUuid={patientUuid} />
+        <VisitSummary visit={activeVisit} patientUuid={patientUuid} />
       </div>
     </div>
   );

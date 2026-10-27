@@ -607,7 +607,7 @@ describe('OrderDetailsTable', () => {
       'order-basket',
       {},
       expect.objectContaining({ visitContext: mockOrders[1].encounter.visit }),
-      expect.objectContaining({ visitContext: mockOrders[1].encounter.visit }),
+      expect.objectContaining({ activeVisit: mockOrders[1].encounter.visit }),
     );
   });
 });

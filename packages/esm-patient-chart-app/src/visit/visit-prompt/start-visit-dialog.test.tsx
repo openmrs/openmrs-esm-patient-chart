@@ -38,7 +38,7 @@ describe('StartVisit', () => {
         onVisitStarted,
       },
       expect.objectContaining({ visitContext: null }),
-      expect.objectContaining({ visitContext: null }),
+      expect.objectContaining({ activeVisit: null }),
     );
     expect(onCancel).not.toHaveBeenCalled();
     expect(defaultProps.closeModal).toHaveBeenCalled();
