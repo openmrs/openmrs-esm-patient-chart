@@ -38,7 +38,6 @@ import {
 } from '@openmrs/esm-framework';
 import {
   hasPatientBannerData,
-  invalidateCurrentVisit,
   invalidateVisitAndEncounterData,
   useActivePatientEnrollment,
   usePatientForBanner,
@@ -367,7 +366,6 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
           // This will invalidate visit history and encounter tables for this patient
           // (if visitContext is updated, it should have been invalidated with mutateSavedOrUpdatedVisit)
           invalidateVisitAndEncounterData(globalMutate, patientUuid);
-          invalidateCurrentVisit(globalMutate, patientUuid);
 
           const visitAttributesRequest = visitToEdit
             ? handleVisitAttributes(visitAttributes, response.data.uuid).then((visitAttributesResponses) => {
