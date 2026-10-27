@@ -48,7 +48,6 @@ export class ConceptReferenceRangeFormService {
     const currentMeasurementDate = new Date().toISOString();
     const refresh = () => {
       this.loading.add(form);
-      form.rootNode.control.markAsPending({ emitEvent: false });
       changes.next();
     };
 
@@ -73,7 +72,6 @@ export class ConceptReferenceRangeFormService {
     };
     register(form.rootNode);
     this.loading.add(form);
-    form.rootNode.control.markAsPending({ emitEvent: false });
 
     subscriptions.add(
       changes
