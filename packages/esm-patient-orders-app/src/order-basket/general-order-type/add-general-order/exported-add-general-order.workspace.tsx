@@ -18,7 +18,7 @@ const ExportedAddGeneralOrderWorkspace: React.FC<
   Workspace2DefinitionProps<OrderableConceptSearchWorkspaceProps, ExportedOrderBasketWindowProps, {}>
 > = ({
   workspaceProps: { order: initialOrder, orderTypeUuid },
-  windowProps: { patient, visitContext },
+  windowProps: { patient, patientUuid, visitContext },
   closeWorkspace,
 }) => {
   return (
@@ -26,8 +26,10 @@ const ExportedAddGeneralOrderWorkspace: React.FC<
       initialOrder={initialOrder}
       orderTypeUuid={orderTypeUuid}
       patient={patient}
+      patientUuid={patientUuid}
       visitContext={visitContext}
       closeWorkspace={closeWorkspace}
+      showPatientBanner
     />
   );
 };

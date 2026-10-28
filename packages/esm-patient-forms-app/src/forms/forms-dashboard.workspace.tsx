@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import FormsDashboard from './forms-dashboard.component';
 import styles from './forms-dashboard-workspace.scss';
 import { type Form, type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
-import { ExtensionSlot, Workspace2 } from '@openmrs/esm-framework';
+import { ExtensionSlot, useLayoutType, Workspace2 } from '@openmrs/esm-framework';
 
 /**
  * This workspace lists a table of available forms. When clicking on a row, it launches
@@ -17,6 +17,7 @@ const FormsDashboardWorkspace: React.FC<PatientWorkspace2DefinitionProps<object,
   groupProps: { patient, patientUuid, visitContext },
 }) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const handleFormOpen = useCallback(
     (form: Form, encounterUuid: string) => {
       launchChildWorkspace('patient-form-entry-workspace', {
@@ -29,6 +30,9 @@ const FormsDashboardWorkspace: React.FC<PatientWorkspace2DefinitionProps<object,
 
   return (
     <Workspace2 title={t('clinicalForms', 'Clinical forms')} hasUnsavedChanges={false}>
+      {isTablet && patient && patientUuid && (
+        <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
+      )}
       <div className={styles.container}>
         <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
         <FormsDashboard {...{ patient, visitContext, handleFormOpen }} />

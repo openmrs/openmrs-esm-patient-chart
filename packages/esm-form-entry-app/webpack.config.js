@@ -107,7 +107,7 @@ module.exports = {
     rules: [
       {
         test: /\.s[ac]ss$/i,
-        include: /node_modules\/@openmrs/,
+        include: /node_modules[\\/]@openmrs/,
         enforce: 'post',
         use: [require.resolve('style-loader'), require.resolve('css-loader')],
       },
