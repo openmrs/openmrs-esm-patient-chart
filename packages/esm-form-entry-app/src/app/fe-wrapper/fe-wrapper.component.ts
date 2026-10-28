@@ -276,9 +276,12 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
 
   public onSubmit() {
     if (this.conceptReferenceRangeFormService.isLoading(this.form)) {
+      // A submission that is already waiting for the ranges holds the state to restore.
+      if (this.pendingSubmitSubscription?.closed === false) {
+        return;
+      }
       const previousState = this.formState;
       this.changeState('submitting');
-      this.pendingSubmitSubscription?.unsubscribe();
       this.pendingSubmitSubscription = this.conceptReferenceRangeFormService.whenLoaded(this.form).subscribe(() => {
         this.changeState(previousState);
         this.onSubmit();
