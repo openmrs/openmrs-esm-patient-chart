@@ -1,7 +1,15 @@
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { AfeFormControl, Form, FormEntryModule, FormFactory } from '@openmrs/ngx-formentry';
+import {
+  AfeFormControl,
+  ArrayNode,
+  Form,
+  FormEntryModule,
+  FormFactory,
+  GroupNode,
+  NodeBase,
+} from '@openmrs/ngx-formentry';
 import { TranslateModule } from '@ngx-translate/core';
 import moment from 'moment';
 import { of, Subject, Subscription } from 'rxjs';
@@ -75,11 +83,46 @@ describe('Reference ranges at the measurement date', () => {
   }
 
   function controlFor(form: Form, id = 'temperature', index = 0): AfeFormControl {
-    const control = form.searchNodeByQuestionId(id)[index].control;
-    if (!(control instanceof AfeFormControl)) {
+    return controlOf(form.searchNodeByQuestionId(id)[index]);
+  }
+
+  function controlOf(node: NodeBase): AfeFormControl {
+    if (!(node.control instanceof AfeFormControl)) {
       throw new Error('Expected a numeric control');
     }
-    return control;
+    return node.control;
+  }
+
+  function vitalsGroup(rendering = 'group') {
+    return {
+      id: 'vitals',
+      label: 'Vitals',
+      type: 'obsGroup',
+      questionOptions: { rendering, concept: 'vitals-uuid' },
+      questions: [
+        numericQuestion(),
+        { id: 'note', label: 'Note', type: 'obs', questionOptions: { rendering: 'text', concept: 'note-uuid' } },
+      ],
+    };
+  }
+
+  /**
+   * Loads an obs group saved at the encounter date into a group node, the way the obs adapter does.
+   */
+  function loadSavedGroup(group: GroupNode, uuid: string, temperature: number) {
+    const obsDatetime = '2020-01-01T00:00:00.000+0000';
+    const temperatureObs = {
+      uuid: `${uuid}-temperature`,
+      concept: 'temperature-uuid',
+      obsDatetime,
+      value: temperature,
+    };
+    const noteObs = { uuid: `${uuid}-note`, concept: 'note-uuid', obsDatetime, value: 'Fine' };
+    group.initialValue = { uuid, concept: 'vitals-uuid', obsDatetime, groupMembers: [temperatureObs, noteObs] };
+    group.children['temperature'].initialValue = temperatureObs;
+    group.children['temperature'].control.setValue(temperature);
+    group.children['note'].initialValue = noteObs;
+    group.children['note'].control.setValue(noteObs.value);
   }
 
   /**
@@ -243,6 +286,59 @@ describe('Reference ranges at the measurement date', () => {
       expect(lastContext()).toEqual({ encounter: 'saved-encounter' });
     }));
   });
+
+  it('moves an unchanged answer with its obs group when a sibling is edited', fakeAsync(() => {
+    const form = createForm([vitalsGroup()]);
+    form.valueProcessingInfo.encounterUuid = 'saved-encounter';
+    form.searchNodeByQuestionId('encDate')[0].initialValue = new Date('2020-01-01T00:00:00Z');
+    const group = form.searchNodeByQuestionId('vitals')[0];
+    if (!(group instanceof GroupNode)) {
+      throw new Error('Expected an obs group');
+    }
+    loadSavedGroup(group, 'saved-group', 37);
+    subscription = service.connect(form, 'patient-uuid');
+    tick();
+    form.searchNodeByQuestionId('encDate')[0].control.setValue('2021-01-01T00:00:00Z');
+    tick();
+    expect(lastContext()).toEqual({ encounter: 'saved-encounter' });
+
+    const note = form.searchNodeByQuestionId('note')[0].control;
+    note.setValue('Feverish');
+    expect(service.isLoading(form)).toBe(true);
+    tick();
+    expect(lastContext()).toEqual({ date: moment('2021-01-01T00:00:00Z').format() });
+
+    note.setValue('Fine');
+    tick();
+    expect(lastContext()).toEqual({ encounter: 'saved-encounter' });
+  }));
+
+  it('moves only the repeated group whose sibling is edited', fakeAsync(() => {
+    resource.getConceptReferenceRanges.and.callFake((_patient, _concepts, context) =>
+      of(context?.date ? later : early),
+    );
+    const form = createForm([vitalsGroup('repeating')]);
+    form.valueProcessingInfo.encounterUuid = 'saved-encounter';
+    form.searchNodeByQuestionId('encDate')[0].initialValue = new Date('2020-01-01T00:00:00Z');
+    const repeat = form.searchNodeByQuestionId('vitals')[0];
+    if (!(repeat instanceof ArrayNode)) {
+      throw new Error('Expected a repeating obs group');
+    }
+    const first = repeat.createChildNode();
+    const second = repeat.createChildNode();
+    loadSavedGroup(first, 'first-group', 37);
+    loadSavedGroup(second, 'second-group', 38);
+    subscription = service.connect(form, 'patient-uuid');
+    tick();
+    form.searchNodeByQuestionId('encDate')[0].control.setValue('2021-01-01T00:00:00Z');
+    tick();
+    expect(controlOf(first.children['temperature']).conceptReferenceRange).toBe(early.get('temperature-uuid'));
+
+    first.children['note'].control.setValue('Feverish');
+    tick();
+    expect(controlOf(first.children['temperature']).conceptReferenceRange).toBe(later.get('temperature-uuid'));
+    expect(controlOf(second.children['temperature']).conceptReferenceRange).toBe(early.get('temperature-uuid'));
+  }));
 
   it('falls back to the encounter date when a separately dated answer has no date yet', fakeAsync(() => {
     const measurement = numericQuestion();
