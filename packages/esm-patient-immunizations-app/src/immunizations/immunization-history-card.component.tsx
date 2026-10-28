@@ -55,7 +55,10 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ error
         nextDoseDate: latestDose?.nextDoseDate,
         doses: immunization.existingDoses.map((dose) => (
           <div key={dose.immunizationObsUuid} className={styles.doseCell}>
-            <div className={styles.doseLabel}>{t('doseNumber', 'Dose {{number}}', { number: dose.doseNumber })}</div>
+            <div className={styles.doseLabel}>
+              {immunization.sequences?.find((sequence) => sequence.sequenceNumber === dose.doseNumber)?.sequenceLabel ??
+                t('doseNumber', 'Dose {{number}}', { number: dose.doseNumber })}
+            </div>
             {dose.occurrenceDateTime && (
               <div className={styles.doseDate}>
                 {formatDate(parseDate(dose.occurrenceDateTime), {
