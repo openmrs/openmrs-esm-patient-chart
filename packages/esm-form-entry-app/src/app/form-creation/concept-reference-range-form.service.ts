@@ -180,7 +180,7 @@ function contextFor(
     !(savedEncounterDate && moment(observation.obsDatetime).isSame(savedEncounterDate))
   ) {
     value = observation.obsDatetime;
-  } else if (encounterDate) {
+  } else if (encounterDate?.control.value && moment(encounterDate.control.value).isValid()) {
     value = encounterDate.control.value;
   } else if (encounterUuid) {
     return { encounter: encounterUuid };
