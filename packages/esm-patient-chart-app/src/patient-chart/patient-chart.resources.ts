@@ -162,7 +162,7 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
 
   useEffect(() => {
     const initializeWorkspaceGroup = async () => {
-      if (isPatientUnavailable || !patient) {
+      if (isPatientUnavailable || !patient || storePatientUuid !== patient.id) {
         latestWorkspaceGroupProps.current = null;
         return;
       }
