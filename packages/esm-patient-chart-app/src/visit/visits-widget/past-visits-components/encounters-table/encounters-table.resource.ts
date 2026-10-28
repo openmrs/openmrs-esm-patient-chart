@@ -6,6 +6,9 @@ import {
   parseDate,
   restBaseUrl,
   showSnackbar,
+  useFeatureFlag,
+  userHasAccess,
+  useSession,
   type Diagnosis,
   type Encounter,
   type EncounterType,
@@ -111,10 +114,12 @@ export function useEncounterTypes() {
 
 export function mapEncounter(encounter: Encounter): MappedEncounter {
   const diagnoses =
-    encounter?.diagnoses?.map((diagnosis) => ({
-      ...diagnosis,
-      certainty: diagnosis.certainty ?? 'CONFIRMED',
-    })) || [];
+    encounter?.diagnoses
+      ?.filter((diagnosis) => !diagnosis.voided)
+      .map((diagnosis) => ({
+        ...diagnosis,
+        certainty: diagnosis.certainty ?? 'CONFIRMED',
+      })) || [];
 
   return {
     id: encounter.uuid,
@@ -233,4 +238,13 @@ export async function downloadPdf(encounterUuids: string[], t: TFunction) {
       subtitle: error.message || t('printError', 'Failed to generate PDF. Please check server logs.'),
     });
   }
+}
+
+/**
+ * Printing encounters requires both the privilege and the optional patientdocuments backend module.
+ */
+export function useCanPrintEncounters() {
+  const session = useSession();
+  const isPatientDocumentsModuleInstalled = useFeatureFlag('patientdocuments-module');
+  return userHasAccess('App: Print encounter forms', session?.user) && isPatientDocumentsModuleInstalled;
 }

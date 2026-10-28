@@ -33,6 +33,7 @@ export default function ExportedAddDrugOrderWorkspace({
       patientUuid={patientUuid}
       visitContext={visitContext}
       closeWorkspace={closeWorkspace}
+      showPatientBanner
       launchAllergyForm={allergyFormWorkspaceName ? launchAllergyForm : undefined}
     />
   );
