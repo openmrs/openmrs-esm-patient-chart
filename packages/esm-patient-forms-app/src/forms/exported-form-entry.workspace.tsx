@@ -1,6 +1,6 @@
 import React from 'react';
 import { type Workspace2DefinitionProps, type Encounter } from '@openmrs/esm-framework';
-import { type Form } from '@openmrs/esm-patient-common-lib';
+import { type Form, usePatientForBanner } from '@openmrs/esm-patient-common-lib';
 import FormEntry from './form-entry.component';
 import { type ExportedClinicalFormsWindowProps } from './exported-forms-dashboard.workspace';
 
@@ -21,8 +21,10 @@ const ExportedFormEntryWorkspace: React.FC<
   closeWorkspace,
   isRootWorkspace,
   workspaceProps: { form, encounterUuid, handlePostResponse },
-  windowProps: { patient, patientUuid, visitContext, mutateVisitContext },
+  windowProps: { patient: patientProp, patientUuid, visitContext, mutateVisitContext },
 }) => {
+  const patient = usePatientForBanner(patientProp, patientUuid);
+
   return (
     <FormEntry
       form={form}
@@ -33,6 +35,7 @@ const ExportedFormEntryWorkspace: React.FC<
       mutateVisitContext={mutateVisitContext}
       closeWorkspace={closeWorkspace}
       showBackButton={!isRootWorkspace}
+      showPatientBanner
       handlePostResponse={handlePostResponse}
     />
   );

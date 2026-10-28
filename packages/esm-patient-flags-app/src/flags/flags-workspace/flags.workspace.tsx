@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Dropdown, Form, InlineLoading, Search, Tile, Toggle, Stack } from '@carbon/react';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import {
+  ExtensionSlot,
   useLayoutType,
   showSnackbar,
   parseDate,
@@ -19,7 +20,7 @@ type SortKey = 'alpha' | 'active' | 'retired';
 
 const FlagsWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
   closeWorkspace,
-  groupProps: { patientUuid },
+  groupProps: { patient, patientUuid },
 }) => {
   const { t } = useTranslation();
   const { flags, isLoading, error, mutate } = usePatientFlags(patientUuid);
@@ -141,6 +142,9 @@ const FlagsWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
 
   return (
     <Workspace2 title={t('editPatientFlags', 'Edit patient flags')} hasUnsavedChanges={hasUnsavedChanges}>
+      {isTablet && patient && patientUuid && (
+        <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
+      )}
       <Form className={styles.formWrapper}>
         {/* The <div> below is required to maintain the page layout styling */}
         <div>
