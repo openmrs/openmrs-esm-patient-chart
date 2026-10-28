@@ -36,10 +36,9 @@ import {
   AddIcon,
   age,
   ExtensionSlot,
-  formatDate,
+  formatPartialDate,
   getPatientName,
   OpenmrsDatePicker,
-  parseDate,
   useConfig,
   useLayoutType,
   Workspace2,
@@ -486,7 +485,7 @@ export function DrugOrderForm({
             <span className={classNames(styles.text02, styles.bodyShort01)}>
               {patientIdentifier && <>{patientIdentifier} &middot; </>}
               {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
-              <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
+              <span>{formatPartialDate(patient?.birthDate, { mode: 'wide', time: false })}</span>
             </span>
           </div>
         )}
