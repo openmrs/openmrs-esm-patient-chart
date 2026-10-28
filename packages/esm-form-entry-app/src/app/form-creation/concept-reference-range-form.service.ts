@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AfeFormControl, ArrayNode, Form, GroupNode, NodeBase } from '@openmrs/ngx-formentry';
+import { AfeFormControl, ArrayNode, Form, GroupNode, NodeBase, ObsAdapterHelper } from '@openmrs/ngx-formentry';
 import moment from 'moment';
 import { forkJoin, Observable, of, Subject, Subscription } from 'rxjs';
 import { debounceTime, filter, map, startWith, switchMap, take, takeUntil } from 'rxjs/operators';
@@ -13,7 +13,7 @@ import { ConceptReferenceRange } from '../types';
 interface NumericNode {
   control: AfeFormControl;
   concept: string;
-  context: ReferenceRangeContext | null;
+  context: ReferenceRangeContext;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -21,7 +21,10 @@ export class ConceptReferenceRangeFormService {
   private readonly loading = new WeakSet<Form>();
   private readonly loaded = new Subject<Form>();
 
-  constructor(private readonly ranges: ConceptReferenceRangeResourceService) {}
+  constructor(
+    private readonly ranges: ConceptReferenceRangeResourceService,
+    private readonly payloads: ObsAdapterHelper,
+  ) {}
 
   isLoading(form: Form): boolean {
     return this.loading.has(form);
@@ -44,14 +47,24 @@ export class ConceptReferenceRangeFormService {
     }
     const changes = new Subject<void>();
     const registered = new WeakSet<NodeBase>();
+    const requested = new WeakMap<AfeFormControl, string>();
     const encounterDate = form.searchNodeByQuestionId('', 'encounterDatetime')[0];
-    const currentMeasurementDate = new Date().toISOString();
+    const currentMeasurementDate = moment().format();
+    const contextOf = (node: NodeBase, parent?: NodeBase) =>
+      contextFor(
+        node,
+        parent,
+        encounterDate,
+        form.valueProcessingInfo.encounterUuid,
+        currentMeasurementDate,
+        this.payloads,
+      );
     const refresh = () => {
       this.loading.add(form);
       changes.next();
     };
 
-    const register = (node: NodeBase) => {
+    const register = (node: NodeBase, parent?: NodeBase) => {
       if (!node || registered.has(node)) {
         return;
       }
@@ -60,15 +73,27 @@ export class ConceptReferenceRangeFormService {
       if (schema?.type === 'encounterDatetime' || schema?.questionOptions?.obsField === 'obsDatetime') {
         subscriptions.add(node.control.valueChanges.subscribe(refresh));
       }
+      if (isNumeric(node)) {
+        // Editing an answer decides whether it's sent with the encounter, which can change the date
+        // it's saved with.
+        subscriptions.add(
+          node.control.valueChanges.subscribe(() => {
+            const context = requested.get(node.control);
+            if (context !== undefined && context !== JSON.stringify(contextOf(node, parent))) {
+              refresh();
+            }
+          }),
+        );
+      }
       if (node instanceof ArrayNode) {
         node.addChildNodeCreatedListener((child: GroupNode) => {
           if (!subscriptions.closed) {
-            register(child);
+            register(child, node);
             refresh();
           }
         });
       }
-      childrenOf(node).forEach(register);
+      childrenOf(node).forEach((child) => register(child, node));
     };
     register(form.rootNode);
     this.loading.add(form);
@@ -82,27 +107,16 @@ export class ConceptReferenceRangeFormService {
             const controls: Array<AfeFormControl> = [];
             const groups = new Map<string, Array<NumericNode>>();
             const collect = (node: NodeBase, parent?: NodeBase) => {
-              const options = node.question.extras?.questionOptions;
-              if (
-                node.control instanceof AfeFormControl &&
-                ['number', 'decimal'].includes(node.question.renderingType)
-              ) {
+              if (isNumeric(node)) {
                 controls.push(node.control);
-                const concept = resolveConceptUuid(form.schema, options?.concept);
+                const concept = resolveConceptUuid(form.schema, node.question.extras?.questionOptions?.concept);
                 if (concept) {
-                  const context = contextFor(
-                    node,
-                    parent,
-                    encounterDate,
-                    form.valueProcessingInfo.encounterUuid,
-                    currentMeasurementDate,
-                  );
-                  if (context) {
-                    const key = JSON.stringify(context);
-                    const nodes = groups.get(key) ?? [];
-                    nodes.push({ control: node.control, concept, context });
-                    groups.set(key, nodes);
-                  }
+                  const context = contextOf(node, parent);
+                  const key = JSON.stringify(context);
+                  requested.set(node.control, key);
+                  const nodes = groups.get(key) ?? [];
+                  nodes.push({ control: node.control, concept, context });
+                  groups.set(key, nodes);
                 }
               }
               childrenOf(node).forEach((child) => collect(child, node));
@@ -155,43 +169,56 @@ function childrenOf(node: NodeBase): Array<NodeBase> {
   return Array.isArray(node.children) ? node.children : Object.values(node.children ?? {});
 }
 
+function isNumeric(node: NodeBase): node is NodeBase & { control: AfeFormControl } {
+  return node.control instanceof AfeFormControl && ['number', 'decimal'].includes(node.question.renderingType);
+}
+
+/**
+ * Returns the context for the date the answer will be saved with, which depends on whether the
+ * answer is sent with the encounter.
+ */
 function contextFor(
   node: NodeBase,
   parent: NodeBase | undefined,
   encounterDate: NodeBase | undefined,
   encounterUuid: string | undefined,
   currentMeasurementDate: string,
-): ReferenceRangeContext | null {
+  payloads: ObsAdapterHelper,
+): ReferenceRangeContext {
   const observation = node.initialValue as { uuid?: string; obsDatetime?: string } | undefined;
-  const observationDate =
-    parent?.question.extras?.type === 'complex-obs'
-      ? childrenOf(parent).find((child) => child.question.extras?.questionOptions?.obsField === 'obsDatetime')?.control
-          .value
-      : undefined;
-  const savedEncounterDate = encounterDate?.initialValue;
+  const complexObs = parent?.question.extras?.type === 'complex-obs' ? parent : undefined;
+  const savedEncounterDate = validDate(encounterDate?.initialValue);
+  const sent: { voided?: boolean } | undefined = payloads.getObsNodePayload(complexObs ?? node)[0];
 
-  // An observation saved without its own date takes the encounter date, and the backend only moves
-  // a saved observation to a new encounter date when it was recorded at the old one.
-  let value: string | Date | undefined;
-  if (observationDate && moment(observationDate).isValid()) {
-    value = observationDate;
-  } else if (
-    observation?.obsDatetime &&
-    !(savedEncounterDate && moment(observation.obsDatetime).isSame(savedEncounterDate))
-  ) {
-    value = observation.obsDatetime;
-  } else if (encounterDate?.control.value && moment(encounterDate.control.value).isValid()) {
-    value = encounterDate.control.value;
-  } else if (encounterUuid) {
-    return { encounter: encounterUuid };
+  let date: string | undefined;
+  if (observation?.uuid && (!sent || sent.voided)) {
+    // REST only applies an encounter date change to the observations sent with the encounter, so a
+    // saved answer that isn't sent keeps its date.
+    date = validDate(observation.obsDatetime);
   } else {
-    value = currentMeasurementDate;
+    // Core gives an observation sent without a date the encounter date, and moves one sent with the
+    // saved encounter date to the new encounter date.
+    const ownDate =
+      validDate(
+        complexObs
+          ? childrenOf(complexObs).find((child) => child.question.extras?.questionOptions?.obsField === 'obsDatetime')
+              ?.control.value
+          : undefined,
+      ) ?? validDate(observation?.obsDatetime);
+    date =
+      ownDate && !(savedEncounterDate && moment(ownDate).isSame(savedEncounterDate))
+        ? ownDate
+        : validDate(encounterDate?.control.value);
   }
 
-  if (!value || !moment(value).isValid()) {
-    return null;
+  if (!date) {
+    // A payload without an encounter date leaves an existing encounter's saved date in place, and
+    // REST gives a new encounter the time of the save.
+    if (encounterUuid) {
+      return { encounter: encounterUuid };
+    }
+    date = currentMeasurementDate;
   }
-  const date = moment(value).format();
   if (encounterUuid && savedEncounterDate && moment(savedEncounterDate).isSame(date)) {
     return { encounter: encounterUuid };
   }
@@ -199,4 +226,8 @@ function contextFor(
     return { obs: observation.uuid };
   }
   return { date };
+}
+
+function validDate(value: moment.MomentInput): string | undefined {
+  return value && moment(value).isValid() ? moment(value).format() : undefined;
 }

@@ -82,6 +82,33 @@ describe('Reference ranges at the measurement date', () => {
     return control;
   }
 
+  /**
+   * Creates a form for an encounter saved on 2020-01-01 with a temperature of 37 recorded at the
+   * encounter date, loaded the way the obs adapter loads saved answers.
+   */
+  function savedEncounterForm(showDate = false): Form {
+    const measurement = numericQuestion();
+    const form = createForm([
+      showDate ? { ...measurement, questionOptions: { ...measurement.questionOptions, showDate: true } } : measurement,
+    ]);
+    const observation = { uuid: 'saved-obs', obsDatetime: '2020-01-01T00:00:00.000+0000', value: 37 };
+    form.valueProcessingInfo.encounterUuid = 'saved-encounter';
+    form.searchNodeByQuestionId('encDate')[0].initialValue = new Date('2020-01-01T00:00:00Z');
+    form.searchNodeByQuestionId('temperature')[0].initialValue = observation;
+    controlFor(form).setValue(observation.value);
+    if (showDate) {
+      form.searchNodeByQuestionId('complex_temperature')[0].initialValue = observation;
+      const date = form.searchNodeByQuestionId('date_temperature')[0];
+      date.initialValue = observation;
+      date.control.setValue(observation.obsDatetime);
+    }
+    return form;
+  }
+
+  function lastContext() {
+    return resource.getConceptReferenceRanges.calls.mostRecent().args[2];
+  }
+
   beforeEach(() => {
     resource = jasmine.createSpyObj<ConceptReferenceRangeResourceService>('ranges', ['getConceptReferenceRanges']);
     resource.getConceptReferenceRanges.and.returnValue(of(early));
@@ -157,18 +184,22 @@ describe('Reference ranges at the measurement date', () => {
     });
   }));
 
-  it('batches saved answers under their encounter until the encounter date changes', fakeAsync(() => {
+  it('batches unchanged saved answers under their encounter, even after the encounter date changes', fakeAsync(() => {
     const form = createForm([numericQuestion(), numericQuestion('anotherTemperature')]);
     form.valueProcessingInfo.encounterUuid = 'historical-encounter';
     form.searchNodeByQuestionId('encDate')[0].initialValue = new Date('2020-01-01T00:00:00Z');
     form.searchNodeByQuestionId('temperature')[0].initialValue = {
       uuid: 'first-obs',
       obsDatetime: '2020-01-01T00:00:00.000+0000',
+      value: 37,
     };
     form.searchNodeByQuestionId('anotherTemperature')[0].initialValue = {
       uuid: 'second-obs',
       obsDatetime: '2020-01-01T00:00:00.000+0000',
+      value: 38,
     };
+    controlFor(form).setValue(37);
+    controlFor(form, 'anotherTemperature').setValue(38);
     subscription = service.connect(form, 'patient-uuid');
     tick();
     expect(resource.getConceptReferenceRanges).toHaveBeenCalledOnceWith('patient-uuid', ['temperature-uuid'], {
@@ -178,10 +209,40 @@ describe('Reference ranges at the measurement date', () => {
     form.searchNodeByQuestionId('encDate')[0].control.setValue('2021-01-01T00:00:00Z');
     tick();
     expect(resource.getConceptReferenceRanges).toHaveBeenCalledTimes(2);
-    expect(resource.getConceptReferenceRanges.calls.mostRecent().args[2]).toEqual({
-      date: moment('2021-01-01T00:00:00Z').format(),
-    });
+    expect(lastContext()).toEqual({ encounter: 'historical-encounter' });
   }));
+
+  [
+    { rendering: 'a plain answer', showDate: false },
+    { rendering: 'an answer with its own date', showDate: true },
+  ].forEach(({ rendering, showDate }) => {
+    it(`keeps ${rendering} at its saved date until an edit sends it with a moved encounter`, fakeAsync(() => {
+      const form = savedEncounterForm(showDate);
+      const control = controlFor(form);
+      subscription = service.connect(form, 'patient-uuid');
+      tick();
+      expect(lastContext()).toEqual({ encounter: 'saved-encounter' });
+
+      // Without an encounter date change, an edited answer is still saved at the encounter date.
+      control.setValue(38);
+      tick();
+      expect(resource.getConceptReferenceRanges).toHaveBeenCalledTimes(1);
+      control.setValue(37);
+
+      form.searchNodeByQuestionId('encDate')[0].control.setValue('2021-01-01T00:00:00Z');
+      tick();
+      expect(lastContext()).toEqual({ encounter: 'saved-encounter' });
+
+      control.setValue(38);
+      expect(service.isLoading(form)).toBe(true);
+      tick();
+      expect(lastContext()).toEqual({ date: moment('2021-01-01T00:00:00Z').format() });
+
+      control.setValue(37);
+      tick();
+      expect(lastContext()).toEqual({ encounter: 'saved-encounter' });
+    }));
+  });
 
   it('falls back to the encounter date when a separately dated answer has no date yet', fakeAsync(() => {
     const measurement = numericQuestion();
@@ -247,12 +308,12 @@ describe('Reference ranges at the measurement date', () => {
         questionOptions: { ...measurement.questionOptions, showDate: true },
       },
     ]);
-    form.searchNodeByQuestionId('temperature')[0].initialValue = {
-      uuid: 'historical-obs',
-      obsDatetime: '2019-01-01T00:00:00Z',
-    };
+    const observation = { uuid: 'historical-obs', obsDatetime: '2019-01-01T00:00:00Z', value: 37 };
+    form.searchNodeByQuestionId('complex_temperature')[0].initialValue = observation;
+    form.searchNodeByQuestionId('temperature')[0].initialValue = observation;
+    controlFor(form).setValue(observation.value);
     const date = form.searchNodeByQuestionId('date_temperature')[0].control;
-    date.setValue('2019-01-01T00:00:00Z');
+    date.setValue(observation.obsDatetime);
     subscription = service.connect(form, 'patient-uuid');
     tick();
     expect(resource.getConceptReferenceRanges.calls.mostRecent().args[2]).toEqual({ obs: 'historical-obs' });
