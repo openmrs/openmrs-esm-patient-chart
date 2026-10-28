@@ -6,6 +6,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TranslateModule } from '@ngx-translate/core';
 
 import { Subject } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 import { FeWrapperComponent } from './fe-wrapper.component';
 import { Form, FormEntryModule, FormFactory } from '@openmrs/ngx-formentry';
@@ -115,7 +116,7 @@ describe('FeWrapperComponent submission while reference ranges load', () => {
       'whenLoaded',
     ]);
     referenceRanges.isLoading.and.callFake(() => loading);
-    referenceRanges.whenLoaded.and.returnValue(loaded);
+    referenceRanges.whenLoaded.and.callFake(() => loaded.pipe(take(1)));
     formSubmission = jasmine.createSpyObj<FormSubmissionService>('formSubmission', ['buildEncounterPayload']);
     const singleSpaProps = jasmine.createSpyObj<SingleSpaPropsService>('singleSpaProps', ['getProp']);
 
@@ -154,6 +155,20 @@ describe('FeWrapperComponent submission while reference ranges load', () => {
     expect(changeState.calls.allArgs()).toEqual([['submitting'], ['initial'], ['readyWithValidationErrors']]);
     expect(form.showErrors).toBe(true);
     expect(formSubmission.buildEncounterPayload).not.toHaveBeenCalled();
+  });
+
+  it('ignores another submission while one waits for the reference ranges', () => {
+    component.onSubmit();
+    component.onSubmit();
+    expect(changeState.calls.allArgs()).toEqual([['submitting']]);
+
+    loading = false;
+    loaded.next();
+    expect(changeState.calls.allArgs()).toEqual([['submitting'], ['initial'], ['readyWithValidationErrors']]);
+
+    loading = true;
+    component.onSubmit();
+    expect(changeState.calls.mostRecent().args).toEqual(['submitting']);
   });
 
   it('drops a pending submission when the form is destroyed', () => {
