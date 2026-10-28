@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 import useSWRInfinite from 'swr/infinite';
-import { openmrsFetch, restBaseUrl, useAttachments, useConfig } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, useAttachments, useConfig, type FetchResponse } from '@openmrs/esm-framework';
 import { getAttachmentBytesUrl } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 import type {
@@ -102,6 +103,32 @@ export function fetchDiagnosisConceptsByName(searchTerm: string, diagnosisConcep
   const url = `${restBaseUrl}/concept?name=${searchTerm}&searchType=fuzzy&class=${diagnosisConceptClass}&v=${customRepresentation}`;
 
   return openmrsFetch<Array<Concept>>(url).then(({ data }) => Promise.resolve(data['results']));
+}
+
+/**
+ * Fetch classes for stored coded diagnoses in one cached request. Unresolved references
+ * are omitted by the endpoint; return null so the form can retain its certainty action.
+ */
+export function useDiagnosisConceptClasses(conceptUuids: Array<string>) {
+  const { data, error, isLoading } = useSWRImmutable<
+    FetchResponse<Record<string, { conceptClass?: { uuid: string } }>>,
+    Error
+  >(
+    conceptUuids.length > 0
+      ? `${restBaseUrl}/conceptreferences?references=${conceptUuids.join(',')}&v=custom:(uuid,conceptClass:(uuid))`
+      : null,
+    openmrsFetch,
+  );
+
+  const conceptClassByUuid = useMemo<Record<string, string | null>>(
+    () =>
+      data?.data
+        ? Object.fromEntries(conceptUuids.map((uuid) => [uuid, data.data[uuid]?.conceptClass?.uuid ?? null]))
+        : {},
+    [conceptUuids, data],
+  );
+
+  return { conceptClassByUuid, error, isLoading };
 }
 
 export function saveVisitNote(abortController: AbortController, payload: VisitNotePayload) {

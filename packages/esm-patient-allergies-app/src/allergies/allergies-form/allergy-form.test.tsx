@@ -3,9 +3,11 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
 import {
+  ExtensionSlot,
   getDefaultsFromConfigSchema,
   showSnackbar,
   useConfig,
+  useLayoutType,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
@@ -28,6 +30,8 @@ const mockUpdatePatientAllergy = vi.mocked(updatePatientAllergy);
 const mockUseAllergens = vi.mocked(useAllergens);
 const mockUseAllergicReactions = vi.mocked(useAllergicReactions);
 const mockUseConfig = vi.mocked(useConfig<AllergiesConfigObject>);
+const mockUseLayoutType = vi.mocked(useLayoutType);
+const mockExtensionSlot = vi.mocked(ExtensionSlot);
 
 vi.mock('./allergy-form.resource', async () => ({
   ...((await vi.importActual('./allergy-form.resource')) as object),
@@ -50,6 +54,7 @@ const mockConcepts = {
 
 describe('AllergyForm', () => {
   beforeEach(() => {
+    mockUseLayoutType.mockReturnValue('large-desktop');
     mockUseAllergens.mockReturnValue({
       isLoading: false,
       allergens: mockAllergens,
@@ -217,6 +222,33 @@ describe('AllergyForm', () => {
 
       expect(mockUpdatePatientAllergy.mock.calls[0][0]).toEqual(expectedPayload);
       expect(mockAllergy).not.toEqual(expectedPayload);
+    });
+  });
+
+  describe('Patient header banner', () => {
+    // Outside the chart (e.g. the ward order basket), the exported workspace is the only place a
+    // patient identifier can appear, so it must render at every width, not just on tablet.
+    it('displays the patient header at every width outside the chart', () => {
+      mockUseLayoutType.mockReturnValue('large-desktop');
+      renderExportedAllergyForm();
+
+      expect(
+        mockExtensionSlot.mock.calls.some(
+          ([props]) => props.name === 'patient-header-slot' && props.state.patientUuid === mockPatient.id,
+        ),
+      ).toBe(true);
+    });
+
+    // Inside the chart the workspace banner must stay tablet-only: on desktop the chart's own
+    // patient banner is already on screen, so rendering this one would duplicate it.
+    it('only displays the in-chart patient header on tablet', () => {
+      mockUseLayoutType.mockReturnValue('large-desktop');
+      renderAllergyForm();
+      expect(mockExtensionSlot.mock.calls.some(([props]) => props.name === 'patient-header-slot')).toBe(false);
+
+      mockUseLayoutType.mockReturnValue('tablet');
+      renderAllergyForm();
+      expect(mockExtensionSlot.mock.calls.some(([props]) => props.name === 'patient-header-slot')).toBe(true);
     });
   });
 });

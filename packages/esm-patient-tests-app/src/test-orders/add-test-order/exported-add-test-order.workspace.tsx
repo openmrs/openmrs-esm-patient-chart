@@ -10,18 +10,20 @@ import AddLabOrder from './add-test-order.component';
  * @see add-test-order.workspace.tsx
  */
 export default function ExportedAddTestOrderWorkspace({
-  windowProps: { patient, visitContext },
+  windowProps: { patient, patientUuid, visitContext },
   workspaceProps: { order: initialOrder, orderTypeUuid, orderToEditOrdererUuid },
   closeWorkspace,
 }: Workspace2DefinitionProps<AddTestOrderWorkspaceProps, ExportedOrderBasketWindowProps, {}>) {
   return (
     <AddLabOrder
       patient={patient}
+      patientUuid={patientUuid}
       visitContext={visitContext}
       initialOrder={initialOrder}
       orderTypeUuid={orderTypeUuid}
       closeWorkspace={closeWorkspace}
       orderToEditOrdererUuid={orderToEditOrdererUuid}
+      showPatientBanner
     />
   );
 }

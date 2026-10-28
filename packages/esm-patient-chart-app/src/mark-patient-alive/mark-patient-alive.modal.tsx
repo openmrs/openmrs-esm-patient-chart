@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { invalidateCurrentVisit, invalidateVisitAndEncounterData } from '@openmrs/esm-patient-common-lib';
+import { invalidateVisitAndEncounterData } from '@openmrs/esm-patient-common-lib';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { markPatientAlive } from '../data.resource';
 
@@ -21,7 +21,6 @@ const MarkPatientAlive: React.FC<MarkPatientAliveProps> = ({ closeModal, patient
     markPatientAlive(patientUuid)
       .then(() => {
         globalMutate((key) => Array.isArray(key) && key[0] === 'patient' && key[1] === patientUuid);
-        invalidateCurrentVisit(globalMutate, patientUuid);
         invalidateVisitAndEncounterData(globalMutate, patientUuid);
         showSnackbar({
           title: t('markAliveSuccessfully', 'Patient marked alive successfully'),

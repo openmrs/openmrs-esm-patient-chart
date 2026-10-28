@@ -59,11 +59,11 @@ vi.mock('../api', async () => ({
   useRequireOutpatientQuantity: () => mockUseRequireOutpatientQuantity(),
 }));
 
-function renderDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem, onSave = vi.fn()) {
+function renderDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem, onSave = vi.fn(), patient = mockPatient) {
   return render(
     <DrugOrderForm
       initialOrderBasketItem={initialOrderBasketItem}
-      patient={mockPatient}
+      patient={patient}
       visitContext={null}
       onSave={onSave}
       saveButtonText="Save order"
@@ -319,6 +319,22 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
     const quantityInput = screen.getByRole('spinbutton', { name: /quantity to dispense/i });
     expect(quantityInput).not.toHaveValue();
     expect(screen.queryByText(/auto-calculated/i)).not.toBeInTheDocument();
+  });
+
+  it('labels the free-text dosage toggle with its current state', async () => {
+    const user = userEvent.setup();
+    renderDrugOrderForm(createNewOrderBasketItem());
+
+    const freeTextToggle = screen.getByRole('switch', { name: /free text dosage/i });
+    expect(freeTextToggle).not.toBeChecked();
+    expect(screen.getByText('Off')).toBeInTheDocument();
+    expect(screen.queryByText('On')).not.toBeInTheDocument();
+
+    await user.click(freeTextToggle);
+
+    expect(freeTextToggle).toBeChecked();
+    expect(screen.getByText('On')).toBeInTheDocument();
+    expect(screen.queryByText('Off')).not.toBeInTheDocument();
   });
 
   it('submits only free-text dosage fields while preserving the structured frequency draft', async () => {
@@ -922,5 +938,39 @@ describe('DrugOrderForm - required field validation', () => {
     expect(screen.getByText('Quantity to dispense is required')).toBeInTheDocument();
     expect(screen.getByText('Number of refills is required')).toBeInTheDocument();
     expect(onSave).not.toHaveBeenCalled();
+  });
+});
+
+describe('DrugOrderForm - patient header', () => {
+  beforeEach(() => {
+    mockOpenmrsDatePicker.mockImplementation(({ id, labelText }) => (
+      <>
+        <label htmlFor={id}>{labelText}</label>
+        <input id={id} type="text" />
+      </>
+    ));
+    mockUseMedicationOrders.mockReturnValue({
+      futureOrders: [],
+      activeOrders: [],
+      pastOrders: [],
+      error: null,
+      isLoading: false,
+      isValidating: false,
+    });
+    mockUseRequireOutpatientQuantity.mockReturnValue({
+      requireOutpatientQuantity: true,
+      error: null,
+      isLoading: false,
+    });
+  });
+
+  it.each([
+    { label: 'an exact birthdate', birthDate: '1993-10-14', expected: '14 — Oct — 1993' },
+    { label: 'an estimated birthdate known to the year', birthDate: '1993', expected: '1993' },
+    { label: 'an estimated birthdate known to the month', birthDate: '2024-03', expected: 'Mar — 2024' },
+  ])('shows $label at its recorded precision', ({ birthDate, expected }) => {
+    renderDrugOrderForm(createNewOrderBasketItem(), vi.fn(), { ...mockPatient, birthDate });
+
+    expect(screen.getByText(expected)).toBeInTheDocument();
   });
 });

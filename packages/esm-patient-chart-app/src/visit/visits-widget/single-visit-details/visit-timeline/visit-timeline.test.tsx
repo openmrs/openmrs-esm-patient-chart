@@ -213,6 +213,7 @@ describe('VisitTimeline', () => {
 
   it('offers a print action for an encounter recorded through a JSON schema form', async () => {
     const user = userEvent.setup();
+    mockUseFeatureFlag.mockImplementation((flagName) => flagName === 'patientdocuments-module');
     renderVisitTimeline([encounterWithJsonSchemaForm]);
 
     await user.click(screen.getByRole('button', { name: /encounter table actions menu/i }));
@@ -225,6 +226,19 @@ describe('VisitTimeline', () => {
       'Print this encounter',
       'Delete this encounter',
     ]);
+  });
+
+  it('does not offer a print action when the patientdocuments module is not installed', async () => {
+    const user = userEvent.setup();
+    mockUseFeatureFlag.mockImplementation((flagName) => flagName !== 'patientdocuments-module');
+    renderVisitTimeline([encounterWithJsonSchemaForm]);
+
+    await user.click(screen.getByRole('button', { name: /encounter table actions menu/i }));
+
+    const actionsMenu = screen.getByRole('menu', { hidden: true });
+    const menuItems = within(actionsMenu).getAllByRole('menuitem', { hidden: true });
+
+    expect(menuItems.map((menuItem) => menuItem.textContent)).toEqual(['Edit this encounter', 'Delete this encounter']);
   });
 
   it('renders a JSON schema form in the embedded form view, with the visit context, when the feature flag is on', async () => {
