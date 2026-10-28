@@ -20,6 +20,7 @@ import {
   parseDate,
   useConfig,
   useLayoutType,
+  UserHasAccess,
 } from '@openmrs/esm-framework';
 import type { ConfigObject } from '../config-schema';
 import type { VitalsTableHeader, VitalsTableRow } from './types';
@@ -34,7 +35,7 @@ const VitalsChart = lazy(loadVitalsChart);
 
 // A failed prefetch is ignored. Opening the chart view retries the import through React.lazy.
 const prefetchVitalsChart = () => {
-  loadVitalsChart().catch(() => {});
+  loadVitalsChart().catch(() => { });
 };
 
 interface VitalsOverviewProps {
@@ -228,7 +229,6 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
                     </IconSwitch>
                   </ContentSwitcher>
                   <>
-                    <span className={styles.divider}>|</span>
                     {showPrintButton && (
                       <Button
                         kind="ghost"
@@ -240,14 +240,19 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
                         {t('print', 'Print')}
                       </Button>
                     )}
-                    <Button
-                      kind="ghost"
-                      renderIcon={AddIcon}
-                      iconDescription="Add vitals"
-                      onClick={launchVitalsBiometricsForm}
+                    <UserHasAccess
+                      privilege="Add Vitals"
                     >
-                      {t('add', 'Add')}
-                    </Button>
+                      <span className={styles.divider}>|</span>
+                      <Button
+                        kind="ghost"
+                        renderIcon={AddIcon}
+                        iconDescription="Add vitals"
+                        onClick={launchVitalsBiometricsForm}
+                      >
+                        {t('add', 'Add')}
+                      </Button>
+                    </UserHasAccess>
                   </>
                 </div>
               </CardHeader>
