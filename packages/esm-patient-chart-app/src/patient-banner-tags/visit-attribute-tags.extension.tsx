@@ -23,6 +23,7 @@ const getAttributeValue = (attributeType, value) => {
       // as local midnight. Otherwise a browser behind the server shows the previous day.
       return formatDate(dayjs(String(value).split('T')[0]).toDate(), {
         mode: 'wide',
+        time: false,
       });
     default:
       return value;

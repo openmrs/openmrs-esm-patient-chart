@@ -158,6 +158,12 @@
   padding: 0;
 }
 
+.tablet,
+.desktop {
+  position: sticky;
+  bottom: 0;
+}
+
 .headerGridRow {
   border-bottom: 0.0625rem solid colors.$gray-20;
   margin: 0;

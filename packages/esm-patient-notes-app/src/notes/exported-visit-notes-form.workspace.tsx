@@ -8,6 +8,7 @@ export interface ExportedVisitNotesFormWorkspaceProps {
   patientUuid: string;
   patient: fhir.Patient;
   visitContext: Visit;
+  showPatientHeader?: boolean;
 }
 
 /**
@@ -16,7 +17,10 @@ export interface ExportedVisitNotesFormWorkspaceProps {
  */
 const ExportedVisitNotesFormWorkspace: React.FC<
   Workspace2DefinitionProps<ExportedVisitNotesFormWorkspaceProps, {}, {}>
-> = ({ closeWorkspace, workspaceProps: { encounter, formContext, patientUuid, patient, visitContext } }) => {
+> = ({
+  closeWorkspace,
+  workspaceProps: { encounter, formContext, patientUuid, patient, visitContext, showPatientHeader = true },
+}) => {
   return (
     <VisitNotesForm
       encounter={encounter}
@@ -25,6 +29,7 @@ const ExportedVisitNotesFormWorkspace: React.FC<
       patient={patient}
       visitContext={visitContext}
       closeWorkspace={closeWorkspace}
+      showPatientHeader={showPatientHeader}
     />
   );
 };
