@@ -18,6 +18,8 @@ export type ZScoreReferenceName = (typeof referenceNames)[number];
 const tableLoaders = {
   wfl_girls_below5: () => import('./tables/wfl_girls_below5.json'),
   wfl_boys_below5: () => import('./tables/wfl_boys_below5.json'),
+  wfh_girls_below5: () => import('./tables/wfh_girls_below5.json'),
+  wfh_boys_below5: () => import('./tables/wfh_boys_below5.json'),
   hfa_girls_below5: () => import('./tables/hfa_girls_below5.json'),
   hfa_boys_below5: () => import('./tables/hfa_boys_below5.json'),
   hfa_girls_5_above: () => import('./tables/hfa_girls_5_above.json'),
@@ -81,7 +83,12 @@ async function loadReference(
 
   switch (name) {
     case 'weightForHeightRef':
-      return age < 5 ? loadTable(`wfl_${children}_below5`) : null;
+      // The WHO standards measure children under 2 lying down (weight-for-length, 45 to 110 cm) and from 2 standing up
+      // (weight-for-height, 65 to 120 cm). Standing height reads about 0.7 cm less than length for the same child.
+      if (age < 2) {
+        return loadTable(`wfl_${children}_below5`);
+      }
+      return age < 5 ? loadTable(`wfh_${children}_below5`) : null;
     case 'heightForAgeRef':
       if (ageInDays <= lastDayOfUnderFiveTables) {
         return rowsFor(await loadTable(`hfa_${children}_below5`), 'Day', ageInDays);
