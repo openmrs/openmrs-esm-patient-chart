@@ -50,10 +50,10 @@ export class ConceptReferenceRangeFormService {
     const requested = new WeakMap<AfeFormControl, string>();
     const encounterDate = form.searchNodeByQuestionId('', 'encounterDatetime')[0];
     const currentMeasurementDate = moment().format();
-    const contextOf = (node: NodeBase, parent?: NodeBase) =>
+    const contextOf = (node: NodeBase, ancestors: Array<NodeBase>) =>
       contextFor(
         node,
-        parent,
+        ancestors,
         encounterDate,
         form.valueProcessingInfo.encounterUuid,
         currentMeasurementDate,
@@ -64,7 +64,7 @@ export class ConceptReferenceRangeFormService {
       changes.next();
     };
 
-    const register = (node: NodeBase, parent?: NodeBase) => {
+    const register = (node: NodeBase, ancestors: Array<NodeBase> = []) => {
       if (!node || registered.has(node)) {
         return;
       }
@@ -74,12 +74,12 @@ export class ConceptReferenceRangeFormService {
         subscriptions.add(node.control.valueChanges.subscribe(refresh));
       }
       if (isNumeric(node)) {
-        // Editing an answer decides whether it's sent with the encounter, which can change the date
-        // it's saved with.
+        // Editing the answer or anything else in its obs group decides whether it's sent with the
+        // encounter, which can change the date it's saved with.
         subscriptions.add(
-          node.control.valueChanges.subscribe(() => {
+          payloadRoot(node, ancestors).control.valueChanges.subscribe(() => {
             const context = requested.get(node.control);
-            if (context !== undefined && context !== JSON.stringify(contextOf(node, parent))) {
+            if (context !== undefined && context !== JSON.stringify(contextOf(node, ancestors))) {
               refresh();
             }
           }),
@@ -88,12 +88,12 @@ export class ConceptReferenceRangeFormService {
       if (node instanceof ArrayNode) {
         node.addChildNodeCreatedListener((child: GroupNode) => {
           if (!subscriptions.closed) {
-            register(child, node);
+            register(child, [...ancestors, node]);
             refresh();
           }
         });
       }
-      childrenOf(node).forEach((child) => register(child, node));
+      childrenOf(node).forEach((child) => register(child, [...ancestors, node]));
     };
     register(form.rootNode);
     this.loading.add(form);
@@ -106,12 +106,12 @@ export class ConceptReferenceRangeFormService {
           switchMap(() => {
             const controls: Array<AfeFormControl> = [];
             const groups = new Map<string, Array<NumericNode>>();
-            const collect = (node: NodeBase, parent?: NodeBase) => {
+            const collect = (node: NodeBase, ancestors: Array<NodeBase> = []) => {
               if (isNumeric(node)) {
                 controls.push(node.control);
                 const concept = resolveConceptUuid(form.schema, node.question.extras?.questionOptions?.concept);
                 if (concept) {
-                  const context = contextOf(node, parent);
+                  const context = contextOf(node, ancestors);
                   const key = JSON.stringify(context);
                   requested.set(node.control, key);
                   const nodes = groups.get(key) ?? [];
@@ -119,7 +119,7 @@ export class ConceptReferenceRangeFormService {
                   groups.set(key, nodes);
                 }
               }
-              childrenOf(node).forEach((child) => collect(child, node));
+              childrenOf(node).forEach((child) => collect(child, [...ancestors, node]));
             };
             collect(form.rootNode);
 
@@ -174,21 +174,35 @@ function isNumeric(node: NodeBase): node is NodeBase & { control: AfeFormControl
 }
 
 /**
+ * Returns the node whose payload carries the answer: the outermost obs group around it, which the obs
+ * adapter sends with all of its members as soon as any of them changes, or the answer itself.
+ */
+function payloadRoot(node: NodeBase, ancestors: Array<NodeBase>): NodeBase {
+  return (
+    ancestors.find(
+      (ancestor) =>
+        ancestor instanceof GroupNode && ['obsGroup', 'complex-obs'].includes(ancestor.question.extras?.type),
+    ) ?? node
+  );
+}
+
+/**
  * Returns the context for the date the answer will be saved with, which depends on whether the
  * answer is sent with the encounter.
  */
 function contextFor(
   node: NodeBase,
-  parent: NodeBase | undefined,
+  ancestors: Array<NodeBase>,
   encounterDate: NodeBase | undefined,
   encounterUuid: string | undefined,
   currentMeasurementDate: string,
   payloads: ObsAdapterHelper,
 ): ReferenceRangeContext {
   const observation = node.initialValue as { uuid?: string; obsDatetime?: string } | undefined;
+  const parent = ancestors[ancestors.length - 1];
   const complexObs = parent?.question.extras?.type === 'complex-obs' ? parent : undefined;
   const savedEncounterDate = validDate(encounterDate?.initialValue);
-  const sent: { voided?: boolean } | undefined = payloads.getObsNodePayload(complexObs ?? node)[0];
+  const sent: { voided?: boolean } | undefined = payloads.getObsNodePayload(payloadRoot(node, ancestors))[0];
 
   let date: string | undefined;
   if (observation?.uuid && (!sent || sent.voided)) {
