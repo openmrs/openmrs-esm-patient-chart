@@ -208,6 +208,27 @@ describe('Reference ranges at the measurement date', () => {
     expect(control.valid).toBe(false);
   }));
 
+  it('keeps ranges at the date the encounter will be saved with while its date is blank or invalid', fakeAsync(() => {
+    const form = createForm();
+    const control = controlFor(form);
+    const encounterDate = form.searchNodeByQuestionId('encDate')[0].control;
+    subscription = service.connect(form, 'patient-uuid');
+    tick();
+    encounterDate.setValue(new Date(Number.NaN));
+    tick();
+    const context = resource.getConceptReferenceRanges.calls.mostRecent().args[2];
+    expect(Math.abs(moment().diff(context.date, 'seconds'))).toBeLessThan(5);
+    expect(control.conceptReferenceRange).toBe(early.get('temperature-uuid'));
+
+    form.valueProcessingInfo.encounterUuid = 'historical-encounter';
+    encounterDate.setValue('');
+    tick();
+    expect(resource.getConceptReferenceRanges.calls.mostRecent().args[2]).toEqual({
+      encounter: 'historical-encounter',
+    });
+    expect(control.conceptReferenceRange).toBe(early.get('temperature-uuid'));
+  }));
+
   it('uses the saved encounter when the form has no encounter-date question', fakeAsync(() => {
     const form = createForm([numericQuestion()], false);
     form.valueProcessingInfo.encounterUuid = 'historical-encounter';
