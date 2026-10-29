@@ -36,15 +36,15 @@ import {
   AddIcon,
   age,
   ExtensionSlot,
-  formatDate,
+  formatPartialDate,
   getPatientName,
   OpenmrsDatePicker,
-  parseDate,
   useConfig,
   useLayoutType,
   Workspace2,
   type Visit,
 } from '@openmrs/esm-framework';
+import { usePatientIdentifier } from '@openmrs/esm-patient-common-lib';
 import { useMedicationOrders, useRequireOutpatientQuantity } from '../api';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
@@ -62,11 +62,13 @@ export interface DrugOrderFormProps {
    */
   initialOrderBasketItem: DrugOrderBasketItem | null;
   patient: fhir.Patient;
+  patientUuid?: string;
   visitContext: Visit;
   onSave: (finalizedOrder: DrugOrderBasketItem) => Promise<void>;
   saveButtonText: string;
   onCancel: () => void;
   workspaceTitle: string;
+  showPatientBanner?: boolean;
   launchAllergyForm?: () => void;
 }
 
@@ -158,16 +160,20 @@ function InputWrapper({ children }) {
 export function DrugOrderForm({
   initialOrderBasketItem,
   patient,
+  patientUuid,
   onSave,
   saveButtonText,
   onCancel,
   visitContext,
   workspaceTitle,
+  showPatientBanner: showPatientBannerProp,
   launchAllergyForm,
 }: DrugOrderFormProps) {
   const { t } = useTranslation();
   const { daysDurationUnit, durationUnitsDaysMap } = useConfig<ConfigObject>();
   const isTablet = useLayoutType() === 'tablet';
+  const showPatientBanner = showPatientBannerProp ?? isTablet;
+  const bannerPatientUuid = patientUuid ?? patient?.id;
   const { orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
   const { requireOutpatientQuantity } = useRequireOutpatientQuantity();
 
@@ -417,6 +423,7 @@ export function DrugOrderForm({
 
   const [showStickyMedicationHeader, setShowMedicationHeader] = useState(false);
   const patientName = patient ? getPatientName(patient) : '';
+  const patientIdentifier = usePatientIdentifier(patient);
 
   const observer = useRef(null);
   const medicationInfoHeaderRef = useCallback(
@@ -467,13 +474,21 @@ export function DrugOrderForm({
             />
           </div>
         )}
-        <div className={styles.patientHeader}>
-          <span className={styles.bodyShort02}>{patientName}</span>
-          <span className={classNames(styles.text02, styles.bodyShort01)}>
-            {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
-            <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
-          </span>
-        </div>
+        {showPatientBanner && patient && bannerPatientUuid ? (
+          <ExtensionSlot
+            name="patient-header-slot"
+            state={{ patient, patientUuid: bannerPatientUuid, hideActionsOverflow: true }}
+          />
+        ) : (
+          <div className={styles.patientHeader}>
+            <span className={styles.bodyShort02}>{patientName}</span>
+            <span className={classNames(styles.text02, styles.bodyShort01)}>
+              {patientIdentifier && <>{patientIdentifier} &middot; </>}
+              {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
+              <span>{formatPartialDate(patient?.birthDate, { mode: 'wide', time: false })}</span>
+            </span>
+          </div>
+        )}
         <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id, launchAllergyForm }} />
         <Form
           className={styles.orderForm}

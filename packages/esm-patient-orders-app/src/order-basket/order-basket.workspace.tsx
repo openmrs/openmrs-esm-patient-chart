@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useLayoutType } from '@openmrs/esm-framework';
 import { type OrderBasketWindowProps, type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import OrderBasket from './order-basket.component';
 import { createOrderBasketExtensionProps } from './order-basket.utils';
@@ -14,6 +15,7 @@ const OrderBasketWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, OrderB
   closeWorkspace,
   launchChildWorkspace,
 }) => {
+  const isTablet = useLayoutType() === 'tablet';
   const orderBasketExtensionProps = useMemo(
     () =>
       createOrderBasketExtensionProps({
@@ -34,6 +36,7 @@ const OrderBasketWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, OrderB
       mutateVisitContext={mutateVisitContext}
       closeWorkspace={closeWorkspace}
       orderBasketExtensionProps={orderBasketExtensionProps}
+      showPatientBanner={isTablet}
     />
   );
 };

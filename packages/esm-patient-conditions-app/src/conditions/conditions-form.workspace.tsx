@@ -6,7 +6,7 @@ import { useForm, FormProvider, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button, ButtonSet, Form, InlineLoading, InlineNotification } from '@carbon/react';
-import { useLayoutType, Workspace2 } from '@openmrs/esm-framework';
+import { ExtensionSlot, useLayoutType, Workspace2 } from '@openmrs/esm-framework';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import { type Condition, useConditions } from './conditions.resource';
 import ConditionsWidget from './conditions-widget.component';
@@ -46,7 +46,7 @@ export type ConditionsFormSchema = z.infer<ReturnType<typeof createSchema>>;
 
 const ConditionsForm: React.FC<PatientWorkspace2DefinitionProps<ConditionFormProps, {}>> = ({
   closeWorkspace,
-  groupProps: { patientUuid },
+  groupProps: { patient, patientUuid },
   workspaceProps: { condition, formContext },
 }) => {
   const { t } = useTranslation();
@@ -95,6 +95,9 @@ const ConditionsForm: React.FC<PatientWorkspace2DefinitionProps<ConditionFormPro
       title={isEditing ? t('editCondition', 'Edit condition') : t('recordCondition', 'Record condition')}
       hasUnsavedChanges={isDirty}
     >
+      {isTablet && patient && patientUuid && (
+        <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
+      )}
       <FormProvider {...methods}>
         <Form className={styles.form} onSubmit={methods.handleSubmit(onSubmit, onError)}>
           <ConditionsWidget

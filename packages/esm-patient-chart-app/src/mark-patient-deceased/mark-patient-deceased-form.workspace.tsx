@@ -23,7 +23,6 @@ import { WarningFilled } from '@carbon/react/icons';
 import {
   type PatientWorkspace2DefinitionProps,
   EmptyState,
-  invalidateCurrentVisit,
   invalidateVisitAndEncounterData,
 } from '@openmrs/esm-patient-common-lib';
 import {
@@ -118,7 +117,6 @@ const MarkPatientDeceasedForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>
       return markPatientDeceased(deathDate, patientUuid, causeOfDeath, nonCodedCauseOfDeath)
         .then(() => {
           globalMutate((key) => Array.isArray(key) && key[0] === 'patient' && key[1] === patientUuid);
-          invalidateCurrentVisit(globalMutate, patientUuid);
           invalidateVisitAndEncounterData(globalMutate, patientUuid);
 
           showSnackbar({
