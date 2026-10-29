@@ -4932,16 +4932,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ng-select/ng-select@npm:^15.1.3":
-  version: 15.2.0
-  resolution: "@ng-select/ng-select@npm:15.2.0"
+"@ng-select/ng-select@npm:^20.7.0":
+  version: 20.7.0
+  resolution: "@ng-select/ng-select@npm:20.7.0"
   dependencies:
     tslib: "npm:^2.8.1"
   peerDependencies:
     "@angular/common": ^20.0.0
     "@angular/core": ^20.0.0
     "@angular/forms": ^20.0.0
-  checksum: 10/8046789b7b0cc6aca8da9ae6bbaeffaa17b6de51943fe2b67c25d20e762f562ffda6321aeaa45b6a7f45ce89dda82976136695afe9a7a99e49198bd29771b18a
+  checksum: 10/d6ebd2ac024f6a9c29259c9d5084442ba8b5ac2fe1d36e4ed02faa1ae799bbe8203acaaa63d253486489d8a05c4492e3e56a951231c806430b518ae1f53ec7b4
   languageName: node
   linkType: hard
 
@@ -5371,7 +5371,7 @@ __metadata:
     "@angular/router": "npm:^20.3.27"
     "@carbon/icons": "npm:^11.73.0"
     "@carbon/styles": "npm:^1.98.0"
-    "@ng-select/ng-select": "npm:^15.1.3"
+    "@ng-select/ng-select": "npm:^20.7.0"
     "@ngx-translate/core": "npm:^16.0.4"
     "@openmrs/ngx-file-uploader": "npm:next"
     "@openmrs/ngx-formentry": "npm:next"
@@ -6153,8 +6153,8 @@ __metadata:
   linkType: hard
 
 "@openmrs/ngx-formentry@npm:next":
-  version: 20.1.1-pre.7
-  resolution: "@openmrs/ngx-formentry@npm:20.1.1-pre.7"
+  version: 20.1.1-pre.16
+  resolution: "@openmrs/ngx-formentry@npm:20.1.1-pre.16"
   dependencies:
     tslib: "npm:^2.3.0"
   peerDependencies:
@@ -6175,7 +6175,7 @@ __metadata:
     reflect-metadata: ^0.1.13
     shelljs: ^0.7.8
     tree-model: ^1.0.7
-  checksum: 10/58df992f2150a7c446a91246102dc1e0e990eacaf3e9a9cdb9b41d63f6eee9ffe4078689b622fc2753769938abf79f80178866bc4c7fb7e428948e80c184517a
+  checksum: 10/d19d518dc9134f2f5f8bc221c46cba47d91c0bb8139027ded3b7b0879a0280a2446cdb034f6fa6dd08c5bb048a3ecf636809a5ce19a472a40af5d37600ffbd69
   languageName: node
   linkType: hard
 
