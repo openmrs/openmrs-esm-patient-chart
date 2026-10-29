@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { useSWRConfig } from 'swr';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
@@ -28,7 +29,7 @@ import {
 } from '@openmrs/esm-framework';
 import {
   hasPatientBannerData,
-  useOptimisticVisitMutations,
+  invalidateVisitAndEncounterData,
   usePatientForBanner,
 } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
@@ -100,7 +101,7 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const abortController = useAbortController();
-  const { invalidateVisitRelatedData } = useOptimisticVisitMutations(patientUuid);
+  const { mutate: globalMutate } = useSWRConfig();
   const showBmi = useMemo(() => shouldShowBmi(patient, config.biometrics), [patient, config.biometrics]);
 
   const isLoadingInitialValues = useMemo(
@@ -249,8 +250,7 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
             if (mutateEncounter) {
               mutateEncounter();
             }
-            // Only invalidate observations data since we created new vitals/biometrics observations
-            invalidateVisitRelatedData({ observations: true, encounters: true });
+            invalidateVisitAndEncounterData(globalMutate, patientUuid);
             invalidateCachedVitalsAndBiometrics();
             closeWorkspace({ discardUnsavedChanges: true });
             showSnackbar({
@@ -289,7 +289,7 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
       formContext,
       initialFieldValuesMap,
       mutateEncounter,
-      invalidateVisitRelatedData,
+      globalMutate,
       patientUuid,
       session?.sessionLocation?.uuid,
       t,
