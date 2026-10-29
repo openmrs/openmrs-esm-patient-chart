@@ -512,7 +512,13 @@ export function DrugOrderForm({
                 unitValue={watchedUnitValue}
               />
             </div>
-            {drug?.uuid && <ExtensionSlot name="drug-order-form-side-effects-slot" state={{ drugUuid: drug.uuid }} />}
+            {drug?.uuid && (
+              <ExtensionSlot
+                className={styles.sideEffectsSlot}
+                name="drug-order-form-side-effects-slot"
+                state={{ drugUuid: drug.uuid }}
+              />
+            )}
             <section className={styles.formSection}>
               <Grid className={styles.gridRow}>
                 <Column lg={12} md={6} sm={4}>

@@ -116,6 +116,14 @@
   margin-bottom: layout.$spacing-06;
 }
 
+.sideEffectsSlot {
+  margin-bottom: layout.$spacing-06;
+
+  &:empty {
+    margin-bottom: 0;
+  }
+}
+
 .sectionHeader {
   @include type.type-style('heading-01');
   margin-bottom: layout.$spacing-05;
