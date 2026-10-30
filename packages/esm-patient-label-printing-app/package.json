@@ -48,6 +48,6 @@
   "devDependencies": {
     "@carbon/react": "^1.92.1",
     "openmrs": "next",
-    "vitest": "^4.1.2"
+    "vitest": "^4.1.11"
   }
 }
