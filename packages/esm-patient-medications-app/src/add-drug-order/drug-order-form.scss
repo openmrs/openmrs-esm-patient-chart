@@ -119,7 +119,7 @@
 .sideEffectsSlot {
   margin-bottom: layout.$spacing-06;
 
-  &:empty {
+  &:not(:has(div:not(:empty))) {
     margin-bottom: 0;
   }
 }
