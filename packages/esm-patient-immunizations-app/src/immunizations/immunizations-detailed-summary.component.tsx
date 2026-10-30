@@ -33,6 +33,7 @@ import {
   PatientChartPagination,
   usePatientChartStore,
 } from '@openmrs/esm-patient-common-lib';
+import { type ImmunizationConfigObject } from '../config-schema';
 import { immunizationFormSub, latestFirst, linkConfiguredSequences } from './utils';
 import { useImmunizations } from '../hooks/useImmunizations';
 import SequenceTable from './components/immunizations-sequence-table.component';
@@ -48,12 +49,11 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
   launchStartVisitPrompt,
 }) => {
   const { t } = useTranslation();
-  const { immunizationsConfig } = useConfig();
+  const { sequenceDefinitions } = useConfig<ImmunizationConfigObject>();
   const displayText = t('immunizations__lower', 'immunizations');
   const headerTitle = t('immunizations', 'Immunizations');
   const { visitContext } = usePatientChartStore(patientUuid);
   const isTablet = useLayoutType() === 'tablet';
-  const sequenceDefinitions = immunizationsConfig?.sequenceDefinitions;
 
   const { data: existingImmunizations, isLoading, error, isValidating } = useImmunizations(patientUuid);
 

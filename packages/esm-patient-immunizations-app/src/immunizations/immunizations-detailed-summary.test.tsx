@@ -1,7 +1,7 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach, type Mock } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import {
   getDefaultsFromConfigSchema,
   launchWorkspace2,
@@ -36,28 +36,26 @@ const mockUseVisit = vi.mocked(useVisit);
 const mockUseConfig = vi.mocked(useConfig<ImmunizationConfigObject>);
 const mockUsePatientChartStore = vi.mocked(usePatientChartStore);
 
-mockUseConfig.mockReturnValue({
-  immunizationsConfig: getDefaultsFromConfigSchema(configSchema) as ImmunizationConfigObject,
-} as any);
+const mockConfig: ImmunizationConfigObject = {
+  ...(getDefaultsFromConfigSchema(configSchema) as ImmunizationConfigObject),
+  sequenceDefinitions: [
+    {
+      vaccineConceptUuid: 'polio-uuid',
+      sequences: [
+        {
+          sequenceLabel: 'Primary Series',
+          sequenceNumber: 1,
+        },
+        {
+          sequenceLabel: 'Booster-1',
+          sequenceNumber: 11,
+        },
+      ],
+    },
+  ],
+};
 
 mockLaunchWorkspace.mockImplementation(vi.fn());
-
-mockUseConfig.mockReturnValue({
-  immunizationsConfig: {
-    immunizationConceptSet: 'CIEL:984',
-    sequenceDefinitions: [
-      {
-        vaccineConceptUuid: 'polio-uuid',
-        sequences: [
-          {
-            sequenceLabel: 'Primary Series',
-            sequenceNumber: 1,
-          },
-        ],
-      },
-    ],
-  },
-} as any);
 
 const mockImmunizationData = [
   {
@@ -81,22 +79,7 @@ const mockImmunizationData = [
 
 describe('ImmunizationsDetailedSummary', () => {
   beforeEach(() => {
-    mockUseConfig.mockReturnValue({
-      immunizationsConfig: {
-        immunizationConceptSet: 'CIEL:984',
-        sequenceDefinitions: [
-          {
-            vaccineConceptUuid: 'polio-uuid',
-            sequences: [
-              {
-                sequenceLabel: 'Primary Series',
-                sequenceNumber: 1,
-              },
-            ],
-          },
-        ],
-      },
-    } as any);
+    mockUseConfig.mockReturnValue(mockConfig);
     mockUseVisit.mockReturnValue({ currentVisit: null } as VisitReturnType);
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: 'patient-123',
@@ -347,7 +330,7 @@ describe('ImmunizationsDetailedSummary', () => {
     expect(screen.getAllByText(/of 2 pages/i)).toHaveLength(2);
   });
 
-  it('displays sequence labels when available', async () => {
+  it('displays the configured sequence label for the latest dose', async () => {
     const immunizationWithSequence = [
       {
         vaccineUuid: 'polio-uuid',
@@ -356,7 +339,7 @@ describe('ImmunizationsDetailedSummary', () => {
           {
             immunizationObsUuid: '1',
             occurrenceDateTime: '2018-11-20T00:00:00.000Z',
-            doseNumber: 1,
+            doseNumber: 11,
             note: [],
             visitUuid: 'visit-uuid',
             expirationDate: '2025-11-20T00:00:00.000Z',
@@ -380,8 +363,8 @@ describe('ImmunizationsDetailedSummary', () => {
 
     await waitForLoadingToFinish();
 
-    // Should show sequence label in the recent vaccination column
-    expect(screen.getByText(/Primary Series/i)).toBeInTheDocument();
+    const polioRow = screen.getByRole('row', { name: /polio/i });
+    expect(within(polioRow).getByText(/last dose on 20-Nov-2018, Booster-1/i)).toBeInTheDocument();
   });
 
   it('formats dates correctly in standard mode', async () => {
