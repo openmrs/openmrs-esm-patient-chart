@@ -38,7 +38,17 @@ export const getPatientSeries = (weights: Array<Observation>, birthDate: dayjs.D
     .sort((a, b) => a.age - b.age);
 };
 
-export const getChartOptions = (t: TFunction): LineChartOptions => {
+const maxAgeInMonths = 60;
+// Each step divides 12, so every whole year keeps its label
+const ageTickStepsInMonths = [2, 4, 6, 12];
+// With less room than this per label, the age labels run into each other
+const minAgeLabelWidthPx = 24;
+
+export const getAgeTickStep = (chartWidth: number) =>
+  ageTickStepsInMonths.find((step) => chartWidth / (maxAgeInMonths / step + 1) >= minAgeLabelWidthPx) ??
+  ageTickStepsInMonths[ageTickStepsInMonths.length - 1];
+
+export const getChartOptions = (t: TFunction, ageTickStep = ageTickStepsInMonths[0]): LineChartOptions => {
   const patientWeightLabel = t('patientWeight', 'Patient weight');
   const referencePalette = {
     P3: 'var(--growth-chart-p3-p97)',
@@ -56,7 +66,7 @@ export const getChartOptions = (t: TFunction): LineChartOptions => {
         mapsTo: 'age',
         scaleType: ScaleTypes.LINEAR,
         ticks: {
-          values: Array.from({ length: 31 }, (_, i) => i * 2),
+          values: Array.from({ length: maxAgeInMonths / ageTickStep + 1 }, (_, i) => i * ageTickStep),
           formatter: (value) => value,
         },
       },
