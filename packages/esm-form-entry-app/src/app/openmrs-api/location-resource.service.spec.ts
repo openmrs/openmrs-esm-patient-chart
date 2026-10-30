@@ -8,7 +8,6 @@ import { WindowRef } from '../window-ref';
 describe('LocationResourceService:', () => {
   let service: LocationResourceService;
   let httpMock: HttpTestingController;
-  let windowRef: WindowRef;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -19,7 +18,6 @@ describe('LocationResourceService:', () => {
 
     service = TestBed.inject(LocationResourceService);
     httpMock = TestBed.inject(HttpTestingController);
-    windowRef = TestBed.inject(WindowRef);
   }));
 
   afterEach(() => {
