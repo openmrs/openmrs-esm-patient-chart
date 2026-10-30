@@ -33,6 +33,7 @@ import {
   EmptyState,
   ErrorState,
   getDrugOrderByUuid,
+  getPatientChartWindowProps,
   invalidateVisitByUuid,
   PatientChartPagination,
   type FulfillerStatus,
@@ -633,7 +634,6 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
   const alreadyInBasket = orders.some((x) => x.uuid === orderItem.uuid);
   const { mutate: globalMutate } = useSWRConfig();
 
-  const windowProps = useMemo(() => ({ encounterUuid: orderItem.encounter.uuid }), [orderItem.encounter.uuid]);
   const groupProps = useMemo(
     () => ({
       patient,
@@ -642,6 +642,11 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
       mutateVisitContext: () => invalidateVisitByUuid(globalMutate, orderItem.encounter.visit?.uuid),
     }),
     [patient, orderItem.encounter.visit, globalMutate],
+  );
+  // The workspaces read the patient / visit from their window props, not from the group props
+  const windowProps = useMemo(
+    () => ({ patient, patientUuid: patient.id, visitContext: orderItem.encounter.visit }),
+    [patient, orderItem.encounter.visit],
   );
 
   const handleCancelOrder = useCallback(() => {
@@ -707,8 +712,12 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
   }, [orderItem, windowProps, groupProps]);
 
   const handleAddOrEditTestResults = useCallback(() => {
-    launchWorkspace2('test-results-form-workspace', { order: orderItem, patient });
-  }, [orderItem, patient]);
+    launchWorkspace2(
+      'test-results-form-workspace',
+      { order: orderItem, labOrderWorkspaceName: 'add-lab-order' },
+      getPatientChartWindowProps(patient.id),
+    );
+  }, [orderItem, patient.id]);
 
   // No actions available for declined orders
   if (isDeclined) {

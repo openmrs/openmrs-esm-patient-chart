@@ -94,6 +94,7 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
   } = useVisit(isVisitContextValid ? null : patientUuid);
 
   const launchedWorkspaceGroupKey = useRef<WorkspaceGroupLaunchKey | null>(null);
+  const launchedWorkspaceGroupProps = useRef<PatientWorkspaceGroupProps | null>(null);
   const latestWorkspaceGroupProps = useRef<PatientWorkspaceGroupProps | null>(null);
   const isWorkspaceGroupLaunchPending = useRef(false);
   const isMounted = useRef(false);
@@ -140,6 +141,7 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
         }
 
         launchedWorkspaceGroupKey.current = launchKey;
+        launchedWorkspaceGroupProps.current = groupProps;
 
         const latestLaunchKey = getWorkspaceGroupLaunchKey(latestWorkspaceGroupProps.current);
         if (workspaceGroupLaunchKeysEqual(latestLaunchKey, launchedWorkspaceGroupKey.current)) {
@@ -161,6 +163,7 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
             patient,
             visitContext: activeVisit,
             mutateVisitContext: mutateActiveVisit,
+            showPatientBanner: 'tabletOnly',
           };
         } else if (newVisitContext) {
           groupProps = {
@@ -168,6 +171,7 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
             patient,
             visitContext: newVisitContext,
             mutateVisitContext: newMutateVisitContext,
+            showPatientBanner: 'tabletOnly',
           };
         } else {
           groupProps = {
@@ -175,6 +179,7 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
             patient,
             visitContext: null,
             mutateVisitContext: null,
+            showPatientBanner: 'tabletOnly',
           };
         }
 
@@ -183,7 +188,10 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
         latestWorkspaceGroupProps.current = groupProps;
         await launchLatestWorkspaceGroup();
         if (isMounted.current) {
-          setPatientChartWorkspaceGroupVisitUuid(launchedWorkspaceGroupKey.current?.visitContextUuid ?? null);
+          setPatientChartWorkspaceGroupVisitUuid(
+            launchedWorkspaceGroupKey.current?.visitContextUuid ?? null,
+            launchedWorkspaceGroupProps.current,
+          );
         }
       }
     };

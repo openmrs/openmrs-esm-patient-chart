@@ -294,17 +294,14 @@ function renderAddDrugOrderWorkspace() {
         order: null,
         orderToEditOrdererUuid: null,
       }}
-      groupProps={{
-        patientUuid: mockPatient.id,
-        patient: mockPatient,
-        visitContext: null,
-        mutateVisitContext: null,
-      }}
+      groupProps={{}}
       workspaceName={''}
       launchChildWorkspace={vi.fn()}
       closeWorkspace={mockCloseWorkspace}
       windowProps={{
-        encounterUuid: '',
+        patientUuid: mockPatient.id,
+        patient: mockPatient,
+        visitContext: null,
       }}
       windowName={''}
       isRootWorkspace={false}

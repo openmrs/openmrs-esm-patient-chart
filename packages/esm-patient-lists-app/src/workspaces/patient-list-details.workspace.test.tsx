@@ -9,6 +9,7 @@ const mockOpenmrsFetch = openmrsFetch as Mock;
 
 const defaultProps: PatientWorkspace2DefinitionProps<PatientListDetailsWorkspaceProps, object> = {
   groupProps: {
+    showPatientBanner: 'tabletOnly',
     patientUuid: '',
     patient: undefined,
     visitContext: null,

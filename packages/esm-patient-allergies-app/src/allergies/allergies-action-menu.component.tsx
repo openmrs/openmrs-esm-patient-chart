@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { launchWorkspace2, showModal, useLayoutType } from '@openmrs/esm-framework';
+import { getPatientChartWindowProps } from '@openmrs/esm-patient-common-lib';
 import { type Allergy } from '../types';
 import { patientAllergiesFormWorkspace } from '../constants';
 import styles from './allergies-action-menu.scss';
@@ -16,11 +17,15 @@ export const AllergiesActionMenu = ({ allergy, patientUuid }: allergiesActionMen
   const isTablet = useLayoutType() === 'tablet';
 
   const launchEditAllergiesForm = useCallback(() => {
-    launchWorkspace2(patientAllergiesFormWorkspace, {
-      allergy,
-      formContext: 'editing',
-    });
-  }, [allergy]);
+    launchWorkspace2(
+      patientAllergiesFormWorkspace,
+      {
+        allergy,
+        formContext: 'editing',
+      },
+      getPatientChartWindowProps(patientUuid),
+    );
+  }, [allergy, patientUuid]);
 
   const launchDeleteAllergyDialog = (allergyId: string) => {
     const dispose = showModal('delete-allergy-modal', {

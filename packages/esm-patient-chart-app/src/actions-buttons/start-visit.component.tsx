@@ -1,9 +1,7 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { OverflowMenuItem } from '@carbon/react';
-import { launchWorkspace2 } from '@openmrs/esm-framework';
-import { type PatientWorkspaceGroupProps } from '@openmrs/esm-patient-common-lib';
-import { type VisitFormProps } from '../visit/visit-form/visit-form.workspace';
+import { launchStartVisitWorkspace } from '../visit/visit-form/launch-start-visit-workspace';
 import styles from './action-button.scss';
 
 interface StartVisitOverflowMenuItemProps {
@@ -15,16 +13,9 @@ const StartVisitOverflowMenuItem: React.FC<StartVisitOverflowMenuItemProps> = ({
   const { t } = useTranslation();
   const isDeceased = Boolean(patient?.deceasedDateTime);
 
-  const handleLaunchModal = useCallback(
-    () =>
-      launchWorkspace2<VisitFormProps, {}, PatientWorkspaceGroupProps>(
-        'start-visit-workspace-form',
-        { openedFrom: 'patient-chart-start-visit' },
-        {},
-        { patient, patientUuid: patient.id, visitContext: null, mutateVisitContext: null },
-      ),
-    [patient],
-  );
+  const handleLaunchModal = useCallback(() => {
+    launchStartVisitWorkspace({ openedFrom: 'patient-chart-start-visit' }, patient.id, patient);
+  }, [patient]);
 
   return (
     !isDeceased && (

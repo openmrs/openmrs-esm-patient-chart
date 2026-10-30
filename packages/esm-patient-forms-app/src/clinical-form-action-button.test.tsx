@@ -29,7 +29,13 @@ describe('<ClinicalFormActionButton>', () => {
 
     render(
       <ClinicalFormActionButton
-        groupProps={{ patientUuid: mockPatient.id, patient: mockPatient, visitContext: null, mutateVisitContext: null }}
+        groupProps={{
+          showPatientBanner: 'tabletOnly',
+          patientUuid: mockPatient.id,
+          patient: mockPatient,
+          visitContext: null,
+          mutateVisitContext: null,
+        }}
       />,
     );
     expect(screen.getByRole('button', { name: /Clinical forms/i })).toBeInTheDocument();
@@ -40,7 +46,13 @@ describe('<ClinicalFormActionButton>', () => {
 
     render(
       <ClinicalFormActionButton
-        groupProps={{ patientUuid: mockPatient.id, patient: mockPatient, visitContext: null, mutateVisitContext: null }}
+        groupProps={{
+          showPatientBanner: 'tabletOnly',
+          patientUuid: mockPatient.id,
+          patient: mockPatient,
+          visitContext: null,
+          mutateVisitContext: null,
+        }}
       />,
     );
     const clinicalActionButton = screen.getByRole('button', { name: /Form/i });

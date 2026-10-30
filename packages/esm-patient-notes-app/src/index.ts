@@ -21,8 +21,10 @@ export const visitNotesActionButton = getSyncLifecycle(visitNotesActionButtonExt
 
 export const visitNotesFormWorkspace = getAsyncLifecycle(() => import('./notes/visit-notes-form.workspace'), options);
 
+// Referenced by other apps' routes.json. The same component as `visitNotesFormWorkspace`: it takes the
+// patient / visit as window props (still accepting them as deprecated workspace props).
 export const exportedVisitNotesFormWorkspace = getAsyncLifecycle(
-  () => import('./notes/exported-visit-notes-form.workspace'),
+  () => import('./notes/visit-notes-form.workspace'),
   options,
 );
 export const stickyNotesButton = getAsyncLifecycle(
