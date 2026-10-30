@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { type FetchResponse, openmrsFetch, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { mockFhirConditionsResponse, searchedCondition } from '__mocks__';
 import { getByTextWithMarkup, mockPatient } from 'tools';
-import { createCondition, useConditions, useConditionsSearch } from './conditions.resource';
+import { createCondition, updateCondition, useConditions, useConditionsSearch } from './conditions.resource';
 import ConditionsForm, { type ConditionFormProps } from './conditions-form.workspace';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 
@@ -47,6 +47,7 @@ function renderConditionsForm(workspaceProps?: ConditionFormProps) {
 }
 
 const mockCreateCondition = vi.mocked(createCondition);
+const mockUpdateCondition = vi.mocked(updateCondition);
 const mockUseConditionsSearch = vi.mocked(useConditionsSearch);
 const mockUseConditions = vi.mocked(useConditions);
 const mockShowSnackbar = vi.mocked(showSnackbar);
@@ -55,7 +56,7 @@ const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 vi.mock('./conditions.resource', async () => ({
   ...((await vi.importActual('./conditions.resource')) as object),
   createCondition: vi.fn(),
-  editCondition: vi.fn(),
+  updateCondition: vi.fn(),
   useConditions: vi.fn(),
   useConditionsSearch: vi.fn(),
 }));
@@ -75,6 +76,26 @@ mockUseConditionsSearch.mockReturnValue({
 });
 
 mockCreateCondition.mockResolvedValue({ status: 201, body: 'Condition created' } as unknown as FetchResponse);
+
+// Shape of the error openmrsFetch throws when the FHIR module rejects a save for lack of privileges
+const fhirPermissionError = {
+  message:
+    'Server responded with 500 () for url http://localhost/openmrs/ws/fhir2/R4/Condition?_summary=data. Check err.responseBody or network tab in dev tools for more info',
+  response: { status: 500, statusText: 'Internal Server Error' },
+  responseBody: {
+    resourceType: 'OperationOutcome',
+    issue: [
+      {
+        severity: 'error',
+        code: 'processing',
+        diagnostics:
+          'HAPI-0389: Failed to call access method: org.openmrs.api.APIAuthenticationException: Privileges required: Edit Conditions',
+      },
+    ],
+  },
+};
+
+const developerOnlyText = /dev tools|https?:\/\/|ws\/fhir2|responseBody|HAPI-|APIAuthenticationException/i;
 
 describe('Conditions form', () => {
   it('renders the conditions form with all the relevant fields and values', () => {
@@ -186,7 +207,7 @@ describe('Conditions form', () => {
     });
   });
 
-  it('renders an error notification if there was a problem recording a condition', async () => {
+  it('renders a human-readable error notification if there was a problem recording a condition', async () => {
     const user = userEvent.setup();
 
     mockUseConditionsSearch.mockReturnValue({
@@ -194,31 +215,111 @@ describe('Conditions form', () => {
       error: null,
       isSearching: false,
     });
+    mockCreateCondition.mockRejectedValueOnce(fhirPermissionError);
 
     renderConditionsForm();
 
-    const submitButton = screen.getByRole('button', { name: /save & close/i });
-    const activeStatusInput = screen.getByRole('radio', { name: 'Active' });
-    const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
-    const onsetDateInput = screen.getByRole('textbox', { name: /onset date/i });
+    await user.type(screen.getByRole('searchbox', { name: /enter condition/i }), 'Headache');
+    await user.click(screen.getByRole('button', { name: /headache/i }));
+    await user.click(screen.getByRole('button', { name: /save & close/i }));
 
-    const error = {
-      message: 'Internal Server Error',
-      response: {
-        status: 500,
-        statusText: 'Internal Server Error',
-      },
+    expect(await screen.findByText('Error creating condition')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'The condition could not be saved. You may not have permission to do this. Contact your system administrator if the problem continues.',
+      ),
+    ).toBeInTheDocument();
+    expect(document.body).not.toHaveTextContent(developerOnlyText);
+  });
+
+  it("renders the server's error message when one is provided", async () => {
+    const user = userEvent.setup();
+
+    mockUseConditionsSearch.mockReturnValue({
+      searchResults: searchedCondition,
+      error: null,
+      isSearching: false,
+    });
+    mockCreateCondition.mockRejectedValueOnce({
+      ...fhirPermissionError,
+      responseBody: { error: { message: 'Privileges required: Add Conditions' } },
+    });
+
+    renderConditionsForm();
+
+    await user.type(screen.getByRole('searchbox', { name: /enter condition/i }), 'Headache');
+    await user.click(screen.getByRole('button', { name: /headache/i }));
+    await user.click(screen.getByRole('button', { name: /save & close/i }));
+
+    expect(await screen.findByText('Privileges required: Add Conditions')).toBeInTheDocument();
+    expect(document.body).not.toHaveTextContent(developerOnlyText);
+  });
+
+  it.each([
+    ['an empty string', ''],
+    ['a whitespace-only string', '   '],
+    ['a non-string value', { detail: 'Not a message string' }],
+  ])('renders the fallback error message when the server message is %s', async (_, message) => {
+    const user = userEvent.setup();
+
+    mockUseConditionsSearch.mockReturnValue({
+      searchResults: searchedCondition,
+      error: null,
+      isSearching: false,
+    });
+    mockCreateCondition.mockRejectedValueOnce({
+      ...fhirPermissionError,
+      responseBody: { error: { message } },
+    });
+
+    renderConditionsForm();
+
+    await user.type(screen.getByRole('searchbox', { name: /enter condition/i }), 'Headache');
+    await user.click(screen.getByRole('button', { name: /headache/i }));
+    await user.click(screen.getByRole('button', { name: /save & close/i }));
+
+    expect(await screen.findByText('Error creating condition')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'The condition could not be saved. You may not have permission to do this. Contact your system administrator if the problem continues.',
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it('renders a human-readable error notification if there was a problem updating a condition', async () => {
+    const user = userEvent.setup();
+
+    const conditionToEdit = {
+      clinicalStatus: 'Active',
+      conceptId: '117399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Hypertension',
+      abatementDateTime: undefined,
+      onsetDateTime: '2020-08-19T00:00:00+00:00',
+      recordedDate: '2020-08-19T18:34:48+00:00',
+      id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
     };
 
-    mockCreateCondition.mockRejectedValue(error);
-    await user.type(conditionSearchInput, 'Headache');
-    await user.click(screen.getByRole('button', { name: /Headache/i }));
-    await user.click(onsetDateInput);
-    await user.paste('2020-05-05');
-    await user.click(activeStatusInput);
-    expect(activeStatusInput).toBeChecked();
-    expect(submitButton).toBeEnabled();
-    await user.click(submitButton);
+    mockUseConditions.mockReturnValue({
+      conditions: [conditionToEdit],
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn().mockResolvedValue(undefined),
+    });
+    mockUpdateCondition.mockRejectedValueOnce(fhirPermissionError);
+
+    renderConditionsForm({ condition: conditionToEdit, formContext: 'editing' });
+
+    await user.click(screen.getByLabelText(/inactive/i));
+    await user.click(screen.getByRole('button', { name: /save & close/i }));
+
+    expect(await screen.findByText('Error updating condition')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'The condition could not be updated. You may not have permission to do this. Contact your system administrator if the problem continues.',
+      ),
+    ).toBeInTheDocument();
+    expect(document.body).not.toHaveTextContent(developerOnlyText);
   });
 
   it('validates the form against the provided zod schema before submitting it', async () => {
