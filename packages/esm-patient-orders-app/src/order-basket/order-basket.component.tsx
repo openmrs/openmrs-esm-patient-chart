@@ -24,6 +24,7 @@ import {
   type OrderBasketItem,
   postOrders,
   postOrdersOnNewEncounter,
+  setOrderBasketItemErrors,
   showOrderSuccessToast,
   useMutatePatientOrders,
   useOrderBasket,
@@ -42,6 +43,18 @@ interface OrderBasketProps {
   orderBasketExtensionProps: OrderBasketExtensionProps;
   showPatientBanner?: boolean;
   onOrderBasketSubmitted?: (encounterUuid: string, postedOrders: Array<Order>) => void;
+}
+
+/**
+ * `postOrders` returns each failed order as a copy of its basket item with the error added, so the basket item
+ * it came from is the one whose own fields all match. Matching on `display` alone would mix up different orders
+ * that share a name.
+ */
+function isErroredCopyOf(erroredItem: OrderBasketItem, item: OrderBasketItem) {
+  return Object.entries(item).every(
+    ([key, value]) =>
+      key === 'orderError' || key === 'extractedOrderError' || erroredItem[key as keyof OrderBasketItem] === value,
+  );
 }
 
 const OrderBasket: React.FC<OrderBasketProps> = ({
@@ -105,6 +118,9 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
   const handleSave = useCallback(async () => {
     const abortController = new AbortController();
     setCreatingEncounterError('');
+    setOrdersWithErrors([]);
+    // Clear errors left over from a previous attempt so retried orders don't stay marked as failed
+    setOrderBasketItemErrors(patientUuid, () => undefined);
 
     setIsSavingOrders(true);
     // orderEncounterUuid should only be preset if the system does not support visits, and the user has an order encounter today.
@@ -144,6 +160,8 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
         showOrderSuccessToast('@openmrs/esm-patient-orders-app', orders);
       } catch (e) {
         console.error(e);
+        // The orders are saved together with the new encounter, so if that request fails none of them were saved
+        setOrderBasketItemErrors(patientUuid, () => e);
         setCreatingEncounterError(
           e.responseBody?.error?.message ||
             t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again'),
@@ -151,13 +169,18 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
       }
     } else {
       try {
-        const { postedOrders, erroredItems } = await postOrders(
+        const { postedOrders, postedItems, erroredItems } = await postOrders(
           patientUuid,
           orderEncounterUuid,
           abortController,
           orderer.uuid,
         );
-        clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
+        const findErroredItem = (item: OrderBasketItem) =>
+          erroredItems.find((erroredItem) => isErroredCopyOf(erroredItem, item));
+        // Only remove the basket items that were saved. Editing or adding an order while signing replaces it with a
+        // new object, so those orders stay in the basket with the failed ones.
+        const wasNotSaved = (item: OrderBasketItem) => !postedItems.includes(item);
+        clearOrders({ exceptThoseMatching: wasNotSaved });
         await mutateOrders();
         invalidateVisitAndEncounterData(mutate, patientUuid);
 
@@ -167,7 +190,8 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
         } else {
           setOrdersWithErrors(erroredItems);
         }
-        clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
+        clearOrders({ exceptThoseMatching: wasNotSaved });
+        setOrderBasketItemErrors(patientUuid, (item) => findErroredItem(item)?.orderError);
         // Only revalidate current visit since orders create new encounters
         mutateVisitContext?.();
         await mutateOrders();
@@ -303,7 +327,11 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
           {(creatingEncounterError || errorFetchingEncounterUuid) && (
             <InlineNotification
               kind="error"
-              title={t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again')}
+              title={
+                creatingEncounterError
+                  ? t('couldNotSignOrders', "Couldn't sign orders")
+                  : t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again')
+              }
               subtitle={creatingEncounterError}
               lowContrast={true}
               className={styles.inlineNotification}

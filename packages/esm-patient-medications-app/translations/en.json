@@ -76,6 +76,7 @@
   "on": "On",
   "onDate": "on",
   "orderActionDiscontinue": "Discontinue",
+  "orderActionFailed": "Failed",
   "orderActionIncomplete": "Incomplete",
   "orderActionNew": "New",
   "orderActionRenew": "Renew",

@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { useOrderBasket } from './useOrderBasket';
+import { setOrderBasketItemErrors, useOrderBasket } from './useOrderBasket';
 import { type OrderBasketItem, type PostDataPrepFunction } from './types';
 import { _resetOrderBasketStore } from './store';
 import { mockFhirPatient } from '__mocks__';
@@ -50,5 +50,30 @@ describe('useOrderBasket', () => {
     });
     expect(drugResult.current.orders).toEqual([mockDrugOrderBasketItem]);
     expect(labResult.current.orders).toEqual([mockLabOrderBasketItem]);
+  });
+
+  it('marks the matching items as failed and clears old errors from the rest', () => {
+    const { result: drugResult } = renderHook(() =>
+      useOrderBasket(mockFhirPatient, 'medications', ((x) => x) as unknown as PostDataPrepFunction),
+    );
+    const { result: labResult } = renderHook(() =>
+      useOrderBasket(mockFhirPatient, 'labs', ((x) => x) as unknown as PostDataPrepFunction),
+    );
+    const forbiddenError = new Error('Forbidden');
+    act(() => {
+      drugResult.current.setOrders([mockDrugOrderBasketItem]);
+      labResult.current.setOrders([
+        { ...mockLabOrderBasketItem, orderError: new Error('Error from a previous attempt') },
+      ]);
+    });
+
+    act(() => {
+      setOrderBasketItemErrors(mockFhirPatient.id, (order) =>
+        order.uuid === mockDrugOrderBasketItem.uuid ? forbiddenError : undefined,
+      );
+    });
+
+    expect(drugResult.current.orders).toEqual([{ ...mockDrugOrderBasketItem, orderError: forbiddenError }]);
+    expect(labResult.current.orders[0].orderError).toBeUndefined();
   });
 });
