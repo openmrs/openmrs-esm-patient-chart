@@ -263,7 +263,7 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
               subtitle: t('vitalsAndBiometricsNowAvailable', 'They are now visible on the Vitals and Biometrics page'),
             });
           })
-          .catch(() => {
+          .catch((error) => {
             showSnackbar({
               title:
                 formContext === 'creating'
@@ -271,7 +271,11 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
                   : t('vitalsAndBiometricsUpdateError', 'Error updating Vitals and Biometrics'),
               kind: 'error',
               isLowContrast: false,
-              subtitle: t('checkForValidity', 'Some of the values entered are invalid'),
+              subtitle:
+                error?.response?.status === 403
+                  ? error?.responseBody?.error?.message ??
+                    t('vitalsAndBiometricsSaveFailure', "Couldn't save vitals. Please try again.")
+                  : t('vitalsAndBiometricsSaveFailure', "Couldn't save vitals. Please try again."),
             });
           });
       } else {
