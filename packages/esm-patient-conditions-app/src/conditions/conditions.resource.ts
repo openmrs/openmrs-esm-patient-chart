@@ -43,6 +43,10 @@ export interface FHIRCondition {
     status: string;
   };
   abatementDateTime?: string;
+  meta?: {
+    versionId?: string;
+    lastUpdated?: string;
+  };
 }
 
 interface CodingData {
@@ -65,6 +69,7 @@ export type Condition = {
   recordedDate: string;
   id: string;
   abatementDateTime?: string;
+  versionId?: string;
 };
 
 export interface ConditionDataTableRow {
@@ -178,6 +183,7 @@ function mapConditionProperties(condition: FHIRCondition): Condition {
     onsetDateTime: condition?.onsetDateTime,
     recordedDate: condition?.recordedDate,
     id: condition?.id,
+    versionId: condition?.meta?.versionId,
   };
 }
 
@@ -226,7 +232,7 @@ export async function createCondition(payload: FormFields) {
   return res;
 }
 
-export async function updateCondition(conditionId, payload: FormFields) {
+export async function updateCondition(conditionId: string, payload: FormFields, versionId?: string) {
   const controller = new AbortController();
   const url = `${fhirBaseUrl}/Condition/${conditionId}`;
 
@@ -260,16 +266,29 @@ export async function updateCondition(conditionId, payload: FormFields) {
     },
   };
 
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+
+  if (versionId) {
+    headers['If-Match'] = versionId.startsWith('W/"') ? versionId : `W/"${versionId}"`;
+  }
+
   const res = await openmrsFetch(url, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers,
     method: 'PUT',
     body: completePayload,
     signal: controller.signal,
   });
 
   return res;
+}
+
+export async function getCondition(conditionId: string, abortController?: AbortController) {
+  const url = `${fhirBaseUrl}/Condition/${conditionId}`;
+  return openmrsFetch(url, {
+    signal: abortController?.signal,
+  });
 }
 
 export async function deleteCondition(conditionId: string) {

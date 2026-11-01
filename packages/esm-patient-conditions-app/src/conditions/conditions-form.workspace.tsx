@@ -57,6 +57,12 @@ const ConditionsForm: React.FC<PatientWorkspace2DefinitionProps<ConditionFormPro
   const [errorUpdating, setErrorUpdating] = useState(null);
   const isEditing = formContext === 'editing';
 
+  const isConflict =
+    errorUpdating?.status === 412 ||
+    errorUpdating?.status === 409 ||
+    errorUpdating?.response?.status === 412 ||
+    errorUpdating?.response?.status === 409;
+
   const matchingCondition = conditions?.find((c) => c?.id === condition?.id);
 
   const schema = createSchema(formContext, t);
@@ -130,8 +136,19 @@ const ConditionsForm: React.FC<PatientWorkspace2DefinitionProps<ConditionFormPro
                   role="alert"
                   kind="error"
                   lowContrast
-                  title={t('errorUpdatingCondition', 'Error updating condition')}
-                  subtitle={errorUpdating?.message}
+                  title={
+                    isConflict
+                      ? t('conditionConflict', 'Condition update conflict')
+                      : t('errorUpdatingCondition', 'Error updating condition')
+                  }
+                  subtitle={
+                    isConflict
+                      ? t(
+                          'conditionConflictMessage',
+                          'This condition was changed by someone else. Reload to see the latest version',
+                        )
+                      : errorUpdating?.message
+                  }
                 />
               </div>
             ) : null}

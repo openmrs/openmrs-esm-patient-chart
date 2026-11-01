@@ -306,6 +306,137 @@ describe('Conditions form', () => {
     await user.click(inactiveStatusInput);
     await user.click(submitButton);
   });
+
+  it('sends If-Match header with versionId when updating condition', async () => {
+    const user = userEvent.setup();
+
+    const conditionToEdit = {
+      clinicalStatus: 'Active',
+      conceptId: '117399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Hypertension',
+      abatementDateTime: undefined,
+      onsetDateTime: '2020-08-19T00:00:00+00:00',
+      recordedDate: '2020-08-19T18:34:48+00:00',
+      id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
+      versionId: '1',
+    };
+
+    mockOpenmrsFetch.mockResolvedValue({ data: mockFhirConditionsResponse } as FetchResponse);
+
+    renderConditionsForm({ condition: conditionToEdit, formContext: 'editing' });
+
+    const inactiveStatusInput = screen.getByLabelText(/inactive/i);
+    const submitButton = screen.getByRole('button', { name: /save & close/i });
+
+    await user.click(inactiveStatusInput);
+    await user.click(submitButton);
+
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/Condition/f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389'),
+      expect.objectContaining({
+        method: 'PUT',
+        headers: expect.objectContaining({
+          'If-Match': 'W/"1"',
+        }),
+      }),
+    );
+  });
+
+  it('displays a conflict notification when update fails with 412 Precondition Failed', async () => {
+    const user = userEvent.setup();
+    vi.mocked(defaultProps.closeWorkspace).mockClear();
+
+    const conditionToEdit = {
+      clinicalStatus: 'Active',
+      conceptId: '117399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Hypertension',
+      abatementDateTime: undefined,
+      onsetDateTime: '2020-08-19T00:00:00+00:00',
+      recordedDate: '2020-08-19T18:34:48+00:00',
+      id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
+      versionId: '1',
+    };
+
+    mockOpenmrsFetch.mockImplementation(async (url, init) => {
+      if (init?.method === 'PUT') {
+        throw {
+          status: 412,
+          response: { status: 412 },
+          message: 'Precondition Failed',
+        };
+      }
+      return { data: mockFhirConditionsResponse } as FetchResponse;
+    });
+
+    renderConditionsForm({ condition: conditionToEdit, formContext: 'editing' });
+
+    const inactiveStatusInput = screen.getByLabelText(/inactive/i);
+    const submitButton = screen.getByRole('button', { name: /save & close/i });
+
+    await user.click(inactiveStatusInput);
+    await user.click(submitButton);
+
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'error',
+        title: 'Condition update conflict',
+        subtitle: 'This condition was changed by someone else. Reload to see the latest version',
+      }),
+    );
+
+    expect(
+      await screen.findByText('This condition was changed by someone else. Reload to see the latest version'),
+    ).toBeInTheDocument();
+    expect(defaultProps.closeWorkspace).not.toHaveBeenCalled();
+  });
+
+  it('displays a conflict notification when update fails with 409 Conflict', async () => {
+    const user = userEvent.setup();
+    vi.mocked(defaultProps.closeWorkspace).mockClear();
+
+    const conditionToEdit = {
+      clinicalStatus: 'Active',
+      conceptId: '117399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Hypertension',
+      abatementDateTime: undefined,
+      onsetDateTime: '2020-08-19T00:00:00+00:00',
+      recordedDate: '2020-08-19T18:34:48+00:00',
+      id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
+      versionId: '1',
+    };
+
+    mockOpenmrsFetch.mockImplementation(async (url, init) => {
+      if (init?.method === 'PUT') {
+        throw {
+          status: 409,
+          response: { status: 409 },
+          message: 'Conflict',
+        };
+      }
+      return { data: mockFhirConditionsResponse } as FetchResponse;
+    });
+
+    renderConditionsForm({ condition: conditionToEdit, formContext: 'editing' });
+
+    const inactiveStatusInput = screen.getByLabelText(/inactive/i);
+    const submitButton = screen.getByRole('button', { name: /save & close/i });
+
+    await user.click(inactiveStatusInput);
+    await user.click(submitButton);
+
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'error',
+        title: 'Condition update conflict',
+        subtitle: 'This condition was changed by someone else. Reload to see the latest version',
+      }),
+    );
+
+    expect(
+      await screen.findByText('This condition was changed by someone else. Reload to see the latest version'),
+    ).toBeInTheDocument();
+    expect(defaultProps.closeWorkspace).not.toHaveBeenCalled();
+  });
 });
 
 describe('Duplicate condition detection', () => {

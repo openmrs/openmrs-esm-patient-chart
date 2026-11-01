@@ -24,6 +24,7 @@ import {
   type Condition,
   type FormFields,
   createCondition,
+  getCondition,
   updateCondition,
   useConditions,
   useConditionsSearch,
@@ -93,7 +94,31 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   const displayName = conditionToEdit?.display;
   const editableClinicalStatus = conditionToEdit?.clinicalStatus;
   const editableAbatementDateTime = conditionToEdit?.abatementDateTime;
+  const [versionId, setVersionId] = useState<string | undefined>(conditionToEdit?.versionId);
   const [selectedCondition, setSelectedCondition] = useState<CodedCondition>(null);
+
+  useEffect(() => {
+    if (isEditing && conditionToEdit?.id) {
+      const abortController = new AbortController();
+      getCondition(conditionToEdit.id, abortController)
+        .then((res) => {
+          const v =
+            res?.data?.meta?.versionId ??
+            res?.headers?.get?.('ETag')?.replace(/^W\/"|"$/g, '') ??
+            res?.headers?.get?.('etag')?.replace(/^W\/"|"$/g, '');
+          if (v) {
+            setVersionId(v);
+          }
+        })
+        .catch((error) => {
+          if (error?.name !== 'AbortError') {
+            console.error('Failed to fetch condition version:', error);
+          }
+        });
+
+      return () => abortController.abort();
+    }
+  }, [isEditing, conditionToEdit?.id]);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
   const { searchResults, isSearching } = useConditionsSearch(debouncedSearchTerm);
@@ -179,8 +204,10 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
       userId: session?.user?.uuid,
     };
 
+    const activeVersionId = versionId ?? conditionToEdit?.versionId ?? matchingCondition?.versionId;
+
     try {
-      await updateCondition(conditionToEdit?.id, payload);
+      await updateCondition(conditionToEdit?.id, payload, activeVersionId);
       await mutate();
 
       showSnackbar({
@@ -192,22 +219,42 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
       closeWorkspaceWithSavedChanges();
     } catch (error) {
       setIsSubmittingForm(false);
+      const isConflict =
+        error?.status === 412 ||
+        error?.status === 409 ||
+        error?.response?.status === 412 ||
+        error?.response?.status === 409;
+
+      if (isConflict) {
+        showSnackbar({
+          isLowContrast: false,
+          kind: 'error',
+          title: t('conditionConflict', 'Condition update conflict'),
+          subtitle: t(
+            'conditionConflictMessage',
+            'This condition was changed by someone else. Reload to see the latest version',
+          ),
+        });
+      }
       setErrorUpdating(error);
     }
   }, [
     closeWorkspaceWithSavedChanges,
     conditionToEdit?.id,
+    conditionToEdit?.versionId,
     displayName,
     editableClinicalStatus,
     isEditing,
     getValues,
     matchingCondition?.conceptId,
+    matchingCondition?.versionId,
     mutate,
     patientUuid,
     session?.user?.uuid,
     setErrorUpdating,
     setIsSubmittingForm,
     t,
+    versionId,
     editableAbatementDateTime,
   ]);
 

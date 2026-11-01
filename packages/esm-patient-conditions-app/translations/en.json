@@ -8,6 +8,8 @@
   "clinicalStatus": "Clinical status",
   "clinicalStatusRequired": "A clinical status is required",
   "condition": "Condition",
+  "conditionConflict": "Condition update conflict",
+  "conditionConflictMessage": "This condition was changed by someone else. Reload to see the latest version",
   "conditionDeleted": "Condition deleted",
   "conditionNowVisible": "It is now visible on the Conditions page",
   "conditionRequired": "A condition is required",
