@@ -5,6 +5,7 @@ import {
   type Form,
   getPatientAndVisitProps,
   type SharedWorkspaceGroupProps,
+  usePatientForBanner,
   useShowPatientBanner,
 } from '@openmrs/esm-patient-common-lib';
 import FormEntry from './form-entry.component';
@@ -31,7 +32,14 @@ const FormEntryWorkspace: React.FC<
   workspaceProps: { form, encounterUuid, additionalProps, handlePostResponse },
   windowProps,
 }) => {
-  const { patient, patientUuid, visitContext } = getPatientAndVisitProps(windowProps, undefined, groupProps);
+  const {
+    patient: patientProp,
+    patientUuid,
+    visitContext,
+  } = getPatientAndVisitProps(windowProps, undefined, groupProps);
+  // Hosts such as the ward pass a partial / REST patient, and child workspaces inherit the window props
+  // of the workspace that opened them, so resolve the patient the banner needs here.
+  const patient = usePatientForBanner(patientProp, patientUuid);
   const shouldShowPatientBanner = useShowPatientBanner(groupProps);
 
   return (

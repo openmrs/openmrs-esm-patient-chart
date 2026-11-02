@@ -108,7 +108,7 @@ export function getPatientAndVisitProps(
   const visitContext =
     windowProps?.visitContext !== undefined ? windowProps.visitContext : workspaceProps?.visitContext;
   if (patient || patientUuid) {
-    return { patient, patientUuid, visitContext };
+    return { patient, patientUuid: patientUuid ?? patient?.id, visitContext };
   }
   return { patient: groupProps?.patient, patientUuid: groupProps?.patientUuid, visitContext: groupProps?.visitContext };
 }

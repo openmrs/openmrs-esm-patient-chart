@@ -3,7 +3,7 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BehaviorSubject } from 'rxjs';
-import { ExtensionSlot, openmrsFetch, Workspace2 } from '@openmrs/esm-framework';
+import { ExtensionSlot, openmrsFetch, usePatient, Workspace2 } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import FormEntry, { type FormEntryProps } from './form-entry.component';
 import FormEntryWorkspace from './form-entry.workspace';
@@ -29,6 +29,7 @@ const defaultProps: FormEntryProps = {
 
 const mockFormEntrySub = vi.fn();
 const mockOpenmrsFetch = vi.mocked(openmrsFetch);
+const mockUsePatient = vi.mocked(usePatient);
 
 const mockExtensionSlot = vi.mocked(ExtensionSlot);
 const mockWorkspace2 = vi.mocked(Workspace2);
@@ -166,5 +167,37 @@ describe('Form entry workspaces', () => {
     rerender(<FormEntryWorkspace {...props} isRootWorkspace />);
 
     expect(screen.queryByRole('button', { name: /Back to clinical forms/ })).not.toBeInTheDocument();
+  });
+
+  it('shows the patient banner with the full patient when the window supplies a partial patient', () => {
+    // E.g. the ward passes a REST patient, and child workspaces inherit the window props of their parent
+    const partialPatient = { id: mockPatient.id, birthDate: mockPatient.birthDate } as fhir.Patient;
+    mockUsePatient.mockReturnValue({
+      patient: mockPatient,
+      patientUuid: mockPatient.id,
+      isLoading: false,
+      error: null,
+    });
+    mockExtensionSlot.mockImplementation((ext) => ext.name as any);
+
+    render(
+      <FormEntryWorkspace
+        {...workspaceDefinitionProps}
+        workspaceProps={{ form: defaultProps.form }}
+        windowProps={{ patient: partialPatient, patientUuid: mockPatient.id, visitContext: null }}
+        groupProps={{ showPatientBanner: 'always' }}
+        isRootWorkspace
+      />,
+    );
+
+    expect(mockUsePatient).toHaveBeenCalledWith(mockPatient.id);
+    expect(
+      mockExtensionSlot.mock.calls.some(
+        ([props]) =>
+          props.name === 'patient-header-slot' &&
+          props.state.patientUuid === mockPatient.id &&
+          props.state.patient === mockPatient,
+      ),
+    ).toBe(true);
   });
 });

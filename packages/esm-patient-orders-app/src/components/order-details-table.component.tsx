@@ -41,6 +41,7 @@ import {
   type OrderBasketItem,
   type OrderType,
   type OrderUrgency,
+  type PatientWorkspaceGroupProps,
   useLaunchWorkspaceRequiringVisit,
   useOrderBasket,
   useOrderTypes,
@@ -634,8 +635,9 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
   const alreadyInBasket = orders.some((x) => x.uuid === orderItem.uuid);
   const { mutate: globalMutate } = useSWRConfig();
 
-  const groupProps = useMemo(
+  const groupProps: PatientWorkspaceGroupProps = useMemo(
     () => ({
+      showPatientBanner: 'tabletOnly',
       patient,
       patientUuid: patient.id,
       visitContext: orderItem.encounter.visit,

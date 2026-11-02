@@ -261,6 +261,14 @@ describe('getPatientAndVisitProps', () => {
     ).toEqual({ patient, patientUuid: patient.id, visitContext: visit });
   });
 
+  it("falls back to the patient's id when only a patient is given", () => {
+    expect(getPatientAndVisitProps({ patient, visitContext: visit }, undefined)).toEqual({
+      patient,
+      patientUuid: patient.id,
+      visitContext: visit,
+    });
+  });
+
   it('falls back to workspace props when there are no window props', () => {
     expect(getPatientAndVisitProps(null, { patient, patientUuid: patient.id, visitContext: visit })).toEqual({
       patient,
