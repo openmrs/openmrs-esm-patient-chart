@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { type FetchResponse, openmrsFetch, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { mockFhirConditionsResponse, searchedCondition } from '__mocks__';
 import { getByTextWithMarkup, mockPatient } from 'tools';
-import { createCondition, useConditions, useConditionsSearch } from './conditions.resource';
+import { createCondition, useCondition, useConditions, useConditionsSearch } from './conditions.resource';
 import ConditionsForm, { type ConditionFormProps } from './conditions-form.workspace';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 
@@ -47,6 +47,7 @@ function renderConditionsForm(workspaceProps?: ConditionFormProps) {
 }
 
 const mockCreateCondition = vi.mocked(createCondition);
+const mockUseCondition = vi.mocked(useCondition);
 const mockUseConditionsSearch = vi.mocked(useConditionsSearch);
 const mockUseConditions = vi.mocked(useConditions);
 const mockShowSnackbar = vi.mocked(showSnackbar);
@@ -56,11 +57,19 @@ vi.mock('./conditions.resource', async () => ({
   ...((await vi.importActual('./conditions.resource')) as object),
   createCondition: vi.fn(),
   editCondition: vi.fn(),
+  useCondition: vi.fn(),
   useConditions: vi.fn(),
   useConditionsSearch: vi.fn(),
 }));
 
 mockOpenmrsFetch.mockResolvedValue({ data: [] } as FetchResponse);
+mockUseCondition.mockReturnValue({
+  condition: null,
+  error: null,
+  isLoading: false,
+  isValidating: false,
+  mutate: vi.fn().mockResolvedValue(undefined),
+});
 mockUseConditions.mockReturnValue({
   conditions: [],
   error: null,
@@ -291,6 +300,7 @@ describe('Conditions form', () => {
       onsetDateTime: '2020-08-19T00:00:00+00:00',
       recordedDate: '2020-08-19T18:34:48+00:00',
       id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
+      versionId: '1',
     };
 
     mockOpenmrsFetch.mockResolvedValue({ data: mockFhirConditionsResponse } as FetchResponse);
@@ -305,6 +315,279 @@ describe('Conditions form', () => {
 
     await user.click(inactiveStatusInput);
     await user.click(submitButton);
+  });
+
+  it('sends If-Match header with versionId when updating condition', async () => {
+    const user = userEvent.setup();
+
+    const conditionToEdit = {
+      clinicalStatus: 'Active',
+      conceptId: '117399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Hypertension',
+      abatementDateTime: undefined,
+      onsetDateTime: '2020-08-19T00:00:00+00:00',
+      recordedDate: '2020-08-19T18:34:48+00:00',
+      id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
+      versionId: '1',
+    };
+
+    mockOpenmrsFetch.mockResolvedValue({ data: mockFhirConditionsResponse } as FetchResponse);
+
+    renderConditionsForm({ condition: conditionToEdit, formContext: 'editing' });
+
+    const inactiveStatusInput = screen.getByLabelText(/inactive/i);
+    const submitButton = screen.getByRole('button', { name: /save & close/i });
+
+    await user.click(inactiveStatusInput);
+    await user.click(submitButton);
+
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/Condition/f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389'),
+      expect.objectContaining({
+        method: 'PUT',
+        headers: expect.objectContaining({
+          'If-Match': 'W/"1"',
+        }),
+      }),
+    );
+  });
+
+  it('displays a conflict notification when update fails with 412 Precondition Failed', async () => {
+    const user = userEvent.setup();
+    vi.mocked(defaultProps.closeWorkspace).mockClear();
+
+    const conditionToEdit = {
+      clinicalStatus: 'Active',
+      conceptId: '117399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Hypertension',
+      abatementDateTime: undefined,
+      onsetDateTime: '2020-08-19T00:00:00+00:00',
+      recordedDate: '2020-08-19T18:34:48+00:00',
+      id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
+      versionId: '1',
+    };
+
+    mockOpenmrsFetch.mockImplementation(async (url, init) => {
+      if (init?.method === 'PUT') {
+        throw {
+          status: 412,
+          response: { status: 412 },
+          message: 'Precondition Failed',
+        };
+      }
+      return { data: mockFhirConditionsResponse } as FetchResponse;
+    });
+
+    renderConditionsForm({ condition: conditionToEdit, formContext: 'editing' });
+
+    const inactiveStatusInput = screen.getByLabelText(/inactive/i);
+    const submitButton = screen.getByRole('button', { name: /save & close/i });
+
+    await user.click(inactiveStatusInput);
+    await user.click(submitButton);
+
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'error',
+        title: 'Condition update conflict',
+        subtitle: 'This condition was changed by someone else. Reload to see the latest version',
+      }),
+    );
+
+    expect(
+      await screen.findByText('This condition was changed by someone else. Reload to see the latest version'),
+    ).toBeInTheDocument();
+    expect(defaultProps.closeWorkspace).not.toHaveBeenCalled();
+  });
+
+  it('displays a conflict notification when update fails with 409 Conflict', async () => {
+    const user = userEvent.setup();
+    vi.mocked(defaultProps.closeWorkspace).mockClear();
+
+    const conditionToEdit = {
+      clinicalStatus: 'Active',
+      conceptId: '117399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Hypertension',
+      abatementDateTime: undefined,
+      onsetDateTime: '2020-08-19T00:00:00+00:00',
+      recordedDate: '2020-08-19T18:34:48+00:00',
+      id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
+      versionId: '1',
+    };
+
+    mockOpenmrsFetch.mockImplementation(async (url, init) => {
+      if (init?.method === 'PUT') {
+        throw {
+          status: 409,
+          response: { status: 409 },
+          message: 'Conflict',
+        };
+      }
+      return { data: mockFhirConditionsResponse } as FetchResponse;
+    });
+
+    renderConditionsForm({ condition: conditionToEdit, formContext: 'editing' });
+
+    const inactiveStatusInput = screen.getByLabelText(/inactive/i);
+    const submitButton = screen.getByRole('button', { name: /save & close/i });
+
+    await user.click(inactiveStatusInput);
+    await user.click(submitButton);
+
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'error',
+        title: 'Condition update conflict',
+        subtitle: 'This condition was changed by someone else. Reload to see the latest version',
+      }),
+    );
+
+    expect(
+      await screen.findByText('This condition was changed by someone else. Reload to see the latest version'),
+    ).toBeInTheDocument();
+    expect(defaultProps.closeWorkspace).not.toHaveBeenCalled();
+  });
+
+  it('disables save button while condition version is loading', () => {
+    const conditionToEdit = {
+      clinicalStatus: 'Active',
+      conceptId: '117399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Hypertension',
+      abatementDateTime: undefined,
+      onsetDateTime: '2020-08-19T00:00:00+00:00',
+      recordedDate: '2020-08-19T18:34:48+00:00',
+      id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
+      versionId: '1',
+    };
+
+    mockUseCondition.mockReturnValue({
+      condition: null,
+      error: null,
+      isLoading: true,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+
+    renderConditionsForm({ condition: conditionToEdit, formContext: 'editing' });
+
+    const submitButton = screen.getByRole('button', { name: /save & close/i });
+    expect(submitButton).toBeDisabled();
+    expect(screen.getByText(/loading condition details/i)).toBeInTheDocument();
+  });
+
+  it('displays error and provides retry button when loading condition fails', async () => {
+    const user = userEvent.setup();
+    const retryFn = vi.fn();
+    const conditionToEdit = {
+      clinicalStatus: 'Active',
+      conceptId: '117399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Hypertension',
+      abatementDateTime: undefined,
+      onsetDateTime: '2020-08-19T00:00:00+00:00',
+      recordedDate: '2020-08-19T18:34:48+00:00',
+      id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
+      versionId: '1',
+    };
+
+    mockUseCondition.mockReturnValue({
+      condition: null,
+      error: new Error('Network error loading condition'),
+      isLoading: false,
+      isValidating: false,
+      mutate: retryFn,
+    });
+
+    renderConditionsForm({ condition: conditionToEdit, formContext: 'editing' });
+
+    expect(screen.getByText('Error loading condition details')).toBeInTheDocument();
+    expect(screen.getByText('Network error loading condition')).toBeInTheDocument();
+    const submitButton = screen.getByRole('button', { name: /save & close/i });
+    expect(submitButton).toBeDisabled();
+
+    const retryButton = screen.getByRole('button', { name: /retry/i });
+    await user.click(retryButton);
+    expect(retryFn).toHaveBeenCalled();
+  });
+
+  it('synchronizes form fields and versionId from loadedCondition', async () => {
+    const user = userEvent.setup();
+
+    const conditionToEdit = {
+      clinicalStatus: 'Active',
+      conceptId: '117399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Hypertension',
+      abatementDateTime: undefined,
+      onsetDateTime: '2020-08-19T00:00:00+00:00',
+      recordedDate: '2020-08-19T18:34:48+00:00',
+      id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
+      versionId: '1',
+    };
+
+    const freshCondition = {
+      ...conditionToEdit,
+      clinicalStatus: 'Inactive',
+      versionId: '42',
+    };
+
+    mockUseCondition.mockReturnValue({
+      condition: freshCondition,
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+
+    renderConditionsForm({ condition: conditionToEdit, formContext: 'editing' });
+
+    const submitButton = screen.getByRole('button', { name: /save & close/i });
+    expect(submitButton).toBeEnabled();
+
+    await user.click(submitButton);
+
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/Condition/f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389'),
+      expect.objectContaining({
+        method: 'PUT',
+        headers: expect.objectContaining({
+          'If-Match': 'W/"42"',
+        }),
+      }),
+    );
+  });
+
+  it('disables save button and displays error when condition version is unavailable', async () => {
+    const user = userEvent.setup();
+    const retryFn = vi.fn();
+    const conditionToEdit = {
+      clinicalStatus: 'Active',
+      conceptId: '117399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Hypertension',
+      abatementDateTime: undefined,
+      onsetDateTime: '2020-08-19T00:00:00+00:00',
+      recordedDate: '2020-08-19T18:34:48+00:00',
+      id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
+    };
+
+    mockUseCondition.mockReturnValue({
+      condition: conditionToEdit,
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: retryFn,
+    });
+
+    renderConditionsForm({ condition: conditionToEdit, formContext: 'editing' });
+
+    expect(screen.getByText('Condition version unavailable')).toBeInTheDocument();
+    expect(
+      screen.getByText('Unable to retrieve the condition version. Reload or retry to prevent conflicting edits.'),
+    ).toBeInTheDocument();
+    const submitButton = screen.getByRole('button', { name: /save & close/i });
+    expect(submitButton).toBeDisabled();
+
+    const retryButton = screen.getByRole('button', { name: /retry/i });
+    await user.click(retryButton);
+    expect(retryFn).toHaveBeenCalled();
   });
 });
 

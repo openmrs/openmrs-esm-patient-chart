@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { type DataTableSortState } from '@carbon/react';
-import { fhirBaseUrl, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
+import { type FetchResponse, fhirBaseUrl, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 
 export interface FHIRConditionResponse {
   entry: Array<{
@@ -43,6 +43,10 @@ export interface FHIRCondition {
     status: string;
   };
   abatementDateTime?: string;
+  meta?: {
+    versionId?: string;
+    lastUpdated?: string;
+  };
 }
 
 interface CodingData {
@@ -65,6 +69,7 @@ export type Condition = {
   recordedDate: string;
   id: string;
   abatementDateTime?: string;
+  versionId?: string;
 };
 
 export interface ConditionDataTableRow {
@@ -151,6 +156,36 @@ export function useConditions(patientUuid: string) {
   };
 }
 
+export function useCondition(conditionId?: string) {
+  const url = conditionId ? `${fhirBaseUrl}/Condition/${conditionId}` : null;
+  const { data, error, isLoading, isValidating, mutate } = useSWR<FetchResponse<FHIRCondition>, Error>(
+    url,
+    openmrsFetch,
+  );
+
+  const mappedCondition = useMemo(() => {
+    if (!data?.data || data?.data?.resourceType !== 'Condition') {
+      return null;
+    }
+    const condition = mapConditionProperties(data.data);
+    if (!condition.versionId) {
+      const etag = data?.headers?.get?.('ETag') ?? data?.headers?.get?.('etag');
+      if (etag) {
+        condition.versionId = etag.replace(/^W\/"|"$/g, '');
+      }
+    }
+    return condition;
+  }, [data]);
+
+  return {
+    condition: mappedCondition,
+    error,
+    isLoading: Boolean(url && isLoading),
+    isValidating,
+    mutate,
+  };
+}
+
 export function useConditionsSearch(conditionToLookup: string) {
   const config = useConfig();
   const conditionConceptClassUuid = config?.conditionConceptClassUuid;
@@ -178,6 +213,7 @@ function mapConditionProperties(condition: FHIRCondition): Condition {
     onsetDateTime: condition?.onsetDateTime,
     recordedDate: condition?.recordedDate,
     id: condition?.id,
+    versionId: condition?.meta?.versionId,
   };
 }
 
@@ -226,7 +262,7 @@ export async function createCondition(payload: FormFields) {
   return res;
 }
 
-export async function updateCondition(conditionId, payload: FormFields) {
+export async function updateCondition(conditionId: string, payload: FormFields, versionId?: string) {
   const controller = new AbortController();
   const url = `${fhirBaseUrl}/Condition/${conditionId}`;
 
@@ -260,16 +296,29 @@ export async function updateCondition(conditionId, payload: FormFields) {
     },
   };
 
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+
+  if (versionId) {
+    headers['If-Match'] = versionId.startsWith('W/"') ? versionId : `W/"${versionId}"`;
+  }
+
   const res = await openmrsFetch(url, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers,
     method: 'PUT',
     body: completePayload,
     signal: controller.signal,
   });
 
   return res;
+}
+
+export async function getCondition(conditionId: string, abortController?: AbortController) {
+  const url = `${fhirBaseUrl}/Condition/${conditionId}`;
+  return openmrsFetch(url, {
+    signal: abortController?.signal,
+  });
 }
 
 export async function deleteCondition(conditionId: string) {

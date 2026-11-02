@@ -93,7 +93,9 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   const displayName = conditionToEdit?.display;
   const editableClinicalStatus = conditionToEdit?.clinicalStatus;
   const editableAbatementDateTime = conditionToEdit?.abatementDateTime;
+  const versionId = conditionToEdit?.versionId;
   const [selectedCondition, setSelectedCondition] = useState<CodedCondition>(null);
+  const isSubmittingRef = useRef(false);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
   const { searchResults, isSearching } = useConditionsSearch(debouncedSearchTerm);
@@ -122,8 +124,14 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   );
 
   const handleCreate = useCallback(async () => {
+    if (isSubmittingRef.current) {
+      return;
+    }
+    isSubmittingRef.current = true;
+
     if (!selectedCondition) {
       setIsSubmittingForm(false);
+      isSubmittingRef.current = false;
       return;
     }
 
@@ -151,6 +159,8 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     } catch (error) {
       setIsSubmittingForm(false);
       setErrorCreating(error);
+    } finally {
+      isSubmittingRef.current = false;
     }
   }, [
     closeWorkspaceWithSavedChanges,
@@ -165,6 +175,11 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   ]);
 
   const handleUpdate = useCallback(async () => {
+    if (isSubmittingRef.current) {
+      return;
+    }
+    isSubmittingRef.current = true;
+
     const payload: FormFields = {
       clinicalStatus: isEditing ? getValues('clinicalStatus') : editableClinicalStatus,
       conceptId: matchingCondition?.conceptId,
@@ -179,8 +194,10 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
       userId: session?.user?.uuid,
     };
 
+    const activeVersionId = versionId ?? conditionToEdit?.versionId ?? matchingCondition?.versionId;
+
     try {
-      await updateCondition(conditionToEdit?.id, payload);
+      await updateCondition(conditionToEdit?.id, payload, activeVersionId);
       await mutate();
 
       showSnackbar({
@@ -192,22 +209,44 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
       closeWorkspaceWithSavedChanges();
     } catch (error) {
       setIsSubmittingForm(false);
+      const isConflict =
+        error?.status === 412 ||
+        error?.status === 409 ||
+        error?.response?.status === 412 ||
+        error?.response?.status === 409;
+
+      if (isConflict) {
+        showSnackbar({
+          isLowContrast: false,
+          kind: 'error',
+          title: t('conditionConflict', 'Condition update conflict'),
+          subtitle: t(
+            'conditionConflictMessage',
+            'This condition was changed by someone else. Reload to see the latest version',
+          ),
+        });
+      }
       setErrorUpdating(error);
+    } finally {
+      isSubmittingRef.current = false;
     }
   }, [
     closeWorkspaceWithSavedChanges,
     conditionToEdit?.id,
+    conditionToEdit?.versionId,
     displayName,
     editableClinicalStatus,
     isEditing,
     getValues,
     matchingCondition?.conceptId,
+    matchingCondition?.versionId,
     mutate,
     patientUuid,
     session?.user?.uuid,
     setErrorUpdating,
     setIsSubmittingForm,
     t,
+    versionId,
     editableAbatementDateTime,
   ]);
 
