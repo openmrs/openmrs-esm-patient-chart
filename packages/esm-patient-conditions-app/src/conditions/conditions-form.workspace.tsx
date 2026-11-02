@@ -65,6 +65,7 @@ const ConditionsForm: React.FC<PatientWorkspace2DefinitionProps<ConditionFormPro
   } = useCondition(isEditing && condition?.id ? condition.id : undefined);
 
   const activeCondition = loadedCondition ?? condition;
+  const hasUsableVersion = Boolean(activeCondition?.versionId);
 
   const isConflict =
     errorUpdating?.status === 412 ||
@@ -165,6 +166,24 @@ const ConditionsForm: React.FC<PatientWorkspace2DefinitionProps<ConditionFormPro
                 </Button>
               </div>
             ) : null}
+            {isEditing && !isLoadingCondition && !errorLoadingCondition && !hasUsableVersion ? (
+              <div className={styles.errorContainer}>
+                <InlineNotification
+                  className={styles.error}
+                  role="alert"
+                  kind="error"
+                  lowContrast
+                  title={t('versionMissing', 'Condition version unavailable')}
+                  subtitle={t(
+                    'versionMissingMessage',
+                    'Unable to retrieve the condition version. Reload or retry to prevent conflicting edits.',
+                  )}
+                />
+                <Button kind="ghost" size="sm" onClick={() => retryLoadCondition()}>
+                  {t('retry', 'Retry')}
+                </Button>
+              </div>
+            ) : null}
             {errorCreating ? (
               <div className={styles.errorContainer}>
                 <InlineNotification
@@ -207,7 +226,10 @@ const ConditionsForm: React.FC<PatientWorkspace2DefinitionProps<ConditionFormPro
               <Button
                 className={styles.button}
                 disabled={
-                  isSubmittingForm || (isEditing && isLoadingCondition) || (isEditing && Boolean(errorLoadingCondition))
+                  isSubmittingForm ||
+                  (isEditing && isLoadingCondition) ||
+                  (isEditing && !hasUsableVersion) ||
+                  (isEditing && Boolean(errorLoadingCondition))
                 }
                 kind="primary"
                 type="submit"

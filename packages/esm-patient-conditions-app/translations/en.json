@@ -51,5 +51,7 @@
   "searching": "Searching",
   "seeAll": "See all",
   "show": "Show",
-  "status": "Status"
+  "status": "Status",
+  "versionMissing": "Condition version unavailable",
+  "versionMissingMessage": "Unable to retrieve the condition version. Reload or retry to prevent conflicting edits."
 }

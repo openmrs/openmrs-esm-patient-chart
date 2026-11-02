@@ -300,6 +300,7 @@ describe('Conditions form', () => {
       onsetDateTime: '2020-08-19T00:00:00+00:00',
       recordedDate: '2020-08-19T18:34:48+00:00',
       id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
+      versionId: '1',
     };
 
     mockOpenmrsFetch.mockResolvedValue({ data: mockFhirConditionsResponse } as FetchResponse);
@@ -456,6 +457,7 @@ describe('Conditions form', () => {
       onsetDateTime: '2020-08-19T00:00:00+00:00',
       recordedDate: '2020-08-19T18:34:48+00:00',
       id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
+      versionId: '1',
     };
 
     mockUseCondition.mockReturnValue({
@@ -484,6 +486,7 @@ describe('Conditions form', () => {
       onsetDateTime: '2020-08-19T00:00:00+00:00',
       recordedDate: '2020-08-19T18:34:48+00:00',
       id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
+      versionId: '1',
     };
 
     mockUseCondition.mockReturnValue({
@@ -517,6 +520,7 @@ describe('Conditions form', () => {
       onsetDateTime: '2020-08-19T00:00:00+00:00',
       recordedDate: '2020-08-19T18:34:48+00:00',
       id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
+      versionId: '1',
     };
 
     const freshCondition = {
@@ -549,6 +553,41 @@ describe('Conditions form', () => {
         }),
       }),
     );
+  });
+
+  it('disables save button and displays error when condition version is unavailable', async () => {
+    const user = userEvent.setup();
+    const retryFn = vi.fn();
+    const conditionToEdit = {
+      clinicalStatus: 'Active',
+      conceptId: '117399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Hypertension',
+      abatementDateTime: undefined,
+      onsetDateTime: '2020-08-19T00:00:00+00:00',
+      recordedDate: '2020-08-19T18:34:48+00:00',
+      id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
+    };
+
+    mockUseCondition.mockReturnValue({
+      condition: conditionToEdit,
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: retryFn,
+    });
+
+    renderConditionsForm({ condition: conditionToEdit, formContext: 'editing' });
+
+    expect(screen.getByText('Condition version unavailable')).toBeInTheDocument();
+    expect(
+      screen.getByText('Unable to retrieve the condition version. Reload or retry to prevent conflicting edits.'),
+    ).toBeInTheDocument();
+    const submitButton = screen.getByRole('button', { name: /save & close/i });
+    expect(submitButton).toBeDisabled();
+
+    const retryButton = screen.getByRole('button', { name: /retry/i });
+    await user.click(retryButton);
+    expect(retryFn).toHaveBeenCalled();
   });
 });
 
