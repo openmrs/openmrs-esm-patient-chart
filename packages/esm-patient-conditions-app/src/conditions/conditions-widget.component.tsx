@@ -24,7 +24,6 @@ import {
   type Condition,
   type FormFields,
   createCondition,
-  getCondition,
   updateCondition,
   useConditions,
   useConditionsSearch,
@@ -94,31 +93,9 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   const displayName = conditionToEdit?.display;
   const editableClinicalStatus = conditionToEdit?.clinicalStatus;
   const editableAbatementDateTime = conditionToEdit?.abatementDateTime;
-  const [versionId, setVersionId] = useState<string | undefined>(conditionToEdit?.versionId);
+  const versionId = conditionToEdit?.versionId;
   const [selectedCondition, setSelectedCondition] = useState<CodedCondition>(null);
-
-  useEffect(() => {
-    if (isEditing && conditionToEdit?.id) {
-      const abortController = new AbortController();
-      getCondition(conditionToEdit.id, abortController)
-        .then((res) => {
-          const v =
-            res?.data?.meta?.versionId ??
-            res?.headers?.get?.('ETag')?.replace(/^W\/"|"$/g, '') ??
-            res?.headers?.get?.('etag')?.replace(/^W\/"|"$/g, '');
-          if (v) {
-            setVersionId(v);
-          }
-        })
-        .catch((error) => {
-          if (error?.name !== 'AbortError') {
-            console.error('Failed to fetch condition version:', error);
-          }
-        });
-
-      return () => abortController.abort();
-    }
-  }, [isEditing, conditionToEdit?.id]);
+  const isSubmittingRef = useRef(false);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
   const { searchResults, isSearching } = useConditionsSearch(debouncedSearchTerm);
@@ -147,8 +124,14 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   );
 
   const handleCreate = useCallback(async () => {
+    if (isSubmittingRef.current) {
+      return;
+    }
+    isSubmittingRef.current = true;
+
     if (!selectedCondition) {
       setIsSubmittingForm(false);
+      isSubmittingRef.current = false;
       return;
     }
 
@@ -176,6 +159,8 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     } catch (error) {
       setIsSubmittingForm(false);
       setErrorCreating(error);
+    } finally {
+      isSubmittingRef.current = false;
     }
   }, [
     closeWorkspaceWithSavedChanges,
@@ -190,6 +175,11 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   ]);
 
   const handleUpdate = useCallback(async () => {
+    if (isSubmittingRef.current) {
+      return;
+    }
+    isSubmittingRef.current = true;
+
     const payload: FormFields = {
       clinicalStatus: isEditing ? getValues('clinicalStatus') : editableClinicalStatus,
       conceptId: matchingCondition?.conceptId,
@@ -237,6 +227,8 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
         });
       }
       setErrorUpdating(error);
+    } finally {
+      isSubmittingRef.current = false;
     }
   }, [
     closeWorkspaceWithSavedChanges,

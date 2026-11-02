@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { type DataTableSortState } from '@carbon/react';
-import { fhirBaseUrl, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
+import { type FetchResponse, fhirBaseUrl, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 
 export interface FHIRConditionResponse {
   entry: Array<{
@@ -151,6 +151,36 @@ export function useConditions(patientUuid: string) {
     conditions: data ? formattedConditions : null,
     error: error,
     isLoading,
+    isValidating,
+    mutate,
+  };
+}
+
+export function useCondition(conditionId?: string) {
+  const url = conditionId ? `${fhirBaseUrl}/Condition/${conditionId}` : null;
+  const { data, error, isLoading, isValidating, mutate } = useSWR<FetchResponse<FHIRCondition>, Error>(
+    url,
+    openmrsFetch,
+  );
+
+  const mappedCondition = useMemo(() => {
+    if (!data?.data || data?.data?.resourceType !== 'Condition') {
+      return null;
+    }
+    const condition = mapConditionProperties(data.data);
+    if (!condition.versionId) {
+      const etag = data?.headers?.get?.('ETag') ?? data?.headers?.get?.('etag');
+      if (etag) {
+        condition.versionId = etag.replace(/^W\/"|"$/g, '');
+      }
+    }
+    return condition;
+  }, [data]);
+
+  return {
+    condition: mappedCondition,
+    error,
+    isLoading: Boolean(url && isLoading),
     isValidating,
     mutate,
   };
