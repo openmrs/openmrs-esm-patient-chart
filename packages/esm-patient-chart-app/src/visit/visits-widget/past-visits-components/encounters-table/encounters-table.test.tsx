@@ -393,10 +393,14 @@ describe('Encounter editability', () => {
     await clickEditEncounter(admissionRowName);
 
     expect(mockLaunchWorkspace).toHaveBeenCalledTimes(1);
-    expect(mockLaunchWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
-      form: mockAdmissionEncounter.form,
-      encounterUuid: mockAdmissionEncounter.uuid,
-    });
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith(
+      'patient-form-entry-workspace',
+      {
+        form: mockAdmissionEncounter.form,
+        encounterUuid: mockAdmissionEncounter.uuid,
+      },
+      expect.objectContaining({ patientUuid: mockPatientAlice.uuid }),
+    );
   });
 
   it('launches the visit notes workspace for visit notes when no onEditEncounter prop is provided', async () => {
@@ -410,8 +414,8 @@ describe('Encounter editability', () => {
       expect.objectContaining({
         encounter: expect.objectContaining(mockVisitNoteEncounter),
         formContext: 'editing',
-        patientUuid: mockPatientAlice.uuid,
       }),
+      expect.objectContaining({ patientUuid: mockPatientAlice.uuid }),
     );
   });
 });

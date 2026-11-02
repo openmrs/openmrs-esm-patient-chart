@@ -164,17 +164,6 @@
   bottom: 0;
 }
 
-.headerGridRow {
-  border-bottom: 0.0625rem solid colors.$gray-20;
-  margin: 0;
-}
-
-.dataGridRow {
-  display: grid;
-  grid-template-columns: 50% 10% 1fr;
-  margin: layout.$spacing-03 layout.$spacing-05;
-}
-
 .formContainer {
   margin: layout.$spacing-05;
   flex: 1;

@@ -27,12 +27,17 @@ describe('StartVisitButton', () => {
     expect(mockLaunchWorkspace).toHaveBeenCalledWith(
       'start-visit-workspace-form',
       { openedFrom: 'patient-chart-start-visit' },
-      {},
+      {
+        patient: mockPatient,
+        patientUuid: mockPatient.id,
+        visitContext: null,
+      },
       {
         patient: mockPatient,
         patientUuid: mockPatient.id,
         visitContext: null,
         mutateVisitContext: null,
+        showPatientBanner: 'tabletOnly',
       },
     );
   });

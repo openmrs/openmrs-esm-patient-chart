@@ -17,7 +17,6 @@ import { mockSessionDataResponse } from '__mocks__';
 import { mockPatient } from 'tools';
 import { createEmptyLabOrder } from './test-order';
 import AddTestOrderWorkspace from './add-test-order.workspace';
-import ExportedAddTestOrderWorkspace from './exported-add-test-order.workspace';
 
 const mockCloseWorkspace = vi.fn();
 const mockUseLayoutType = vi.mocked(useLayoutType);
@@ -66,16 +65,11 @@ function renderAddLabOrderWorkspace() {
         orderTypeUuid: 'test-lab-order-type-uuid',
         orderToEditOrdererUuid: '',
       }}
-      groupProps={{
-        patientUuid: mockPatient.id,
-        patient: mockPatient,
-        visitContext: null,
-        mutateVisitContext: null,
-      }}
+      groupProps={{ showPatientBanner: 'tabletOnly' }}
       workspaceName={''}
       launchChildWorkspace={vi.fn()}
       windowName={''}
-      windowProps={{ encounterUuid: '' }}
+      windowProps={{ patientUuid: mockPatient.id, patient: mockPatient, visitContext: null }}
       isRootWorkspace={false}
       showActionMenu={true}
     />,
@@ -239,16 +233,15 @@ describe('AddLabOrder', () => {
             action: 'REVISE',
           },
         }}
-        groupProps={{
-          patientUuid: mockPatient.id,
-          patient: mockPatient,
-          visitContext: null,
-          mutateVisitContext: null,
-        }}
+        groupProps={{}}
         workspaceName={''}
         launchChildWorkspace={vi.fn()}
         windowName={''}
-        windowProps={{ encounterUuid: '' }}
+        windowProps={{
+          patientUuid: mockPatient.id,
+          patient: mockPatient,
+          visitContext: null,
+        }}
         isRootWorkspace={false}
         showActionMenu={true}
       />,
@@ -306,7 +299,7 @@ describe('AddLabOrder', () => {
   test('should display the patient header at every width outside the chart', () => {
     mockUseLayoutType.mockReturnValue('large-desktop');
     render(
-      <ExportedAddTestOrderWorkspace
+      <AddTestOrderWorkspace
         closeWorkspace={mockCloseWorkspace}
         groupProps={{}}
         workspaceProps={{
@@ -314,14 +307,9 @@ describe('AddLabOrder', () => {
           orderToEditOrdererUuid: '',
         }}
         windowProps={{
-          encounterUuid: '',
-          drugOrderWorkspaceName: '',
-          labOrderWorkspaceName: '',
-          generalOrderWorkspaceName: '',
           patient: mockPatient,
           patientUuid: mockPatient.id,
           visitContext: null,
-          mutateVisitContext: vi.fn(),
         }}
         workspaceName={''}
         launchChildWorkspace={vi.fn()}
@@ -347,16 +335,15 @@ describe('AddLabOrder', () => {
         workspaceProps={{
           orderToEditOrdererUuid: '',
         }}
-        groupProps={{
-          patientUuid: mockPatient.id,
-          patient: mockPatient,
-          visitContext: null,
-          mutateVisitContext: null,
-        }}
+        groupProps={{}}
         workspaceName={''}
         launchChildWorkspace={vi.fn()}
         windowName={''}
-        windowProps={{ encounterUuid: '' }}
+        windowProps={{
+          patientUuid: mockPatient.id,
+          patient: mockPatient,
+          visitContext: null,
+        }}
         isRootWorkspace={false}
         showActionMenu={true}
       />,

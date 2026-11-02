@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { Add, ArrowLeft } from '@carbon/react/icons';
-import { ExtensionSlot, useLayoutType, Workspace2 } from '@openmrs/esm-framework';
-import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
+import { ExtensionSlot, Workspace2 } from '@openmrs/esm-framework';
+import { type PatientWorkspace2DefinitionProps, useShowPatientBanner } from '@openmrs/esm-patient-common-lib';
 import { type Task } from './task-list.resource';
 import AddTaskForm from './add-task-form.component';
 import TaskListView from './task-list-view.component';
@@ -17,7 +17,7 @@ const TaskListWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
   const patientUuid = groupProps?.patientUuid ?? '';
   const visitContext = groupProps?.visitContext;
   const { t } = useTranslation();
-  const isTablet = useLayoutType() === 'tablet';
+  const shouldShowPatientBanner = useShowPatientBanner(groupProps);
   const [view, setView] = useState<View>('list');
   const [selectedTaskUuid, setSelectedTaskUuid] = useState<string | null>(null);
 
@@ -63,7 +63,7 @@ const TaskListWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
 
   return (
     <Workspace2 title={title}>
-      {isTablet && patient && patientUuid && (
+      {shouldShowPatientBanner && patient && patientUuid && (
         <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
       )}
       <div className={styles.workspaceContainer}>

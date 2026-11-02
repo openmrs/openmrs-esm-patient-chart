@@ -3,15 +3,9 @@ import classNames from 'classnames';
 import dayjs from 'dayjs';
 import { Button, ModalBody, ModalFooter, ModalHeader, RadioButton, InlineLoading, Tile } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import {
-  ErrorState,
-  launchWorkspace2,
-  OpenmrsDatePicker,
-  useDebounce,
-  useOnVisible,
-  type Visit,
-} from '@openmrs/esm-framework';
+import { ErrorState, OpenmrsDatePicker, useDebounce, useOnVisible, type Visit } from '@openmrs/esm-framework';
 import { invalidateVisitByUuid, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { launchStartVisitWorkspace } from '../../visit-form/launch-start-visit-workspace';
 import { useInfiniteVisits } from '../visit.resource';
 import VisitContextInfo from './visit-context-info.component';
 import styles from './visit-context-switcher.scss';
@@ -51,9 +45,7 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
 
   const openStartVisitWorkspace = () => {
     closeModal();
-    launchWorkspace2('start-visit-workspace-form', {
-      openedFrom: 'visit-context-switcher',
-    });
+    launchStartVisitWorkspace({ openedFrom: 'visit-context-switcher' }, patientUuid);
   };
 
   return (

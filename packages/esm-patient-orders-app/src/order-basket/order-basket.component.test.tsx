@@ -38,7 +38,6 @@ const mockVisitContext = {
 } as any;
 
 const mockCloseWorkspace = vi.fn(() => Promise.resolve(true));
-const mockMutateVisitContext = vi.fn();
 
 const mockOrderBasketExtensionProps = {
   patient: mockPatient,
@@ -90,7 +89,6 @@ describe('OrderBasket', () => {
         patientUuid={mockPatientUuid}
         patient={mockPatient}
         visitContext={mockVisitContext}
-        mutateVisitContext={mockMutateVisitContext}
         closeWorkspace={mockCloseWorkspace}
         orderBasketExtensionProps={mockOrderBasketExtensionProps}
       />,
@@ -107,7 +105,6 @@ describe('OrderBasket', () => {
         patientUuid={mockPatientUuid}
         patient={mockPatient}
         visitContext={mockVisitContext}
-        mutateVisitContext={mockMutateVisitContext}
         closeWorkspace={mockCloseWorkspace}
         orderBasketExtensionProps={mockOrderBasketExtensionProps}
       />,

@@ -41,7 +41,7 @@ export const addLabOrderWorkspace = getAsyncLifecycle(
 );
 
 export const exportedAddLabOrderWorkspace = getAsyncLifecycle(
-  () => import('./test-orders/add-test-order/exported-add-test-order.workspace'),
+  () => import('./test-orders/add-test-order/add-test-order.workspace'),
   options,
 );
 
