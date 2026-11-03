@@ -394,8 +394,6 @@ const VisitForm: React.FC<Workspace2DefinitionProps<VisitFormProps, VisitFormWin
 
           // Use targeted SWR invalidation instead of global mutateVisit
           // This will invalidate visit history and encounter tables for this patient
-          // and the saved visit itself, in case it is the visit in the patient chart store
-          invalidateVisitByUuid(globalMutate, visit.uuid);
           invalidateVisitAndEncounterData(globalMutate, patientUuid);
 
           const visitAttributesRequest = visitToEdit
