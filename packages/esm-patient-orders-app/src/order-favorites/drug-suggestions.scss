@@ -1,0 +1,105 @@
+@use '@carbon/colors';
+@use '@carbon/type';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.suggestions {
+  display: flex;
+  flex-direction: column;
+  margin: layout.$spacing-05;
+  background-color: $ui-01;
+  border: 1px solid $ui-03;
+  border-left: 3px solid var(--brand-03);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: layout.$spacing-04;
+  padding: layout.$spacing-04 layout.$spacing-03 layout.$spacing-04 layout.$spacing-05;
+  border-bottom: 1px solid $ui-03;
+}
+
+.icon {
+  flex-shrink: 0;
+  margin-top: layout.$spacing-01;
+  fill: var(--brand-03);
+}
+
+.heading {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  @include type.type-style('heading-compact-01');
+  margin: 0;
+  color: $ui-05;
+}
+
+.subtitle {
+  @include type.type-style('helper-text-01');
+  margin: 0;
+  color: $text-02;
+}
+
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: layout.$spacing-03;
+  padding: layout.$spacing-04 layout.$spacing-03 layout.$spacing-04 layout.$spacing-05;
+  border-bottom: 1px solid $ui-03;
+}
+
+.itemContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.itemTitle {
+  @include type.type-style('heading-compact-01');
+  margin: 0;
+  color: colors.$gray-70;
+}
+
+.itemForm {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}
+
+.reason {
+  @include type.type-style('helper-text-01');
+  margin: layout.$spacing-01 0 0 0;
+  color: var(--brand-03);
+}
+
+.dontSuggestButton {
+  padding-inline-start: 0;
+}
+
+.swapPrompt {
+  @include type.type-style('body-01');
+  padding: layout.$spacing-05;
+  color: $ui-05;
+  border-bottom: 1px solid $ui-03;
+
+  p {
+    margin: 0;
+  }
+}
+
+.swapActions {
+  display: flex;
+  gap: layout.$spacing-03;
+  margin-top: layout.$spacing-05;
+}
+
+.footnote {
+  @include type.type-style('helper-text-01');
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+  margin: 0;
+  padding: layout.$spacing-03 layout.$spacing-05;
+  color: $text-02;
+}
