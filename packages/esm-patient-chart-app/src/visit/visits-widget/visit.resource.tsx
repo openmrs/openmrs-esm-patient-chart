@@ -15,10 +15,8 @@ export function useInfiniteVisits(
   params: Record<string, number | string> = {},
   rep: string = customRepresentation,
 ) {
-  const url = new URL(
-    `${window.openmrsBase}/${restBaseUrl}/visit?patient=${patientUuid}&v=${rep}`,
-    window.location.toString(),
-  );
+  const openmrsBase = window.openmrsBase.replace(/\/$/, '');
+  const url = new URL(`${openmrsBase}${restBaseUrl}/visit?patient=${patientUuid}&v=${rep}`, window.location.toString());
   for (const key in params) {
     url.searchParams.set(key, '' + params[key]);
   }
@@ -33,8 +31,9 @@ export function usePaginatedVisits(
   pageSize: number,
   params: Record<string, number | string> = {},
 ) {
+  const openmrsBase = window.openmrsBase.replace(/\/$/, '');
   const url = new URL(
-    `${window.openmrsBase}/${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}`,
+    `${openmrsBase}${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}`,
     window.location.toString(),
   );
   for (const key in params) {
