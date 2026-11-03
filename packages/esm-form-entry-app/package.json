@@ -58,7 +58,7 @@
     "carbon-components-angular": "^5.62.1",
     "jspdf": "^4.2.1",
     "lodash": "^4.18.1",
-    "moment": "^2.29.4",
+    "moment": "^2.31.0",
     "ngx-bootstrap": "^20.0.2",
     "ngx-webcam": "^0.4.1",
     "reflect-metadata": "^0.1.13",
