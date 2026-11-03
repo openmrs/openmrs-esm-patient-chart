@@ -25,7 +25,6 @@ describe('VisitNoteActionButton', () => {
         groupProps={{
           showPatientBanner: 'tabletOnly',
           patientUuid: 'patient-uuid',
-          mutateVisitContext: null,
           patient: null,
           visitContext: null,
         }}
@@ -43,7 +42,6 @@ describe('VisitNoteActionButton', () => {
           patientUuid: mockPatient.id,
           patient: mockPatient,
           visitContext: null,
-          mutateVisitContext: null,
         }}
       />,
     );

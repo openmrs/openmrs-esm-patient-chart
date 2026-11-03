@@ -164,12 +164,11 @@ const VisitForm: React.FC<Workspace2DefinitionProps<VisitFormProps, VisitFormWin
       // For visit creation, we need to update:
       // 1. Current visit data (for critical components like visit summary, action buttons)
       // 2. Visit history table (for the paginated visit list)
-      const mutateSavedOrUpdatedVisit = () => invalidateVisitByUuid(globalMutate, visit.uuid);
       mutateActiveVisit();
-      setVisitContext?.(visit, mutateSavedOrUpdatedVisit);
+      setVisitContext?.(visit);
       onVisitStartedCallback?.(visit);
     },
-    [globalMutate, mutateActiveVisit, onVisitStartedCallback, setVisitContext],
+    [mutateActiveVisit, onVisitStartedCallback, setVisitContext],
   );
   const allVisitTypes = useVisitTypes();
   const { earliestAllowedStartDate, isLoading: isLoadingBirthdateCheck } =
@@ -395,7 +394,6 @@ const VisitForm: React.FC<Workspace2DefinitionProps<VisitFormProps, VisitFormWin
 
           // Use targeted SWR invalidation instead of global mutateVisit
           // This will invalidate visit history and encounter tables for this patient
-          // (if visitContext is updated, it should have been invalidated with mutateSavedOrUpdatedVisit)
           invalidateVisitAndEncounterData(globalMutate, patientUuid);
 
           const visitAttributesRequest = visitToEdit

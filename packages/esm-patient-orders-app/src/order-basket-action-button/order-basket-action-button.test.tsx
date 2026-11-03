@@ -52,7 +52,6 @@ describe('<OrderBasketActionButton/>', () => {
           patient: mockPatient,
           patientUuid: mockPatient.id,
           visitContext: null,
-          mutateVisitContext: null,
         }}
       />,
     );
@@ -71,7 +70,6 @@ describe('<OrderBasketActionButton/>', () => {
           patient: mockPatient,
           patientUuid: mockPatient.id,
           visitContext: null,
-          mutateVisitContext: null,
         }}
       />,
     );
@@ -93,7 +91,6 @@ describe('<OrderBasketActionButton/>', () => {
           patient: mockPatient,
           patientUuid: mockPatient.id,
           visitContext: null,
-          mutateVisitContext: null,
         }}
       />,
     );
@@ -113,7 +110,6 @@ describe('<OrderBasketActionButton/>', () => {
           patient: mockPatient,
           patientUuid: mockPatient.id,
           visitContext: null,
-          mutateVisitContext: null,
         }}
       />,
     );
@@ -131,7 +127,6 @@ describe('<OrderBasketActionButton/>', () => {
           patient: mockPatient,
           patientUuid: mockPatient.id,
           visitContext: null,
-          mutateVisitContext: null,
         }}
       />,
     );

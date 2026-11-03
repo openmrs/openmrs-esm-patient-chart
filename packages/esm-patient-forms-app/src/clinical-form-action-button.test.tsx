@@ -34,7 +34,6 @@ describe('<ClinicalFormActionButton>', () => {
           patientUuid: mockPatient.id,
           patient: mockPatient,
           visitContext: null,
-          mutateVisitContext: null,
         }}
       />,
     );
@@ -51,7 +50,6 @@ describe('<ClinicalFormActionButton>', () => {
           patientUuid: mockPatient.id,
           patient: mockPatient,
           visitContext: null,
-          mutateVisitContext: null,
         }}
       />,
     );

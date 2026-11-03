@@ -86,7 +86,6 @@ function renderPatientListWorkspace() {
       windowProps={{}}
       groupProps={{
         showPatientBanner: 'tabletOnly',
-        mutateVisitContext: vi.fn(),
         patient: null,
         patientUuid: null,
         visitContext: null,

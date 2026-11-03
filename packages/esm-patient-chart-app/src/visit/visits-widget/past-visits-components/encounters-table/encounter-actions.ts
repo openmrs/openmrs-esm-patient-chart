@@ -86,7 +86,6 @@ interface ConfirmAndDeleteEncounterArgs {
   patientUuid: string;
   t: TFunction;
   mutate: ReturnType<typeof useSWRConfig>['mutate'];
-  mutateVisitContext?: () => void;
 }
 
 export function confirmAndDeleteEncounter({
@@ -95,7 +94,6 @@ export function confirmAndDeleteEncounter({
   patientUuid,
   t,
   mutate,
-  mutateVisitContext,
 }: ConfirmAndDeleteEncounterArgs) {
   const dispose = showModal('delete-encounter-modal', {
     close: () => dispose(),
@@ -104,10 +102,7 @@ export function confirmAndDeleteEncounter({
       const abortController = new AbortController();
       deleteEncounter(encounterUuid, abortController)
         .then(() => {
-          // Update current visit data for critical components
-          mutateVisitContext?.();
-
-          // Also invalidate visit history and encounter tables since the encounter was deleted
+          // Invalidate visit history and encounter tables since the encounter was deleted
           invalidateVisitAndEncounterData(mutate, patientUuid);
 
           showSnackbar({

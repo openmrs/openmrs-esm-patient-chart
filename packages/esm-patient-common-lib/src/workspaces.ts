@@ -3,7 +3,6 @@ import {
   launchWorkspace2,
   navigate,
   showModal,
-  useFeatureFlag,
   useLayoutType,
   type Visit,
   type Workspace2DefinitionProps,
@@ -15,7 +14,6 @@ export interface PatientWorkspaceGroupProps {
   patient: fhir.Patient;
   patientUuid: string;
   visitContext: Visit;
-  mutateVisitContext: () => void;
   /**
    * When the workspaces of this group render the patient banner themselves. The patient chart has its own
    * patient header on desktop, so every group props object it builds sets `'tabletOnly'` (required here so
@@ -53,8 +51,9 @@ export function useShowPatientBanner(groupProps: PatientBannerGroupProps | null 
 
 /**
  * The window props taken by workspaces that are shared between the patient chart and other apps
- * (ward, service queues, dispensing, ...). These workspaces never read group props: whoever opens
- * the window supplies the patient / visit the workspace acts on. In the patient chart, use
+ * (ward, service queues, dispensing, ...). Whoever opens the window supplies the patient / visit the
+ * workspace acts on; these workspaces read group props only for the patient banner mode and as a last
+ * resort when a launch supplies no patient (see `SharedWorkspaceGroupProps`). In the patient chart, use
  * `getPatientChartWindowProps` to build them.
  */
 export interface PatientWorkspaceWindowProps {
@@ -249,7 +248,6 @@ export function useActionMenuButtonLaunchProps<T extends object>(
 export function useStartVisitIfNeeded(patientUuid: string) {
   const { visitContext, workspaceGroupVisitUuid } = usePatientChartStore(patientUuid);
   const { systemVisitEnabled } = useSystemVisitSetting();
-  const isRdeEnabled = useFeatureFlag('rde');
   // Setting a new visit context makes the patient chart relaunch its workspace group, which closes
   // any workspace opened before the relaunch. So a pending prompt resolves only once the workspace
   // group has the new visit context.
@@ -272,35 +270,17 @@ export function useStartVisitIfNeeded(patientUuid: string) {
           pendingPromptResolvers.current.push(() => resolve(true));
         };
 
-        if (isRdeEnabled) {
-          let isVisitSelected = false;
-          const dispose = showModal('visit-context-switcher', {
-            patientUuid,
-            closeModal: () => {
-              dispose();
-              if (!isVisitSelected) {
-                resolve(false);
-              }
-            },
-            onAfterVisitSelected: () => {
-              isVisitSelected = true;
-              resolveOnceWorkspaceGroupHasVisit();
-            },
-            size: 'sm',
-          });
-        } else {
-          const dispose = showModal('start-visit-dialog', {
-            closeModal: () => dispose(),
-            onCancel: () => {
-              dispose();
-              resolve(false);
-            },
-            onVisitStarted: resolveOnceWorkspaceGroupHasVisit,
-            patientUuid,
-          });
-        }
+        const dispose = showModal('start-visit-dialog', {
+          closeModal: () => dispose(),
+          onCancel: () => {
+            dispose();
+            resolve(false);
+          },
+          onVisitStarted: resolveOnceWorkspaceGroupHasVisit,
+          patientUuid,
+        });
       });
     }
-  }, [visitContext, systemVisitEnabled, isRdeEnabled, patientUuid]);
+  }, [visitContext, systemVisitEnabled, patientUuid]);
   return startVisitIfNeeded;
 }
