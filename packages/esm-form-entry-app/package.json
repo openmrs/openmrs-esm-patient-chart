@@ -51,7 +51,7 @@
     "@angular/router": "^20.3.27",
     "@carbon/icons": "^11.73.0",
     "@carbon/styles": "^1.98.0",
-    "@ng-select/ng-select": "^15.1.3",
+    "@ng-select/ng-select": "^20.7.0",
     "@ngx-translate/core": "^16.0.4",
     "@openmrs/ngx-file-uploader": "next",
     "@openmrs/ngx-formentry": "next",

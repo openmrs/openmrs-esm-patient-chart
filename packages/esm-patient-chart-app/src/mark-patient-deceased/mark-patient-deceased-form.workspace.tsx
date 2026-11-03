@@ -23,8 +23,8 @@ import { WarningFilled } from '@carbon/react/icons';
 import {
   type PatientWorkspace2DefinitionProps,
   EmptyState,
-  invalidateCurrentVisit,
   invalidateVisitAndEncounterData,
+  useShowPatientBanner,
 } from '@openmrs/esm-patient-common-lib';
 import {
   ExtensionSlot,
@@ -43,9 +43,11 @@ import styles from './mark-patient-deceased-form.scss';
 
 const MarkPatientDeceasedForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
   closeWorkspace,
-  groupProps: { patientUuid, patient },
+  groupProps,
 }) => {
   const { t } = useTranslation();
+  const { patientUuid, patient } = groupProps;
+  const shouldShowPatientBanner = useShowPatientBanner(groupProps);
   const isTablet = useLayoutType() === 'tablet';
   const memoizedState = useMemo(() => ({ patientUuid, patient }), [patientUuid, patient]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -118,7 +120,6 @@ const MarkPatientDeceasedForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>
       return markPatientDeceased(deathDate, patientUuid, causeOfDeath, nonCodedCauseOfDeath)
         .then(() => {
           globalMutate((key) => Array.isArray(key) && key[0] === 'patient' && key[1] === patientUuid);
-          invalidateCurrentVisit(globalMutate, patientUuid);
           invalidateVisitAndEncounterData(globalMutate, patientUuid);
 
           showSnackbar({
@@ -145,7 +146,7 @@ const MarkPatientDeceasedForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>
     <Workspace2 title={t('markPatientDeceased', 'Mark patient deceased')} hasUnsavedChanges={isDirty}>
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
         <div>
-          {isTablet && (
+          {shouldShowPatientBanner && (
             <Row className={styles.headerGridRow}>
               <ExtensionSlot className={styles.dataGridRow} name="visit-form-header-slot" state={memoizedState} />
             </Row>

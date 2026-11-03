@@ -38,7 +38,6 @@ interface OrderBasketProps {
   patientUuid: string;
   patient: fhir.Patient;
   visitContext: Visit;
-  mutateVisitContext: () => void;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   orderBasketExtensionProps: OrderBasketExtensionProps;
   showPatientBanner?: boolean;
@@ -61,7 +60,6 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
   patientUuid,
   patient,
   visitContext,
-  mutateVisitContext,
   closeWorkspace,
   orderBasketExtensionProps,
   showPatientBanner,
@@ -138,8 +136,6 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
         );
         await closeWorkspace({ discardUnsavedChanges: true });
         mutateEncounterUuid();
-        // Only revalidate current visit since orders create new encounters
-        mutateVisitContext?.();
         invalidateVisitAndEncounterData(mutate, patientUuid);
         clearOrders();
         await mutateOrders();
@@ -192,8 +188,6 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
         }
         clearOrders({ exceptThoseMatching: wasNotSaved });
         setOrderBasketItemErrors(patientUuid, (item) => findErroredItem(item)?.orderError);
-        // Only revalidate current visit since orders create new encounters
-        mutateVisitContext?.();
         await mutateOrders();
         invalidateVisitAndEncounterData(mutate, patientUuid);
         onOrderBasketSubmitted?.(orderEncounterUuid, postedOrders);
@@ -215,7 +209,6 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
     orderEncounterUuid,
     mutateEncounterUuid,
     mutateOrders,
-    mutateVisitContext,
     orders,
     patientUuid,
     t,

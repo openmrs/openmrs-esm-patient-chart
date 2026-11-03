@@ -18,6 +18,7 @@ dayjs.extend(utc);
 const defaultProps: PatientWorkspace2DefinitionProps<ConditionFormProps, object> = {
   closeWorkspace: vi.fn(),
   groupProps: {
+    showPatientBanner: 'tabletOnly',
     patientUuid: mockPatient.id,
     patient: mockPatient,
     visitContext: null,

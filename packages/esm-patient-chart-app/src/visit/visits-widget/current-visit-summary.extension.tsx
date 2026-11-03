@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { launchWorkspace2 } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { launchStartVisitWorkspace } from '../visit-form/launch-start-visit-workspace';
 import VisitSummary from './past-visits-components/visit-summary.component';
 import styles from './current-visit-summary.scss';
 
@@ -26,9 +26,7 @@ const CurrentVisitSummary: React.FC<CurrentVisitSummaryProps> = ({ patientUuid }
       <EmptyState
         headerTitle={t('currentVisit', 'Current visit')}
         displayText={t('noActiveVisitMessage', 'active visits')}
-        launchForm={() =>
-          launchWorkspace2('start-visit-workspace-form', { openedFrom: 'patient-chart-current-visit-summary' })
-        }
+        launchForm={() => launchStartVisitWorkspace({ openedFrom: 'patient-chart-current-visit-summary' }, patientUuid)}
       />
     );
   }
