@@ -1,6 +1,8 @@
-import { renderHook, waitFor } from '@testing-library/react';
+import React from 'react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { launchWorkspaceGroup2, usePatient, useVisit, type Visit } from '@openmrs/esm-framework';
+import { SWRConfig } from 'swr';
+import { launchWorkspaceGroup2, openmrsFetch, usePatient, useVisit, type Visit } from '@openmrs/esm-framework';
 import { setPatientChartWorkspaceGroupVisitUuid, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { mockFhirPatient } from '__mocks__';
 import { usePatientChartPatientAndVisit } from './patient-chart.resources';
@@ -17,6 +19,7 @@ vi.mock('@openmrs/esm-patient-common-lib', () => ({
 }));
 
 const mockLaunchWorkspaceGroup = vi.mocked(launchWorkspaceGroup2);
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 const mockUsePatient = vi.mocked(usePatient);
 const mockUseVisit = vi.mocked(useVisit);
 const mockUsePatientChartStore = vi.mocked(usePatientChartStore);
@@ -76,6 +79,303 @@ describe('usePatientChartPatientAndVisit', () => {
       setPatient,
       setVisitContext,
     });
+    mockUseVisit.mockReturnValue({
+      activeVisit: null,
+      mutate: mutateVisit,
+      isValidating: false,
+      error: null,
+      currentVisit: null,
+      currentVisitIsRetrospective: false,
+      isLoading: false,
+    });
+  });
+
+  it('preserves the patient-load error for an unavailable patient', () => {
+    const error = Object.assign(new Error('Gone'), { response: { status: 410, statusText: 'Gone' } });
+    mockUsePatient.mockReturnValue({
+      isLoading: false,
+      patient: undefined,
+      patientUuid: mockFhirPatient.id,
+      error,
+    });
+
+    const { result } = renderHook(() => usePatientChartPatientAndVisit(mockFhirPatient.id));
+
+    expect(result.current).toEqual(expect.objectContaining({ error }));
+    expect(result.current.patient).toBeUndefined();
+    expect(mockLaunchWorkspaceGroup).not.toHaveBeenCalled();
+  });
+
+  it('preserves missing patient data when loading completes without an error', () => {
+    mockUsePatient.mockReturnValue({
+      isLoading: false,
+      patient: null,
+      patientUuid: mockFhirPatient.id,
+      error: null,
+    });
+
+    const { result } = renderHook(() => usePatientChartPatientAndVisit(mockFhirPatient.id));
+
+    expect(result.current.patient).toBeNull();
+    expect(mockLaunchWorkspaceGroup).not.toHaveBeenCalled();
+  });
+
+  it('does not launch or store a retained patient when the patient request has errored', () => {
+    mockUsePatient.mockReturnValue({
+      isLoading: false,
+      patient: mockFhirPatient,
+      patientUuid: mockFhirPatient.id,
+      error: Object.assign(new Error('Gone'), { response: { status: 410, statusText: 'Gone' } }),
+    });
+
+    renderHook(() => usePatientChartPatientAndVisit(mockFhirPatient.id));
+
+    expect(mockLaunchWorkspaceGroup).not.toHaveBeenCalled();
+    expect(setPatient).toHaveBeenLastCalledWith(null);
+    expect(setVisitContext).not.toHaveBeenCalled();
+  });
+
+  it('clears a cached patient and suppresses visit launches until the patient request recovers', async () => {
+    let activeVisit = visitA;
+    mockUseVisit.mockImplementation(() => ({
+      activeVisit,
+      mutate: mutateVisit,
+      isValidating: false,
+      error: null,
+      currentVisit: null,
+      currentVisitIsRetrospective: false,
+      isLoading: false,
+    }));
+
+    const { rerender } = renderHook(() => usePatientChartPatientAndVisit(mockFhirPatient.id));
+    await waitFor(() => expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(1));
+
+    mockUsePatient.mockReturnValue({
+      isLoading: false,
+      patient: mockFhirPatient,
+      patientUuid: mockFhirPatient.id,
+      error: Object.assign(new Error('Gone'), { response: { status: 410, statusText: 'Gone' } }),
+    });
+    activeVisit = visitB;
+    rerender();
+
+    expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(1);
+    expect(setPatient).toHaveBeenLastCalledWith(null);
+
+    mockUsePatient.mockReturnValue({
+      isLoading: false,
+      patient: mockFhirPatient,
+      patientUuid: mockFhirPatient.id,
+      error: null,
+    });
+    rerender();
+
+    await waitFor(() => expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(2));
+    expect(mockLaunchWorkspaceGroup).toHaveBeenLastCalledWith(
+      'patient-chart',
+      expect.objectContaining({ patientUuid: mockFhirPatient.id, visitContext: visitB }),
+    );
+    expect(setPatient).toHaveBeenLastCalledWith(mockFhirPatient);
+  });
+
+  it('does not launch a queued visit or publish its context after a pending launch resolves while unavailable', async () => {
+    let activeVisit = visitA;
+    let resolveFirstLaunch!: (value: boolean) => void;
+    mockLaunchWorkspaceGroup.mockReturnValueOnce(
+      new Promise<boolean>((resolve) => {
+        resolveFirstLaunch = resolve;
+      }),
+    );
+    mockUseVisit.mockImplementation(() => ({
+      activeVisit,
+      mutate: mutateVisit,
+      isValidating: false,
+      error: null,
+      currentVisit: null,
+      currentVisitIsRetrospective: false,
+      isLoading: false,
+    }));
+
+    const { rerender } = renderHook(() => usePatientChartPatientAndVisit(mockFhirPatient.id));
+    await waitFor(() => expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(1));
+
+    activeVisit = visitB;
+    rerender();
+    mockUsePatient.mockReturnValue({
+      isLoading: false,
+      patient: mockFhirPatient,
+      patientUuid: mockFhirPatient.id,
+      error: Object.assign(new Error('Gone'), { response: { status: 410, statusText: 'Gone' } }),
+    });
+    rerender();
+    setWorkspaceGroupVisitUuid.mockClear();
+
+    await act(async () => resolveFirstLaunch(true));
+
+    expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(1);
+    expect(setWorkspaceGroupVisitUuid).not.toHaveBeenCalled();
+    expect(setPatient).toHaveBeenLastCalledWith(null);
+
+    mockUsePatient.mockReturnValue({
+      isLoading: false,
+      patient: mockFhirPatient,
+      patientUuid: mockFhirPatient.id,
+      error: null,
+    });
+    rerender();
+    await waitFor(() => expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(2));
+    expect(mockLaunchWorkspaceGroup).toHaveBeenLastCalledWith(
+      'patient-chart',
+      expect.objectContaining({ visitContext: visitB }),
+    );
+    expect(setWorkspaceGroupVisitUuid).toHaveBeenLastCalledWith(visitB.uuid, groupPropsFor(visitB));
+  });
+
+  it('reconciles the recovered visit after an invalidated launch may have changed the framework group', async () => {
+    let activeVisit = visitA;
+    let resolveSecondLaunch!: (value: boolean) => void;
+    mockLaunchWorkspaceGroup.mockResolvedValueOnce(true).mockReturnValueOnce(
+      new Promise<boolean>((resolve) => {
+        resolveSecondLaunch = resolve;
+      }),
+    );
+    mockUseVisit.mockImplementation(() => ({
+      activeVisit,
+      mutate: mutateVisit,
+      isValidating: false,
+      error: null,
+      currentVisit: null,
+      currentVisitIsRetrospective: false,
+      isLoading: false,
+    }));
+
+    const { rerender } = renderHook(() => usePatientChartPatientAndVisit(mockFhirPatient.id));
+    await waitFor(() =>
+      expect(setWorkspaceGroupVisitUuid).toHaveBeenLastCalledWith(visitA.uuid, groupPropsFor(visitA)),
+    );
+
+    activeVisit = visitB;
+    rerender();
+    await waitFor(() => expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(2));
+    mockUsePatient.mockReturnValue({
+      isLoading: false,
+      patient: mockFhirPatient,
+      patientUuid: mockFhirPatient.id,
+      error: new Error('Network error'),
+    });
+    rerender();
+    setWorkspaceGroupVisitUuid.mockClear();
+    await act(async () => resolveSecondLaunch(true));
+    expect(setWorkspaceGroupVisitUuid).not.toHaveBeenCalled();
+
+    activeVisit = visitA;
+    mockUsePatient.mockReturnValue({
+      isLoading: false,
+      patient: mockFhirPatient,
+      patientUuid: mockFhirPatient.id,
+      error: null,
+    });
+    rerender();
+
+    await waitFor(() => expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(3));
+    expect(mockLaunchWorkspaceGroup).toHaveBeenLastCalledWith(
+      'patient-chart',
+      expect.objectContaining({ visitContext: visitA }),
+    );
+    expect(setWorkspaceGroupVisitUuid).toHaveBeenLastCalledWith(visitA.uuid, groupPropsFor(visitA));
+  });
+
+  it('does not launch the active-visit group until the store patient identity is restored on recovery', async () => {
+    const retrospectiveVisit = { uuid: 'retrospective-visit', patient: { uuid: mockFhirPatient.id } } as Visit;
+    const refetchedRetrospectiveVisit = {
+      ...retrospectiveVisit,
+      display: 'Refetched retrospective visit',
+    } as Visit;
+    const goneError = () => Object.assign(new Error('Gone'), { response: { status: 410, statusText: 'Gone' } });
+
+    // The active-visit fetch settled while the patient was unavailable. The store was
+    // cleared on unavailability, so its patient identity is null and the saved
+    // retrospective visit is masked.
+    mockUseVisit.mockImplementation(() => ({
+      activeVisit: visitA,
+      mutate: mutateVisit,
+      isValidating: false,
+      error: null,
+      currentVisit: null,
+      currentVisitIsRetrospective: false,
+      isLoading: false,
+    }));
+    mockUsePatientChartStore.mockReturnValue({
+      patientUuid: null,
+      patient: null,
+      visitContext: null,
+      setPatient,
+      setVisitContext,
+    });
+    mockUsePatient.mockReturnValue({
+      isLoading: false,
+      patient: mockFhirPatient,
+      patientUuid: mockFhirPatient.id,
+      error: goneError(),
+    });
+
+    // The framework mock's openmrsFetch never resolves; resolve the retrospective
+    // visit refetch for this test and restore the default afterwards.
+    mockOpenmrsFetch.mockResolvedValue({ data: refetchedRetrospectiveVisit } as never);
+
+    const wrapper = ({ children }: { children: React.ReactNode }) =>
+      React.createElement(
+        SWRConfig,
+        {
+          value: {
+            dedupingInterval: 0,
+            provider: () => new Map(),
+          },
+        },
+        children,
+      );
+    const { rerender } = renderHook(() => usePatientChartPatientAndVisit(mockFhirPatient.id), { wrapper });
+    expect(mockLaunchWorkspaceGroup).not.toHaveBeenCalled();
+
+    // The patient request recovers while the store identity is still null. The settled
+    // active visit must not launch a group that would override the retrospective visit.
+    mockUsePatient.mockReturnValue({
+      isLoading: false,
+      patient: mockFhirPatient,
+      patientUuid: mockFhirPatient.id,
+      error: null,
+    });
+    rerender();
+
+    await waitFor(() => expect(setPatient).toHaveBeenCalledWith(mockFhirPatient));
+    expect(mockLaunchWorkspaceGroup).not.toHaveBeenCalled();
+
+    // Once the store identity is restored, the retrospective visit is unmasked and the
+    // group launches with its refetch instead of the settled active visit.
+    mockUsePatientChartStore.mockReturnValue({
+      patientUuid: mockFhirPatient.id,
+      patient: mockFhirPatient,
+      visitContext: retrospectiveVisit,
+      setPatient,
+      setVisitContext,
+    });
+    mockUseVisit.mockImplementation(() => ({
+      activeVisit: null,
+      mutate: mutateVisit,
+      isValidating: false,
+      error: null,
+      currentVisit: null,
+      currentVisitIsRetrospective: false,
+      isLoading: false,
+    }));
+    rerender();
+
+    await waitFor(() => expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(1));
+    expect(mockLaunchWorkspaceGroup).toHaveBeenLastCalledWith(
+      'patient-chart',
+      expect.objectContaining({ patientUuid: mockFhirPatient.id, visitContext: refetchedRetrospectiveVisit }),
+    );
+    mockOpenmrsFetch.mockImplementation(() => new Promise(() => {}));
   });
 
   it('relaunches the patient-chart workspace group when the visit context changes', async () => {
