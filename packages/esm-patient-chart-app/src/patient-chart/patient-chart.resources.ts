@@ -78,23 +78,17 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
     patientUuid: storePatientUuid,
     setPatient,
     visitContext,
-    mutateVisitContext,
     setVisitContext,
   } = usePatientChartStore(patientUuid);
 
   const isVisitContextValid = visitContext?.patient.uuid === patientUuid;
-  const {
-    visit: newVisitContext,
-    mutate: newMutateVisitContext,
-    isValidating: isValidatingVisitContext,
-  } = useVisitByUuid(isVisitContextValid ? visitContext.uuid : null);
-  const {
-    activeVisit,
-    isValidating: isValidatingActiveVisit,
-    mutate: mutateActiveVisit,
-  } = useVisit(isVisitContextValid ? null : patientUuid);
+  const { visit: newVisitContext, isValidating: isValidatingVisitContext } = useVisitByUuid(
+    isVisitContextValid ? visitContext.uuid : null,
+  );
+  const { activeVisit, isValidating: isValidatingActiveVisit } = useVisit(isVisitContextValid ? null : patientUuid);
 
   const launchedWorkspaceGroupKey = useRef<WorkspaceGroupLaunchKey | null>(null);
+  const launchedWorkspaceGroupProps = useRef<PatientWorkspaceGroupProps | null>(null);
   const latestWorkspaceGroupProps = useRef<PatientWorkspaceGroupProps | null>(null);
   const isWorkspaceGroupLaunchPending = useRef(false);
   const isMounted = useRef(false);
@@ -149,6 +143,7 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
         }
 
         launchedWorkspaceGroupKey.current = launchKey;
+        launchedWorkspaceGroupProps.current = groupProps;
 
         const latestLaunchKey = getWorkspaceGroupLaunchKey(latestWorkspaceGroupProps.current);
         if (workspaceGroupLaunchKeysEqual(latestLaunchKey, launchedWorkspaceGroupKey.current)) {
@@ -174,30 +169,33 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
             patientUuid: patient.id,
             patient,
             visitContext: activeVisit,
-            mutateVisitContext: mutateActiveVisit,
+            showPatientBanner: 'tabletOnly',
           };
         } else if (newVisitContext) {
           groupProps = {
             patientUuid: patient.id,
             patient,
             visitContext: newVisitContext,
-            mutateVisitContext: newMutateVisitContext,
+            showPatientBanner: 'tabletOnly',
           };
         } else {
           groupProps = {
             patientUuid: patient.id,
             patient,
             visitContext: null,
-            mutateVisitContext: null,
+            showPatientBanner: 'tabletOnly',
           };
         }
 
-        setVisitContext(groupProps.visitContext, groupProps.mutateVisitContext);
+        setVisitContext(groupProps.visitContext);
 
         latestWorkspaceGroupProps.current = groupProps;
         await launchLatestWorkspaceGroup();
         if (isMounted.current && latestWorkspaceGroupProps.current) {
-          setPatientChartWorkspaceGroupVisitUuid(launchedWorkspaceGroupKey.current?.visitContextUuid ?? null);
+          setPatientChartWorkspaceGroupVisitUuid(
+            launchedWorkspaceGroupKey.current?.visitContextUuid ?? null,
+            launchedWorkspaceGroupProps.current,
+          );
         }
       }
     };
@@ -215,12 +213,10 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
   }, [
     newVisitContext,
     isValidatingVisitContext,
-    newMutateVisitContext,
     setVisitContext,
     activeVisit,
     isValidatingActiveVisit,
     storePatientUuid,
-    mutateActiveVisit,
     patient,
     isPatientUnavailable,
     t,
@@ -244,12 +240,11 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
       patientUuid,
       patient,
       visitContext,
-      mutateVisitContext,
       isLoadingPatient,
       error,
       setPatient,
     }),
-    [patient, patientUuid, visitContext, mutateVisitContext, isLoadingPatient, error, setPatient],
+    [patient, patientUuid, visitContext, isLoadingPatient, error, setPatient],
   );
 
   return state;

@@ -31,10 +31,10 @@ it('renders an Edit form that enables users to toggle flags on or off', async ()
     <FlagsWorkspace
       closeWorkspace={vi.fn()}
       groupProps={{
+        showPatientBanner: 'tabletOnly',
         patientUuid: mockPatient.id,
         patient: mockPatient,
         visitContext: null,
-        mutateVisitContext: null,
       }}
       workspaceProps={{}}
       windowProps={{}}
@@ -73,10 +73,10 @@ it('sorts by active and retired correctly via controlled dropdown', async () => 
     <FlagsWorkspace
       closeWorkspace={vi.fn()}
       groupProps={{
+        showPatientBanner: 'tabletOnly',
         patientUuid: mockPatient.id,
         patient: mockPatient,
         visitContext: null,
-        mutateVisitContext: null,
       }}
       workspaceProps={{}}
       windowProps={{}}

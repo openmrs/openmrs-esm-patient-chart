@@ -41,10 +41,10 @@ const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const testProps: PatientWorkspace2DefinitionProps<ProgramsFormProps, {}> = {
   closeWorkspace: mockCloseWorkspace,
   groupProps: {
+    showPatientBanner: 'tabletOnly',
     patientUuid: mockPatient.id,
     patient: mockPatient,
     visitContext: null,
-    mutateVisitContext: null,
   },
   workspaceName: '',
   launchChildWorkspace: vi.fn(),

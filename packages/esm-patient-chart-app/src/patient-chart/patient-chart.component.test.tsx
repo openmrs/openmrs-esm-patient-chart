@@ -38,7 +38,6 @@ const mockErrorState = vi.mocked(ErrorState);
 const mockUseLayoutType = vi.mocked(useLayoutType);
 const setPatient = vi.fn();
 const setVisitContext = vi.fn();
-const mutateVisitContext = vi.fn();
 
 // This consumer lives outside the chart, as the framework's navigation does.
 function FrameworkNavigation() {
@@ -82,13 +81,12 @@ describe('PatientChart', () => {
       isLoading: false,
       isValidating: false,
       error: null,
-      mutate: mutateVisitContext,
+      mutate: vi.fn(),
     });
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: mockFhirPatient.id,
       patient: null,
       visitContext: null,
-      mutateVisitContext: null,
       setPatient,
       setVisitContext,
     });
