@@ -29,11 +29,12 @@ interface VisitSummaryProps {
   patientUuid: string;
   patient: EncountersTableProps['patient'];
   onEncounterSaved?: EncountersTableProps['onEncounterSaved'];
+  openedFrom?: EncountersTableProps['openedFrom'];
 }
 
 const visitSummaryPanelSlot = 'visit-summary-panels';
 
-const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid, patient, onEncounterSaved }) => {
+const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid, patient, onEncounterSaved, openedFrom }) => {
   const config = useConfig<ChartConfig>();
   const { t } = useTranslation();
   const extensions = useAssignedExtensions(visitSummaryPanelSlot);
@@ -152,6 +153,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid, patient
               patientUuid={patientUuid}
               patient={patient}
               onEncounterSaved={onEncounterSaved}
+              openedFrom={openedFrom}
             />
           </TabPanel>
           <TabPanel>
@@ -169,6 +171,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid, patient
               patientUuid={patientUuid}
               patient={patient}
               onEncounterSaved={onEncounterSaved}
+              openedFrom={openedFrom}
             />
           </TabPanel>
           <ExtensionSlot name={visitSummaryPanelSlot}>

@@ -1,0 +1,102 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+// Fills the tab panel and never scrolls itself; the two columns scroll independently instead.
+.container {
+  display: flex;
+  gap: layout.$spacing-05;
+  background-color: $ui-background;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.pickerColumn {
+  flex: 0 0 20rem;
+  max-width: 20rem;
+  border-right: 1px solid $ui-03;
+  overflow: hidden auto;
+  min-height: 0;
+}
+
+.mainPanel {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.mainPanelContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.visitHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: layout.$spacing-03;
+  padding: layout.$spacing-05;
+  border-bottom: 1px solid $ui-03;
+}
+
+.visitHeaderInfo {
+  min-width: 0;
+}
+
+.visitActions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.visitType {
+  @include type.type-style('heading-03');
+  margin-bottom: layout.$spacing-02;
+}
+
+.visitMeta {
+  display: flex;
+  align-items: center;
+  color: $text-02;
+  @include type.type-style('body-compact-01');
+}
+
+.separator,
+.visitLocation {
+  margin: 0 layout.$spacing-02;
+}
+
+.addToVisitBar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: layout.$spacing-03;
+  padding: layout.$spacing-05;
+  background-color: $ui-01;
+  border-bottom: 1px solid $ui-03;
+}
+
+.addToVisitLabel {
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
+}
+
+// Mirrors the look of the shared EmptyState (centered, bordered tile + illustration), but without
+// its heading, shown when no visit is selected yet.
+.emptyStateLayer {
+  margin: layout.$spacing-05;
+}
+
+.emptyStateTile {
+  text-align: center;
+  border: 1px solid $ui-03;
+}
+
+.emptyStateContent {
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-03;
+}

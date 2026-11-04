@@ -1,0 +1,87 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.visitCardRow {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+  width: 100%;
+  text-align: start;
+  border: solid 1px $ui-03;
+  background-color: $ui-01;
+  padding: layout.$spacing-03 layout.$spacing-04;
+  cursor: pointer;
+
+  &:not(:first-child) {
+    border-top: none;
+  }
+
+  &:hover {
+    background-color: $ui-03;
+  }
+
+  // Besides the background, mark the selected card with an accent bar, so it stands out while hovering other cards.
+  &.isSelected {
+    background-color: $ui-03;
+    box-shadow: inset layout.$spacing-02 0 0 0 var(--brand-01);
+  }
+}
+
+.visitInfoContainer {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.visitCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: layout.$spacing-03;
+  margin-bottom: layout.$spacing-02;
+}
+
+.visitInfo {
+  display: block;
+}
+
+.visitType {
+  @include type.type-style('heading-compact-01');
+}
+
+.visitStatusTag {
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.createVisitButtonContainer {
+  padding: layout.$spacing-05;
+}
+
+.datepicker {
+  padding-top: layout.$spacing-05;
+}
+
+.tile {
+  margin: auto;
+  margin-top: layout.$spacing-07;
+  width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.content {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: layout.$spacing-03;
+}
+
+.helper {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}
