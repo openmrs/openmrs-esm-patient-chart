@@ -7,6 +7,11 @@
   },
   "extensions": [
     {
+      "name": "encounter-visit-note",
+      "component": "encounterVisitNote",
+      "slot": "encounter-workspace-slot"
+    },
+    {
       "name": "notes-overview-widget",
       "component": "notesOverview",
       "meta": {
