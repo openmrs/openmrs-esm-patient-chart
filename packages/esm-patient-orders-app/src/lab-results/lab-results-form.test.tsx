@@ -8,7 +8,12 @@ import React from 'react';
 import { vi, describe, expect, test, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getDefaultsFromConfigSchema, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import {
+  getDefaultsFromConfigSchema,
+  showSnackbar,
+  useConfig,
+  type Workspace2DefinitionProps,
+} from '@openmrs/esm-framework';
 import {
   useOrderConceptsByUuids,
   useLabEncounter,
@@ -22,11 +27,8 @@ import {
   updateObservation,
 } from './lab-results.resource';
 import LabResultsForm, { type LabResultsFormProps } from './lab-results-form.workspace';
-import ExportedLabResultsForm, {
-  type LabResultsFormProps as ExportedLabResultsFormProps,
-} from './exported-lab-results-form.workspace';
 import {
-  type PatientWorkspace2DefinitionProps,
+  type PatientWorkspaceWindowProps,
   type Order,
   type TestOrderBasketItem,
   useOrderBasket,
@@ -76,18 +78,19 @@ const mockOrder = {
 
 const mockCloseWorkspace = vi.fn();
 
-const testProps: PatientWorkspace2DefinitionProps<LabResultsFormProps, {}> = {
+// As launched by the patient chart: the patient is a window prop, and the chart's lab order form is supplied
+const testProps: Workspace2DefinitionProps<LabResultsFormProps, Partial<PatientWorkspaceWindowProps>, object> = {
   closeWorkspace: mockCloseWorkspace,
   workspaceProps: {
     order: mockOrder as Order,
+    labOrderWorkspaceName: 'add-lab-order',
   },
-  windowProps: {},
-  groupProps: {
+  windowProps: {
     patientUuid: mockPatient.id,
     patient: mockPatient,
     visitContext: null,
-    mutateVisitContext: null,
   },
+  groupProps: {},
   launchChildWorkspace: vi.fn(),
   workspaceName: '',
   windowName: '',
@@ -95,13 +98,14 @@ const testProps: PatientWorkspace2DefinitionProps<LabResultsFormProps, {}> = {
   showActionMenu: true,
 };
 
+// As launched by apps that still pass the patient as a (deprecated) workspace prop, e.g. the Laboratory app
 const exportedTestProps = {
   closeWorkspace: mockCloseWorkspace,
   workspaceProps: {
     patient: mockPatient,
     order: mockOrder as Order,
-  } satisfies ExportedLabResultsFormProps,
-  windowProps: {},
+  } satisfies LabResultsFormProps,
+  windowProps: null as Partial<PatientWorkspaceWindowProps> | null,
   groupProps: {},
   launchChildWorkspace: vi.fn(),
   workspaceName: '',
@@ -172,7 +176,7 @@ describe('LabResultsForm', () => {
   });
 
   test('hides the add tests basket in exported context without a launch callback', () => {
-    render(<ExportedLabResultsForm {...exportedTestProps} />);
+    render(<LabResultsForm {...exportedTestProps} />);
 
     expect(screen.queryByText('Add Tests to this order')).not.toBeInTheDocument();
   });
@@ -190,7 +194,7 @@ describe('LabResultsForm', () => {
 
   test('hides the add tests basket in exported context with a child workspace name when disabled', () => {
     render(
-      <ExportedLabResultsForm
+      <LabResultsForm
         {...exportedTestProps}
         workspaceProps={{
           ...exportedTestProps.workspaceProps,
@@ -209,7 +213,7 @@ describe('LabResultsForm', () => {
     });
 
     render(
-      <ExportedLabResultsForm
+      <LabResultsForm
         {...exportedTestProps}
         workspaceProps={{
           ...exportedTestProps.workspaceProps,

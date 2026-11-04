@@ -30,10 +30,10 @@ describe('MarkPatientDeceasedForm', () => {
     windowProps: {},
     workspaceProps: {},
     groupProps: {
+      showPatientBanner: 'tabletOnly',
       patientUuid: mockPatient.id,
       patient: mockPatient,
       visitContext: null,
-      mutateVisitContext: null,
     },
     windowName: '',
     isRootWorkspace: false,

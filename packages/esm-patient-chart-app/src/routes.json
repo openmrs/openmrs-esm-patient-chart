@@ -230,10 +230,6 @@
     {
       "name": "start-visit-dialog",
       "component": "startVisitModal"
-    },
-    {
-      "name": "visit-context-switcher",
-      "component": "visitContextSwitcherModal"
     }
   ],
   "pages": [
