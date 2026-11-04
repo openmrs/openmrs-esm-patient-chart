@@ -20,7 +20,6 @@ describe('VisitBannerTag', () => {
       patientUuid: mockPatient.id,
       patient: mockPatient,
       visitContext: null,
-      mutateVisitContext: null,
       setPatient: vi.fn(),
       setVisitContext: vi.fn(),
     });
@@ -86,7 +85,6 @@ describe('VisitBannerTag', () => {
       patientUuid: mockPatient.id,
       patient: mockPatient,
       visitContext: { ...mockCurrentVisit, stopDatetime: '2022-01-01T12:00:00.000+0000' },
-      mutateVisitContext: null,
       setPatient: vi.fn(),
       setVisitContext: vi.fn(),
     });

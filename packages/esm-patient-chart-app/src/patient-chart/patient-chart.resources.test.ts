@@ -21,10 +21,14 @@ const mockUsePatient = vi.mocked(usePatient);
 const mockUseVisit = vi.mocked(useVisit);
 const mockUsePatientChartStore = vi.mocked(usePatientChartStore);
 
-const mutateVisitContext = vi.fn();
+const mutateVisit = vi.fn();
 const setPatient = vi.fn();
 const setVisitContext = vi.fn();
 const setWorkspaceGroupVisitUuid = vi.mocked(setPatientChartWorkspaceGroupVisitUuid);
+
+// The group props the workspace group was launched with are recorded alongside its visit uuid
+const groupPropsFor = (visit: Visit) =>
+  expect.objectContaining({ visitContext: expect.objectContaining({ uuid: visit.uuid }) });
 
 const visitA = { uuid: 'visit-a', patient: { uuid: mockFhirPatient.id } } as Visit;
 const visitB = { uuid: 'visit-b', patient: { uuid: mockFhirPatient.id } } as Visit;
@@ -39,7 +43,7 @@ function mockNoActiveVisitForPatientSwitch() {
   }));
   mockUseVisit.mockImplementation(() => ({
     activeVisit: null,
-    mutate: mutateVisitContext,
+    mutate: mutateVisit,
     isValidating: false,
     error: null,
     currentVisit: null,
@@ -50,7 +54,6 @@ function mockNoActiveVisitForPatientSwitch() {
     patientUuid,
     patient: patientUuid === patientB.id ? patientB : mockFhirPatient,
     visitContext: null,
-    mutateVisitContext: null,
     setPatient,
     setVisitContext,
   }));
@@ -70,7 +73,6 @@ describe('usePatientChartPatientAndVisit', () => {
       patientUuid: mockFhirPatient.id,
       patient: mockFhirPatient,
       visitContext: null,
-      mutateVisitContext: null,
       setPatient,
       setVisitContext,
     });
@@ -80,7 +82,7 @@ describe('usePatientChartPatientAndVisit', () => {
     let activeVisit = visitA;
     mockUseVisit.mockImplementation(() => ({
       activeVisit,
-      mutate: mutateVisitContext,
+      mutate: mutateVisit,
       isValidating: false,
       error: null,
       currentVisit: null,
@@ -97,7 +99,6 @@ describe('usePatientChartPatientAndVisit', () => {
         patient: mockFhirPatient,
         patientUuid: mockFhirPatient.id,
         visitContext: visitA,
-        mutateVisitContext,
       }),
     );
 
@@ -111,7 +112,6 @@ describe('usePatientChartPatientAndVisit', () => {
         patient: mockFhirPatient,
         patientUuid: mockFhirPatient.id,
         visitContext: visitB,
-        mutateVisitContext,
       }),
     );
   });
@@ -120,7 +120,7 @@ describe('usePatientChartPatientAndVisit', () => {
     let activeVisit = visitA;
     mockUseVisit.mockImplementation(() => ({
       activeVisit,
-      mutate: mutateVisitContext,
+      mutate: mutateVisit,
       isValidating: false,
       error: null,
       currentVisit: null,
@@ -130,7 +130,9 @@ describe('usePatientChartPatientAndVisit', () => {
 
     const { rerender } = renderHook(() => usePatientChartPatientAndVisit(mockFhirPatient.id));
 
-    await waitFor(() => expect(setWorkspaceGroupVisitUuid).toHaveBeenLastCalledWith(visitA.uuid));
+    await waitFor(() =>
+      expect(setWorkspaceGroupVisitUuid).toHaveBeenLastCalledWith(visitA.uuid, groupPropsFor(visitA)),
+    );
     expect(mockLaunchWorkspaceGroup.mock.invocationCallOrder[0]).toBeLessThan(
       setWorkspaceGroupVisitUuid.mock.invocationCallOrder.at(-1),
     );
@@ -138,14 +140,16 @@ describe('usePatientChartPatientAndVisit', () => {
     activeVisit = visitB;
     rerender();
 
-    await waitFor(() => expect(setWorkspaceGroupVisitUuid).toHaveBeenLastCalledWith(visitB.uuid));
+    await waitFor(() =>
+      expect(setWorkspaceGroupVisitUuid).toHaveBeenLastCalledWith(visitB.uuid, groupPropsFor(visitB)),
+    );
   });
 
   it('does not record a new visit when the workspace group relaunch is declined', async () => {
     let activeVisit = visitA;
     mockUseVisit.mockImplementation(() => ({
       activeVisit,
-      mutate: mutateVisitContext,
+      mutate: mutateVisit,
       isValidating: false,
       error: null,
       currentVisit: null,
@@ -154,7 +158,9 @@ describe('usePatientChartPatientAndVisit', () => {
     }));
 
     const { rerender } = renderHook(() => usePatientChartPatientAndVisit(mockFhirPatient.id));
-    await waitFor(() => expect(setWorkspaceGroupVisitUuid).toHaveBeenLastCalledWith(visitA.uuid));
+    await waitFor(() =>
+      expect(setWorkspaceGroupVisitUuid).toHaveBeenLastCalledWith(visitA.uuid, groupPropsFor(visitA)),
+    );
 
     mockLaunchWorkspaceGroup.mockResolvedValueOnce(false);
     activeVisit = visitB;
@@ -162,14 +168,14 @@ describe('usePatientChartPatientAndVisit', () => {
 
     await waitFor(() => expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(2));
     await waitFor(() => expect(setWorkspaceGroupVisitUuid).toHaveBeenCalledTimes(2));
-    expect(setWorkspaceGroupVisitUuid).toHaveBeenLastCalledWith(visitA.uuid);
+    expect(setWorkspaceGroupVisitUuid).toHaveBeenLastCalledWith(visitA.uuid, groupPropsFor(visitA));
   });
 
   it('does not relaunch when the same visit UUID is returned with new object references', async () => {
     let activeVisit: Visit = visitA;
     mockUseVisit.mockImplementation(() => ({
       activeVisit,
-      mutate: mutateVisitContext,
+      mutate: mutateVisit,
       isValidating: false,
       error: null,
       currentVisit: null,
@@ -256,7 +262,7 @@ describe('usePatientChartPatientAndVisit', () => {
     mockLaunchWorkspaceGroup.mockReturnValueOnce(firstLaunch).mockResolvedValue(true);
     mockUseVisit.mockImplementation(() => ({
       activeVisit,
-      mutate: mutateVisitContext,
+      mutate: mutateVisit,
       isValidating: false,
       error: null,
       currentVisit: null,

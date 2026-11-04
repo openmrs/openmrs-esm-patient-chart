@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-growth-chart-app",
-  "version": "13.0.0",
+  "version": "13.0.1",
   "license": "MPL-2.0",
   "description": "Patient growth chart microfrontend for the OpenMRS SPA",
   "generator": "@openmrs/create-o3-app@1.2.0",

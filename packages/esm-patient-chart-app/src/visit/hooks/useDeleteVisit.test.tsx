@@ -2,11 +2,7 @@ import { useSWRConfig } from 'swr';
 import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { showSnackbar, type Visit } from '@openmrs/esm-framework';
-import {
-  invalidateCurrentVisit,
-  invalidateVisitAndEncounterData,
-  usePatientChartStore,
-} from '@openmrs/esm-patient-common-lib';
+import { invalidateVisitAndEncounterData, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { useDeleteVisit } from './useDeleteVisit';
 import { deleteVisit, restoreVisit } from '../visits-widget/visit.resource';
 
@@ -24,7 +20,6 @@ vi.mock('../visits-widget/visit.resource', async () => {
 });
 
 vi.mock('@openmrs/esm-patient-common-lib', () => ({
-  invalidateCurrentVisit: vi.fn(),
   invalidateVisitAndEncounterData: vi.fn(),
   usePatientChartStore: vi.fn(),
 }));
@@ -65,7 +60,6 @@ describe('useDeleteVisit', () => {
       patientUuid: 'patient-123',
       patient: null,
       visitContext: null,
-      mutateVisitContext: vi.fn(),
       setPatient: vi.fn(),
       setVisitContext: mockSetVisitContext,
     });
@@ -144,7 +138,6 @@ describe('useDeleteVisit', () => {
       patientUuid: 'patient-123',
       patient: null,
       visitContext: null,
-      mutateVisitContext: vi.fn(),
       setPatient: vi.fn(),
       setVisitContext: mockSetVisitContext,
     });
@@ -190,7 +183,6 @@ describe('useDeleteVisit', () => {
       patientUuid: 'patient-123',
       patient: null,
       visitContext: null,
-      mutateVisitContext: vi.fn(),
       setPatient: vi.fn(),
       setVisitContext: mockSetVisitContext,
     });

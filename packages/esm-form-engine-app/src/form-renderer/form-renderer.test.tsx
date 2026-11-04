@@ -27,7 +27,6 @@ describe('FormRenderer', () => {
     promptBeforeClosing: vi.fn(),
     setTitle: vi.fn(),
     visitContext: null,
-    mutateVisitContext: null,
   };
 
   test('renders FormError component when there is an error', () => {

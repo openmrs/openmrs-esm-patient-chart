@@ -59,11 +59,11 @@ vi.mock('../api', async () => ({
   useRequireOutpatientQuantity: () => mockUseRequireOutpatientQuantity(),
 }));
 
-function renderDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem, onSave = vi.fn()) {
+function renderDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem, onSave = vi.fn(), patient = mockPatient) {
   return render(
     <DrugOrderForm
       initialOrderBasketItem={initialOrderBasketItem}
-      patient={mockPatient}
+      patient={patient}
       visitContext={null}
       onSave={onSave}
       saveButtonText="Save order"
@@ -938,5 +938,39 @@ describe('DrugOrderForm - required field validation', () => {
     expect(screen.getByText('Quantity to dispense is required')).toBeInTheDocument();
     expect(screen.getByText('Number of refills is required')).toBeInTheDocument();
     expect(onSave).not.toHaveBeenCalled();
+  });
+});
+
+describe('DrugOrderForm - patient header', () => {
+  beforeEach(() => {
+    mockOpenmrsDatePicker.mockImplementation(({ id, labelText }) => (
+      <>
+        <label htmlFor={id}>{labelText}</label>
+        <input id={id} type="text" />
+      </>
+    ));
+    mockUseMedicationOrders.mockReturnValue({
+      futureOrders: [],
+      activeOrders: [],
+      pastOrders: [],
+      error: null,
+      isLoading: false,
+      isValidating: false,
+    });
+    mockUseRequireOutpatientQuantity.mockReturnValue({
+      requireOutpatientQuantity: true,
+      error: null,
+      isLoading: false,
+    });
+  });
+
+  it.each([
+    { label: 'an exact birthdate', birthDate: '1993-10-14', expected: '14 — Oct — 1993' },
+    { label: 'an estimated birthdate known to the year', birthDate: '1993', expected: '1993' },
+    { label: 'an estimated birthdate known to the month', birthDate: '2024-03', expected: 'Mar — 2024' },
+  ])('shows $label at its recorded precision', ({ birthDate, expected }) => {
+    renderDrugOrderForm(createNewOrderBasketItem(), vi.fn(), { ...mockPatient, birthDate });
+
+    expect(screen.getByText(expected)).toBeInTheDocument();
   });
 });

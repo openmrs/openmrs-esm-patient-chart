@@ -1,17 +1,23 @@
 import { type Actions, createGlobalStore, useStoreWithActions, type Visit } from '@openmrs/esm-framework';
+import { type PatientWorkspaceGroupProps } from '../workspaces';
 
 export interface PatientChartStore {
   patientUuid: string;
   patient: fhir.Patient;
   visitContext: Visit;
-  mutateVisitContext: () => void;
   /**
    * The uuid of the visit context the patient-chart workspace group was last launched with.
    * Note that when the visit context is changed, the workspaces group (with stale visit context)
-   * must close and reopen, and during that process its visitContext might differ from 
+   * must close and reopen, and during that process its visitContext might differ from
    * `store.visitContext`
    */
   workspaceGroupVisitUuid?: string | null;
+  /**
+   * The group props the patient-chart workspace group was last launched with. The workspace system
+   * only relaunches the group when the patient or visit uuid changes, so these objects can be older
+   * than `patient` / `visitContext` above. See `getPatientChartWindowProps`.
+   */
+  workspaceGroupProps?: PatientWorkspaceGroupProps | null;
 }
 
 const patientChartStoreName = 'patient-chart-global-store';
@@ -20,16 +26,16 @@ const patientChartStore = createGlobalStore<PatientChartStore>(patientChartStore
   patientUuid: null,
   patient: null,
   visitContext: null,
-  mutateVisitContext: null,
   workspaceGroupVisitUuid: null,
+  workspaceGroupProps: null,
 });
 
 const patientChartStoreActions = {
   setPatient(_, patient: fhir.Patient) {
     return { patient, patientUuid: patient?.id ?? null };
   },
-  setVisitContext(_, visitContext: Visit, mutateVisitContext: () => void) {
-    return { visitContext, mutateVisitContext };
+  setVisitContext(_, visitContext: Visit) {
+    return { visitContext };
   },
 } satisfies Actions<PatientChartStore>;
 
@@ -37,8 +43,28 @@ const patientChartStoreActions = {
  * Records the visit context the patient-chart workspace group was last launched with.
  * Only the patient chart should call this, after it launches its workspace group.
  */
-export function setPatientChartWorkspaceGroupVisitUuid(workspaceGroupVisitUuid: string | null) {
-  patientChartStore.setState({ workspaceGroupVisitUuid });
+export function setPatientChartWorkspaceGroupVisitUuid(
+  workspaceGroupVisitUuid: string | null,
+  workspaceGroupProps?: PatientWorkspaceGroupProps | null,
+) {
+  patientChartStore.setState(
+    workspaceGroupProps === undefined ? { workspaceGroupVisitUuid } : { workspaceGroupVisitUuid, workspaceGroupProps },
+  );
+}
+
+/**
+ * Non-reactive read of the patient chart store, for use inside callbacks (e.g. at the moment a
+ * workspace is launched). Like `usePatientChartStore`, it only returns the store values if
+ * `patientUuid` matches the patient in the store; otherwise it returns null. If `patientUuid` is
+ * omitted, it returns the store values of whichever patient the patient chart currently has open
+ * (or null if it has none).
+ */
+export function getPatientChartStoreState(patientUuid?: string): PatientChartStore | null {
+  const state = patientChartStore.getState();
+  if (patientUuid === undefined) {
+    return state.patientUuid ? state : null;
+  }
+  return state.patientUuid === patientUuid ? state : null;
 }
 
 /**
@@ -59,12 +85,12 @@ export function usePatientChartStore(patientUuid: string) {
   } else {
     const fakeStore: typeof store = {
       ...store,
-      mutateVisitContext: null,
       setVisitContext: () => {},
       patient: null,
       patientUuid: null,
       visitContext: null,
       workspaceGroupVisitUuid: null,
+      workspaceGroupProps: null,
     };
     return fakeStore;
   }

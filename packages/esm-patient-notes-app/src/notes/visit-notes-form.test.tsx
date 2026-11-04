@@ -7,7 +7,7 @@
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { vi, expect, test, describe, beforeEach, afterEach } from 'vitest';
+import { vi, describe, it, expect, test, beforeEach, afterEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { Button, Checkbox, OverflowMenuItem, type CheckboxProps } from '@carbon/react';
 import { screen, render, waitFor, within, act, fireEvent } from '@testing-library/react';
@@ -21,6 +21,7 @@ import {
   OpenmrsDatePicker,
   showSnackbar,
   useConfig,
+  useLayoutType,
   usePatient,
   useSession,
   useFeatureFlag,
@@ -29,8 +30,8 @@ import {
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import {
-  type PatientWorkspace2DefinitionProps,
-  type PatientWorkspaceGroupProps,
+  type PatientBannerGroupProps,
+  type PatientWorkspaceWindowProps,
   useAllowedFileExtensions,
 } from '@openmrs/esm-patient-common-lib';
 import {
@@ -54,24 +55,20 @@ import {
 import { configSchema, type ConfigObject } from '../config-schema';
 import enTranslations from '../../translations/en.json';
 import { mockPatient, getByTextWithMarkup } from 'tools';
-import ExportedVisitNotesFormWorkspace, {
-  type ExportedVisitNotesFormWorkspaceProps,
-} from './exported-visit-notes-form.workspace';
 import VisitNotesFormWorkspace, { type VisitNotesFormWorkspaceProps } from './visit-notes-form.workspace';
 
-const defaultProps: PatientWorkspace2DefinitionProps<VisitNotesFormWorkspaceProps, {}> = {
+const defaultProps: Workspace2DefinitionProps<VisitNotesFormWorkspaceProps, PatientWorkspaceWindowProps, object> = {
   closeWorkspace: vi.fn(),
   workspaceProps: {
     formContext: 'creating' as const,
   },
-  groupProps: {
+  windowProps: {
     patient: mockPatient,
     patientUuid: mockPatient.id,
     visitContext: null,
-    mutateVisitContext: null,
   },
+  groupProps: { showPatientBanner: 'tabletOnly' },
   launchChildWorkspace: vi.fn(),
-  windowProps: {},
   workspaceName: '',
   windowName: '',
   isRootWorkspace: false,
@@ -80,20 +77,23 @@ const defaultProps: PatientWorkspace2DefinitionProps<VisitNotesFormWorkspaceProp
 
 function renderVisitNotesForm(
   workspaceProps: Partial<VisitNotesFormWorkspaceProps> = {},
-  groupProps: Partial<PatientWorkspaceGroupProps> = {},
+  windowProps: Partial<PatientWorkspaceWindowProps> = {},
+  groupProps: PatientBannerGroupProps = defaultProps.groupProps,
 ) {
   const props = {
     ...defaultProps,
+    groupProps,
     workspaceProps: { ...defaultProps.workspaceProps, ...workspaceProps },
-    groupProps: { ...defaultProps.groupProps, ...groupProps },
+    windowProps: { ...defaultProps.windowProps, ...windowProps },
   };
   return render(<VisitNotesFormWorkspace {...props} />);
 }
 
-function renderExportedVisitNotesForm(workspaceProps: Partial<ExportedVisitNotesFormWorkspaceProps> = {}) {
-  const props: Workspace2DefinitionProps<ExportedVisitNotesFormWorkspaceProps, {}, {}> = {
+// Launchers that have not migrated to window props still pass the patient / visit as workspace props
+function renderVisitNotesFormWithDeprecatedWorkspaceProps(workspaceProps: Partial<VisitNotesFormWorkspaceProps> = {}) {
+  const props: Workspace2DefinitionProps<VisitNotesFormWorkspaceProps, PatientWorkspaceWindowProps, object> = {
     ...defaultProps,
-    groupProps: {},
+    windowProps: null,
     workspaceProps: {
       formContext: 'creating',
       patient: mockPatient,
@@ -102,7 +102,7 @@ function renderExportedVisitNotesForm(workspaceProps: Partial<ExportedVisitNotes
       ...workspaceProps,
     },
   };
-  render(<ExportedVisitNotesFormWorkspace {...props} />);
+  return render(<VisitNotesFormWorkspace {...props} />);
 }
 
 function actionsMenuFor(card: HTMLElement) {
@@ -164,6 +164,9 @@ const mockShowSnackbar = vi.mocked(showSnackbar);
 const mockUpdateVisitNote = vi.mocked(updateVisitNote);
 const mockUseDiagnosisConceptClasses = vi.mocked(useDiagnosisConceptClasses);
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockExtensionSlot = vi.mocked(ExtensionSlot);
+const mockUseLayoutType = vi.mocked(useLayoutType);
+const mockUsePatient = vi.mocked(usePatient);
 
 const { diagnosisConceptClass } = getDefaultsFromConfigSchema(configSchema) as ConfigObject;
 const symptomConceptClass = 'symptom-concept-class-uuid';
@@ -448,7 +451,7 @@ test('omits the visit when there is no visit context', async () => {
   );
 });
 
-test('attaches the visit supplied by an out-of-chart launcher to a newly created note', async () => {
+test('attaches the visit supplied as a (deprecated) workspace prop to a newly created note', async () => {
   const user = userEvent.setup();
 
   mockSaveVisitNote.mockResolvedValueOnce({ status: 201, body: 'Condition created' } as unknown as Awaited<
@@ -456,7 +459,7 @@ test('attaches the visit supplied by an out-of-chart launcher to a newly created
   >);
   mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
 
-  renderExportedVisitNotesForm({ visitContext: { uuid: 'visit-context-uuid' } as Visit });
+  renderVisitNotesFormWithDeprecatedWorkspaceProps({ visitContext: { uuid: 'visit-context-uuid' } as Visit });
 
   await addDiagnosis(user, 'Diabetes Mellitus', { primary: true });
 
@@ -1937,9 +1940,10 @@ describe('when the patient record becomes unavailable while the form is open', (
   }: { exported?: boolean; workspaceProps?: Partial<VisitNotesFormWorkspaceProps> } = {}) {
     const element = (launcherPatientUuid: string) =>
       exported ? (
-        <ExportedVisitNotesFormWorkspace
+        <VisitNotesFormWorkspace
           {...defaultProps}
           groupProps={{}}
+          windowProps={null}
           workspaceProps={{
             formContext: 'creating',
             patient: mockPatient,
@@ -2755,4 +2759,76 @@ describe('when the patient record becomes unavailable while the form is open', (
       );
     },
   );
+});
+
+describe('Patient header banner', () => {
+  beforeEach(() => {
+    mockUseLayoutType.mockReturnValue('large-desktop');
+    mockUsePatient.mockReturnValue({ patient: null, patientUuid: null, isLoading: false, error: null });
+  });
+
+  const hasPatientHeader = () => mockExtensionSlot.mock.calls.some(([props]) => props.name === 'patient-header-slot');
+
+  it('shows the patient header when the group asks for it at every width', () => {
+    renderVisitNotesForm({}, {}, { showPatientBanner: 'always' });
+
+    expect(
+      mockExtensionSlot.mock.calls.some(
+        ([props]) => props.name === 'patient-header-slot' && props.state.patientUuid === mockPatient.id,
+      ),
+    ).toBe(true);
+  });
+
+  it('shows the patient header at every width by default outside the patient chart', () => {
+    render(<VisitNotesFormWorkspace {...defaultProps} groupProps={{}} />);
+
+    expect(hasPatientHeader()).toBe(true);
+  });
+
+  it('shows the patient header only on tablet in the patient chart', () => {
+    const { unmount } = renderVisitNotesForm();
+    expect(hasPatientHeader()).toBe(false);
+    unmount();
+
+    mockExtensionSlot.mockClear();
+    mockUseLayoutType.mockReturnValue('tablet');
+    renderVisitNotesForm();
+    expect(hasPatientHeader()).toBe(true);
+  });
+
+  it('does not render the visit form header slot', () => {
+    mockUseLayoutType.mockReturnValue('tablet');
+    renderVisitNotesForm();
+
+    expect(mockExtensionSlot.mock.calls.some(([props]) => props.name === 'visit-form-header-slot')).toBe(false);
+  });
+
+  it('does not show the patient header until the full patient is available', () => {
+    const partialPatient = { id: mockPatient.id, birthDate: mockPatient.birthDate } as fhir.Patient;
+
+    renderVisitNotesForm({}, { patient: partialPatient }, { showPatientBanner: 'always' });
+
+    expect(hasPatientHeader()).toBe(false);
+  });
+
+  it('shows the patient header once the full patient is fetched for a partial patient', () => {
+    const partialPatient = { id: mockPatient.id, birthDate: mockPatient.birthDate } as fhir.Patient;
+    mockUsePatient.mockReturnValue({
+      patient: mockPatient,
+      patientUuid: mockPatient.id,
+      isLoading: false,
+      error: null,
+    });
+
+    renderVisitNotesForm({}, { patient: partialPatient }, { showPatientBanner: 'always' });
+
+    expect(
+      mockExtensionSlot.mock.calls.some(
+        ([props]) =>
+          props.name === 'patient-header-slot' &&
+          props.state.patientUuid === mockPatient.id &&
+          props.state.patient === mockPatient,
+      ),
+    ).toBe(true);
+  });
 });

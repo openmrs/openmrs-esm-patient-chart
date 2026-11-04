@@ -1,5 +1,3 @@
-@use '@carbon/layout';
-@use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .container {
@@ -8,23 +6,6 @@
   background-color: white;
   display: flex;
   flex-direction: column;
-}
-
-.patientHeader {
-  padding: layout.$spacing-03 layout.$spacing-05 layout.$spacing-06;
-  background-color: $ui-01;
-
-  span:first-of-type {
-    margin-right: layout.$spacing-03;
-  }
-
-  .text02 {
-    color: $text-02;
-  }
-}
-
-.bodyShort02 {
-  @include type.type-style('body-compact-02');
 }
 
 .text02 {

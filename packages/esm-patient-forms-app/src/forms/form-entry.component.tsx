@@ -6,6 +6,7 @@ import {
   openmrsFetch,
   type FetchResponse,
   useConfig,
+  useLayoutType,
   Workspace2,
   type Workspace2DefinitionProps,
   type Encounter,
@@ -13,6 +14,7 @@ import {
 import {
   type Form,
   type FormRendererProps,
+  hasPatientBannerData,
   invalidateVisitAndEncounterData,
   WorkspaceBackButton,
 } from '@openmrs/esm-patient-common-lib';
@@ -29,13 +31,13 @@ export interface FormEntryProps {
   patientUuid;
   patient;
   visitContext;
-  mutateVisitContext;
   additionalProps?: Record<string, any>;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   handlePostResponse?: (encounter: Encounter) => void;
   showBackButton?: boolean;
   hideControls?: boolean;
   hidePatientBanner?: boolean;
+  showPatientBanner?: boolean;
   preFilledQuestions?: Record<string, string>;
 }
 
@@ -45,12 +47,12 @@ const FormEntry: React.FC<FormEntryProps> = ({
   patientUuid,
   patient,
   visitContext,
-  mutateVisitContext,
   closeWorkspace,
   handlePostResponse,
   showBackButton = false,
   hideControls,
   hidePatientBanner,
+  showPatientBanner: showPatientBannerProp,
   preFilledQuestions,
   additionalProps,
 }) => {
@@ -82,7 +84,14 @@ const FormEntry: React.FC<FormEntryProps> = ({
   const isHtmlForm = htmlForm != null;
   const { mutate: globalMutate } = useSWRConfig();
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const showPatientBanner =
+    (showPatientBannerProp ?? isTablet) &&
+    !hidePatientBanner &&
+    hasPatientBannerData(patient) &&
+    patientUuid &&
+    additionalProps?.mode !== 'embedded-view';
 
   const { mutateForms } = useForms(patientUuid, visitUuid);
 
@@ -101,16 +110,15 @@ const FormEntry: React.FC<FormEntryProps> = ({
       additionalProps: additionalProps ?? {},
       handlePostResponse,
       hideControls,
-      hidePatientBanner,
+      // When this workspace renders the patient banner itself, suppress the form engine's own
+      // banner (which only shows when the panel is ultra-wide) to avoid duplicates.
+      hidePatientBanner: hidePatientBanner || showPatientBanner,
       preFilledQuestions,
       closeWorkspace: () => {
         return closeWorkspace();
       },
       closeWorkspaceWithSavedChanges: () => {
-        // Update current visit data for critical components
-        mutateVisitContext?.();
-
-        // Also invalidate visit history and encounter tables since form submission may create/update encounters
+        // Invalidate visit history and encounter tables since form submission may create/update encounters
         invalidateVisitAndEncounterData(globalMutate, patientUuid);
 
         mutateForms?.();
@@ -128,8 +136,8 @@ const FormEntry: React.FC<FormEntryProps> = ({
       handlePostResponse,
       hideControls,
       hidePatientBanner,
+      showPatientBanner,
       mutateForms,
-      mutateVisitContext,
       patient,
       patientUuid,
       preFilledQuestions,
@@ -170,6 +178,9 @@ const FormEntry: React.FC<FormEntryProps> = ({
 
   return (
     <Workspace2 title={form.display ?? t('clinicalForm', 'Clinical form')} hasUnsavedChanges={hasUnsavedChanges}>
+      {showPatientBanner && (
+        <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
+      )}
       <div>
         {/* Legacy HTML forms do not report unsaved changes to the workspace. */}
         {showBackButton && !isHtmlForm && (
