@@ -28,12 +28,20 @@ import {
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import {
+  ClinicianPicker,
   type DeprecatedPatientWorkspaceProps,
+  EncounterDateTimePicker,
+  getEncounterClinician,
   getPatientAndVisitProps,
   hasPatientBannerData,
   invalidateVisitAndEncounterData,
   type SharedWorkspaceGroupProps,
   type PatientWorkspaceWindowProps,
+  type Provider,
+  replaceEncounterClinician,
+  resolveNewEncounterDatetime,
+  useClinicianEncounterRole,
+  useEncounterProvider,
   usePatientForBanner,
   useShowPatientBanner,
 } from '@openmrs/esm-patient-common-lib';
@@ -99,7 +107,35 @@ const VitalsAndBiometricsForm: React.FC<
     isLoading: isLoadingEncounter,
     mutate: mutateEncounter,
     vitalsAndBiometrics: initialFieldValuesMap,
+    encounter: existingEncounter,
   } = useEncounterVitalsAndBiometrics(formContext === 'editing' ? editEncounterUuid : null);
+
+  // `null` means "now": the server stamps new encounters. When editing, the existing datetime is kept unless changed.
+  const initialEncounterDatetime = useMemo(
+    () => (existingEncounter?.encounterDatetime ? new Date(existingEncounter.encounterDatetime) : null),
+    [existingEncounter?.encounterDatetime],
+  );
+  const [encounterDatetime, setEncounterDatetime] = useState<Date | null>(null);
+  const [encounterDatetimeError, setEncounterDatetimeError] = useState<string | undefined>();
+  useEffect(() => {
+    setEncounterDatetime(initialEncounterDatetime);
+  }, [initialEncounterDatetime]);
+
+  const clinicianEncounterRole = useClinicianEncounterRole(config.vitals.clinicianEncounterRole);
+  const initialProvider = useMemo<Provider | null>(
+    () => getEncounterClinician(existingEncounter?.encounterProviders, clinicianEncounterRole),
+    [existingEncounter?.encounterProviders, clinicianEncounterRole],
+  );
+  const {
+    provider: clinician,
+    setProvider: setClinician,
+    hasChanged: hasClinicianChanged,
+    encounterProviders,
+  } = useEncounterProvider({ initialProvider, encounterRoleUuid: clinicianEncounterRole });
+  // When editing, the encounter's datetime must be within the encounter's own visit, which is not necessarily the
+  // visit of the window props (e.g. when editing an old encounter from the vitals page).
+  const datetimeVisit = formContext === 'editing' && existingEncounter ? existingEncounter.visit ?? null : visitContext;
+  const hasEncounterDatetimeChanged = encounterDatetime?.getTime() !== initialEncounterDatetime?.getTime();
   const [hasInvalidVitals, setHasInvalidVitals] = useState(false);
   const [muacColorCode, setMuacColorCode] = useState('');
   const [showErrorNotification, setShowErrorNotification] = useState(false);
@@ -125,7 +161,8 @@ const VitalsAndBiometricsForm: React.FC<
     resolver: zodResolver(VitalsAndBiometricsFormSchema),
   });
 
-  const hasUserUnsavedChanges = Object.keys(dirtyFields).length > 0;
+  const hasUserUnsavedChanges =
+    Object.keys(dirtyFields).length > 0 || hasEncounterDatetimeChanged || hasClinicianChanged;
 
   useEffect(() => {
     if (formContext === 'editing' && !isLoadingInitialValues && initialFieldValuesMap) {
@@ -249,8 +286,30 @@ const VitalsAndBiometricsForm: React.FC<
           session?.sessionLocation?.uuid,
           [...newObs, ...toBeVoided],
           abortController,
+          {
+            // a new encounter of a past visit must be dated within the visit; the server would stamp "now"
+            encounterDatetime:
+              formContext === 'creating'
+                ? resolveNewEncounterDatetime(encounterDatetime, visitContext)
+                : hasEncounterDatetimeChanged
+                  ? encounterDatetime
+                  : null,
+            // When editing, the clinician is replaced separately after the save (see `replaceEncounterClinician`),
+            // as posting `encounterProviders` to an existing encounter would only add to its providers
+            encounterProviders: formContext === 'creating' ? encounterProviders : undefined,
+            // Attach a new encounter to its visit explicitly, as the server can't infer the right visit for a backdated one
+            visitUuid: visitContext?.uuid,
+          },
         )
-          .then(() => {
+          .then(async () => {
+            if (formContext === 'editing' && hasClinicianChanged && clinician?.uuid) {
+              await replaceEncounterClinician(
+                abortController,
+                editEncounterUuid,
+                clinician.uuid,
+                clinicianEncounterRole,
+              );
+            }
             if (mutateEncounter) {
               mutateEncounter();
             }
@@ -291,7 +350,13 @@ const VitalsAndBiometricsForm: React.FC<
       dirtyFields,
       editEncounterUuid,
       conceptRanges,
+      clinician?.uuid,
+      clinicianEncounterRole,
+      encounterDatetime,
+      encounterProviders,
       formContext,
+      hasClinicianChanged,
+      hasEncounterDatetimeChanged,
       initialFieldValuesMap,
       mutateEncounter,
       onEncounterSaved,
@@ -299,6 +364,7 @@ const VitalsAndBiometricsForm: React.FC<
       patientUuid,
       session?.sessionLocation?.uuid,
       t,
+      visitContext,
     ],
   );
 
@@ -318,6 +384,9 @@ const VitalsAndBiometricsForm: React.FC<
           // When this workspace renders the patient banner itself, suppress the form engine's own
           // banner (which only shows when the panel is ultra-wide) to avoid duplicates.
           hidePatientBanner: showWorkspacePatientBanner,
+          // the form's own encounter datetime and provider questions are replaced by the pickers above the form
+          encounterDatetime,
+          encounterProvider: clinician?.uuid ?? null,
           closeWorkspaceWithSavedChanges: () => {
             closeWorkspace({ discardUnsavedChanges: true });
           },
@@ -696,7 +765,7 @@ const VitalsAndBiometricsForm: React.FC<
             className={styles.button}
             kind="primary"
             onClick={handleSubmit(savePatientVitalsAndBiometrics, onError)}
-            disabled={!hasUserUnsavedChanges || isSubmitting}
+            disabled={!hasUserUnsavedChanges || isSubmitting || Boolean(encounterDatetimeError)}
             type="submit"
           >
             {t('saveAndClose', 'Save and close')}
@@ -718,6 +787,17 @@ const VitalsAndBiometricsForm: React.FC<
       {showWorkspacePatientBanner && (
         <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
       )}
+      <EncounterDateTimePicker
+        id="vitals"
+        dateLabel={t('vitalsDate', 'Vitals date')}
+        timingLabel={t('theseVitalsAre', 'These vitals are')}
+        allowNow={initialEncounterDatetime === null}
+        visit={datetimeVisit}
+        value={encounterDatetime}
+        onChange={setEncounterDatetime}
+        onValidityChange={setEncounterDatetimeError}
+      />
+      <ClinicianPicker id="vitals" value={clinician} onChange={setClinician} />
       {formElement}
     </Workspace2>
   );

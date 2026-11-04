@@ -27,6 +27,8 @@ const FormRenderer: React.FC<FormRendererProps> = ({
   hidePatientBanner,
   handlePostResponse,
   preFilledQuestions,
+  encounterDatetime,
+  encounterProvider,
 }) => {
   const { t } = useTranslation();
 
@@ -93,6 +95,8 @@ const FormRenderer: React.FC<FormRendererProps> = ({
     <>
       {schema && (
         <FormEngine
+          encounterDatetime={encounterDatetime}
+          encounterProvider={encounterProvider}
           encounterUUID={encounterUuid}
           formJson={schema}
           formSessionIntent={formSessionIntent}

@@ -205,11 +205,3 @@ export const visitContextHeader = getAsyncLifecycle(
   () => import('./visit/visits-widget/visit-context/visit-context-header.extension'),
   { featureName: 'visit-context-header', moduleName },
 );
-
-export const retrospectiveDateTimePicker = getAsyncLifecycle(
-  () =>
-    import(
-      './visit/visits-widget/visit-context/retrospective-data-date-time-picker/retrospective-date-time-picker.component'
-    ),
-  { featureName: 'retrospective-date-time-picker', moduleName },
-);
