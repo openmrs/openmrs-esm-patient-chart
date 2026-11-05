@@ -46,7 +46,7 @@
   "errorFetchingDrugOrderTemplates": "Ошибка при получении шаблонов назначений",
   "errorFetchingDrugResults": "Ошибка при получении результатов для \"{{searchTerm}}\"",
   "errorFetchingDrugs": "Ошибка при получении списка медикаментов",
-  "errorFetchingOrderConfig": "Произошла ошибка при получении конфигурации назначений",
+  "errorFetchingOrderConfig": "Error occurred when fetching Order config",
   "errorLoadingCategories": "Ошибка загрузки категорий медикаментов",
   "errorLoadingTree": "Ошибка загрузки структуры категорий",
   "errorSavingDrugOrder": "Ошибка при сохранении назначения",
