@@ -5,8 +5,10 @@ import {
   fhirBaseUrl,
   restBaseUrl,
   openmrsFetch,
+  parseDate,
   useConfig,
   type OpenmrsResource,
+  type Visit,
 } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
@@ -524,6 +526,40 @@ function mapVitalsAndBiometrics(resource: FHIRObservationResource): MappedVitals
   };
 }
 
+/**
+ * What a new vitals encounter is attached to: the visit it belongs to and who recorded it.
+ */
+export interface NewVitalsEncounterContext {
+  visit?: Pick<Visit, 'uuid' | 'startDatetime' | 'stopDatetime'> | null;
+  providerUuid?: string | null;
+  encounterRoleUuid?: string | null;
+}
+
+/**
+ * The encounterDatetime to send for a new vitals encounter in `visit`: now, clamped into the visit's
+ * date range. Returns undefined when now already falls inside an open visit, so that the server stamps
+ * the encounter with its own clock (a client clock running ahead would otherwise be rejected as a
+ * future date). A closed visit, or one starting after now, gets an explicit datetime inside it.
+ */
+export function getVitalsEncounterDatetime(
+  visit: NewVitalsEncounterContext['visit'],
+  now: Date = new Date(),
+): Date | undefined {
+  if (!visit) {
+    return undefined;
+  }
+  const visitStart = visit.startDatetime ? parseDate(visit.startDatetime) : null;
+  const visitStop = visit.stopDatetime ? parseDate(visit.stopDatetime) : null;
+
+  if (visitStop && !Number.isNaN(visitStop.getTime()) && now > visitStop) {
+    return visitStop;
+  }
+  if (visitStart && !Number.isNaN(visitStart.getTime()) && now < visitStart) {
+    return visitStart;
+  }
+  return visitStop ? now : undefined;
+}
+
 export function createOrUpdateVitalsAndBiometrics(
   patientUuid: string,
   encounterTypeUuid: string,
@@ -531,6 +567,7 @@ export function createOrUpdateVitalsAndBiometrics(
   location: string,
   vitalsAndBiometricsObs: Array<OpenmrsResource>,
   abortController: AbortController,
+  newEncounterContext?: NewVitalsEncounterContext,
 ) {
   const url = encounterUuid ? `${restBaseUrl}/encounter/${encounterUuid}` : `${restBaseUrl}/encounter`;
 
@@ -541,6 +578,21 @@ export function createOrUpdateVitalsAndBiometrics(
   if (!encounterUuid) {
     encounter['location'] = location;
     encounter['encounterType'] = encounterTypeUuid;
+
+    // Attach the new encounter to the visit it was recorded in, rather than leaving the server to guess
+    // one from the session location and the current time (which misses visits started at another
+    // location and past visits). An edit leaves the encounter's visit, datetime and providers alone.
+    const { visit, providerUuid, encounterRoleUuid } = newEncounterContext ?? {};
+    if (visit?.uuid) {
+      encounter['visit'] = visit.uuid;
+      const encounterDatetime = getVitalsEncounterDatetime(visit);
+      if (encounterDatetime) {
+        encounter['encounterDatetime'] = encounterDatetime;
+      }
+    }
+    if (providerUuid && encounterRoleUuid) {
+      encounter['encounterProviders'] = [{ provider: providerUuid, encounterRole: encounterRoleUuid }];
+    }
   }
   return openmrsFetch(url, {
     method: 'POST',
