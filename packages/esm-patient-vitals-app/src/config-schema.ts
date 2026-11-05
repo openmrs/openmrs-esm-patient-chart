@@ -1,4 +1,4 @@
-import { Type } from '@openmrs/esm-framework';
+import { Type, validator } from '@openmrs/esm-framework';
 
 export const configSchema = {
   concepts: {
@@ -63,10 +63,19 @@ export const configSchema = {
       _default: '67a71486-1a54-468f-ac3e-7091a9a79584',
     },
     clinicianEncounterRole: {
-      _type: Type.UUID,
+      // a string rather than Type.UUID, so that it can be left empty
+      _type: Type.String,
       _default: '240b26f9-dd88-4172-823d-4a8bfeb7841f',
       _description:
-        'The encounter role given to the logged-in provider on a new vitals encounter. Leave empty to save the encounter without a provider.',
+        'The UUID of the encounter role given to the logged-in provider on a new vitals encounter. Leave empty to save the encounter without a provider.',
+      _validators: [
+        validator(
+          (v: unknown) =>
+            v === '' ||
+            (typeof v === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v)),
+          'Must be an encounter role UUID, or empty',
+        ),
+      ],
     },
     vitalsOverdueThresholdHours: {
       _type: Type.Number,
