@@ -23,6 +23,7 @@ import { useReactToPrint } from 'react-to-print';
 import {
   CardHeader,
   compare,
+  getDurationUnitLabel,
   getPatientChartWindowProps,
   PatientChartPagination,
   type DrugOrderBasketItem,
@@ -146,7 +147,7 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
                   )}
                   {t('medicationDurationAndUnit', 'for {{duration}} {{durationUnit}}', {
                     duration: medication.duration,
-                    durationUnit: medication.durationUnits?.display?.toLowerCase(),
+                    durationUnit: getDurationUnitLabel(t, medication.durationUnits, medication.duration),
                   })}{' '}
                 </>
               )}
