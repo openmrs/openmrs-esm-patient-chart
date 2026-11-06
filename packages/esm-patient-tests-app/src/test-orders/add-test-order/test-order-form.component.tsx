@@ -19,7 +19,7 @@ import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import {
   type OrderUrgency,
-  priorityOptions,
+  getPriorityOptions,
   useOrderBasket,
   useOrderType,
   type TestOrderBasketItem,
@@ -299,7 +299,7 @@ export function LabOrderForm({
                     invalidText={fieldState?.error?.message}
                     labelText={t('priority', 'Priority')}
                   >
-                    {priorityOptions.map((option) => (
+                    {getPriorityOptions().map((option) => (
                       <SelectItem key={option.value} value={option.value} text={option.label} />
                     ))}
                   </Select>
