@@ -246,6 +246,11 @@ const VitalsAndBiometricsForm: React.FC<
           session?.sessionLocation?.uuid,
           [...newObs, ...toBeVoided],
           abortController,
+          {
+            visit: visitContext,
+            providerUuid: session?.currentProvider?.uuid,
+            encounterRoleUuid: config.vitals.clinicianEncounterRole,
+          },
         )
           .then(() => {
             if (mutateEncounter) {
@@ -283,6 +288,7 @@ const VitalsAndBiometricsForm: React.FC<
       abortController,
       closeWorkspace,
       config.concepts,
+      config.vitals.clinicianEncounterRole,
       config.vitals.encounterTypeUuid,
       dirtyFields,
       editEncounterUuid,
@@ -292,8 +298,10 @@ const VitalsAndBiometricsForm: React.FC<
       mutateEncounter,
       globalMutate,
       patientUuid,
+      session?.currentProvider?.uuid,
       session?.sessionLocation?.uuid,
       t,
+      visitContext,
     ],
   );
 
