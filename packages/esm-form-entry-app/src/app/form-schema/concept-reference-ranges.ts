@@ -1,10 +1,9 @@
-import { ConceptReferenceRange, FormSchema, Questions } from '../types';
+import { FormSchema, Questions } from '../types';
 
 /**
- * The form engine only derives numeric bounds from `questionOptions.min` and `questionOptions.max`,
- * and only does so for these two rendering types.
+ * Rendering types supported by the form engine for numeric observations.
  */
-const numericRenderingTypes = ['number', 'decimal'];
+const numericRenderingTypes = ['number', 'decimal', 'numeric'];
 
 /**
  * Collects the concept of every numeric question in the given schema. These are the concepts for
@@ -20,46 +19,6 @@ export function getNumericQuestionConcepts(formSchema: FormSchema): Array<string
     .filter((concept) => Boolean(concept));
 
   return Array.from(new Set(concepts));
-}
-
-/**
- * Narrows the bounds of every numeric question to the concept reference range which applies to the
- * current patient, so that values the backend would reject are caught during data entry.
- *
- * Only the absolute bounds are used, mirroring how the backend validates observations. A bound
- * defined by the schema is never widened: whichever of the two bounds is stricter wins.
- *
- * @param formSchema The schema to be modified in place.
- * @param referenceRanges The reference ranges which apply to the patient, keyed by concept UUID.
- */
-export function applyConceptReferenceRanges(
-  formSchema: FormSchema,
-  referenceRanges: Map<string, ConceptReferenceRange> | undefined,
-) {
-  if (!referenceRanges?.size) {
-    return;
-  }
-
-  for (const question of getNumericQuestions(formSchema)) {
-    const concept = resolveConceptUuid(formSchema, question.questionOptions.concept);
-    const referenceRange = concept ? referenceRanges.get(concept) : undefined;
-
-    if (!referenceRange) {
-      continue;
-    }
-
-    const min = strictestBound(toNumber(question.questionOptions.min), toNumber(referenceRange.lowAbsolute), Math.max);
-    const max = strictestBound(toNumber(question.questionOptions.max), toNumber(referenceRange.hiAbsolute), Math.min);
-
-    // The form engine only wires up the min and max validators when both bounds are set, so there
-    // is nothing to apply as long as one of them is missing.
-    if (min === undefined || max === undefined) {
-      continue;
-    }
-
-    question.questionOptions.min = String(min);
-    question.questionOptions.max = String(max);
-  }
 }
 
 function getNumericQuestions(formSchema: FormSchema): Array<Questions> {
@@ -92,7 +51,7 @@ function getNumericQuestions(formSchema: FormSchema): Array<Questions> {
  * question uses, so a missing key means the reference is stale. Returning nothing for those is how a
  * stale question ends up being left out of the request instead of taking a whole batch down.
  */
-function resolveConceptUuid(formSchema: FormSchema, concept: string): string | undefined {
+export function resolveConceptUuid(formSchema: FormSchema, concept: string): string | undefined {
   const conceptReferences = formSchema.conceptReferences;
 
   if (conceptReferences) {
@@ -100,29 +59,4 @@ function resolveConceptUuid(formSchema: FormSchema, concept: string): string | u
   }
 
   return concept;
-}
-
-function toNumber(value: string | number | null | undefined): number | undefined {
-  if (value === null || value === undefined || value === '') {
-    return undefined;
-  }
-
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : undefined;
-}
-
-function strictestBound(
-  schemaBound: number | undefined,
-  referenceRangeBound: number | undefined,
-  pickStrictest: (a: number, b: number) => number,
-): number | undefined {
-  if (schemaBound === undefined) {
-    return referenceRangeBound;
-  }
-
-  if (referenceRangeBound === undefined) {
-    return schemaBound;
-  }
-
-  return pickStrictest(schemaBound, referenceRangeBound);
 }
