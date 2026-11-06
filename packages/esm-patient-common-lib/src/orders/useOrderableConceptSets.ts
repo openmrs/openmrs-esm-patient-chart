@@ -31,12 +31,6 @@ function useOrderableConceptSWR(searchTerm: string, orderableConceptSets?: Array
     openmrsFetchMultipleConcepts,
   );
 
-  useEffect(() => {
-    if (error) {
-      reportError(error);
-    }
-  });
-
   const results = useMemo(() => {
     if (isLoading || error) return null;
 
