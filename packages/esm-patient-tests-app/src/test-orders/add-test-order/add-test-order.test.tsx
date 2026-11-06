@@ -7,6 +7,7 @@ import { type PostDataPrepLabOrderFunction } from '../api';
 import {
   ExtensionSlot,
   getDefaultsFromConfigSchema,
+  translateFrom,
   useConfig,
   useLayoutType,
   useSession,
@@ -155,6 +156,32 @@ describe('AddLabOrder', () => {
     });
 
     expect(mockCloseWorkspace).toHaveBeenCalled();
+  });
+
+  test('shows the priority options in the session language', async () => {
+    const user = userEvent.setup();
+    const mockTranslateFrom = vi.mocked(translateFrom);
+    const defaultTranslateFrom = mockTranslateFrom.getMockImplementation();
+    // Translations arrive after the module has loaded, as they do in the app
+    const french = { Routine: 'De routine', Stat: 'Urgent', 'On scheduled date': 'À la date prévue' };
+    mockTranslateFrom.mockImplementation((moduleName, key, fallback, options) =>
+      moduleName === '@openmrs/esm-patient-chart-app' && french[key]
+        ? french[key]
+        : defaultTranslateFrom(moduleName, key, fallback, options),
+    );
+
+    try {
+      renderAddLabOrderWorkspace();
+      await user.type(screen.getByRole('searchbox'), 'cd4');
+      await screen.findByText('CD4 COUNT');
+      await user.click(screen.getByRole('button', { name: /order form/i }));
+
+      expect(screen.getByRole('option', { name: 'De routine' })).toHaveValue('ROUTINE');
+      expect(screen.getByRole('option', { name: 'Urgent' })).toHaveValue('STAT');
+      expect(screen.getByRole('option', { name: 'À la date prévue' })).toHaveValue('ON_SCHEDULED_DATE');
+    } finally {
+      mockTranslateFrom.mockImplementation(defaultTranslateFrom);
+    }
   });
 
   test('from lab search, click add directly to order basket', async () => {

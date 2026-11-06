@@ -84,9 +84,23 @@ export function useDrugOrderByUuid(orderUuid: string) {
   };
 }
 
-// See the Urgency enum in https://github.com/openmrs/openmrs-core/blob/492dcd35b85d48730bd19da48f6db146cc882c22/api/src/main/java/org/openmrs/Order.java
-export const priorityOptions: PriorityOption[] = [
-  { value: 'ROUTINE', label: translateFrom(patientChartAppModuleName, 'Routine') },
-  { value: 'STAT', label: translateFrom(patientChartAppModuleName, 'Stat') },
-  { value: 'ON_SCHEDULED_DATE', label: translateFrom(patientChartAppModuleName, 'On scheduled date') },
-];
+/**
+ * The order priorities, with labels translated when called. Call it at render time: translations
+ * are not loaded yet when a module is first evaluated, so labels computed then stay in English.
+ *
+ * See the Urgency enum in https://github.com/openmrs/openmrs-core/blob/492dcd35b85d48730bd19da48f6db146cc882c22/api/src/main/java/org/openmrs/Order.java
+ */
+export function getPriorityOptions(): PriorityOption[] {
+  return [
+    { value: 'ROUTINE', label: translateFrom(patientChartAppModuleName, 'Routine') },
+    { value: 'STAT', label: translateFrom(patientChartAppModuleName, 'Stat') },
+    { value: 'ON_SCHEDULED_DATE', label: translateFrom(patientChartAppModuleName, 'On scheduled date') },
+  ];
+}
+
+/**
+ * @deprecated The labels are translated once, when the module loads, which is usually before the
+ * translations are available. Use {@link getPriorityOptions} at render time for labels; the values
+ * here are still correct.
+ */
+export const priorityOptions: PriorityOption[] = getPriorityOptions();
