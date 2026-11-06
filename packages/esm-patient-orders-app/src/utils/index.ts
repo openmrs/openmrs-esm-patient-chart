@@ -154,7 +154,7 @@ export function buildGeneralOrder(order: Order, action?: OrderAction): OrderBask
  * Utility function to extract display value from ObservationValue
  */
 export const getObservationDisplayValue = (value: ObservationValue): string => {
-  if (!value) return '--';
+  if (value === null || value === undefined || value === '') return '--';
   if (typeof value === 'string') return value;
   if (typeof value === 'number') return value.toString();
   if (value && typeof value === 'object' && 'display' in value) return value.display;

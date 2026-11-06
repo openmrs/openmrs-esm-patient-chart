@@ -176,6 +176,10 @@ const LabResultsForm: React.FC<
     enableAddTestsDuringResultEntry && !isEditMode && !hasSavedResults && !!resolvedLaunchLabOrderForm;
 
   useEffect(() => {
+    // 0 is a result, so this can't be a truthiness check
+    const hasSavedValue = (value: ObservationValue | undefined) =>
+      value !== null && value !== undefined && value !== '';
+
     // Leave fields the user has changed alone, so saved results that load later don't overwrite their edits
     const fillSavedValue = (fieldName: string, value: ObservationValue) => {
       if (!getFieldState(fieldName).isDirty) {
@@ -188,7 +192,7 @@ const LabResultsForm: React.FC<
       if (concept && completeLabResult && (isEditMode || hasSavedResults)) {
         if (isCoded(concept) && typeof completeLabResult?.value === 'object' && completeLabResult?.value?.uuid) {
           fillSavedValue(concept.uuid, completeLabResult.value.uuid);
-        } else if (isNumeric(concept) && completeLabResult?.value) {
+        } else if (isNumeric(concept) && hasSavedValue(completeLabResult?.value)) {
           fillSavedValue(concept.uuid, parseFloat(completeLabResult.value as string));
         } else if (isText(concept) && completeLabResult?.value) {
           fillSavedValue(concept.uuid, completeLabResult?.value);
@@ -199,11 +203,11 @@ const LabResultsForm: React.FC<
             if (isCoded(member)) {
               value = typeof obs?.value === 'object' ? obs.value.uuid : obs?.value;
             } else if (isNumeric(member)) {
-              value = obs?.value ? parseFloat(obs.value as string) : undefined;
+              value = hasSavedValue(obs?.value) ? parseFloat(obs.value as string) : undefined;
             } else if (isText(member)) {
               value = obs?.value;
             }
-            if (value) fillSavedValue(member.uuid, value);
+            if (hasSavedValue(value)) fillSavedValue(member.uuid, value);
           });
         }
       }
