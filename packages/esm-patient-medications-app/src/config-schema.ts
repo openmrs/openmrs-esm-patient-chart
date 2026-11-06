@@ -1,18 +1,6 @@
 import { Type, validator } from '@openmrs/esm-framework';
 
 export const configSchema = {
-  daysDurationUnit: {
-    uuid: {
-      _type: Type.ConceptUuid,
-      _default: '1072AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-      _description: 'The uuid of the concept of medication duration unit in days',
-    },
-    display: {
-      _type: Type.String,
-      _description: 'The text to display in the medication duration units menu for the "days" unit.',
-      _default: 'Days',
-    },
-  },
   drugOrderTypeUUID: {
     _type: Type.UUID,
     _description: "UUID for the 'Drug' order type to fetch medications",
@@ -74,10 +62,6 @@ export const configSchema = {
 };
 
 export interface ConfigObject {
-  daysDurationUnit: {
-    uuid: string;
-    display: string;
-  };
   drugOrderTypeUUID: string;
   orderTypeUuid: string;
   showPrintButton: boolean;

@@ -1,9 +1,9 @@
 import { ComboBox } from '@carbon/react';
-import { useConfig, useDebounce, type Visit } from '@openmrs/esm-framework';
+import { useDebounce, type Visit } from '@openmrs/esm-framework';
 import { type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import React, { useMemo, useState } from 'react';
 import { getTemplateOrderBasketItem, useDrugSearch, useDrugTemplates } from './drug-search.resource';
-import { type ConfigObject } from '../../config-schema';
+import { useOrderConfig } from '../../api/order-config';
 import { useTranslation } from 'react-i18next';
 
 interface DrugSearchComboBoxProps {
@@ -23,7 +23,8 @@ const DrugSearchComboBox: React.FC<DrugSearchComboBoxProps> = ({
   setSelectedDrugItem,
   visit,
 }) => {
-  const { daysDurationUnit } = useConfig<ConfigObject>();
+  const { orderConfigObject } = useOrderConfig();
+  const daysDurationUnit = orderConfigObject?.daysDurationUnit;
   const { t } = useTranslation();
   const [drugSearchTerm, setDrugSearchTerm] = useState('');
   const debouncedDrugSearchTerm = useDebounce(drugSearchTerm);

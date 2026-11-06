@@ -26,7 +26,7 @@ import {
   useSession,
 } from '@openmrs/esm-framework';
 import { configSchema, type ConfigObject } from '../config-schema';
-import { type PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { type DrugOrderBasketItem, type PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 import AddDrugOrderWorkspace from './add-drug-order.workspace';
 
@@ -39,6 +39,13 @@ const mockExtensionSlot = vi.mocked(ExtensionSlot);
 const mockUserHasAccess = vi.mocked(UserHasAccess);
 const mockUseMedicationOrders = vi.fn();
 const mockUseRequireOutpatientQuantity = vi.fn();
+const { mockDaysDurationUnit, mockUseOrderConfig } = vi.hoisted(() => ({
+  mockDaysDurationUnit: {
+    uuid: '1072AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    display: 'Days',
+  },
+  mockUseOrderConfig: vi.fn(),
+}));
 
 mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema) as ConfigObject);
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
@@ -57,9 +64,21 @@ vi.mock('../api', async () => ({
   useRequireOutpatientQuantity: () => mockUseRequireOutpatientQuantity(),
 }));
 
+vi.mock('../api/order-config', () => ({
+  useOrderConfig: mockUseOrderConfig,
+}));
+
 describe('AddDrugOrderWorkspace drug search', () => {
   beforeEach(() => {
     _resetOrderBasketStore();
+
+    mockUseOrderConfig.mockReturnValue({
+      orderConfigObject: {
+        daysDurationUnit: mockDaysDurationUnit,
+      },
+      isLoading: false,
+      error: null,
+    });
 
     mockUseDrugSearch.mockImplementation(() => ({
       isLoading: false,
@@ -113,6 +132,47 @@ describe('AddDrugOrderWorkspace drug search', () => {
     const asprin162 = screen.getByText(/Aspirin 162.5mg/i);
     expect(asprin162).toBeInTheDocument();
     expect(asprin162.closest('[role="listitem"]')).toHaveTextContent(/Aspirin.*162.5mg.*tablet/i);
+  });
+
+  test('waits for order configuration before enabling drug actions', async () => {
+    const user = userEvent.setup();
+    mockUseOrderConfig.mockReturnValue({
+      orderConfigObject: {
+        daysDurationUnit: undefined,
+      },
+      isLoading: true,
+      error: null,
+    });
+
+    const { rerender } = renderAddDrugOrderWorkspace();
+    await user.type(screen.getByRole('searchbox'), 'Aspirin');
+
+    const aspirin325Div = getByTextWithMarkup(/Aspirin 325mg/i).closest('[role="listitem"]') as HTMLElement;
+    expect(within(aspirin325Div).getByRole('button', { name: /Add to basket/i })).toBeDisabled();
+    expect(within(aspirin325Div).getByRole('button', { name: /Order form/i })).toBeDisabled();
+
+    mockUseOrderConfig.mockReturnValue({
+      orderConfigObject: {
+        daysDurationUnit: mockDaysDurationUnit,
+      },
+      isLoading: false,
+      error: null,
+    });
+    rerender(getAddDrugOrderWorkspace());
+
+    const addToBasketButton = within(aspirin325Div).getByRole('button', { name: /Add to basket/i });
+    await waitFor(() => expect(addToBasketButton).toBeEnabled());
+    expect(within(aspirin325Div).getByRole('button', { name: /Order form/i })).toBeEnabled();
+
+    const { result: hookResult } = renderHook(() =>
+      useOrderBasket(mockPatient, 'medications', ((x) => x) as unknown as PostDataPrepFunction),
+    );
+    await user.click(addToBasketButton);
+
+    expect((hookResult.current.orders[0] as DrugOrderBasketItem)?.durationUnit).toEqual({
+      valueCoded: mockDaysDurationUnit.uuid,
+      value: mockDaysDurationUnit.display,
+    });
   });
 
   test('shows a visual cue and disables actions if the medication is already prescribed', async () => {
@@ -173,10 +233,9 @@ describe('AddDrugOrderWorkspace drug search', () => {
     const aspirin325AddButton = within(aspirin325Div).getByText(/Add to basket/i);
     await user.click(aspirin325AddButton);
 
-    const { daysDurationUnit } = getDefaultsFromConfigSchema(configSchema) as ConfigObject;
     expect(hookResult.current.orders).toEqual([
       expect.objectContaining({
-        ...getTemplateOrderBasketItem(mockDrugSearchResultApiData[2], null, daysDurationUnit),
+        ...getTemplateOrderBasketItem(mockDrugSearchResultApiData[2], null, mockDaysDurationUnit),
         isOrderIncomplete: true,
       }),
     ]);
@@ -221,7 +280,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
           ...getTemplateOrderBasketItem(
             mockDrugSearchResultApiData[0],
             null,
-            (getDefaultsFromConfigSchema(configSchema) as ConfigObject).daysDurationUnit,
+            mockDaysDurationUnit,
             mockDrugOrderTemplateApiData[mockDrugSearchResultApiData[0].uuid][0],
           ),
           freeTextDosage: null,
@@ -287,8 +346,8 @@ describe('AddDrugOrderWorkspace drug search', () => {
   });
 });
 
-function renderAddDrugOrderWorkspace() {
-  render(
+function getAddDrugOrderWorkspace() {
+  return (
     <AddDrugOrderWorkspace
       workspaceProps={{
         order: null,
@@ -306,6 +365,10 @@ function renderAddDrugOrderWorkspace() {
       windowName={''}
       isRootWorkspace={false}
       showActionMenu={false}
-    />,
+    />
   );
+}
+
+function renderAddDrugOrderWorkspace() {
+  return render(getAddDrugOrderWorkspace());
 }
