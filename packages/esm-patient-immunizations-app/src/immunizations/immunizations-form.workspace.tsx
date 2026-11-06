@@ -29,7 +29,7 @@ import { useImmunizationsConceptSet } from '../hooks/useImmunizationsConceptSet'
 import styles from './immunizations-form.scss';
 
 const ImmunizationsForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({ closeWorkspace, groupProps }) => {
-  const { patientUuid, patient, visitContext } = groupProps;
+  const { patientUuid, patient, activeVisit } = groupProps;
   const config = useConfig<ImmunizationConfigObject>();
   const currentUser = useSession();
   const shouldShowPatientBanner = useShowPatientBanner(groupProps);
@@ -175,7 +175,7 @@ const ImmunizationsForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
         await savePatientImmunization(
           mapToFHIRImmunizationResource(
             immunization,
-            immunizationToEditMeta?.visitUuid || visitContext?.uuid,
+            immunizationToEditMeta?.visitUuid || activeVisit?.uuid,
             currentUser?.sessionLocation?.uuid,
             currentUser?.currentProvider?.uuid,
           ),
@@ -202,7 +202,7 @@ const ImmunizationsForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
       currentUser?.sessionLocation?.uuid,
       patientUuid,
       currentUser?.currentProvider?.uuid,
-      visitContext?.uuid,
+      activeVisit?.uuid,
       immunizationToEditMeta,
       immunizationsConceptSet,
       closeWorkspace,

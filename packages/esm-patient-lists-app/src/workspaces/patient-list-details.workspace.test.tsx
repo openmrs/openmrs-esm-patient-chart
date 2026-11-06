@@ -12,7 +12,7 @@ const defaultProps: PatientWorkspace2DefinitionProps<PatientListDetailsWorkspace
     showPatientBanner: 'tabletOnly',
     patientUuid: '',
     patient: undefined,
-    visitContext: null,
+    activeVisit: null,
   },
   closeWorkspace: vi.fn(),
   workspaceProps: {
