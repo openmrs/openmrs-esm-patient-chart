@@ -15,7 +15,6 @@ import {
   Stack,
 } from '@carbon/react';
 import {
-  age,
   ExtensionSlot,
   type OpenmrsResource,
   showSnackbar,
@@ -37,12 +36,7 @@ import {
   useShowPatientBanner,
 } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
-import {
-  calculateBodyMassIndex,
-  extractNumbers,
-  getMuacColorCode,
-  isValueWithinReferenceRange,
-} from './vitals-biometrics-form.utils';
+import { calculateBodyMassIndex, getMuacColorCode, isValueWithinReferenceRange } from './vitals-biometrics-form.utils';
 import {
   assessValue,
   createOrUpdateVitalsAndBiometrics,
@@ -52,7 +46,7 @@ import {
   useConceptUnits,
   useEncounterVitalsAndBiometrics,
 } from '../common';
-import { prepareObsForSubmission, shouldShowBmi } from '../common/helpers';
+import { getPatientAge, prepareObsForSubmission, shouldShowBmi } from '../common/helpers';
 import { useVitalsConceptMetadata } from '../common/data.resource';
 import { VitalsAndBiometricsFormSchema, type VitalsBiometricsFormData } from './schema';
 import VitalsAndBiometricsInput from './vitals-biometrics-input.component';
@@ -145,12 +139,17 @@ const VitalsAndBiometricsForm: React.FC<
   const height = watch('height');
 
   useEffect(() => {
-    const patientBirthDate = patient?.birthDate;
-    if (patientBirthDate && midUpperArmCircumference) {
-      const patientAge = extractNumbers(age(patientBirthDate));
-      getMuacColorCode(patientAge, midUpperArmCircumference, setMuacColorCode);
+    if (!patient || !midUpperArmCircumference) {
+      return;
     }
-  }, [watch, patient?.birthDate, midUpperArmCircumference]);
+
+    const patientAge = getPatientAge(patient);
+    if (patientAge === null) {
+      return;
+    }
+
+    getMuacColorCode(patientAge, midUpperArmCircumference, setMuacColorCode);
+  }, [watch, patient, midUpperArmCircumference]);
 
   useEffect(() => {
     if (!showBmi) {
