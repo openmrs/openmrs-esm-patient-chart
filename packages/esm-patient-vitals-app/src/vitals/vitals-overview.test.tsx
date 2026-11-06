@@ -1,8 +1,8 @@
 import React from 'react';
-import { vi, describe, it, expect, afterEach } from 'vitest';
+import { vi, describe, it, expect, afterEach, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, waitFor, within } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, useConfig, UserHasAccess } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject, configSchema } from '../config-schema';
 import { formattedVitals, mockConceptUnits, mockVitalsConfig } from '__mocks__';
@@ -18,8 +18,12 @@ const testProps = {
   urlLabel: '',
 };
 
+
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const mockUseVitalsAndBiometrics = vi.mocked(useVitalsAndBiometrics);
+//add after UserHasAccess Changes
+const mockUserHasAccess = vi.mocked(UserHasAccess)
+
 
 global.ResizeObserver = class ResizeObserver {
   observe = vi.fn();
@@ -54,6 +58,47 @@ const getRowDates = () =>
     .filter(Boolean);
 
 describe('VitalsOverview', () => {
+
+  beforeEach(() => {
+    mockUserHasAccess.mockImplementation(({ children }) => <>{children}</>);
+  });
+
+  it('hides the Add button when the user lacks Add Vitals', async () => {
+    mockUserHasAccess.mockImplementation(({ privilege, children }) =>
+      privilege === 'Add Vitals' ? null : <>{children}</>,
+    );
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: formattedVitals,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsOverview {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    expect(
+      await screen.findByRole('table', { name: /vitals/i }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', { name: /^add\b/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows the Add button when access is granted', async () => {
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: formattedVitals,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsOverview {...testProps} />);
+
+    await waitForLoadingToFinish();
+    expect(await screen.findByRole('table', { name: /vitals/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^add\b/i })).toBeInTheDocument();
+  });
+
+
+
   it('renders an empty state view if vitals data is unavailable', async () => {
     mockUseVitalsAndBiometrics.mockReturnValue({
       data: [],
