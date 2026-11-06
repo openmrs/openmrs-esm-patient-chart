@@ -255,8 +255,8 @@ describe('MedicationsDetailsTable - Modify', () => {
         orderToEditOrdererUuid: medicationFixture.orderer.uuid,
       }),
       expect.objectContaining({ patientUuid: mockPatient.id }),
-      expect.objectContaining({ patientUuid: mockPatient.id }),
     );
+    // Only the window props are passed: the chart's workspace group is not replaced for an order of another visit
     expect(mockStartVisitIfNeeded).not.toHaveBeenCalled();
   });
 });
