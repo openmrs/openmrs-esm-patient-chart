@@ -139,17 +139,18 @@ const VitalsAndBiometricsForm: React.FC<
   const height = watch('height');
 
   useEffect(() => {
-    if (!patient || !midUpperArmCircumference) {
-      return;
+    const patientAge = patient ? getPatientAge(patient) : null;
+    if (
+      patientAge !== null &&
+      midUpperArmCircumference != null &&
+      !isNaN(midUpperArmCircumference) &&
+      midUpperArmCircumference > 0
+    ) {
+      getMuacColorCode(patientAge, midUpperArmCircumference, setMuacColorCode);
+    } else {
+      setMuacColorCode('');
     }
-
-    const patientAge = getPatientAge(patient);
-    if (patientAge === null) {
-      return;
-    }
-
-    getMuacColorCode(patientAge, midUpperArmCircumference, setMuacColorCode);
-  }, [watch, patient, midUpperArmCircumference]);
+  }, [patient, midUpperArmCircumference]);
 
   useEffect(() => {
     if (!showBmi) {
