@@ -1,6 +1,6 @@
 import type { Order } from '@openmrs/esm-patient-common-lib';
 import { describe, it, expect } from 'vitest';
-import { buildMedicationOrder } from './index';
+import { buildMedicationOrder, getObservationDisplayValue, interpretObservation } from './index';
 
 const medicationOrder = {
   uuid: 'order-uuid',
@@ -148,5 +148,28 @@ describe('buildMedicationOrder', () => {
     const result = buildMedicationOrder(medicationOrder, 'REVISE');
 
     expect(result.previousOrderDateActivated).toBe(medicationOrder.dateActivated);
+  });
+});
+
+describe('getObservationDisplayValue', () => {
+  it('shows a numeric value of 0', () => {
+    expect(getObservationDisplayValue(0)).toBe('0');
+  });
+
+  it.each([[null], [undefined], ['']])('shows a placeholder for %j', (value) => {
+    expect(getObservationDisplayValue(value)).toBe('--');
+  });
+});
+
+describe('interpretObservation', () => {
+  it('shows a numeric value of 0 with its units', () => {
+    const { displayValue } = interpretObservation(
+      { value: 0 } as Parameters<typeof interpretObservation>[0],
+      {
+        units: 'mg/dL',
+      } as Parameters<typeof interpretObservation>[1],
+    );
+
+    expect(displayValue).toBe('0 mg/dL');
   });
 });
