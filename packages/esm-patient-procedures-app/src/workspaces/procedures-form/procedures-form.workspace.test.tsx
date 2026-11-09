@@ -47,7 +47,6 @@ const mockUseProcedureTypes = vi.mocked(useProcedureTypes);
 
 mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
-  overviewPageSize: 5,
   detailedViewPageSize: 10,
   procedureConceptUuid: '',
   procedureConceptSourceType: 'any',
@@ -62,10 +61,10 @@ mockUseConfig.mockReturnValue({
 const defaultProps: PatientWorkspace2DefinitionProps<ProceduresFormProps, object> = {
   closeWorkspace: vi.fn(),
   groupProps: {
+    showPatientBanner: 'tabletOnly',
     patientUuid: mockPatient.id,
     patient: mockPatient,
-    visitContext: null,
-    mutateVisitContext: null,
+    activeVisit: null,
   },
   workspaceName: '',
   launchChildWorkspace: vi.fn(),

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
 import {
@@ -10,7 +10,11 @@ import {
   useVisit,
   type Visit,
 } from '@openmrs/esm-framework';
-import { type PatientWorkspaceGroupProps, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import {
+  type PatientWorkspaceGroupProps,
+  setPatientChartWorkspaceGroupVisitUuid,
+  usePatientChartStore,
+} from '@openmrs/esm-patient-common-lib';
 
 const defaultVisitCustomRepresentation =
   'custom:(uuid,display,voided,indication,startDatetime,stopDatetime,' +
@@ -24,6 +28,23 @@ const defaultVisitCustomRepresentation =
   'attributes:(uuid,display,attributeType:(name,datatypeClassname,uuid),value),' +
   'location:(uuid,name,display))';
 
+type WorkspaceGroupLaunchKey = {
+  patientUuid: string | null;
+  activeVisitUuid: string | null;
+};
+
+// The workspace group is current only when it was launched for this patient and active visit.
+function getWorkspaceGroupLaunchKey(groupProps: PatientWorkspaceGroupProps | null): WorkspaceGroupLaunchKey {
+  return {
+    patientUuid: groupProps?.patientUuid ?? null,
+    activeVisitUuid: groupProps?.activeVisit?.uuid ?? null,
+  };
+}
+
+function workspaceGroupLaunchKeysEqual(a: WorkspaceGroupLaunchKey | null, b: WorkspaceGroupLaunchKey | null) {
+  return a?.patientUuid === b?.patientUuid && a?.activeVisitUuid === b?.activeVisitUuid;
+}
+
 export function useVisitByUuid(visitUuid: string | null, representation: string = defaultVisitCustomRepresentation) {
   const url = `${restBaseUrl}/visit/${visitUuid}?v=${representation}`;
   const { data, ...rest } = useSWR<{ data: Visit }>(visitUuid ? url : null, openmrsFetch);
@@ -31,21 +52,21 @@ export function useVisitByUuid(visitUuid: string | null, representation: string 
 }
 
 /**
- * This hook manages fetching of the patient and the visitContext
+ * This hook manages fetching of the patient and the active visit
  * when entering the patient chart, and the associated updated to patient chart store.
  *
  * The patient chart store sets the patient when we enter the patient chart
  * and unsets the patient when we leave. (This gives extensions and workspaces a way
  * to check whether they are rendered within the patient chart app.)
- * Note: We do not unset visitContext when leaving the chart, so it persists across
- * in‑app navigation. On a full page reload, visitContext is rehydrated by refetching
+ * Note: We do not unset the stored active visit when leaving the chart, so it persists across
+ * in‑app navigation. On a full page reload, the active visit is rehydrated by refetching
  * (via useVisit/useVisitByUuId) rather than restored from storage.
- * When we enter the chart, we want to update the visit context as follows:
- * does the the stored visitContext exist and belong to the patient?
- * 1. If so, the visitContext should be valid but possibly stale; fetch the visit again
- *    and update the context
+ * When we enter the chart, we want to update the stored active visit as follows:
+ * does the stored active visit exist and belong to the patient?
+ * 1. If so, it should be valid but possibly stale; fetch the visit again
+ *    and update the stored active visit
  * 2. If not, fetch the active visit of the patient, If it exists, set it as the
- *    visitContext; otherwise, clear it.
+ *    stored active visit; otherwise, clear it.
  * @param patientUuid
  * @returns
  */
@@ -55,74 +76,112 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
   const {
     patientUuid: storePatientUuid,
     setPatient,
-    visitContext,
-    mutateVisitContext,
-    setVisitContext,
+    activeVisit: storedActiveVisit,
+    setActiveVisit,
   } = usePatientChartStore(patientUuid);
 
-  const isVisitContextValid = visitContext?.patient.uuid === patientUuid;
-  const {
-    visit: newVisitContext,
-    mutate: newMutateVisitContext,
-    isValidating: isValidatingVisitContext,
-  } = useVisitByUuid(isVisitContextValid ? visitContext.uuid : null);
-  const {
-    activeVisit,
-    isValidating: isValidatingActiveVisit,
-    mutate: mutateActiveVisit,
-  } = useVisit(isVisitContextValid ? null : patientUuid);
+  const isStoredVisitValid = storedActiveVisit?.patient.uuid === patientUuid;
+  const { visit: storedVisit, isValidating: isValidatingStoredVisit } = useVisitByUuid(
+    isStoredVisitValid ? storedActiveVisit.uuid : null,
+  );
+  const { activeVisit, isValidating: isValidatingActiveVisit } = useVisit(isStoredVisitValid ? null : patientUuid);
 
-  const launchedVisitContextUuid = useRef<string | null | undefined>(undefined);
+  const launchedWorkspaceGroupKey = useRef<WorkspaceGroupLaunchKey | null>(null);
+  const launchedWorkspaceGroupProps = useRef<PatientWorkspaceGroupProps | null>(null);
+  const latestWorkspaceGroupProps = useRef<PatientWorkspaceGroupProps | null>(null);
   const isWorkspaceGroupLaunchPending = useRef(false);
+  const isMounted = useRef(false);
 
   useEffect(() => {
-    let cancelled = false;
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
+  const launchLatestWorkspaceGroup = useCallback(async () => {
+    if (isWorkspaceGroupLaunchPending.current) {
+      return;
+    }
+
+    isWorkspaceGroupLaunchPending.current = true;
+
+    try {
+      let needsLaunch = true;
+      while (needsLaunch) {
+        const groupProps = latestWorkspaceGroupProps.current;
+        const launchKey = getWorkspaceGroupLaunchKey(groupProps);
+
+        if (workspaceGroupLaunchKeysEqual(launchKey, launchedWorkspaceGroupKey.current)) {
+          needsLaunch = false;
+          continue;
+        }
+
+        if (!isMounted.current) {
+          return;
+        }
+
+        const launched = await launchWorkspaceGroup2('patient-chart', groupProps);
+
+        if (!isMounted.current) {
+          return;
+        }
+
+        // launchWorkspaceGroup2 returns false when the user keeps the current workspace group open.
+        if (!launched) {
+          needsLaunch = false;
+          continue;
+        }
+
+        launchedWorkspaceGroupKey.current = launchKey;
+        launchedWorkspaceGroupProps.current = groupProps;
+
+        const latestLaunchKey = getWorkspaceGroupLaunchKey(latestWorkspaceGroupProps.current);
+        if (workspaceGroupLaunchKeysEqual(latestLaunchKey, launchedWorkspaceGroupKey.current)) {
+          needsLaunch = false;
+        }
+      }
+    } finally {
+      isWorkspaceGroupLaunchPending.current = false;
+    }
+  }, []);
+
+  useEffect(() => {
     const initializeWorkspaceGroup = async () => {
-      if (!isValidatingVisitContext && !isValidatingActiveVisit && patient) {
+      if (!isValidatingStoredVisit && !isValidatingActiveVisit && patient) {
         let groupProps: PatientWorkspaceGroupProps = null;
         if (activeVisit) {
           groupProps = {
             patientUuid: patient.id,
             patient,
-            visitContext: activeVisit,
-            mutateVisitContext: mutateActiveVisit,
+            activeVisit,
+            showPatientBanner: 'tabletOnly',
           };
-        } else if (newVisitContext) {
+        } else if (storedVisit) {
           groupProps = {
             patientUuid: patient.id,
             patient,
-            visitContext: newVisitContext,
-            mutateVisitContext: newMutateVisitContext,
+            activeVisit: storedVisit,
+            showPatientBanner: 'tabletOnly',
           };
         } else {
           groupProps = {
             patientUuid: patient.id,
             patient,
-            visitContext: null,
-            mutateVisitContext: null,
+            activeVisit: null,
+            showPatientBanner: 'tabletOnly',
           };
         }
 
-        setVisitContext(groupProps.visitContext, groupProps.mutateVisitContext);
+        setActiveVisit(groupProps.activeVisit);
 
-        const visitContextUuid = groupProps.visitContext?.uuid ?? null;
-        const visitContextChanged = visitContextUuid !== launchedVisitContextUuid.current;
-
-        if (visitContextChanged && !isWorkspaceGroupLaunchPending.current) {
-          isWorkspaceGroupLaunchPending.current = true;
-          try {
-            const launched = await launchWorkspaceGroup2('patient-chart', groupProps);
-            if (cancelled) {
-              return;
-            }
-
-            if (launched) {
-              launchedVisitContextUuid.current = visitContextUuid;
-            }
-          } finally {
-            isWorkspaceGroupLaunchPending.current = false;
-          }
+        latestWorkspaceGroupProps.current = groupProps;
+        await launchLatestWorkspaceGroup();
+        if (isMounted.current) {
+          setPatientChartWorkspaceGroupVisitUuid(
+            launchedWorkspaceGroupKey.current?.activeVisitUuid ?? null,
+            launchedWorkspaceGroupProps.current,
+          );
         }
       }
     };
@@ -136,20 +195,17 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
       });
     });
 
-    return () => {
-      cancelled = true;
-    };
+    return () => {};
   }, [
-    newVisitContext,
-    isValidatingVisitContext,
-    newMutateVisitContext,
-    setVisitContext,
+    storedVisit,
+    isValidatingStoredVisit,
+    setActiveVisit,
     activeVisit,
     isValidatingActiveVisit,
     storePatientUuid,
-    mutateActiveVisit,
     patient,
     t,
+    launchLatestWorkspaceGroup,
   ]);
 
   useEffect(() => {
@@ -166,12 +222,13 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
     () => ({
       patientUuid,
       patient: patient ?? {},
-      visitContext,
-      mutateVisitContext,
+      // The key stays `visitContext`: it is the slot state of the patient header / info slots,
+      // which extensions (possibly from other apps) read.
+      visitContext: storedActiveVisit,
       isLoadingPatient,
       setPatient,
     }),
-    [patient, patientUuid, visitContext, mutateVisitContext, isLoadingPatient, setPatient],
+    [patient, patientUuid, storedActiveVisit, isLoadingPatient, setPatient],
   );
 
   return state;

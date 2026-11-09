@@ -15,10 +15,9 @@
 }
 
 .backButton {
-  padding: 0 layout.$spacing-05;
-
   button {
     display: flex;
+    margin-bottom: layout.$spacing-05;
 
     svg {
       order: 1;

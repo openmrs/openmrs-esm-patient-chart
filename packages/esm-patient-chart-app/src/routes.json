@@ -1,12 +1,23 @@
 {
   "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "webservices.rest": ">=2.12.0"
+  },
   "optionalBackendDependencies": {
     "emrapi": {
-      "version": ">=2.0.0 <4.0.0",
+      "version": ">=2.1.0 <4.0.0",
       "feature": {
         "flagName": "emrapi-module",
         "label": "EMR API Module",
         "description": "This module, if installed, provides core EMR business logic."
+      }
+    },
+    "patientdocuments": {
+      "version": ">=1.1.0",
+      "feature": {
+        "flagName": "patientdocuments-module",
+        "label": "Patient Documents Module",
+        "description": "This module, if installed, provides the ability to print patient encounters."
       }
     }
   },
@@ -143,6 +154,12 @@
       }
     },
     {
+      "name": "visit-summary",
+      "component": "visitSummary",
+      "online": true,
+      "offline": true
+    },
+    {
       "name": "edit-visit-action-button",
       "slot": "visit-detail-overview-actions",
       "component": "editVisitDetailsActionButton",
@@ -213,10 +230,6 @@
     {
       "name": "start-visit-dialog",
       "component": "startVisitModal"
-    },
-    {
-      "name": "visit-context-switcher",
-      "component": "visitContextSwitcherModal"
     }
   ],
   "pages": [

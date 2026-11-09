@@ -457,12 +457,12 @@ export function useFetchProviders() {
 export function useProviderRoles() {
   const { allowAssigningProviderRole } = useConfig<Config>();
   const url = allowAssigningProviderRole ? `${restBaseUrl}/providerrole?v=custom:(uuid,name)` : null;
-  const response = useSWRImmutable<FetchResponse<ProviderRoleSearchResponse>>(url, openmrsFetch);
-  const results = response?.data?.data?.results ?? [];
-  return results.map((result) => ({
+  const { data, isLoading } = useSWRImmutable<FetchResponse<ProviderRoleSearchResponse>>(url, openmrsFetch);
+  const providerRoleOptions = (data?.data?.results ?? []).map((result) => ({
     id: result.uuid,
     label: result.name,
   }));
+  return { providerRoleOptions, isLoading };
 }
 
 // PlanDefinition types for system tasks

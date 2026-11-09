@@ -20,13 +20,6 @@
   ],
   "extensions": [
     {
-      "name": "procedures-overview-widget",
-      "slot": "patient-chart-summary-dashboard-slot",
-      "component": "proceduresOverview",
-      "order": 4,
-      "meta": { "fullWidth": false }
-    },
-    {
       "name": "procedures-details-widget",
       "slot": "patient-chart-procedures-dashboard-slot",
       "component": "proceduresDetailedSummary",

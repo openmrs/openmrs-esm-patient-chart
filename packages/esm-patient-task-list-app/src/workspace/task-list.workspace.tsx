@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { Add, ArrowLeft } from '@carbon/react/icons';
-import { Workspace2, type Visit } from '@openmrs/esm-framework';
-import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
+import { ExtensionSlot, Workspace2 } from '@openmrs/esm-framework';
+import { type PatientWorkspace2DefinitionProps, useShowPatientBanner } from '@openmrs/esm-patient-common-lib';
 import { type Task } from './task-list.resource';
 import AddTaskForm from './add-task-form.component';
 import TaskListView from './task-list-view.component';
@@ -13,8 +13,11 @@ import styles from './task-list.scss';
 type View = 'list' | 'form' | 'details' | 'edit';
 
 const TaskListWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({ groupProps }) => {
-  const { patientUuid, visitContext } = groupProps ?? { patientUuid: '', visitContext: undefined as unknown as Visit };
+  const patient = groupProps?.patient;
+  const patientUuid = groupProps?.patientUuid ?? '';
+  const activeVisit = groupProps?.activeVisit;
   const { t } = useTranslation();
+  const shouldShowPatientBanner = useShowPatientBanner(groupProps);
   const [view, setView] = useState<View>('list');
   const [selectedTaskUuid, setSelectedTaskUuid] = useState<string | null>(null);
 
@@ -44,8 +47,25 @@ const TaskListWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
   const backText =
     view === 'edit' ? t('backToTaskDetails', 'Back to task details') : t('backToTaskList', 'Back to task list');
 
+  const title = (() => {
+    switch (view) {
+      case 'form':
+        return t('addTask', 'Add task');
+      case 'edit':
+        return t('editTask', 'Edit task');
+      case 'details':
+        return t('taskDetails', 'Task details');
+      case 'list':
+      default:
+        return t('taskListWorkspaceTitle', 'Task list');
+    }
+  })();
+
   return (
-    <Workspace2 title={t('taskListWorkspaceTitle', 'Task List')}>
+    <Workspace2 title={title}>
+      {shouldShowPatientBanner && patient && patientUuid && (
+        <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
+      )}
       <div className={styles.workspaceContainer}>
         {['form', 'details', 'edit'].includes(view) && (
           <div className={styles.backButton}>
@@ -54,13 +74,14 @@ const TaskListWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
               renderIcon={(props) => <ArrowLeft size={16} {...props} />}
               iconDescription={backText}
               onClick={handleBackClick}
+              size="sm"
             >
               <span>{backText}</span>
             </Button>
           </div>
         )}
         {view === 'form' && (
-          <AddTaskForm patientUuid={patientUuid} activeVisit={visitContext} onClose={() => setView('list')} />
+          <AddTaskForm patientUuid={patientUuid} activeVisit={activeVisit} onClose={() => setView('list')} />
         )}
         {view === 'list' && <TaskListView patientUuid={patientUuid} onTaskClick={handleTaskClick} />}
         {view === 'list' && (
@@ -68,10 +89,10 @@ const TaskListWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
             <Button
               kind="ghost"
               renderIcon={(props) => <Add size={16} {...props} />}
-              iconDescription={t('addTask', 'Add Task')}
+              iconDescription={t('addTask', 'Add task')}
               onClick={() => setView('form')}
             >
-              {t('addTask', 'Add Task')}
+              {t('addTask', 'Add task')}
             </Button>
           </div>
         )}
@@ -86,7 +107,7 @@ const TaskListWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
         {view === 'edit' && selectedTaskUuid && (
           <AddTaskForm
             patientUuid={patientUuid}
-            activeVisit={visitContext}
+            activeVisit={activeVisit}
             onClose={handleEditComplete}
             editTaskUuid={selectedTaskUuid}
           />

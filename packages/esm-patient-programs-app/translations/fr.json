@@ -8,6 +8,7 @@
   "chooseProgram": "Choisissez un programme",
   "chooseStatus": "Choisissez un statut de programme",
   "completedOn": "Terminé le",
+  "completionDateCannotBeBeforeEnrollmentDate": "Completion date cannot be before the enrollment date",
   "configurePrograms": "Veuillez configurer des programmes pour continuer.",
   "dateCompleted": "Date de fin",
   "dateEnrolled": "Date d'enregistrement",

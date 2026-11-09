@@ -5,53 +5,59 @@ import {
   type OpenmrsResource,
   parseDate,
   restBaseUrl,
+  toOmrsIsoString,
   type Visit,
 } from '@openmrs/esm-framework';
 import { type OrderBasketStore, orderBasketStore } from './store';
 import type { ExtractedOrderErrorObject, Order, OrderBasketItem, OrderErrorObject, OrderPost } from './types';
 
-function getOrdersPayloadFromOrderBasket(patientUuid: string, ordererUuid: string, encounterDate?: Date) {
+function getOrdersPayloadFromOrderBasket(patientUuid: string, ordererUuid: string): Array<OrderPost> {
   const { items, postDataPrepFunctions }: OrderBasketStore = orderBasketStore.getState();
   const patientItems = items[patientUuid];
+
+  if (!patientItems) {
+    return [];
+  }
 
   const orders: Array<OrderPost> = [];
   Object.entries(patientItems).forEach(([grouping, groupOrders]) => {
     groupOrders.forEach((order) => {
-      const preppedOrder = encounterDate ? floorOrderStartDate(order, encounterDate) : order;
-      orders.push(postDataPrepFunctions[grouping](preppedOrder, patientUuid, null, ordererUuid));
+      orders.push(postDataPrepFunctions[grouping](order, patientUuid, null, ordererUuid));
     });
   });
 
   return orders;
 }
 
-function getOrderStartDate(order: OrderBasketItem) {
-  const orderWithDates = order as { scheduledDate?: Date | string; startDate?: Date | string };
-  if (orderWithDates.scheduledDate) {
-    return { key: 'scheduledDate', value: orderWithDates.scheduledDate } as const;
+/**
+ * Guards against a malformed date silently corrupting the POST payload: an invalid `Date` is
+ * truthy and fails every comparison, so it would otherwise slip through unclamped and serialize to
+ * `null`/`"Invalid Date"`. Throws with the offending value so the failure is diagnosable.
+ */
+function assertValidDate(date: Date, rawValue: string): Date {
+  if (Number.isNaN(date.getTime())) {
+    throw new Error(`Cannot post orders: "${rawValue}" is not a valid date.`);
   }
-  if (orderWithDates.startDate) {
-    return { key: 'startDate', value: orderWithDates.startDate } as const;
-  }
-  return null;
+  return date;
 }
 
 /**
- * Returns a shallow copy of the basket item with its selected start date floored
- * to `encounterDate`. The backend enforces `dateActivated >= encounterDatetime`,
- * so if a user-selected start date fell before the encounter date (for example,
- * because it was earlier than the visit start), it must be raised to match.
+ * The earliest explicit `dateActivated` among the prepped orders, or `undefined` when none set
+ * one. Orders left without a `dateActivated` are stamped by the server at request time, so they
+ * impose no lower bound on the encounter datetime.
  */
-function floorOrderStartDate<T extends OrderBasketItem>(order: T, encounterDate: Date): T {
-  const orderStartDate = getOrderStartDate(order);
-  if (!orderStartDate) {
-    return order;
+function earliestDateActivated(orders: ReadonlyArray<OrderPost>): Date | undefined {
+  let earliest: Date | undefined;
+  for (const order of orders) {
+    if (!order.dateActivated) {
+      continue;
+    }
+    const dateActivated = assertValidDate(new Date(order.dateActivated), order.dateActivated);
+    if (!earliest || dateActivated < earliest) {
+      earliest = dateActivated;
+    }
   }
-  const startDate = orderStartDate.value instanceof Date ? orderStartDate.value : new Date(orderStartDate.value);
-  if (startDate < encounterDate) {
-    return { ...order, [orderStartDate.key]: encounterDate } as T;
-  }
-  return order;
+  return earliest;
 }
 
 export async function postOrdersOnNewEncounter(
@@ -61,46 +67,59 @@ export async function postOrdersOnNewEncounter(
   orderLocationUuid: string,
   ordererUuid: string,
   abortController?: AbortController,
-
-  /**
-   * Desired encounter datetime. Clamped to the visit window before posting.
-   * When omitted: if the visit is stopped, falls back to `visit.startDatetime`;
-   * otherwise the field is dropped from the POST so the server defaults to now.
-   */
-  encounterDate?: Date,
 ) {
-  if (!encounterDate) {
-    if (currentVisit?.stopDatetime) {
-      encounterDate = parseDate(currentVisit.startDatetime);
-    } else {
-      encounterDate = null;
+  const orders = getOrdersPayloadFromOrderBasket(patientUuid, ordererUuid);
+
+  // The backend enforces `dateActivated >= encounterDatetime`, so the encounter must sit at or
+  // before the earliest explicitly-requested order activation. Orders without a `dateActivated`
+  // are "start now": in a real-time (open) visit we leave encounterDatetime unset too, so the
+  // server stamps the encounter and those orders at the same request-time clock.
+  let encounterDatetime = earliestDateActivated(orders);
+
+  // A stopped (retrospective) visit ended in the past, so the server's "now" would fall outside
+  // the visit window. Pin the encounter to the visit start when nothing else set it.
+  const isRetrospective = Boolean(currentVisit?.stopDatetime);
+  if (!encounterDatetime && isRetrospective) {
+    encounterDatetime = assertValidDate(parseDate(currentVisit.startDatetime), currentVisit.startDatetime);
+  }
+
+  // Clamp to the visit window so Encounter.datetimeShouldBeInVisitDatesRange holds at both ends.
+  if (encounterDatetime && currentVisit?.startDatetime) {
+    const visitStart = assertValidDate(parseDate(currentVisit.startDatetime), currentVisit.startDatetime);
+    if (encounterDatetime < visitStart) {
+      encounterDatetime = visitStart;
+    }
+  }
+  if (encounterDatetime && currentVisit?.stopDatetime) {
+    const visitStop = assertValidDate(parseDate(currentVisit.stopDatetime), currentVisit.stopDatetime);
+    if (encounterDatetime > visitStop) {
+      encounterDatetime = visitStop;
     }
   }
 
-  // Clamp the encounter datetime to the visit window so the backend's
-  // Encounter.datetimeShouldBeInVisitDatesRange constraint holds at both ends.
-  if (encounterDate && currentVisit?.startDatetime) {
-    const visitStart = parseDate(currentVisit.startDatetime);
-    if (encounterDate < visitStart) {
-      encounterDate = visitStart;
+  if (encounterDatetime) {
+    const encounterDateActivated = toOmrsIsoString(encounterDatetime);
+    for (const order of orders) {
+      if (order.dateActivated) {
+        // Keep explicit start dates, but raise any that clamping pushed below the encounter.
+        if (new Date(order.dateActivated) < encounterDatetime) {
+          order.dateActivated = encounterDateActivated;
+        }
+      } else if (isRetrospective && !order.scheduledDate) {
+        // "Start now" orders in a closed visit must be pinned to the encounter datetime; otherwise
+        // the server would stamp them at real-time now, outside the visit window.
+        order.dateActivated = encounterDateActivated;
+      }
     }
   }
-  if (encounterDate && currentVisit?.stopDatetime) {
-    const visitStop = parseDate(currentVisit.stopDatetime);
-    if (encounterDate > visitStop) {
-      encounterDate = visitStop;
-    }
-  }
-
-  const orders = getOrdersPayloadFromOrderBasket(patientUuid, ordererUuid, encounterDate ?? undefined);
 
   const encounterPostData: EncounterPost = {
     patient: patientUuid,
     location: orderLocationUuid,
     encounterType: orderEncounterType,
-    // only specify the encounterDatetime if it's given, otherwise
-    // don't specify that let the server default it to `now`
-    ...(encounterDate ? { encounterDatetime: encounterDate } : {}),
+    // Only send encounterDatetime when we need a specific time; otherwise let the server default it
+    // to now (EncounterResource.newDelegate() stamps the request-time server clock).
+    ...(encounterDatetime ? { encounterDatetime } : {}),
     visit: currentVisit?.uuid,
     obs: [],
     orders,

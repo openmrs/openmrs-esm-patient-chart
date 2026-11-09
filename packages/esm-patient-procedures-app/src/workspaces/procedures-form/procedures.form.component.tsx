@@ -201,10 +201,11 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
               selectedConcept={procedureConcept}
               onChange={(concept) => {
                 setProcedureConcept(concept);
-                setValue('procedureCoded', concept?.uuid ?? '');
+                setValue('procedureCoded', concept?.uuid ?? '', { shouldValidate: true });
               }}
+              invalid={Boolean(errors.procedureCoded)}
+              invalidText={errors.procedureCoded?.message}
             />
-            {errors.procedureCoded && <p className={styles.errorMessage}>{errors.procedureCoded.message}</p>}
           </FormGroup>
 
           <FormGroup legendText={<RequiredFieldLabel label={t('procedureType', 'Procedure type')} />}>
@@ -221,12 +222,13 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
                   itemToString={(item: ProcedureType) => item?.name ?? ''}
                   initialSelectedItem={procedureTypes.find((pt) => pt.uuid === getValues('procedureType')) ?? null}
                   onChange={({ selectedItem }: { selectedItem: ProcedureType | null }) =>
-                    setValue('procedureType', selectedItem?.uuid ?? '')
+                    setValue('procedureType', selectedItem?.uuid ?? '', { shouldValidate: true })
                   }
+                  invalid={Boolean(errors.procedureType)}
+                  invalidText={errors.procedureType?.message}
                 />
               </ResponsiveWrapper>
             )}
-            {errors.procedureType && <p className={styles.errorMessage}>{errors.procedureType.message}</p>}
           </FormGroup>
 
           <FormGroup legendText={<RequiredFieldLabel label={t('bodySite', 'Body site')} />}>
@@ -237,10 +239,11 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
               selectedConcept={bodySiteConcept}
               onChange={(concept) => {
                 setBodySiteConcept(concept);
-                setValue('bodySite', concept?.uuid ?? '');
+                setValue('bodySite', concept?.uuid ?? '', { shouldValidate: true });
               }}
+              invalid={Boolean(errors.bodySite)}
+              invalidText={errors.bodySite?.message}
             />
-            {errors.bodySite && <p className={styles.errorMessage}>{errors.bodySite.message}</p>}
           </FormGroup>
           <FormGroup legendText={t('isStartDateKnown', 'Is start date known?')}>
             <ContentSwitcher
@@ -296,6 +299,8 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
                     onChange={({ selectedItem }: { selectedItem: { id: string; label: string } | null }) =>
                       setEstimatedYear(selectedItem?.id ?? '')
                     }
+                    invalid={Boolean(errors.startDateTime)}
+                    invalidText={errors.startDateTime?.message}
                   />
                 </ResponsiveWrapper>
                 <ResponsiveWrapper>
@@ -312,7 +317,6 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
                   />
                 </ResponsiveWrapper>
               </div>
-              {errors.startDateTime && <p className={styles.errorMessage}>{errors.startDateTime.message}</p>}
             </FormGroup>
           )}
 
@@ -338,7 +342,7 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
               <Controller
                 name="duration"
                 control={control}
-                render={({ field: { onChange, value, ref, name } }) => (
+                render={({ field: { onChange, value, ref, name }, fieldState }) => (
                   <ResponsiveWrapper>
                     <NumberInput
                       id="duration"
@@ -349,6 +353,8 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
                       min={1}
                       hideSteppers
                       allowEmpty
+                      invalid={Boolean(fieldState.error)}
+                      invalidText={fieldState.error?.message}
                       value={value ?? ''}
                       onChange={(_event, { value: nextValue }: { value: number | string }) => {
                         if (nextValue == null || nextValue === '') {
@@ -365,7 +371,7 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
               <Controller
                 name="durationUnit"
                 control={control}
-                render={({ field }) => (
+                render={({ field, fieldState }) => (
                   <ResponsiveWrapper>
                     <ComboBox
                       id="durationUnit"
@@ -377,6 +383,8 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
                       onChange={({ selectedItem }: { selectedItem: ConceptReference | null }) =>
                         field.onChange(selectedItem?.uuid ?? null)
                       }
+                      invalid={Boolean(fieldState.error)}
+                      invalidText={fieldState.error?.message}
                     />
                   </ResponsiveWrapper>
                 )}
@@ -387,15 +395,13 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
                 </p>
               )}
             </div>
-            {errors.duration && <p className={styles.errorMessage}>{errors.duration.message}</p>}
-            {errors.durationUnit && <p className={styles.errorMessage}>{errors.durationUnit.message}</p>}
           </FormGroup>
 
           <FormGroup legendText={<RequiredFieldLabel label={t('status', 'Status')} />}>
             <Controller
               name="status"
               control={control}
-              render={({ field }) => (
+              render={({ field, fieldState }) => (
                 <ResponsiveWrapper>
                   <ComboBox
                     id="status"
@@ -408,6 +414,8 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
                     onChange={({ selectedItem }: { selectedItem: ConceptReference | null }) =>
                       field.onChange(selectedItem?.uuid ?? null)
                     }
+                    invalid={Boolean(fieldState.error)}
+                    invalidText={fieldState.error?.message}
                   />
                 </ResponsiveWrapper>
               )}
@@ -417,25 +425,25 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
                 {t('statusOptionsLoadFailed', 'Could not load status options. Please try again.')}
               </p>
             )}
-            {errors.status && <p className={styles.errorMessage}>{errors.status.message}</p>}
           </FormGroup>
 
           <FormGroup legendText={t('notes', 'Notes')}>
             <Controller
               name="notes"
               control={control}
-              render={({ field }) => (
+              render={({ field, fieldState }) => (
                 <ResponsiveWrapper>
                   <TextArea
                     {...field}
                     id="notes"
                     labelText=""
                     placeholder={t('enterNotes', 'Enter notes (optional)')}
+                    invalid={Boolean(fieldState.error)}
+                    invalidText={fieldState.error?.message}
                   />
                 </ResponsiveWrapper>
               )}
             />
-            {errors.notes && <p className={styles.errorMessage}>{errors.notes.message}</p>}
           </FormGroup>
         </Stack>
       </div>

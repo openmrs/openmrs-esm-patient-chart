@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-generic-patient-widgets-app",
-  "version": "12.1.0",
+  "version": "13.0.1",
   "license": "MPL-2.0",
   "description": "Generic widgets for the patient chart",
   "browser": "dist/openmrs-esm-generic-patient-widgets-app.js",
@@ -11,8 +11,9 @@
     "serve": "rspack serve --mode=development",
     "debug": "npm run serve",
     "build": "rspack --mode=production",
+    "clean": "git clean -fdX -- dist",
     "analyze": "rspack --mode=production --env analyze=true",
-    "lint": "cross-env eslint src --ext tsx,ts --fix --max-warnings=0",
+    "lint": "eslint src --fix --max-warnings=0",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest watch",
     "coverage": "vitest run --coverage --passWithNoTests",
@@ -34,24 +35,25 @@
     "url": "git+https://github.com/openmrs/openmrs-esm-patient-chart.git"
   },
   "bugs": {
-    "url": "https://github.com/openmrs/openmrs-esm-patient-chart/issues"
+    "url": "https://openmrs.atlassian.net/jira/software/c/projects/O3/boards/37"
   },
   "dependencies": {
-    "@carbon/charts-react": "^1.27.0",
-    "@carbon/react": "^1.83.0",
-    "lodash-es": "^4.18.1"
+    "@carbon/charts-react": "^1.27.0"
   },
   "peerDependencies": {
-    "@openmrs/esm-framework": "9.x",
-    "@openmrs/esm-patient-common-lib": "12.x",
+    "@carbon/react": "1.x",
+    "@openmrs/esm-framework": "11.x",
+    "@openmrs/esm-patient-common-lib": "13.x",
     "dayjs": "1.x",
-    "react": "^18.2.0",
+    "react": "18.x",
+    "react-dom": "18.x",
     "react-i18next": "16.x",
     "react-router-dom": "6.x",
     "rxjs": "6.x",
     "swr": "2.x"
   },
   "devDependencies": {
+    "@carbon/react": "^1.92.1",
     "@openmrs/esm-patient-common-lib": "workspace:*",
     "openmrs": "next",
     "vitest": "^4.1.2"

@@ -14,6 +14,10 @@ vi.mock('./sticky-note.resource', () => ({
   updateStickyNote: vi.fn(),
 }));
 
+vi.mock('./utils', () => ({
+  decodeHtmlEntities: (text: string) => text,
+}));
+
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const mockShowSnackbar = vi.mocked(showSnackbar);
 const mockCreateStickyNote = vi.mocked(createStickyNote);

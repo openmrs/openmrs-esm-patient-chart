@@ -3,9 +3,7 @@ import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 import { moduleName } from './constants';
-import ProceduresOverview from './components/overview/procedures-overview.component';
 import ProceduresDetailedSummary from './components/detailed-summary/procedures-detailed-summary.component';
-import ProceduresFormWorkspace from './workspaces/procedures-form/procedures-form.workspace';
 
 const options = {
   featureName: 'patient-procedures-app',
@@ -19,13 +17,14 @@ export const startupApp = () => {
 };
 
 // Extensions
-export const proceduresOverview = getSyncLifecycle(ProceduresOverview, options);
-
 export const proceduresDetailedSummary = getSyncLifecycle(ProceduresDetailedSummary, options);
 
 export const proceduresDashboardLink = getSyncLifecycle(createDashboardLink({ ...dashboardMeta }), options);
 
-export const proceduresFormWorkspace = getSyncLifecycle(ProceduresFormWorkspace, options);
+export const proceduresFormWorkspace = getAsyncLifecycle(
+  () => import('./workspaces/procedures-form/procedures-form.workspace'),
+  options,
+);
 
 export const procedureDeleteConfirmationDialog = getAsyncLifecycle(
   () => import('./modals/delete-procedure/delete-procedure.modal'),

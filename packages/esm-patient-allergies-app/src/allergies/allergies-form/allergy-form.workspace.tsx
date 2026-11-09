@@ -30,6 +30,7 @@ import {
   useLayoutType,
   ResponsiveWrapper,
   Workspace2,
+  type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import {
   type Allergen,
@@ -43,7 +44,12 @@ import { useAllergies } from '../allergy-intolerance.resource';
 import { type AllergiesConfigObject } from '../../config-schema';
 import { ALLERGEN_TYPES, type Allergy } from '../../types';
 import styles from './allergy-form.scss';
-import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
+import {
+  getPatientAndVisitProps,
+  type PatientWorkspaceWindowProps,
+  type SharedWorkspaceGroupProps,
+  useShowPatientBanner,
+} from '@openmrs/esm-patient-common-lib';
 
 interface AllergyFormData {
   allergen: Allergen;
@@ -58,6 +64,8 @@ export interface AllergyFormWorkspaceProps {
   allergy?: Allergy;
   formContext: 'creating' | 'editing';
 }
+
+export type AllergyFormWindowProps = Pick<PatientWorkspaceWindowProps, 'patient' | 'patientUuid'>;
 
 interface FormValues {
   allergen: Allergen | null;
@@ -118,17 +126,37 @@ const allergyFormSchema = (t: TFunction, otherConceptUuid: string) =>
       }
     });
 
-function AllergyFormWorkspace({
+export interface AllergyFormProps {
+  allergy?: Allergy;
+  closeWorkspace: Workspace2DefinitionProps<
+    AllergyFormWorkspaceProps,
+    AllergyFormWindowProps,
+    object
+  >['closeWorkspace'];
+  formContext: 'creating' | 'editing';
+  patient: fhir.Patient;
+  patientUuid: string;
+  showPatientBanner?: boolean;
+}
+
+// Presentational form, decoupled from how the patient context is sourced (the workspace below takes
+// it from its window props). We never call `usePatient()` here: per O3-4505, only the root chart
+// component loads the patient, to avoid an SWR re-render cascade.
+export function AllergyForm({
+  allergy,
   closeWorkspace,
-  groupProps: { patient, patientUuid },
-  workspaceProps: { allergy, formContext },
-}: PatientWorkspace2DefinitionProps<AllergyFormWorkspaceProps, {}>) {
+  formContext,
+  patient,
+  patientUuid,
+  showPatientBanner: showPatientBannerProp,
+}: AllergyFormProps) {
   const { allergens } = useAllergens();
   const { allergicReactions, isLoading: isLoadingReactions } = useAllergicReactions();
   const { concepts } = useConfig<AllergiesConfigObject>();
-  const { allergies, mutate } = useAllergies(patient.id);
+  const { allergies, mutate } = useAllergies(patientUuid);
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
+  const showPatientBanner = showPatientBannerProp ?? isTablet;
   const formValuesLoadedRef = useRef(false);
   const { mildReactionUuid, moderateReactionUuid, otherConceptUuid, severeReactionUuid } = useMemo(
     () => concepts,
@@ -403,6 +431,9 @@ function AllergyFormWorkspace({
       title={allergy ? t('editAllergy', 'Edit an allergy') : t('recordNewAllergy', 'Record a new allergy')}
       hasUnsavedChanges={isDirty}
     >
+      {showPatientBanner && patient && patientUuid && (
+        <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
+      )}
       <Form className={styles.formContainer} onSubmit={handleSubmit(onSubmit)}>
         {isTablet ? (
           <Row className={styles.header}>
@@ -602,6 +633,32 @@ function AllergyFormWorkspace({
         </div>
       </Form>
     </Workspace2>
+  );
+}
+
+/**
+ * This workspace displays the form to record or edit an allergy. It acts on the patient given by its
+ * window props rather than by the patient chart's group props, so it works both in the patient chart
+ * and in other apps' workspace windows (e.g. the ward's order basket).
+ */
+function AllergyFormWorkspace({
+  closeWorkspace,
+  windowProps,
+  workspaceProps: { allergy, formContext },
+  groupProps,
+}: Workspace2DefinitionProps<AllergyFormWorkspaceProps, AllergyFormWindowProps, SharedWorkspaceGroupProps>) {
+  const { patient, patientUuid } = getPatientAndVisitProps(windowProps, undefined, groupProps);
+  const shouldShowPatientBanner = useShowPatientBanner(groupProps);
+
+  return (
+    <AllergyForm
+      allergy={allergy}
+      closeWorkspace={closeWorkspace}
+      formContext={formContext}
+      patient={patient}
+      patientUuid={patientUuid}
+      showPatientBanner={shouldShowPatientBanner}
+    />
   );
 }
 

@@ -188,6 +188,8 @@ export type MappedObservation = {
   hiAbsolute?: number;
   hiCritical?: number;
   flatName: string;
+  /** All flatNames that collapsed into this entry's normalized branch. */
+  flatNames?: Array<string>;
   hasData: boolean;
   range: string;
   obsDatetime: string;

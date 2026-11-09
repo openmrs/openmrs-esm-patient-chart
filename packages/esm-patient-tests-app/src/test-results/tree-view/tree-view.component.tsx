@@ -28,6 +28,11 @@ const GroupedPanelsTables: React.FC<{ patientUuid: string; className: string; lo
   const { checkboxes, someChecked, tableData } = useContext(FilterContext);
   const selectedCheckboxes = Object.keys(checkboxes).filter((key) => checkboxes[key]);
 
+  // An entry can represent several collapsed branches; match a checkbox against
+  // every flatName that contributed to it, not just the one it carries.
+  const entryMatchesCheckbox = (entry: GroupedObservation['entries'][number], selectedKey: string) =>
+    (entry.flatNames ?? [entry.flatName]).includes(selectedKey) || entry.key === selectedKey;
+
   const tableFilteredSubRows = useMemo(
     () =>
       tableData
@@ -36,7 +41,9 @@ const GroupedPanelsTables: React.FC<{ patientUuid: string; className: string; lo
             !someChecked ||
             (row.entries &&
               Array.isArray(row.entries) &&
-              row.entries.some((entry) => selectedCheckboxes.some((selectedKey) => entry.flatName === selectedKey))),
+              row.entries.some((entry) =>
+                selectedCheckboxes.some((selectedKey) => entryMatchesCheckbox(entry, selectedKey)),
+              )),
         )
         .map((subRows: GroupedObservation, index) => {
           return {
@@ -46,9 +53,7 @@ const GroupedPanelsTables: React.FC<{ patientUuid: string; className: string; lo
                 ? subRows.entries.filter(
                     (entry) =>
                       !someChecked ||
-                      selectedCheckboxes.some(
-                        (selectedKey) => entry.flatName === selectedKey || entry.key === selectedKey,
-                      ),
+                      selectedCheckboxes.some((selectedKey) => entryMatchesCheckbox(entry, selectedKey)),
                   )
                 : [],
           };

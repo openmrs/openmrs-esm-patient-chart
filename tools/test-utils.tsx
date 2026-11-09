@@ -1,4 +1,3 @@
-/* eslint-disable testing-library/no-node-access */
 import React from 'react';
 import { SWRConfig } from 'swr';
 import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';

@@ -75,7 +75,7 @@
   "vitalsAndBiometricsUpdated": "Vitaldaten und biometrische Daten aktualisiert",
   "vitalsAndBiometricsUpdateError": "Fehler beim Aktualisieren von Vitaldaten und biometrischen Daten",
   "vitalsHistory": "Vitaldatenhistorie",
-  "vitalSignDisplayed": "Lebenszeichen werden angezeigt",
-  "vitalSigns": "Lebenszeichen",
+  "vitalSignDisplayed": "Vitaldaten werden angezeigt",
+  "vitalSigns": "Vitaldaten",
   "weight": "Gewicht"
 }

@@ -24,10 +24,7 @@ test('Add and remove an attachment', async ({ page, patient }) => {
   });
 
   await test.step('And I choose the attachment file to upload', async () => {
-    const fileChooserPromise = page.waitForEvent('filechooser');
-    await page.getByRole('button', { name: /drag and drop files here or click to upload/i }).click();
-    const fileChooser = await fileChooserPromise;
-    await fileChooser.setFiles(filePath);
+    await page.locator('input[type="file"]').setInputFiles(filePath);
   });
 
   await test.step('And I verify the image name field is pre-filled', async () => {
@@ -116,7 +113,10 @@ test('Add and remove an attachment', async ({ page, patient }) => {
   });
 
   await test.step('And I confirm the deletion in the modal', async () => {
-    await page.getByRole('button', { name: /^danger delete$/i }).click();
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: /delete/i })
+      .click();
   });
 
   await test.step('Then I should see a success notification', async () => {
@@ -155,10 +155,7 @@ test('Upload and preview a PDF attachment', async ({ page, patient }) => {
   });
 
   await test.step('And I choose the PDF file to upload', async () => {
-    const fileChooserPromise = page.waitForEvent('filechooser');
-    await page.getByRole('button', { name: /drag and drop files here or click to upload/i }).click();
-    const fileChooser = await fileChooserPromise;
-    await fileChooser.setFiles(filePath);
+    await page.locator('input[type="file"]').setInputFiles(filePath);
   });
 
   await test.step('And I verify the file name field is pre-filled', async () => {
@@ -198,7 +195,7 @@ test('Upload and preview a PDF attachment', async ({ page, patient }) => {
   });
 
   await test.step('Then I should see the PDF preview modal open', async () => {
-    await expect(page.locator('iframe[title="PDFViewer"]')).toBeVisible();
+    await expect(page.getByTitle(displayedFileName)).toBeVisible();
   });
 
   await test.step('And I should see the exact PDF filename displayed in the preview', async () => {
@@ -210,7 +207,7 @@ test('Upload and preview a PDF attachment', async ({ page, patient }) => {
   });
 
   await test.step('And the preview should have a delete option in the overflow menu', async () => {
-    await page.getByRole('button', { name: /options/i }).click();
+    await page.getByRole('button', { name: /attachment actions/i }).click();
     await expect(page.getByText(/delete pdf/i)).toBeVisible();
     await page.keyboard.press('Escape');
   });
@@ -233,7 +230,7 @@ test('Upload and preview a PDF attachment', async ({ page, patient }) => {
   });
 
   await test.step('Then I should see the PDF preview modal open again', async () => {
-    await expect(page.locator('iframe[title="PDFViewer"]')).toBeVisible();
+    await expect(page.getByTitle(displayedFileName)).toBeVisible();
   });
 
   await test.step('When I press the Escape key', async () => {

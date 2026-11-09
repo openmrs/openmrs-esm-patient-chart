@@ -27,7 +27,7 @@ const defaultProps = {
 };
 
 function getMenuTrigger() {
-  return screen.getByRole('button', { name: /options/i });
+  return screen.getByRole('button', { name: /edit or delete procedure/i });
 }
 
 async function openMenu(user: ReturnType<typeof userEvent.setup>) {
@@ -56,6 +56,7 @@ describe('Procedures Action Menu', () => {
 
     const panel = await openMenu(user);
 
+    expect(panel).toHaveAttribute('aria-label', 'Edit or delete procedure');
     expect(within(panel!).getByText('Edit')).toBeInTheDocument();
     expect(within(panel!).getByText('Delete')).toBeInTheDocument();
   });

@@ -56,11 +56,20 @@ export const configSchema = {
   drugCategoryConceptSets: {
     _type: Type.Array,
     _description:
-      'Concept Set UUIDs that define drug categories shown in the "Browse" tab, allowing users to browse drugs by category.',
+      'Concept Set UUIDs that define drug categories shown in the "Browse" tab, allowing users to browse drugs by category. This feature requires webservices.rest 3.2.0 or later.',
     _default: [],
     _elements: {
       _type: Type.String,
     },
+  },
+  minimumCharacterLengthForDrugSearch: {
+    _type: Type.Number,
+    _validators: [
+      validator((v: unknown) => typeof v === 'number' && Number.isInteger(v) && v >= 1, 'Must be a positive integer'),
+    ],
+    _description:
+      'The minimum number of characters that must be entered in the drug search input before the search is performed.',
+    _default: 2,
   },
 };
 
@@ -76,4 +85,5 @@ export interface ConfigObject {
   requireIndication: boolean;
   durationUnitsDaysMap: Record<string, number>;
   drugCategoryConceptSets: Array<string>;
+  minimumCharacterLengthForDrugSearch: number;
 }

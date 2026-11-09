@@ -29,7 +29,7 @@ test('Add, edit and delete patient biometrics', async ({ page, patient }) => {
     await expect(biometricsPage.page.getByRole('spinbutton', { name: /bmi/i })).toHaveValue('22.5');
   });
 
-  await test.step('When I fill `25` as the mid upper arm circumference ', async () => {
+  await test.step('When I fill `25` as the mid upper arm circumference', async () => {
     await biometricsPage.page.getByRole('spinbutton', { name: /muac/i }).fill('25');
   });
 
@@ -59,7 +59,7 @@ test('Add, edit and delete patient biometrics', async ({ page, patient }) => {
     await biometricsPage
       .biometricsTable()
       .locator('tbody > tr')
-      .getByRole('button', { name: /options/i })
+      .getByRole('button', { name: /edit or delete vitals and biometrics/i })
       .click();
   });
 
@@ -111,13 +111,16 @@ test('Add, edit and delete patient biometrics', async ({ page, patient }) => {
     await biometricsPage
       .biometricsTable()
       .locator('tbody > tr')
-      .getByRole('button', { name: /options/i })
+      .getByRole('button', { name: /edit or delete vitals and biometrics/i })
       .click();
   });
 
   await test.step('And I click on the `Delete` button', async () => {
     await page.getByRole('menuitem', { name: /delete/i }).click();
-    await page.getByRole('button', { name: /delete/i }).click();
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: /delete/i })
+      .click();
   });
 
   await test.step('Then I should see a success toast notification', async () => {

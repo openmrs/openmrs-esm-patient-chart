@@ -2,8 +2,9 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { orderBy } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Dropdown, Form, InlineLoading, Search, Tile, Toggle, Stack } from '@carbon/react';
-import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
+import { type PatientWorkspace2DefinitionProps, useShowPatientBanner } from '@openmrs/esm-patient-common-lib';
 import {
+  ExtensionSlot,
   useLayoutType,
   showSnackbar,
   parseDate,
@@ -17,12 +18,11 @@ import styles from './flags-workspace.scss';
 
 type SortKey = 'alpha' | 'active' | 'retired';
 
-const FlagsWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
-  closeWorkspace,
-  groupProps: { patientUuid },
-}) => {
+const FlagsWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({ closeWorkspace, groupProps }) => {
+  const { patient, patientUuid } = groupProps;
   const { t } = useTranslation();
   const { flags, isLoading, error, mutate } = usePatientFlags(patientUuid);
+  const shouldShowPatientBanner = useShowPatientBanner(groupProps);
   const isTablet = useLayoutType() === 'tablet';
   const [isSaving, setIsSaving] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -141,6 +141,9 @@ const FlagsWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
 
   return (
     <Workspace2 title={t('editPatientFlags', 'Edit patient flags')} hasUnsavedChanges={hasUnsavedChanges}>
+      {shouldShowPatientBanner && patient && patientUuid && (
+        <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
+      )}
       <Form className={styles.formWrapper}>
         {/* The <div> below is required to maintain the page layout styling */}
         <div>

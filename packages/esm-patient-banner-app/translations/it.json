@@ -9,6 +9,7 @@
   "deceased": "Deceduto",
   "district": "Distretto",
   "from_lower": "da",
+  "pastVisitWithDate": "Past visit: {{date}}",
   "postalCode": "Codice postale",
   "started": "Iniziato",
   "state": "Stato",
