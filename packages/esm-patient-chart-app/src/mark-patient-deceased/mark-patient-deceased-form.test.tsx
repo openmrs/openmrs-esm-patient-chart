@@ -33,7 +33,7 @@ describe('MarkPatientDeceasedForm', () => {
       showPatientBanner: 'tabletOnly',
       patientUuid: mockPatient.id,
       patient: mockPatient,
-      visitContext: null,
+      activeVisit: null,
     },
     windowName: '',
     isRootWorkspace: false,

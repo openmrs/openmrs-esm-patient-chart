@@ -46,7 +46,7 @@
   "errorFetchingDrugOrderTemplates": "មានបញ្ហាក្នុងការទាញយកទម្រង់គំរូវេជ្ជបញ្ជាសម្រាប់ឱសថ",
   "errorFetchingDrugResults": "មានបញ្ហាក្នុងការទាញយកលទ្ធផលសម្រាប់ \"{{searchTerm}}\"",
   "errorFetchingDrugs": "Error fetching drugs",
-  "errorFetchingOrderConfig": "មានបញ្ហានៅពេលទាញយកការកំណត់វេជ្ជបញ្ជា",
+  "errorFetchingOrderConfig": "Error occurred when fetching Order config",
   "errorLoadingCategories": "Error loading drug categories",
   "errorLoadingTree": "Error loading category structure",
   "errorSavingDrugOrder": "Error saving drug order",

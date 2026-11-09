@@ -28,6 +28,11 @@ export function launchStartVisitWorkspace<T extends VisitFormProps>(
     'start-visit-workspace-form',
     workspaceProps,
     windowProps,
-    { ...windowProps, showPatientBanner: 'tabletOnly' },
+    {
+      patient: windowProps.patient,
+      patientUuid: windowProps.patientUuid,
+      activeVisit: null,
+      showPatientBanner: 'tabletOnly',
+    },
   );
 }

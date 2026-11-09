@@ -75,9 +75,9 @@ beforeEach(() => {
   mockUsePatientChartStore.mockReturnValue({
     patientUuid: mockPatientAlice.uuid,
     patient: mockFhirPatient,
-    visitContext: null,
+    activeVisit: null,
     setPatient: vi.fn(),
-    setVisitContext: vi.fn(),
+    setActiveVisit: vi.fn(),
   } as any);
 });
 
