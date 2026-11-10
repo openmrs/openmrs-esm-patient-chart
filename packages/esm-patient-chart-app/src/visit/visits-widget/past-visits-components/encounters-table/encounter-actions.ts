@@ -1,7 +1,14 @@
 import type { TFunction } from 'i18next';
 import type { useSWRConfig } from 'swr';
-import { launchWorkspace2, type LoggedInUser, showModal, showSnackbar, userHasAccess } from '@openmrs/esm-framework';
-import { invalidateVisitAndEncounterData } from '@openmrs/esm-patient-common-lib';
+import {
+  type Encounter,
+  launchWorkspace2,
+  type LoggedInUser,
+  showModal,
+  showSnackbar,
+  userHasAccess,
+} from '@openmrs/esm-framework';
+import { getPatientChartWindowProps, invalidateVisitAndEncounterData } from '@openmrs/esm-patient-common-lib';
 import { type ChartConfig } from '../../../../config-schema';
 import { deleteEncounter, type EncountersTableProps, type MappedEncounter } from './encounters-table.resource';
 
@@ -9,8 +16,8 @@ import { deleteEncounter, type EncountersTableProps, type MappedEncounter } from
  * A "Visit Note" encounter created outside of a form is edited through the visit notes workspace
  * rather than the generic form entry workspace.
  */
-export function isVisitNoteEncounter(encounter: MappedEncounter): boolean {
-  return encounter.encounterType === 'Visit Note' && !encounter.form;
+export function isVisitNoteEncounter(encounter: Encounter): boolean {
+  return encounter.encounterType?.display === 'Visit Note' && !encounter.form;
 }
 
 /**
@@ -46,23 +53,30 @@ export function canModifyEncounter(
  * chart's own edit workspace for it.
  */
 export function editEncounter(
-  encounter: MappedEncounter,
+  encounter: Encounter,
   patientUuid: string,
   onEditEncounter?: EncountersTableProps['onEditEncounter'],
 ) {
   if (onEditEncounter) {
     onEditEncounter(encounter, isVisitNoteEncounter(encounter));
   } else if (isVisitNoteEncounter(encounter)) {
-    launchWorkspace2('visit-notes-form-workspace', {
-      encounter,
-      formContext: 'editing',
-      patientUuid,
-    });
+    launchWorkspace2(
+      'visit-notes-form-workspace',
+      {
+        encounter,
+        formContext: 'editing',
+      },
+      getPatientChartWindowProps(patientUuid),
+    );
   } else {
-    launchWorkspace2('patient-form-entry-workspace', {
-      form: encounter.form,
-      encounterUuid: encounter.id,
-    });
+    launchWorkspace2(
+      'patient-form-entry-workspace',
+      {
+        form: encounter.form,
+        encounterUuid: encounter.uuid,
+      },
+      getPatientChartWindowProps(patientUuid),
+    );
   }
 }
 
@@ -72,7 +86,6 @@ interface ConfirmAndDeleteEncounterArgs {
   patientUuid: string;
   t: TFunction;
   mutate: ReturnType<typeof useSWRConfig>['mutate'];
-  mutateVisitContext?: () => void;
 }
 
 export function confirmAndDeleteEncounter({
@@ -81,7 +94,6 @@ export function confirmAndDeleteEncounter({
   patientUuid,
   t,
   mutate,
-  mutateVisitContext,
 }: ConfirmAndDeleteEncounterArgs) {
   const dispose = showModal('delete-encounter-modal', {
     close: () => dispose(),
@@ -90,10 +102,7 @@ export function confirmAndDeleteEncounter({
       const abortController = new AbortController();
       deleteEncounter(encounterUuid, abortController)
         .then(() => {
-          // Update current visit data for critical components
-          mutateVisitContext?.();
-
-          // Also invalidate visit history and encounter tables since the encounter was deleted
+          // Invalidate visit history and encounter tables since the encounter was deleted
           invalidateVisitAndEncounterData(mutate, patientUuid);
 
           showSnackbar({

@@ -1,8 +1,8 @@
-import React, { type ComponentProps, useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
 import {
-  ArrowLeftIcon,
+  ExtensionSlot,
   SearchIcon,
   ListCheckedIcon,
   showSnackbar,
@@ -18,6 +18,7 @@ import {
   showOrderSuccessToast,
   useMutatePatientOrders,
   useOrderBasket,
+  WorkspaceBackButton,
 } from '@openmrs/esm-patient-common-lib';
 
 import { type ConfigObject } from '../config-schema';
@@ -47,6 +48,7 @@ export interface AddDrugOrderProps {
   patientUuid: string;
   visitContext: Visit;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
+  showPatientBanner?: boolean;
 
   /**
    * Optional launcher for the allergy form, provided when this workspace runs outside the patient
@@ -69,10 +71,12 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
   patientUuid,
   visitContext,
   closeWorkspace,
+  showPatientBanner: showPatientBannerProp,
   launchAllergyForm,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
+  const showPatientBanner = showPatientBannerProp ?? isTablet;
   const { orders, setOrders, clearOrders } = useOrderBasket<DrugOrderBasketItem>(
     patient,
     'medications',
@@ -176,6 +180,7 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
           title: t('errorSavingDrugOrder', 'Error saving drug order'),
           subtitle: error.message,
         });
+        throw error;
       };
 
       return postOrder(
@@ -195,18 +200,14 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
   if (!currentOrder) {
     return (
       <Workspace2 title={workspaceTitle}>
+        {showPatientBanner && patient && patientUuid && (
+          <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
+        )}
         {!isTablet && (
-          <div className={styles.backButton}>
-            <Button
-              iconDescription="Return to order basket"
-              kind="ghost"
-              onClick={() => closeWorkspace()}
-              renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
-              size="sm"
-            >
-              <span>{t('backToOrderBasket', 'Back to order basket')}</span>
-            </Button>
-          </div>
+          <WorkspaceBackButton
+            label={t('backToOrderBasket', 'Back to order basket')}
+            onClick={() => closeWorkspace()}
+          />
         )}
         {drugCategoryConceptSets?.length > 0 ? (
           <Tabs>
@@ -269,9 +270,11 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
         onSave={currentOrder?.action === 'REVISE' ? submitDrugOrderToServer : saveDrugOrderToBasket}
         onCancel={isEditingExistingOrder ? closeWorkspace : () => setCurrentOrder(undefined)}
         patient={patient}
+        patientUuid={patientUuid}
         visitContext={visitContext}
         saveButtonText={t('saveOrder', 'Save order')}
         workspaceTitle={workspaceTitle}
+        showPatientBanner={showPatientBanner}
         launchAllergyForm={launchAllergyForm}
       />
     );

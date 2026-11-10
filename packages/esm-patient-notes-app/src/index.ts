@@ -1,10 +1,4 @@
-import {
-  defineConfigSchema,
-  getAsyncLifecycle,
-  getSyncLifecycle,
-  messageOmrsServiceWorker,
-  restBaseUrl,
-} from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import notesOverviewExtension from './notes/notes-overview.extension';
 import visitNotesActionButtonExtension from './visit-note-action-button.extension';
@@ -19,11 +13,6 @@ const options = {
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 export function startupApp() {
-  messageOmrsServiceWorker({
-    type: 'registerDynamicRoute',
-    pattern: `.+${restBaseUrl}/encounter.+`,
-  });
-
   defineConfigSchema(moduleName, configSchema);
 }
 
@@ -32,8 +21,10 @@ export const visitNotesActionButton = getSyncLifecycle(visitNotesActionButtonExt
 
 export const visitNotesFormWorkspace = getAsyncLifecycle(() => import('./notes/visit-notes-form.workspace'), options);
 
+// Referenced by other apps' routes.json. The same component as `visitNotesFormWorkspace`: it takes the
+// patient / visit as window props (still accepting them as deprecated workspace props).
 export const exportedVisitNotesFormWorkspace = getAsyncLifecycle(
-  () => import('./notes/exported-visit-notes-form.workspace'),
+  () => import('./notes/visit-notes-form.workspace'),
   options,
 );
 export const stickyNotesButton = getAsyncLifecycle(

@@ -19,10 +19,9 @@ describe('VisitBannerTag', () => {
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: mockPatient.id,
       patient: mockPatient,
-      visitContext: null,
-      mutateVisitContext: null,
+      activeVisit: null,
       setPatient: vi.fn(),
-      setVisitContext: vi.fn(),
+      setActiveVisit: vi.fn(),
     });
   });
 
@@ -85,10 +84,9 @@ describe('VisitBannerTag', () => {
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: mockPatient.id,
       patient: mockPatient,
-      visitContext: { ...mockCurrentVisit, stopDatetime: '2022-01-01T12:00:00.000+0000' },
-      mutateVisitContext: null,
+      activeVisit: { ...mockCurrentVisit, stopDatetime: '2022-01-01T12:00:00.000+0000' },
       setPatient: vi.fn(),
-      setVisitContext: vi.fn(),
+      setActiveVisit: vi.fn(),
     });
 
     const patient = { ...mockPatient, deceasedDateTime: null };

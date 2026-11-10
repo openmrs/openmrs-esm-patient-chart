@@ -4,38 +4,12 @@ import { ToolbarControlTypes } from '@carbon/charts';
 import { type LineChartOptions, ScaleTypes } from '@carbon/charts-react';
 import { getCoreTranslation } from '@openmrs/esm-framework';
 import type { Observation } from './growth-chart.resource';
-import boysWeightData from '../who-data/boys/weight-for-age.json';
-import girlsWeightData from '../who-data/girls/weight-for-age.json';
 
-interface ChartDatum {
+export interface ChartDatum {
   group: string;
   age: number;
   value: number;
 }
-
-export const getReferenceSeries = (gender?: string) => {
-  const supportedGender = gender?.toLowerCase();
-  const whoData = supportedGender === 'female' ? girlsWeightData : supportedGender === 'male' ? boysWeightData : null;
-
-  if (!whoData) {
-    return [];
-  }
-
-  const referenceSeries: Array<ChartDatum> = [];
-  const percentiles = ['P3', 'P15', 'P50', 'P85', 'P97'];
-
-  whoData.forEach((point) => {
-    percentiles.forEach((p) => {
-      referenceSeries.push({
-        group: p,
-        age: point.age_months,
-        value: point[p],
-      });
-    });
-  });
-
-  return referenceSeries;
-};
 
 export const getPatientSeries = (weights: Array<Observation>, birthDate: dayjs.Dayjs, patientWeightLabel: string) => {
   return weights
@@ -64,30 +38,14 @@ export const getPatientSeries = (weights: Array<Observation>, birthDate: dayjs.D
     .sort((a, b) => a.age - b.age);
 };
 
-export const getChartData = (patient: fhir.Patient, weights: Array<Observation>, t: TFunction) => {
-  if (!patient.birthDate) {
-    return [];
-  }
-
-  const birthDate = dayjs(patient.birthDate);
-  if (!birthDate.isValid()) {
-    return [];
-  }
-
-  const referenceSeries = getReferenceSeries(patient.gender);
-  const patientSeries = getPatientSeries(weights, birthDate, t('patientWeight', 'Patient weight'));
-
-  return [...referenceSeries, ...patientSeries];
-};
-
 export const getChartOptions = (t: TFunction): LineChartOptions => {
   const patientWeightLabel = t('patientWeight', 'Patient weight');
   const referencePalette = {
-    P3: 'var(--cds-support-error)',
-    P15: 'var(--cds-support-warning)',
-    P50: 'var(--cds-support-success)',
-    P85: 'var(--cds-support-warning)',
-    P97: 'var(--cds-support-error)',
+    P3: 'var(--growth-chart-p3-p97)',
+    P15: 'var(--growth-chart-p15-p85)',
+    P50: 'var(--growth-chart-p50)',
+    P85: 'var(--growth-chart-p15-p85)',
+    P97: 'var(--growth-chart-p3-p97)',
   };
 
   return {
@@ -127,7 +85,7 @@ export const getChartOptions = (t: TFunction): LineChartOptions => {
     color: {
       scale: {
         ...referencePalette,
-        [patientWeightLabel]: 'var(--cds-text-primary)',
+        [patientWeightLabel]: 'var(--growth-chart-patient)',
       },
     },
     grid: {

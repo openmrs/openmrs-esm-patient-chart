@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
 
 process.env.TZ = 'UTC';
@@ -11,7 +12,7 @@ export default defineConfig({
     globals: true,
     clearMocks: true,
     testTimeout: 30000,
-    setupFiles: [new URL('./setup-tests.ts', import.meta.url).pathname],
+    setupFiles: [fileURLToPath(new URL('./setup-tests.ts', import.meta.url))],
     exclude: ['**/node_modules/**', '**/e2e/**', '**/dist/**', '**/packages/esm-form-entry-app/**'],
     coverage: {
       provider: 'v8',
@@ -44,16 +45,16 @@ export default defineConfig({
     },
     alias: [
       { find: /^@openmrs\/esm-framework$/, replacement: '@openmrs/esm-framework/mock' },
-      { find: 'react-i18next', replacement: new URL('../__mocks__/react-i18next.js', import.meta.url).pathname },
+      { find: 'react-i18next', replacement: fileURLToPath(new URL('../__mocks__/react-i18next.js', import.meta.url)) },
       {
         find: /^@carbon\/charts-react$/,
-        replacement: new URL('../__mocks__/@carbon__charts-react.ts', import.meta.url).pathname,
+        replacement: fileURLToPath(new URL('../__mocks__/@carbon__charts-react.ts', import.meta.url)),
       },
-      { find: /^tools$/, replacement: new URL('./index.ts', import.meta.url).pathname },
-      { find: /^tools\/(.*)$/, replacement: new URL('./', import.meta.url).pathname + '$1' },
-      { find: /^__mocks__$/, replacement: new URL('../__mocks__/index.ts', import.meta.url).pathname },
-      { find: /^__mocks__\/(.*)$/, replacement: new URL('../__mocks__/', import.meta.url).pathname + '$1' },
-      { find: /^uuid$/, replacement: new URL('../node_modules/uuid/dist/index.js', import.meta.url).pathname },
+      { find: /^tools$/, replacement: fileURLToPath(new URL('./index.ts', import.meta.url)) },
+      { find: /^tools\/(.*)$/, replacement: fileURLToPath(new URL('./', import.meta.url)) + '$1' },
+      { find: /^__mocks__$/, replacement: fileURLToPath(new URL('../__mocks__/index.ts', import.meta.url)) },
+      { find: /^__mocks__\/(.*)$/, replacement: fileURLToPath(new URL('../__mocks__/', import.meta.url)) + '$1' },
+      { find: /^uuid$/, replacement: fileURLToPath(new URL('../node_modules/uuid/dist/index.js', import.meta.url)) },
     ],
   },
 });

@@ -28,19 +28,12 @@ interface VisitSummaryProps {
   visit: Visit;
   patientUuid: string;
   onEditEncounter?: EncountersTableProps['onEditEncounter'];
-  mutateVisitContext?: EncountersTableProps['mutateVisitContext'];
   patient?: EncountersTableProps['patient'];
 }
 
 const visitSummaryPanelSlot = 'visit-summary-panels';
 
-const VisitSummary: React.FC<VisitSummaryProps> = ({
-  visit,
-  patientUuid,
-  onEditEncounter,
-  mutateVisitContext,
-  patient,
-}) => {
+const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid, onEditEncounter, patient }) => {
   const config = useConfig<ChartConfig>();
   const { t } = useTranslation();
   const extensions = useAssignedExtensions(visitSummaryPanelSlot);
@@ -111,7 +104,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({
       <p className={styles.diagnosisLabel}>{t('diagnoses', 'Diagnoses')}</p>
       <div className={styles.diagnosesList}>
         {diagnoses.length > 0 ? (
-          <DiagnosisTags diagnoses={diagnoses} />
+          <DiagnosisTags diagnoses={diagnoses} showCertainty />
         ) : (
           <p className={classNames(styles.bodyLong01, styles.text02)} style={{ marginBottom: '0.5rem' }}>
             {t('noDiagnosesFound', 'No diagnoses found')}
@@ -158,7 +151,6 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({
               visit={visit}
               patientUuid={patientUuid}
               onEditEncounter={onEditEncounter}
-              mutateVisitContext={mutateVisitContext}
               patient={patient}
             />
           </TabPanel>
@@ -176,7 +168,6 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({
               visit={visit}
               patientUuid={patientUuid}
               onEditEncounter={onEditEncounter}
-              mutateVisitContext={mutateVisitContext}
               patient={patient}
             />
           </TabPanel>

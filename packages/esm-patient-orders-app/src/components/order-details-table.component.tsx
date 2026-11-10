@@ -3,7 +3,6 @@ import dayjs from 'dayjs';
 import { capitalize } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
-import { useSWRConfig } from 'swr';
 import {
   Button,
   DataTable,
@@ -33,13 +32,14 @@ import {
   EmptyState,
   ErrorState,
   getDrugOrderByUuid,
-  invalidateVisitByUuid,
+  getPatientChartWindowProps,
   PatientChartPagination,
   type FulfillerStatus,
   type Order,
   type OrderBasketItem,
   type OrderType,
   type OrderUrgency,
+  type PatientWorkspaceGroupProps,
   useLaunchWorkspaceRequiringVisit,
   useOrderBasket,
   useOrderTypes,
@@ -632,21 +632,20 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
   }, [orderItem.type, orderItem.orderType.uuid]);
   const { orders, setOrders } = useOrderBasket<OrderBasketItem>(patient, grouping, postDataPrepFn);
   const alreadyInBasket = orders.some((x) => x.uuid === orderItem.uuid);
-  const { mutate: globalMutate } = useSWRConfig();
-  const { systemVisitEnabled: visitRequired } = useSystemVisitSetting();
-  const encounterUuid = orderItem.encounter.uuid;
-  const visitContext = orderItem.encounter.visit ?? null;
-  const visitUuid = visitContext?.uuid;
 
-  const windowProps = useMemo(() => ({ encounterUuid }), [encounterUuid]);
-  const groupProps = useMemo(
+  const groupProps: PatientWorkspaceGroupProps = useMemo(
     () => ({
+      showPatientBanner: 'tabletOnly',
       patient,
       patientUuid: patient.id,
-      visitContext,
-      mutateVisitContext: visitUuid ? () => invalidateVisitByUuid(globalMutate, visitUuid) : null,
+      activeVisit: orderItem.encounter.visit,
     }),
-    [globalMutate, patient, visitContext, visitUuid],
+    [patient, orderItem.encounter.visit],
+  );
+  // The workspaces read the patient / visit from their window props, not from the group props
+  const windowProps = useMemo(
+    () => ({ patient, patientUuid: patient.id, visitContext: orderItem.encounter.visit }),
+    [patient, orderItem.encounter.visit],
   );
 
   const handleCancelOrder = useCallback(() => {
@@ -716,8 +715,12 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
   }, [groupProps, orderItem, windowProps]);
 
   const handleAddOrEditTestResults = useCallback(() => {
-    launchWorkspace2('test-results-form-workspace', { order: orderItem, patient });
-  }, [orderItem, patient]);
+    launchWorkspace2(
+      'test-results-form-workspace',
+      { order: orderItem, labOrderWorkspaceName: 'add-lab-order' },
+      getPatientChartWindowProps(patient.id),
+    );
+  }, [orderItem, patient.id]);
 
   // No actions available for declined orders
   if (isDeclined) {

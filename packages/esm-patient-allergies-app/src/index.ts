@@ -1,11 +1,4 @@
-import {
-  defineConfigSchema,
-  fhirBaseUrl,
-  getAsyncLifecycle,
-  getSyncLifecycle,
-  messageOmrsServiceWorker,
-  restBaseUrl,
-} from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
@@ -23,21 +16,6 @@ const options = {
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 export function startupApp() {
-  messageOmrsServiceWorker({
-    type: 'registerDynamicRoute',
-    pattern: `.+${restBaseUrl}/concept.+`,
-  });
-
-  messageOmrsServiceWorker({
-    type: 'registerDynamicRoute',
-    pattern: `.+${restBaseUrl}/patient/.+/allergy.+`,
-  });
-
-  messageOmrsServiceWorker({
-    type: 'registerDynamicRoute',
-    pattern: `.+${fhirBaseUrl}/AllergyIntolerance.+`,
-  });
-
   defineConfigSchema(moduleName, configSchema);
 }
 
@@ -56,10 +34,10 @@ export const allergyFormWorkspace = getAsyncLifecycle(
   options,
 );
 
-// Variant for use outside the patient chart (e.g. registered by the ward app into its own
-// workspace group). Receives the patient context via window props instead of the chart group.
+// Public name referenced by other apps' routes.json (e.g. the ward app registers it into its own
+// workspace window). The same component as `allergyFormWorkspace`: both take the patient via window props.
 export const exportedAllergyFormWorkspace = getAsyncLifecycle(
-  () => import('./allergies/allergies-form/exported-allergy-form.workspace'),
+  () => import('./allergies/allergies-form/allergy-form.workspace'),
   options,
 );
 

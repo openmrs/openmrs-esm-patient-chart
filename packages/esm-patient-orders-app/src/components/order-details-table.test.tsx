@@ -6,6 +6,7 @@ import userEvent from '@testing-library/user-event';
 import {
   type ConfigObject,
   getDefaultsFromConfigSchema,
+  launchWorkspace2,
   openmrsFetch,
   useConfig,
   useSession,
@@ -31,6 +32,7 @@ const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 const mockSession = vi.mocked(useSession);
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const mockUseReactToPrint = vi.mocked(useReactToPrint);
+const mockLaunchWorkspace2 = vi.mocked(launchWorkspace2);
 
 mockSession.mockReturnValue(mockSessionDataResponse.data);
 mockOpenmrsFetch.mockImplementation(vi.fn());
@@ -593,18 +595,9 @@ describe('OrderDetailsTable', () => {
     expect(screen.getByRole('button', { name: /actions menu/i })).toBeInTheDocument();
   });
 
-  it('disables cancel action while keeping modify enabled when visits are required and an order has no visit context', async () => {
-    const user = userEvent.setup();
-    const orderWithoutVisitContext = {
-      ...mockOrders[0],
-      encounter: {
-        ...mockOrders[0].encounter,
-        visit: null,
-      },
-    };
-
+  it('passes a visit context refresh function to the order basket when cancelling an order', async () => {
     mockUsePatientOrders.mockReturnValue({
-      data: [orderWithoutVisitContext] as unknown as Array<Order>,
+      data: [mockOrders[1]] as unknown as Array<Order>,
       error: undefined,
       isLoading: false,
       isValidating: false,
@@ -615,57 +608,19 @@ describe('OrderDetailsTable', () => {
 
     await screen.findByRole('table');
     await user.click(screen.getByRole('button', { name: /actions menu/i }));
+    const menuItems = screen.getAllByRole('menuitem', { hidden: true });
+    await user.click(menuItems.find((item) => /cancel order/i.test(item.textContent)));
 
-    const actionsMenu = await screen.findByRole('menu', { hidden: true });
-    const modifyItem = within(actionsMenu)
-      .getAllByRole('menuitem', { hidden: true })
-      .find((item) => /modify order/i.test(item.textContent));
-    const cancelItem = within(actionsMenu)
-      .getAllByRole('menuitem', { hidden: true })
-      .find((item) => /cancel order/i.test(item.textContent));
-
-    expect(modifyItem).toBeEnabled();
-    expect(cancelItem).toBeDisabled();
-  });
-
-  it('keeps modify and cancel actions enabled when visits are not required and an order has no visit', async () => {
-    const user = userEvent.setup();
-    const orderWithoutVisitContext = {
-      ...mockOrders[0],
-      encounter: {
-        ...mockOrders[0].encounter,
-        visit: null,
-      },
-    };
-
-    mockUseSystemVisitSetting.mockReturnValue({
-      systemVisitEnabled: false,
-      isLoadingSystemVisitSetting: false,
-      errorFetchingSystemVisitSetting: null,
-    });
-    mockUsePatientOrders.mockReturnValue({
-      data: [orderWithoutVisitContext] as unknown as Array<Order>,
-      error: undefined,
-      isLoading: false,
-      isValidating: false,
-      mutate: vi.fn(),
-    });
-
-    renderOrderDetailsTable();
-
-    await screen.findByRole('table');
-    await user.click(screen.getByRole('button', { name: /actions menu/i }));
-
-    const actionsMenu = await screen.findByRole('menu', { hidden: true });
-    const modifyItem = within(actionsMenu)
-      .getAllByRole('menuitem', { hidden: true })
-      .find((item) => /modify order/i.test(item.textContent));
-    const cancelItem = within(actionsMenu)
-      .getAllByRole('menuitem', { hidden: true })
-      .find((item) => /cancel order/i.test(item.textContent));
-
-    expect(modifyItem).toBeEnabled();
-    expect(cancelItem).toBeEnabled();
+    expect(mockLaunchWorkspace2).toHaveBeenCalledWith(
+      'order-basket',
+      {},
+      expect.objectContaining({ visitContext: mockOrders[1].encounter.visit }),
+      expect.objectContaining({
+        activeVisit: mockOrders[1].encounter.visit,
+        // Without it the group is relaunched with the default 'always' and a second patient banner shows up
+        showPatientBanner: 'tabletOnly',
+      }),
+    );
   });
 });
 

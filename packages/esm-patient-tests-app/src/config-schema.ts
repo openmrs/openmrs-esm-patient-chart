@@ -113,7 +113,8 @@ export const configSchema = {
         _default: [],
       },
     },
-    _description: 'Whether to allow for provision of coded order reason',
+    _description:
+      'Whether to allow for provision of coded order reason. This feature requires webservices.rest 3.1.0 or later.',
     _default: [],
   },
 };

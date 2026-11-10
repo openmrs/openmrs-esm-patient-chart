@@ -17,7 +17,6 @@ import { mockEncountersAlice, mockFhirPatient, mockPatientAlice, mockVisit } fro
 import { renderWithSwr } from 'tools';
 import { type ChartConfig, defaultVisitTimelinePageSize, esmPatientChartSchema } from '../../../../config-schema';
 import { jsonSchemaResourceName } from '../../../../constants';
-import { type MappedEncounter } from '../../past-visits-components/encounters-table/encounters-table.resource';
 import VisitTimeline from './visit-timeline.component';
 
 const mockExtensionSlot = vi.mocked(ExtensionSlot);
@@ -68,7 +67,7 @@ function buildEncounters(count: number): Array<Encounter> {
 
 function renderVisitTimeline(
   encounters: Array<Encounter> = mockEncountersAlice,
-  onEditEncounter?: (encounter: MappedEncounter, isVisitNote: boolean) => void,
+  onEditEncounter?: (encounter: Encounter, isVisitNote: boolean) => void,
 ) {
   const visit = { ...mockVisit, encounters } as Visit;
   return renderWithSwr(
@@ -94,10 +93,9 @@ beforeEach(() => {
   mockUsePatientChartStore.mockReturnValue({
     patientUuid: mockPatientAlice.uuid,
     patient: mockFhirPatient,
-    visitContext: null,
-    mutateVisitContext: vi.fn(),
+    activeVisit: null,
     setPatient: vi.fn(),
-    setVisitContext: vi.fn(),
+    setActiveVisit: vi.fn(),
   } as any);
 });
 
@@ -184,10 +182,7 @@ describe('VisitTimeline', () => {
     await clickEditEncounter();
 
     expect(onEditEncounter).toHaveBeenCalledTimes(1);
-    expect(onEditEncounter).toHaveBeenCalledWith(
-      expect.objectContaining({ id: admissionEncounter.uuid, encounterType: 'Admission' }),
-      false,
-    );
+    expect(onEditEncounter).toHaveBeenCalledWith(expect.objectContaining(admissionEncounter), false);
     expect(mockLaunchWorkspace).not.toHaveBeenCalled();
   });
 
@@ -196,10 +191,14 @@ describe('VisitTimeline', () => {
     await clickEditEncounter();
 
     expect(mockLaunchWorkspace).toHaveBeenCalledTimes(1);
-    expect(mockLaunchWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
-      form: admissionEncounter.form,
-      encounterUuid: admissionEncounter.uuid,
-    });
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith(
+      'patient-form-entry-workspace',
+      {
+        form: admissionEncounter.form,
+        encounterUuid: admissionEncounter.uuid,
+      },
+      expect.objectContaining({ patientUuid: mockPatientAlice.uuid }),
+    );
   });
 
   it('hides the actions menu when the user lacks the privilege to edit the encounter', () => {
@@ -217,6 +216,7 @@ describe('VisitTimeline', () => {
 
   it('offers a print action for an encounter recorded through a JSON schema form', async () => {
     const user = userEvent.setup();
+    mockUseFeatureFlag.mockImplementation((flagName) => flagName === 'patientdocuments-module');
     renderVisitTimeline([encounterWithJsonSchemaForm]);
 
     await user.click(screen.getByRole('button', { name: /encounter table actions menu/i }));
@@ -229,6 +229,19 @@ describe('VisitTimeline', () => {
       'Print this encounter',
       'Delete this encounter',
     ]);
+  });
+
+  it('does not offer a print action when the patientdocuments module is not installed', async () => {
+    const user = userEvent.setup();
+    mockUseFeatureFlag.mockImplementation((flagName) => flagName !== 'patientdocuments-module');
+    renderVisitTimeline([encounterWithJsonSchemaForm]);
+
+    await user.click(screen.getByRole('button', { name: /encounter table actions menu/i }));
+
+    const actionsMenu = screen.getByRole('menu', { hidden: true });
+    const menuItems = within(actionsMenu).getAllByRole('menuitem', { hidden: true });
+
+    expect(menuItems.map((menuItem) => menuItem.textContent)).toEqual(['Edit this encounter', 'Delete this encounter']);
   });
 
   it('renders a JSON schema form in the embedded form view, with the visit context, when the feature flag is on', async () => {

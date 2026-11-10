@@ -6,6 +6,9 @@ import {
   parseDate,
   restBaseUrl,
   showSnackbar,
+  useFeatureFlag,
+  userHasAccess,
+  useSession,
   type Diagnosis,
   type Encounter,
   type EncounterType,
@@ -37,13 +40,7 @@ export interface EncountersTableProps {
    * the chart's edit workspaces belong to the `patient-chart` workspace group, which is scoped to chart URLs
    * and whose group props only the chart populates.
    */
-  onEditEncounter?: (encounter: MappedEncounter, isVisitNote: boolean) => void;
-  /**
-   * Revalidates the host's copy of the visit once an encounter is deleted. Inside the chart this comes from
-   * the patient chart store, which `usePatientChartStore` only populates for the chart's own patient, so
-   * hosts embedding this table elsewhere need to supply it for deletions to show up.
-   */
-  mutateVisitContext?: () => void;
+  onEditEncounter?: (encounter: Encounter, isVisitNote: boolean) => void;
   /**
    * The patient these encounters belong to, handed to the embedded form view. Inside the chart this comes
    * from the patient chart store, which `usePatientChartStore` only populates for the chart's own patient,
@@ -68,6 +65,7 @@ export interface MappedEncounter {
   visitType: string;
   visitTypeUuid?: string;
   visitUuid: string;
+  encounter: Encounter;
 }
 
 export function deleteEncounter(encounterUuid: string, abortController: AbortController) {
@@ -109,19 +107,21 @@ export function useEncounterTypes() {
 }
 
 export function mapEncounter(encounter: Encounter): MappedEncounter {
+  const diagnoses =
+    encounter?.diagnoses
+      ?.filter((diagnosis) => !diagnosis.voided)
+      .map((diagnosis) => ({
+        ...diagnosis,
+        certainty: diagnosis.certainty ?? 'CONFIRMED',
+      })) || [];
+
   return {
     id: encounter.uuid,
     datetime: formatDatetime(parseDate(encounter.encounterDatetime), {
       noToday: true,
     }),
     rawDatetime: encounter.encounterDatetime,
-    diagnoses:
-      encounter.diagnoses
-        ?.filter((diagnosis) => !diagnosis.voided)
-        .map((diagnosis) => ({
-          ...diagnosis,
-          certainty: diagnosis.certainty || 'PROVISIONAL',
-        })) || [],
+    diagnoses,
     encounterType: encounter.encounterType?.display,
     editPrivilege: encounter.encounterType?.editPrivilege?.display,
     form: encounter.form as Form,
@@ -134,6 +134,7 @@ export function mapEncounter(encounter: Encounter): MappedEncounter {
     visitType: encounter.visit?.visitType?.display ?? '--',
     visitTypeUuid: encounter.visit?.visitType?.uuid,
     visitUuid: encounter.visit?.uuid,
+    encounter: { ...encounter, diagnoses },
   };
 }
 
@@ -231,4 +232,13 @@ export async function downloadPdf(encounterUuids: string[], t: TFunction) {
       subtitle: error.message || t('printError', 'Failed to generate PDF. Please check server logs.'),
     });
   }
+}
+
+/**
+ * Printing encounters requires both the privilege and the optional patientdocuments backend module.
+ */
+export function useCanPrintEncounters() {
+  const session = useSession();
+  const isPatientDocumentsModuleInstalled = useFeatureFlag('patientdocuments-module');
+  return userHasAccess('App: Print encounter forms', session?.user) && isPatientDocumentsModuleInstalled;
 }

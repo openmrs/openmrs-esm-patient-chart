@@ -11,6 +11,7 @@
     "experimentalDecorators": true,
     "module": "ES2022",
     "moduleResolution": "node",
+    "resolveJsonModule": true,
     "importHelpers": true,
     "target": "ES2022",
     "types": [

@@ -1,22 +1,26 @@
 import dayjs from 'dayjs';
-import { getChartOptions, getPatientSeries, getReferenceSeries } from './growth-chart.utils';
-import type { Observation } from './growth-chart.resource';
+import { getChartOptions, getPatientSeries } from './growth-chart.utils';
+import { getReferenceSeries, type Observation } from './growth-chart.resource';
 import type { TFunction } from 'i18next';
 import { describe, expect, it } from 'vitest';
 
 describe('growth-chart.utils', () => {
   describe('getReferenceSeries', () => {
-    it('should return reference series for male', () => {
-      const result = getReferenceSeries('male');
+    it('should return reference series for male', async () => {
+      const result = await getReferenceSeries('male');
       expect(result.length).toBeGreaterThan(0);
       expect(result[0]).toHaveProperty('group');
       expect(result[0]).toHaveProperty('age');
       expect(result[0]).toHaveProperty('value');
     });
 
-    it('should return reference series for female', () => {
-      const result = getReferenceSeries('female');
+    it('should return reference series for female', async () => {
+      const result = await getReferenceSeries('female');
       expect(result.length).toBeGreaterThan(0);
+    });
+
+    it('should return an empty series for unsupported genders', async () => {
+      expect(await getReferenceSeries('unknown')).toEqual([]);
     });
   });
 

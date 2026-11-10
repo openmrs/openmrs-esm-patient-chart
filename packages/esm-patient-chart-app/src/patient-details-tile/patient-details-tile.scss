@@ -13,6 +13,12 @@
   margin: 0 layout.$spacing-05;
 }
 
+.header {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+}
+
 .details {
   margin-top: 5px;
   @include type.type-style('body-compact-01');

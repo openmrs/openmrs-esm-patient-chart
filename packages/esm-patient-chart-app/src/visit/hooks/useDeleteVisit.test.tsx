@@ -2,11 +2,7 @@ import { useSWRConfig } from 'swr';
 import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { showSnackbar, type Visit } from '@openmrs/esm-framework';
-import {
-  invalidateCurrentVisit,
-  invalidateVisitAndEncounterData,
-  usePatientChartStore,
-} from '@openmrs/esm-patient-common-lib';
+import { invalidateVisitAndEncounterData, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { useDeleteVisit } from './useDeleteVisit';
 import { deleteVisit, restoreVisit } from '../visits-widget/visit.resource';
 
@@ -24,7 +20,6 @@ vi.mock('../visits-widget/visit.resource', async () => {
 });
 
 vi.mock('@openmrs/esm-patient-common-lib', () => ({
-  invalidateCurrentVisit: vi.fn(),
   invalidateVisitAndEncounterData: vi.fn(),
   usePatientChartStore: vi.fn(),
 }));
@@ -37,7 +32,7 @@ const mockUsePatientChartStore = vi.mocked(usePatientChartStore);
 const mockInvalidateVisitAndEncounterData = vi.mocked(invalidateVisitAndEncounterData);
 
 const mockGlobalMutate = vi.fn();
-const mockSetVisitContext = vi.fn();
+const mockSetActiveVisit = vi.fn();
 
 const mockVisitType = {
   uuid: 'visit-type-123',
@@ -64,10 +59,9 @@ describe('useDeleteVisit', () => {
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: 'patient-123',
       patient: null,
-      visitContext: null,
-      mutateVisitContext: vi.fn(),
+      activeVisit: null,
       setPatient: vi.fn(),
-      setVisitContext: mockSetVisitContext,
+      setActiveVisit: mockSetActiveVisit,
     });
 
     mockUseSWRConfig.mockReturnValue({
@@ -143,10 +137,9 @@ describe('useDeleteVisit', () => {
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: 'patient-123',
       patient: null,
-      visitContext: null,
-      mutateVisitContext: vi.fn(),
+      activeVisit: null,
       setPatient: vi.fn(),
-      setVisitContext: mockSetVisitContext,
+      setActiveVisit: mockSetActiveVisit,
     });
     mockUseSWRConfig.mockReturnValue({
       mutate: mockGlobalMutate,
@@ -189,10 +182,9 @@ describe('useDeleteVisit', () => {
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: 'patient-123',
       patient: null,
-      visitContext: null,
-      mutateVisitContext: vi.fn(),
+      activeVisit: null,
       setPatient: vi.fn(),
-      setVisitContext: mockSetVisitContext,
+      setActiveVisit: mockSetActiveVisit,
     });
     mockUseSWRConfig.mockReturnValue({
       mutate: mockGlobalMutate,

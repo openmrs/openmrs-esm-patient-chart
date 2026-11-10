@@ -1,8 +1,8 @@
-import React, { type ComponentProps, useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Button, Search } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import {
-  ArrowLeftIcon,
+  ExtensionSlot,
   ResponsiveWrapper,
   useConfig,
   useDebounce,
@@ -11,7 +11,12 @@ import {
   Workspace2,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
-import { type OrderBasketItem, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
+import {
+  type OrderBasketItem,
+  useOrderBasket,
+  useOrderType,
+  WorkspaceBackButton,
+} from '@openmrs/esm-patient-common-lib';
 import { OrderForm } from '../general-order-form/general-order-form.component';
 import { prepOrderPostData } from '../resources';
 import { type ConfigObject } from '../../../config-schema';
@@ -22,8 +27,10 @@ interface AddGeneralOrderProps {
   initialOrder: OrderBasketItem;
   orderTypeUuid: string;
   patient: fhir.Patient;
+  patientUuid: string;
   visitContext: Visit;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
+  showPatientBanner?: boolean;
 }
 
 /**
@@ -33,11 +40,14 @@ const AddGeneralOrder: React.FC<AddGeneralOrderProps> = ({
   initialOrder,
   orderTypeUuid,
   patient,
+  patientUuid,
   visitContext,
   closeWorkspace,
+  showPatientBanner: showPatientBannerProp,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
+  const showPatientBanner = showPatientBannerProp ?? isTablet;
   const { orders } = useOrderBasket<OrderBasketItem>(patient, orderTypeUuid, prepOrderPostData);
   const { orderTypes } = useConfig<ConfigObject>();
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
@@ -81,19 +91,15 @@ const AddGeneralOrder: React.FC<AddGeneralOrderProps> = ({
 
   return (
     <Workspace2 title={title} hasUnsavedChanges={hasUnsavedChanges}>
+      {showPatientBanner && patient && patientUuid && (
+        <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
+      )}
       <div className={styles.workspaceWrapper}>
         {!isTablet && (
-          <div className={styles.backButton}>
-            <Button
-              iconDescription={t('backToOrderBasket', 'Back to order basket')}
-              kind="ghost"
-              onClick={() => closeWorkspace()}
-              renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
-              size="sm"
-            >
-              <span>{t('backToOrderBasket', 'Back to order basket')}</span>
-            </Button>
-          </div>
+          <WorkspaceBackButton
+            label={t('backToOrderBasket', 'Back to order basket')}
+            onClick={() => closeWorkspace()}
+          />
         )}
         {currentOrder ? (
           <OrderForm

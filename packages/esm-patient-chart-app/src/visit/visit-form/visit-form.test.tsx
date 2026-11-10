@@ -1,21 +1,26 @@
 import React from 'react';
-import { vi, describe, it, expect, test, beforeEach } from 'vitest';
+import { vi, describe, it, expect, test, beforeEach, afterEach } from 'vitest';
 import dayjs from 'dayjs';
 import { fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
   type FetchResponse,
+  ExtensionSlot,
   getDefaultsFromConfigSchema,
+  OpenmrsDatePicker,
   saveVisit,
   showSnackbar,
   updateVisit,
   useConfig,
   useEmrConfiguration,
+  useLayoutType,
   useLocations,
+  usePatient,
   useVisit,
   useVisitTypes,
   Workspace2,
   type Visit,
+  type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { mockLocations, mockPastVisitWithEncounters, mockVisitTypes, mockVisitWithAttributes } from '__mocks__';
 import { mockPatient } from 'tools';
@@ -32,8 +37,7 @@ import {
   useVisitFormCallbacks,
   useVisitFormSchemaAndDefaultValues,
 } from './visit-form.resource';
-import VisitForm, { type VisitFormProps } from './visit-form.workspace';
-import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib/src';
+import VisitForm, { type VisitFormProps, type VisitFormWindowProps } from './visit-form.workspace';
 
 const visitUuid = 'test_visit_uuid';
 const visitAttributes = {
@@ -57,22 +61,32 @@ const visitAttributes = {
     preferredHandlerClassname: 'default',
     retired: false,
   },
+  followUpDate: {
+    uuid: 'f2e6c103-2d54-4645-b2bb-32f4f31d1710',
+    name: 'Follow-up date',
+    display: 'Follow-up date',
+    datatypeConfig: '',
+    datatypeClassname: 'org.openmrs.customdatatype.datatype.DateDatatype',
+    description: '',
+    preferredHandlerClassname: 'default',
+    retired: false,
+  },
 };
 
 const mockCloseWorkspace = vi.fn();
-const mockMutateVisitContext = vi.fn();
-const defaultProps: PatientWorkspace2DefinitionProps<VisitFormProps, {}> = {
+type VisitFormWorkspaceDefinitionProps = Workspace2DefinitionProps<VisitFormProps, VisitFormWindowProps, object>;
+
+const defaultProps: VisitFormWorkspaceDefinitionProps = {
   closeWorkspace: mockCloseWorkspace,
   workspaceProps: {
     openedFrom: 'test',
   },
-  windowProps: {},
-  groupProps: {
+  windowProps: {
     patientUuid: mockPatient.id,
     patient: mockPatient,
     visitContext: null,
-    mutateVisitContext: mockMutateVisitContext,
   },
+  groupProps: { showPatientBanner: 'tabletOnly' },
   workspaceName: '',
   launchChildWorkspace: vi.fn(),
   windowName: '',
@@ -95,6 +109,10 @@ const mockUseVisit = vi.mocked(useVisit);
 const mockUseVisitTypes = vi.mocked(useVisitTypes);
 const mockUseLocations = vi.mocked(useLocations);
 const mockUseEmrConfiguration = vi.mocked(useEmrConfiguration);
+const mockOpenmrsDatePicker = vi.mocked(OpenmrsDatePicker);
+const mockExtensionSlot = vi.mocked(ExtensionSlot);
+const mockUseLayoutType = vi.mocked(useLayoutType);
+const mockUsePatient = vi.mocked(usePatient);
 
 // from ./visit-form.resource
 const mockOnVisitCreatedOrUpdatedCallback = vi.fn();
@@ -128,6 +146,13 @@ vi.mock('../hooks/useVisitAttributeType', () => ({
         isLoading: false,
         error: null,
         data: visitAttributes.insurancePolicyNumber,
+      };
+    }
+    if (attributeUuid === visitAttributes.followUpDate.uuid) {
+      return {
+        isLoading: false,
+        error: null,
+        data: visitAttributes.followUpDate,
       };
     }
   }),
@@ -350,10 +375,10 @@ describe('Visit form', () => {
       uuid: 'location-b',
     });
 
-    const props: PatientWorkspace2DefinitionProps<VisitFormProps, {}> = {
+    const props: VisitFormWorkspaceDefinitionProps = {
       ...defaultProps,
-      groupProps: {
-        ...defaultProps.groupProps,
+      windowProps: {
+        ...defaultProps.windowProps,
         visitContext: null,
       },
     };
@@ -469,6 +494,22 @@ describe('Visit form', () => {
       kind: 'success',
       title: 'Visit started',
     });
+  });
+
+  it('calls the onVisitStarted workspace prop with the saved visit after closing the form', async () => {
+    const user = userEvent.setup();
+    const onVisitStarted = vi.fn();
+
+    render(<VisitForm {...defaultProps} workspaceProps={{ ...defaultProps.workspaceProps, onVisitStarted }} />);
+
+    await user.click(screen.getByLabelText(/Outpatient visit/i));
+    await user.click(screen.getByRole('combobox', { name: /Select a location/i }));
+    await user.click(screen.getByText('Inpatient Ward'));
+    await user.click(screen.getByRole('button', { name: /Start visit/i }));
+
+    await waitFor(() => expect(onVisitStarted).toHaveBeenCalledTimes(1));
+    expect(onVisitStarted).toHaveBeenCalledWith(expect.objectContaining({ uuid: visitUuid }));
+    expect(mockCloseWorkspace.mock.invocationCallOrder[0]).toBeLessThan(onVisitStarted.mock.invocationCallOrder[0]);
   });
 
   it('reports no unsaved changes after a successful save, even while callbacks are still pending', async () => {
@@ -678,6 +719,154 @@ describe('Visit form', () => {
       subtitle: 'Facility Visit updated successfully',
       kind: 'success',
       title: 'Visit details updated',
+    });
+  });
+
+  describe('date visit attributes', () => {
+    const dateAttributeUuid = 'e1f2a3b4-0000-4000-8000-000000000001';
+    // A server east of UTC returns the saved date at its own midnight
+    const savedDateValue = '2026-10-15T00:00:00.000+0530';
+    const visitWithDateAttribute = {
+      ...mockVisitWithAttributes,
+      attributes: [
+        {
+          uuid: dateAttributeUuid,
+          display: 'Follow-up date: 2026-10-15',
+          attributeType: { uuid: visitAttributes.followUpDate.uuid, display: 'Follow-up date' },
+          value: savedDateValue,
+        },
+      ],
+    } as unknown as Visit;
+
+    function setDateAttributeConfig(required = false) {
+      mockUseConfig.mockReturnValue({
+        ...getDefaultsFromConfigSchema(esmPatientChartSchema),
+        visitAttributeTypes: [{ uuid: visitAttributes.followUpDate.uuid, required, displayInThePatientBanner: true }],
+      });
+    }
+
+    const defaultDatePickerMock = mockOpenmrsDatePicker.getMockImplementation();
+
+    beforeEach(() => {
+      // Like the real picker, report a cleared input as null, so tests can clear the field with user.clear
+      mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange, invalid, invalidText }) => (
+        <>
+          <label htmlFor={id}>{labelText}</label>
+          <input
+            id={id}
+            type="text"
+            value={value ? dayjs(value as string).format('DD/MM/YYYY') : ''}
+            onChange={(evt) => onChange?.(evt.target.value ? dayjs(evt.target.value).toDate() : null)}
+          />
+          {invalid && <span>{invalidText}</span>}
+        </>
+      ));
+      mockUpdateVisit.mockResolvedValue({
+        status: 201,
+        data: { uuid: visitUuid, visitType: { display: 'Facility Visit' } },
+      } as unknown as FetchResponse<Visit>);
+    });
+
+    afterEach(() => {
+      mockOpenmrsDatePicker.mockImplementation(defaultDatePickerMock);
+    });
+
+    it('starts a new visit with the date attribute as a yyyy-MM-dd value', async () => {
+      const user = userEvent.setup();
+      setDateAttributeConfig();
+
+      renderVisitForm();
+
+      await user.click(screen.getByLabelText(/Outpatient visit/i));
+      await user.click(screen.getByLabelText('Follow-up date (optional)'));
+      await user.paste('2026-10-20');
+      await user.click(screen.getByRole('button', { name: /Start visit/i }));
+
+      expect(mockSaveVisit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          attributes: [{ attributeType: visitAttributes.followUpDate.uuid, value: '2026-10-20' }],
+        }),
+        expect.any(Object),
+      );
+    });
+
+    it('shows the validation error for a required date attribute', async () => {
+      const user = userEvent.setup();
+      setDateAttributeConfig(true);
+
+      renderVisitForm();
+
+      await user.click(screen.getByLabelText(/Outpatient visit/i));
+      await user.click(screen.getByRole('button', { name: /Start visit/i }));
+
+      expect(screen.getByText('This field is required')).toBeInTheDocument();
+      expect(mockSaveVisit).not.toHaveBeenCalled();
+    });
+
+    it('shows the saved date in the edit form without shifting the day', () => {
+      setDateAttributeConfig();
+
+      renderVisitForm(visitWithDateAttribute);
+
+      expect(screen.getByLabelText('Follow-up date (optional)')).toHaveValue('15/10/2026');
+    });
+
+    it('does not update an unchanged date attribute when editing a visit', async () => {
+      const user = userEvent.setup();
+      setDateAttributeConfig();
+
+      renderVisitForm(visitWithDateAttribute);
+
+      await user.click(screen.getByLabelText(/Outpatient visit/i));
+      await user.click(screen.getByRole('button', { name: /Update visit/i }));
+
+      expect(mockUpdateVisit).toHaveBeenCalled();
+      expect(mockUpdateVisitAttribute).not.toHaveBeenCalled();
+      expect(mockCreateVisitAttribute).not.toHaveBeenCalled();
+    });
+
+    it('updates a changed date attribute with a yyyy-MM-dd value when editing a visit', async () => {
+      const user = userEvent.setup();
+      setDateAttributeConfig();
+
+      renderVisitForm(visitWithDateAttribute);
+
+      await user.click(screen.getByLabelText(/Outpatient visit/i));
+      // Select the saved date so the pasted date replaces it
+      await user.tripleClick(screen.getByLabelText('Follow-up date (optional)'));
+      await user.paste('2026-10-20');
+      await user.click(screen.getByRole('button', { name: /Update visit/i }));
+
+      expect(mockUpdateVisitAttribute).toHaveBeenCalledWith(visitUuid, dateAttributeUuid, '2026-10-20');
+    });
+
+    it('keeps the required error when a required date attribute is cleared', async () => {
+      const user = userEvent.setup();
+      setDateAttributeConfig(true);
+
+      renderVisitForm();
+
+      await user.click(screen.getByLabelText(/Outpatient visit/i));
+      await user.click(screen.getByLabelText('Follow-up date'));
+      await user.paste('2026-10-20');
+      await user.clear(screen.getByLabelText('Follow-up date'));
+      await user.click(screen.getByRole('button', { name: /Start visit/i }));
+
+      expect(screen.getByText('This field is required')).toBeInTheDocument();
+      expect(mockSaveVisit).not.toHaveBeenCalled();
+    });
+
+    it('deletes an optional date attribute that is cleared when editing a visit', async () => {
+      const user = userEvent.setup();
+      setDateAttributeConfig();
+
+      renderVisitForm(visitWithDateAttribute);
+
+      await user.click(screen.getByLabelText(/Outpatient visit/i));
+      await user.clear(screen.getByLabelText('Follow-up date (optional)'));
+      await user.click(screen.getByRole('button', { name: /Update visit/i }));
+
+      expect(mockDeleteVisitAttribute).toHaveBeenCalledWith(visitUuid, dateAttributeUuid);
     });
   });
 
@@ -1324,12 +1513,117 @@ describe('useVisitFormSchemaAndDefaultValues birthdate validation', () => {
 });
 
 function renderVisitForm(visitToEdit?: Visit) {
-  const props: PatientWorkspace2DefinitionProps<VisitFormProps, {}> = {
+  const props: VisitFormWorkspaceDefinitionProps = {
     ...defaultProps,
-    groupProps: {
-      ...defaultProps.groupProps,
+    windowProps: {
+      ...defaultProps.windowProps,
       visitContext: visitToEdit ?? null,
     },
+  };
+  return render(<VisitForm {...props} />);
+}
+
+describe('Visit form patient header banner', () => {
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientChartSchema),
+      visitAttributeTypes: [],
+    });
+    mockUseVisitTypes.mockReturnValue(mockVisitTypes);
+    mockUseLocations.mockReturnValue(mockLocations);
+    mockUseEmrConfiguration.mockReturnValue({
+      emrConfiguration: {
+        atFacilityVisitType: null,
+      },
+      isLoadingEmrConfiguration: false,
+      errorFetchingEmrConfiguration: null,
+      mutateEmrConfiguration: null,
+    });
+    mockUseDefaultVisitLocation.mockReturnValue(defaultVisitLocation);
+    mockUseLayoutType.mockReturnValue('large-desktop');
+    mockUsePatient.mockReturnValue({ patient: null, patientUuid: null, isLoading: false, error: null });
+  });
+
+  const hasPatientHeaderSlot = () =>
+    mockExtensionSlot.mock.calls.some(([props]) => props.name === 'visit-form-header-slot');
+
+  it('never renders the standard patient header slot', () => {
+    mockUseLayoutType.mockReturnValue('tablet');
+    renderVisitFormWithPatientHeader();
+
+    expect(mockExtensionSlot.mock.calls.some(([props]) => props.name === 'patient-header-slot')).toBe(false);
+  });
+
+  it('shows the visit form header when the group always shows the banner', () => {
+    renderVisitFormWithPatientHeader();
+
+    expect(
+      mockExtensionSlot.mock.calls.some(
+        ([props]) => props.name === 'visit-form-header-slot' && props.state.patientUuid === mockPatient.id,
+      ),
+    ).toBe(true);
+  });
+
+  it('shows the visit form header at every width by default outside the patient chart', () => {
+    render(<VisitForm {...defaultProps} groupProps={{}} />);
+
+    expect(hasPatientHeaderSlot()).toBe(true);
+  });
+
+  it('shows the visit form header only on tablet in the patient chart', () => {
+    const { unmount } = renderVisitForm();
+    expect(hasPatientHeaderSlot()).toBe(false);
+    unmount();
+
+    mockExtensionSlot.mockClear();
+    mockUseLayoutType.mockReturnValue('tablet');
+    renderVisitForm();
+    expect(hasPatientHeaderSlot()).toBe(true);
+  });
+
+  it('does not show the visit form header until the full patient is available', () => {
+    const partialPatient = { id: mockPatient.id, birthDate: mockPatient.birthDate } as fhir.Patient;
+
+    renderVisitFormWithPatientHeader({ patient: partialPatient });
+
+    expect(hasPatientHeaderSlot()).toBe(false);
+  });
+
+  it('shows the visit form header once the full patient is fetched for a partial patient', () => {
+    const partialPatient = { id: mockPatient.id, birthDate: mockPatient.birthDate } as fhir.Patient;
+    mockUsePatient.mockReturnValue({
+      patient: mockPatient,
+      patientUuid: mockPatient.id,
+      isLoading: false,
+      error: null,
+    });
+
+    renderVisitFormWithPatientHeader({ patient: partialPatient });
+
+    expect(
+      mockExtensionSlot.mock.calls.some(
+        ([props]) =>
+          props.name === 'visit-form-header-slot' &&
+          props.state.patientUuid === mockPatient.id &&
+          props.state.patient === mockPatient,
+      ),
+    ).toBe(true);
+  });
+
+  it('does not filter any extension out of the visit form header slot', () => {
+    mockUseLayoutType.mockReturnValue('tablet');
+    renderVisitFormWithPatientHeader();
+
+    const headerSlot = mockExtensionSlot.mock.calls.find(([props]) => props.name === 'visit-form-header-slot')?.[0];
+    expect(headerSlot.select).toBeUndefined();
+  });
+});
+
+function renderVisitFormWithPatientHeader(windowProps: Partial<VisitFormWindowProps> = {}) {
+  const props: VisitFormWorkspaceDefinitionProps = {
+    ...defaultProps,
+    windowProps: { ...defaultProps.windowProps, ...windowProps },
+    groupProps: { showPatientBanner: 'always' },
   };
   return render(<VisitForm {...props} />);
 }

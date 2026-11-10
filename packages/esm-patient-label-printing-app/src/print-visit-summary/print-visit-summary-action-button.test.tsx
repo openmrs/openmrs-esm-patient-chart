@@ -1,28 +1,19 @@
 import React from 'react';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { vi, describe, it, expect } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, showModal, useConfig, UserHasAccess, type Visit } from '@openmrs/esm-framework';
+import { showModal, UserHasAccess, type Visit } from '@openmrs/esm-framework';
 import { mockVisit } from '__mocks__';
 import { renderWithSwr } from 'tools';
-import { configSchema, type ConfigObject } from '../config-schema';
 import PrintVisitSummaryActionButton from './print-visit-summary-action-button.component';
 
-const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const mockShowModal = vi.mocked(showModal);
 const mockUserHasAccess = vi.mocked(UserHasAccess);
 
 const mockPatient = { id: mockVisit.patient.uuid } as fhir.Patient;
 
 describe('PrintVisitSummaryActionButton', () => {
-  beforeEach(() => {
-    mockUseConfig.mockReturnValue({
-      ...getDefaultsFromConfigSchema(configSchema),
-      showPrintVisitSummaryButton: true,
-    } as ConfigObject);
-  });
-
-  it('renders the print button when enabled in config', () => {
+  it('renders the print button', () => {
     renderWithSwr(<PrintVisitSummaryActionButton visit={mockVisit} patient={mockPatient} />);
 
     expect(screen.getByRole('button', { name: /print visit summary/i })).toBeInTheDocument();
@@ -32,17 +23,6 @@ describe('PrintVisitSummaryActionButton', () => {
     renderWithSwr(<PrintVisitSummaryActionButton visit={mockVisit} patient={mockPatient} compact />);
 
     expect(screen.getByRole('button', { name: /print visit summary/i })).toBeInTheDocument();
-  });
-
-  it('does not render the button when disabled in config', () => {
-    mockUseConfig.mockReturnValue({
-      ...getDefaultsFromConfigSchema(configSchema),
-      showPrintVisitSummaryButton: false,
-    } as ConfigObject);
-
-    renderWithSwr(<PrintVisitSummaryActionButton visit={mockVisit} patient={mockPatient} />);
-
-    expect(screen.queryByRole('button', { name: /print visit summary/i })).not.toBeInTheDocument();
   });
 
   it('does not render the button when the visit UUID is missing', () => {
