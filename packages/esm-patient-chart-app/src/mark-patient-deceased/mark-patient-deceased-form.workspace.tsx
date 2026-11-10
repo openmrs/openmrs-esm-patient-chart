@@ -24,6 +24,7 @@ import {
   type PatientWorkspace2DefinitionProps,
   EmptyState,
   invalidateVisitAndEncounterData,
+  useShowPatientBanner,
 } from '@openmrs/esm-patient-common-lib';
 import {
   ExtensionSlot,
@@ -42,9 +43,11 @@ import styles from './mark-patient-deceased-form.scss';
 
 const MarkPatientDeceasedForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
   closeWorkspace,
-  groupProps: { patientUuid, patient },
+  groupProps,
 }) => {
   const { t } = useTranslation();
+  const { patientUuid, patient } = groupProps;
+  const shouldShowPatientBanner = useShowPatientBanner(groupProps);
   const isTablet = useLayoutType() === 'tablet';
   const memoizedState = useMemo(() => ({ patientUuid, patient }), [patientUuid, patient]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -143,7 +146,7 @@ const MarkPatientDeceasedForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>
     <Workspace2 title={t('markPatientDeceased', 'Mark patient deceased')} hasUnsavedChanges={isDirty}>
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
         <div>
-          {isTablet && (
+          {shouldShowPatientBanner && (
             <Row className={styles.headerGridRow}>
               <ExtensionSlot className={styles.dataGridRow} name="visit-form-header-slot" state={memoizedState} />
             </Row>

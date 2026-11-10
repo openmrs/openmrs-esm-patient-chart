@@ -61,10 +61,10 @@ mockUseConfig.mockReturnValue({
 const defaultProps: PatientWorkspace2DefinitionProps<ProceduresFormProps, object> = {
   closeWorkspace: vi.fn(),
   groupProps: {
+    showPatientBanner: 'tabletOnly',
     patientUuid: mockPatient.id,
     patient: mockPatient,
-    visitContext: null,
-    mutateVisitContext: null,
+    activeVisit: null,
   },
   workspaceName: '',
   launchChildWorkspace: vi.fn(),

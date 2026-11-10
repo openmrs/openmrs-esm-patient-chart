@@ -1,36 +1,51 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ExtensionSlot, Workspace2, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import {
+  type ClinicalFormsWindowProps,
+  type Form,
+  getPatientAndVisitProps,
+  hasPatientBannerData,
+  type SharedWorkspaceGroupProps,
+  usePatientForBanner,
+  useShowPatientBanner,
+} from '@openmrs/esm-patient-common-lib';
 import FormsDashboard from './forms-dashboard.component';
 import styles from './forms-dashboard-workspace.scss';
-import { type Form, type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
-import { ExtensionSlot, useLayoutType, Workspace2 } from '@openmrs/esm-framework';
 
 /**
- * This workspace lists a table of available forms. When clicking on a row, it launches
- * either the form-entry workspace or the html-form-entry workspace.
+ * This workspace lists a table of available forms. When clicking on a row, it launches the form
+ * entry workspace (by default, the patient chart's `patient-form-entry-workspace`; other apps pass
+ * the name of the one they registered as `formEntryWorkspaceName`).
  *
- * This workspace must only be used within the patient chart.
- * @see exported-forms-dashboard.workspace.tsx
+ * It takes the patient and visit from its window props, not from group props, so it can be used
+ * both inside and outside the patient chart.
  */
-const FormsDashboardWorkspace: React.FC<PatientWorkspace2DefinitionProps<object, object>> = ({
-  launchChildWorkspace,
-  groupProps: { patient, patientUuid, visitContext },
-}) => {
+const FormsDashboardWorkspace: React.FC<
+  Workspace2DefinitionProps<object, ClinicalFormsWindowProps, SharedWorkspaceGroupProps>
+> = ({ launchChildWorkspace, groupProps, windowProps }) => {
+  const formEntryWorkspaceName = windowProps?.formEntryWorkspaceName ?? 'patient-form-entry-workspace';
+  const {
+    patient: patientProp,
+    patientUuid,
+    visitContext,
+  } = getPatientAndVisitProps(windowProps, undefined, groupProps);
   const { t } = useTranslation();
-  const isTablet = useLayoutType() === 'tablet';
+  const shouldShowPatientBanner = useShowPatientBanner(groupProps);
+  const patient = usePatientForBanner(patientProp, patientUuid);
   const handleFormOpen = useCallback(
     (form: Form, encounterUuid: string) => {
-      launchChildWorkspace('patient-form-entry-workspace', {
+      launchChildWorkspace(formEntryWorkspaceName, {
         form,
         encounterUuid,
       });
     },
-    [launchChildWorkspace],
+    [launchChildWorkspace, formEntryWorkspaceName],
   );
 
   return (
     <Workspace2 title={t('clinicalForms', 'Clinical forms')} hasUnsavedChanges={false}>
-      {isTablet && patient && patientUuid && (
+      {shouldShowPatientBanner && hasPatientBannerData(patient) && patientUuid && (
         <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
       )}
       <div className={styles.container}>
