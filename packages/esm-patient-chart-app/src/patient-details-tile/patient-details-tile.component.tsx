@@ -35,7 +35,7 @@ const PatientDetailsTile: React.FC<PatientDetailsTileInterface> = ({ patient }) 
               <>
                 {' '}
                 &middot; <span>{age(patient.birthDate)}</span> &middot;{' '}
-                <span>{formatPartialDate(patient.birthDate, { mode: 'wide', time: false })}</span>
+                <span>{formatPartialDate(patient.birthDate, { mode: 'wide', time: false, noToday: true })}</span>
               </>
             )}
           </div>
