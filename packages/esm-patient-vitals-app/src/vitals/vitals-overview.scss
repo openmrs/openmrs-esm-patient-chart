@@ -43,3 +43,11 @@
 .printButton {
   margin-left: 1.25rem;
 }
+
+// Matches the rendered chart view (the 400px chart plus its label and tab panel padding)
+// so the card doesn't resize while the chart loads.
+.chartSkeleton {
+  height: 466px;
+  margin: layout.$spacing-03 layout.$spacing-05;
+  width: auto;
+}

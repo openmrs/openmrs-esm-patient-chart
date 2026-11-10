@@ -11,7 +11,8 @@ interface UploadStatusComponentProps {
 
 const UploadStatusComponent: React.FC<UploadStatusComponentProps> = ({ title }) => {
   const { t } = useTranslation();
-  const { filesToUpload, saveFile, closeModal, clearData, onCompletion } = useContext(CameraMediaUploaderContext);
+  const { filesToUpload, saveFile, closeModal, clearData, onCompletion, showUploadSnackbar } =
+    useContext(CameraMediaUploaderContext);
   const [filesUploading, setFilesUploading] = useState([]);
 
   useEffect(() => {
@@ -30,12 +31,14 @@ const UploadStatusComponent: React.FC<UploadStatusComponentProps> = ({ title }) 
       filesToUpload.map((file, index) =>
         saveFile(file)
           .then(() => {
-            showSnackbar({
-              title: t('uploadComplete', 'Upload complete'),
-              subtitle: `${file.fileName} ${t('uploadedSuccessfully', 'uploaded successfully')}`,
-              kind: 'success',
-              isLowContrast: true,
-            });
+            if (showUploadSnackbar !== false) {
+              showSnackbar({
+                title: t('uploadComplete', 'Upload complete'),
+                subtitle: `${file.fileName} ${t('uploadedSuccessfully', 'uploaded successfully')}`,
+                kind: 'success',
+                isLowContrast: true,
+              });
+            }
             setFilesUploading((prevfilesToUpload) =>
               prevfilesToUpload.map((file, prevFileIndex) =>
                 prevFileIndex === index
@@ -58,7 +61,7 @@ const UploadStatusComponent: React.FC<UploadStatusComponentProps> = ({ title }) 
     ).then(() => {
       onCompletion?.();
     });
-  }, [onCompletion, saveFile, filesToUpload, t, setFilesUploading]);
+  }, [onCompletion, saveFile, filesToUpload, t, setFilesUploading, showUploadSnackbar]);
 
   return (
     <div className={styles.cameraSection}>

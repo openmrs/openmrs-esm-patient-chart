@@ -3,7 +3,6 @@ import dayjs from 'dayjs';
 import { capitalize } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
-import { useSWRConfig } from 'swr';
 import {
   Button,
   DataTable,
@@ -33,13 +32,14 @@ import {
   EmptyState,
   ErrorState,
   getDrugOrderByUuid,
-  invalidateVisitByUuid,
+  getPatientChartWindowProps,
   PatientChartPagination,
   type FulfillerStatus,
   type Order,
   type OrderBasketItem,
   type OrderType,
   type OrderUrgency,
+  type PatientWorkspaceGroupProps,
   useLaunchWorkspaceRequiringVisit,
   useOrderBasket,
   useOrderTypes,
@@ -303,14 +303,14 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
 
     const identifiers =
       patient?.identifier?.filter(
-        (identifier) => !excludePatientIdentifierCodeTypes?.uuids?.includes(identifier.type.coding[0].code),
+        (identifier) => !excludePatientIdentifierCodeTypes?.uuids?.includes(identifier.type?.coding?.[0]?.code),
       ) ?? [];
 
     return {
       name: patient ? getPatientName(patient) : '',
       age: age(patient?.birthDate),
       gender: getGender(patient?.gender),
-      location: patient?.address?.[0].city,
+      location: patient?.address?.[0]?.city,
       identifiers: identifiers?.length ? identifiers.map(({ value }) => value) : [],
     };
   }, [patient, excludePatientIdentifierCodeTypes?.uuids]);
@@ -337,6 +337,25 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
       onBeforeGetContentResolve.current = null;
       setIsPrinting(false);
     },
+    pageStyle: `
+      @page {
+        /* Remove browser default header (title) and footer (url) */
+        margin: 0;
+      }
+      @media print {
+        html,
+        body {
+          /* Tell browsers to print background colors */
+          -webkit-print-color-adjust: exact;
+          color-adjust: exact;
+          margin: 0 !important;
+          width: fit-content;
+          padding: 0 !important;
+          overflow: hidden;
+          page-break-inside: avoid;
+        }
+      }
+    `,
   });
 
   const orderTypesToDisplay = useMemo(
@@ -612,17 +631,20 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
   }, [orderItem.type, orderItem.orderType.uuid]);
   const { orders, setOrders } = useOrderBasket<OrderBasketItem>(patient, grouping, postDataPrepFn);
   const alreadyInBasket = orders.some((x) => x.uuid === orderItem.uuid);
-  const { mutate: globalMutate } = useSWRConfig();
 
-  const windowProps = useMemo(() => ({ encounterUuid: orderItem.encounter.uuid }), [orderItem.encounter.uuid]);
-  const groupProps = useMemo(
+  const groupProps: PatientWorkspaceGroupProps = useMemo(
     () => ({
+      showPatientBanner: 'tabletOnly',
       patient,
       patientUuid: patient.id,
-      visitContext: orderItem.encounter.visit,
-      mutateVisitContext: invalidateVisitByUuid(globalMutate, orderItem.encounter.visit.uuid),
+      activeVisit: orderItem.encounter.visit,
     }),
-    [patient, orderItem.encounter.visit, globalMutate],
+    [patient, orderItem.encounter.visit],
+  );
+  // The workspaces read the patient / visit from their window props, not from the group props
+  const windowProps = useMemo(
+    () => ({ patient, patientUuid: patient.id, visitContext: orderItem.encounter.visit }),
+    [patient, orderItem.encounter.visit],
   );
 
   const handleCancelOrder = useCallback(() => {
@@ -688,8 +710,12 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
   }, [orderItem, windowProps, groupProps]);
 
   const handleAddOrEditTestResults = useCallback(() => {
-    launchWorkspace2('test-results-form-workspace', { order: orderItem, patient });
-  }, [orderItem, patient]);
+    launchWorkspace2(
+      'test-results-form-workspace',
+      { order: orderItem, labOrderWorkspaceName: 'add-lab-order' },
+      getPatientChartWindowProps(patient.id),
+    );
+  }, [orderItem, patient.id]);
 
   // No actions available for declined orders
   if (isDeclined) {
@@ -698,7 +724,13 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
 
   return (
     <Layer className={styles.layer}>
-      <OverflowMenu aria-label={t('actionsMenu', 'Actions menu')} align="left" flipped selectorPrimaryFocus="#modify">
+      <OverflowMenu
+        aria-label={t('actionsMenu', 'Actions menu')}
+        iconDescription={t('actionsMenu', 'Actions menu')}
+        align="left"
+        flipped
+        selectorPrimaryFocus="#modify"
+      >
         <OverflowMenuItem
           className={styles.menuItem}
           disabled={alreadyInBasket}

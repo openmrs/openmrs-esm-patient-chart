@@ -85,7 +85,7 @@ const ObsTableHorizontal: React.FC<ObsTableHorizontalProps> = ({ patientUuid }) 
   let obssGroupedByEncounters = useMemo(
     () =>
       encounters?.length
-        ? encounters.map((encounter) => observations.filter((o) => o.encounter.reference === encounter.reference))
+        ? encounters.map((encounter) => observations.filter((o) => o.encounter?.reference === encounter.reference))
         : [],
     [encounters, observations],
   );
@@ -196,7 +196,7 @@ const ObsTableHorizontal: React.FC<ObsTableHorizontalProps> = ({ patientUuid }) 
             if (typeof rawValue !== 'number') {
               value = undefined;
             } else if (rawValue % 1 !== 0) {
-              if (decimalPlaces > 0) {
+              if (decimalPlaces != null) {
                 value = rawValue.toFixed(decimalPlaces);
               } else {
                 value = rawValue.toFixed(2);
@@ -413,7 +413,8 @@ const Cell: React.FC<{
 
   const handleSave = useCallback(
     async (conceptKey: string) => {
-      if (!editingValue || editingValue === cellData?.value) {
+      // A numeric 0 is a legitimate value; only bail on genuinely empty input.
+      if (editingValue === '' || editingValue == null || editingValue === cellData?.value) {
         setIsEditing(false);
         setEditingValue('');
         return;

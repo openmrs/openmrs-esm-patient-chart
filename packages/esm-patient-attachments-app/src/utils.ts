@@ -1,4 +1,5 @@
-import { type Attachment, type AttachmentResponse, attachmentUrl, formatDate } from '@openmrs/esm-framework';
+import { type Attachment, type AttachmentResponse, formatDate } from '@openmrs/esm-framework';
+import { getAttachmentBytesUrl } from '@openmrs/esm-patient-common-lib';
 
 export function readFileAsString(file: File) {
   return new Promise<string>((resolve) => {
@@ -31,7 +32,7 @@ export interface AttachmentTableData extends Attachment {
 export function createGalleryEntry(data: AttachmentResponse): AttachmentTableData {
   return {
     id: data.uuid,
-    src: `${window.openmrsBase}${attachmentUrl}/${data.uuid}/bytes`,
+    src: getAttachmentBytesUrl(data.uuid),
     filename: data.filename.replace(/\.[^\\/.]+$/, ''),
     description: data.comment,
     dateTimeValue: data.dateTime,

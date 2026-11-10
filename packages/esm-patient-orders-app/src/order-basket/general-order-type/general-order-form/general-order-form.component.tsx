@@ -148,7 +148,7 @@ export function OrderForm({
             isLowContrast: false,
             kind: 'error',
             title: t('errorSavingDrugOrder', 'Error saving order'),
-            subtitle: error,
+            subtitle: error?.responseBody?.error?.message ?? error?.message,
           });
         });
     },

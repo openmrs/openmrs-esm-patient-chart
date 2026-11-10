@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
 import useSWR from 'swr';
 import {
-  getDynamicOfflineDataEntries,
   interpolateUrl,
   openmrsFetch,
   restBaseUrl,
@@ -17,7 +16,6 @@ import {
   formEncounterUrl,
   formEncounterUrlPoc,
 } from '../constants';
-import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpers';
 
 function useCustomFormsUrl(patientUuid: string, visitUuid: string) {
   const { customFormsUrl, showHtmlFormEntryForms } = useConfig<FormEntryConfigSchema>();
@@ -37,22 +35,15 @@ function useCustomFormsUrl(patientUuid: string, visitUuid: string) {
   };
 }
 
-export function useFormEncounters(cachedOfflineFormsOnly = false, patientUuid: string = '', visitUuid: string = '') {
+export function useFormEncounters(patientUuid: string = '', visitUuid: string = '') {
   const { url, hasCustomFormsUrl } = useCustomFormsUrl(patientUuid, visitUuid);
 
-  return useSWR([url, cachedOfflineFormsOnly], async () => {
+  return useSWR([url], async () => {
     const res = await openmrsFetch<ListResponse<Form>>(url);
     // show published forms and hide component forms
-    const forms = hasCustomFormsUrl
+    return hasCustomFormsUrl
       ? res?.data.results
       : res.data?.results?.filter((form) => form.published && !/component/i.test(form.name)) ?? [];
-
-    if (!cachedOfflineFormsOnly) {
-      return forms;
-    }
-
-    const dynamicFormData = await getDynamicOfflineDataEntries('form');
-    return forms.filter((form) => dynamicFormData.some((entry) => entry.identifier === form.uuid));
   });
 }
 
@@ -75,11 +66,9 @@ export function useForms(
   visitUuid?: string,
   startDate?: Date,
   endDate?: Date,
-  cachedOfflineFormsOnly = false,
   orderBy: 'name' | 'most-recent' = 'name',
 ) {
-  const { htmlFormEntryForms } = useConfig<FormEntryConfigSchema>();
-  const allFormsRes = useFormEncounters(cachedOfflineFormsOnly, patientUuid, visitUuid);
+  const allFormsRes = useFormEncounters(patientUuid, visitUuid);
   const encountersRes = useEncountersWithFormRef(patientUuid, startDate, endDate);
   const pastEncounters = encountersRes.data?.data?.results ?? [];
   const data = allFormsRes.data ? mapToFormCompletedInfo(allFormsRes.data, pastEncounters) : undefined;
@@ -89,16 +78,7 @@ export function useForms(
     allFormsRes.mutate();
     encountersRes.mutate();
   };
-  // Note:
-  // `pastEncounters` is currently considered as optional (i.e. any errors are ignored) since it's only used for display
-  // and doesn't change any functional flows. This makes offline mode much easier to implement since the past encounters
-  // don't have to be cached regularly.
-  // If this ever becomes a problem for online mode (i.e. if an error should be rendered there when past encounters
-  // for determining filled out forms can't be loaded) this should ideally be conditionally controlled via a flag
-  // such that the current offline behavior doesn't change.
-  let formsToDisplay = cachedOfflineFormsOnly
-    ? data?.filter((formInfo) => isValidOfflineFormEncounter(formInfo.form, htmlFormEntryForms))
-    : data;
+  let formsToDisplay = data;
 
   if (session?.user) {
     formsToDisplay = formsToDisplay?.filter((formInfo) =>

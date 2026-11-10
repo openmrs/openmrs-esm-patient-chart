@@ -2,17 +2,12 @@ import React from 'react';
 import { vi, describe, expect, test } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import { screen, render } from '@testing-library/react';
-import {
-  type AssignedExtension,
-  type ExtensionSlotState,
-  useExtensionStore,
-  useExtensionSlotMeta,
-} from '@openmrs/esm-framework';
+import { useAssignedExtensions, useExtensionStore } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import ChartReview from './chart-review.component';
 
+const mockUseAssignedExtensions = vi.mocked(useAssignedExtensions);
 const mockUseExtensionStore = vi.mocked(useExtensionStore);
-const mockUseExtensionSlotMeta = vi.mocked(useExtensionSlotMeta);
 
 vi.mock('react-router-dom', async () => ({
   ...((await vi.importActual('react-router-dom')) as object),
@@ -25,20 +20,12 @@ vi.mock('react-router-dom', async () => ({
   }),
 }));
 
-function slotMetaFromStore(store, slotName) {
-  return Object.fromEntries(
-    store.slots[slotName].assignedExtensions.map((e) => {
-      return [e.name, e.meta];
-    }),
-  );
-}
-
 describe('ChartReview', () => {
   test('renders a grid-based layout', () => {
     const mockStore = {
       slots: {
         'patient-chart-dashboard-slot': {
-          assignedExtensions: [
+          candidateExtensions: [
             {
               name: 'charts-summary-dashboard',
               meta: {
@@ -55,16 +42,16 @@ describe('ChartReview', () => {
                 title: 'Test Results',
               },
             },
-          ] as unknown as AssignedExtension[],
+          ],
         },
         'patient-chart-summary-dashboard-slot': {
-          assignedExtensions: [],
+          candidateExtensions: [],
         },
-      } as Record<string, ExtensionSlotState>,
+      },
     };
 
     mockUseExtensionStore.mockReturnValue(mockStore as unknown as ReturnType<typeof useExtensionStore>);
-    mockUseExtensionSlotMeta.mockImplementation((slotName) => slotMetaFromStore(mockStore, slotName));
+    mockUseAssignedExtensions.mockImplementation((slotName) => mockStore.slots[slotName]?.candidateExtensions ?? []);
 
     render(
       <BrowserRouter>

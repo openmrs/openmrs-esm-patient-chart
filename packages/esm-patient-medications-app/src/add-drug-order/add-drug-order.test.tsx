@@ -178,7 +178,6 @@ describe('AddDrugOrderWorkspace drug search', () => {
       expect.objectContaining({
         ...getTemplateOrderBasketItem(mockDrugSearchResultApiData[2], null, daysDurationUnit),
         isOrderIncomplete: true,
-        scheduledDate: expect.any(Date),
       }),
     ]);
     expect(mockCloseWorkspace).toHaveBeenCalled();
@@ -225,7 +224,8 @@ describe('AddDrugOrderWorkspace drug search', () => {
             (getDefaultsFromConfigSchema(configSchema) as ConfigObject).daysDurationUnit,
             mockDrugOrderTemplateApiData[mockDrugSearchResultApiData[0].uuid][0],
           ),
-          scheduledDate: expect.any(Date),
+          freeTextDosage: null,
+          scheduledDate: undefined,
           indication: 'Hypertension',
         }),
       ]),
@@ -294,17 +294,14 @@ function renderAddDrugOrderWorkspace() {
         order: null,
         orderToEditOrdererUuid: null,
       }}
-      groupProps={{
-        patientUuid: mockPatient.id,
-        patient: mockPatient,
-        visitContext: null,
-        mutateVisitContext: null,
-      }}
+      groupProps={{}}
       workspaceName={''}
       launchChildWorkspace={vi.fn()}
       closeWorkspace={mockCloseWorkspace}
       windowProps={{
-        encounterUuid: '',
+        patientUuid: mockPatient.id,
+        patient: mockPatient,
+        visitContext: null,
       }}
       windowName={''}
       isRootWorkspace={false}

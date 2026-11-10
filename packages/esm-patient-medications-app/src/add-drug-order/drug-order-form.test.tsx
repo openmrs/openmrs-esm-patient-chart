@@ -1,5 +1,5 @@
 import React from 'react';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, OpenmrsDatePicker, useConfig, useSession } from '@openmrs/esm-framework';
@@ -59,11 +59,11 @@ vi.mock('../api', async () => ({
   useRequireOutpatientQuantity: () => mockUseRequireOutpatientQuantity(),
 }));
 
-function renderDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem, onSave = vi.fn()) {
+function renderDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem, onSave = vi.fn(), patient = mockPatient) {
   return render(
     <DrugOrderForm
       initialOrderBasketItem={initialOrderBasketItem}
-      patient={mockPatient}
+      patient={patient}
       visitContext={null}
       onSave={onSave}
       saveButtonText="Save order"
@@ -84,12 +84,17 @@ function createNewOrderBasketItem(overrides?: Partial<DrugOrderBasketItem>): Dru
 }
 
 const completeMedicationOrderFields: Partial<DrugOrderBasketItem> = {
+  isFreeTextDosage: false,
+  scheduledDate: new Date(),
   dosage: 1,
   unit: { valueCoded: '1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 'Tablet' },
   route: { valueCoded: '160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 'Oral' },
   frequency: { valueCoded: 'once-daily-uuid', value: 'Once daily', frequencyPerDay: 1 },
   duration: 7,
   durationUnit: { valueCoded: '1072AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 'Days' },
+  asNeeded: false,
+  asNeededCondition: '',
+  patientInstructions: '',
   indication: 'Pain',
   pillsDispensed: 7,
   quantityUnits: { valueCoded: '1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 'Tablet' },
@@ -150,19 +155,34 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
     });
   });
 
-  it('snaps same-day date-only start dates to the current wall-clock time before saving', () => {
-    const selectedDate = new Date('2026-05-21T00:00:00.000Z');
-    const now = new Date('2026-05-21T12:34:56.000Z');
+  describe('getOrderStartDateForSubmission', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-05-21T12:34:56.000Z'));
+    });
 
-    expect(getOrderStartDateForSubmission(selectedDate, undefined, now)).toBe(now);
-  });
+    afterEach(() => {
+      vi.useRealTimers();
+    });
 
-  it('keeps applying the minimum start date after snapping same-day start dates', () => {
-    const selectedDate = new Date('2026-05-21T00:00:00.000Z');
-    const now = new Date('2026-05-21T12:34:56.000Z');
-    const startDateMin = new Date('2026-05-21T13:00:00.000Z');
+    it('leaves the start date unset for a same-day (today) selection so the posting layer supplies it', () => {
+      const selectedDate = new Date('2026-05-21T00:00:00.000Z');
 
-    expect(getOrderStartDateForSubmission(selectedDate, startDateMin, now)).toBe(startDateMin);
+      expect(getOrderStartDateForSubmission(selectedDate, undefined)).toBeUndefined();
+    });
+
+    it('preserves an explicitly selected non-today start date', () => {
+      const selectedDate = new Date('2026-05-25T00:00:00.000Z');
+
+      expect(getOrderStartDateForSubmission(selectedDate, undefined)).toBe(selectedDate);
+    });
+
+    it('raises an explicitly selected start date below the minimum up to the minimum', () => {
+      const selectedDate = new Date('2026-05-19T00:00:00.000Z');
+      const startDateMin = new Date('2026-05-20T00:00:00.000Z');
+
+      expect(getOrderStartDateForSubmission(selectedDate, startDateMin)).toBe(startDateMin);
+    });
   });
 
   it('auto-calculates quantity when dose, frequency, and duration are filled', async () => {
@@ -299,6 +319,125 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
     const quantityInput = screen.getByRole('spinbutton', { name: /quantity to dispense/i });
     expect(quantityInput).not.toHaveValue();
     expect(screen.queryByText(/auto-calculated/i)).not.toBeInTheDocument();
+  });
+
+  it('labels the free-text dosage toggle with its current state', async () => {
+    const user = userEvent.setup();
+    renderDrugOrderForm(createNewOrderBasketItem());
+
+    const freeTextToggle = screen.getByRole('switch', { name: /free text dosage/i });
+    expect(freeTextToggle).not.toBeChecked();
+    expect(screen.getByText('Off')).toBeInTheDocument();
+    expect(screen.queryByText('On')).not.toBeInTheDocument();
+
+    await user.click(freeTextToggle);
+
+    expect(freeTextToggle).toBeChecked();
+    expect(screen.getByText('On')).toBeInTheDocument();
+    expect(screen.queryByText('Off')).not.toBeInTheDocument();
+  });
+
+  it('submits only free-text dosage fields while preserving the structured frequency draft', async () => {
+    const user = userEvent.setup();
+    const onSave = vi.fn().mockResolvedValue(undefined);
+    renderDrugOrderForm(createNewOrderBasketItem({ ...completeMedicationOrderFields, isQuantityManual: true }), onSave);
+    await user.click(screen.getByRole('switch', { name: /free text dosage/i }));
+    await user.type(screen.getByPlaceholderText(/^free text dosage$/i), 'Take one tablet twice daily');
+    fireEvent.submit(screen.getByRole('form', { name: /add drug order/i }));
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
+    expect(onSave.mock.calls[0][0]).toMatchObject({
+      isFreeTextDosage: true,
+      freeTextDosage: 'Take one tablet twice daily',
+      dosage: null,
+      unit: null,
+      route: null,
+      frequency: null,
+      patientInstructions: null,
+    });
+    await user.click(screen.getByRole('switch', { name: /free text dosage/i }));
+    expect(screen.getByRole('combobox', { name: /frequency/i })).toHaveValue('Once daily');
+  });
+
+  it('preserves both dosage drafts when switching between dosage modes', async () => {
+    const user = userEvent.setup();
+    renderDrugOrderForm(createNewOrderBasketItem());
+
+    const doseInput = screen.getByRole('spinbutton', { name: /dose/i });
+    await user.clear(doseInput);
+    await user.type(doseInput, '1');
+
+    const patientInstructions = screen.getByPlaceholderText(/additional dosing instructions/i);
+    await user.type(patientInstructions, 'Take after eating');
+
+    const freeTextToggle = screen.getByRole('switch', { name: /free text dosage/i });
+    await user.click(freeTextToggle);
+
+    const freeTextDosage = screen.getByPlaceholderText(/^free text dosage$/i);
+    await user.type(freeTextDosage, 'Take one tablet when needed');
+
+    await user.click(freeTextToggle);
+    expect(screen.getByRole('spinbutton', { name: /dose/i })).toHaveValue(1);
+    expect(screen.getByPlaceholderText(/additional dosing instructions/i)).toHaveValue('Take after eating');
+
+    await user.click(freeTextToggle);
+    expect(screen.getByPlaceholderText(/^free text dosage$/i)).toHaveValue('Take one tablet when needed');
+  });
+
+  it('does not show simple dosage details while entering free-text dosage', async () => {
+    const user = userEvent.setup();
+    renderDrugOrderForm(createNewOrderBasketItem(completeMedicationOrderFields));
+
+    expect(screen.getAllByText(/1 tablet/i).length).toBeGreaterThan(0);
+
+    await user.click(screen.getByRole('switch', { name: /free text dosage/i }));
+
+    expect(screen.queryByText(/1 tablet/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/oral/i)).not.toBeInTheDocument();
+  });
+
+  it('submits dosage, prescription, and dispensing details on save', async () => {
+    const user = userEvent.setup();
+    const onSave = vi.fn().mockResolvedValue(undefined);
+    renderDrugOrderForm(createNewOrderBasketItem(completeMedicationOrderFields), onSave);
+
+    await user.type(screen.getByPlaceholderText(/additional dosing instructions/i), 'Take after eating');
+    const indication = screen.getByPlaceholderText(/e\.g\. "Hypertension"/i);
+    await user.clear(indication);
+    await user.type(indication, 'Pain');
+
+    fireEvent.submit(screen.getByRole('form', { name: /add drug order/i }));
+
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
+    expect(onSave.mock.calls[0][0]).toMatchObject({
+      patientInstructions: 'Take after eating',
+      indication: 'Pain',
+      pillsDispensed: 7,
+      quantityUnits: expect.objectContaining({ value: 'Tablet' }),
+      numRefills: 0,
+    });
+  });
+
+  it('keeps draft values when saving fails so clinicians can retry', async () => {
+    const user = userEvent.setup();
+    const onSave = vi.fn().mockRejectedValue(new Error('Save failed'));
+    renderDrugOrderForm(createNewOrderBasketItem(completeMedicationOrderFields), onSave);
+
+    const patientInstructions = screen.getByPlaceholderText(/additional dosing instructions/i);
+    await user.clear(patientInstructions);
+    await user.type(patientInstructions, 'Take after eating');
+
+    const indication = screen.getByPlaceholderText(/e\.g\. "Hypertension"/i);
+    await user.clear(indication);
+    await user.type(indication, 'Pain');
+
+    fireEvent.submit(screen.getByRole('form', { name: /add drug order/i }));
+
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
+    expect(patientInstructions).toHaveValue('Take after eating');
+    expect(indication).toHaveValue('Pain');
+    expect(screen.getByRole('spinbutton', { name: /quantity to dispense/i })).toHaveValue(7);
+    expect(screen.getByRole('combobox', { name: /quantity unit/i })).toHaveValue('Tablet');
+    expect(screen.getByRole('spinbutton', { name: /prescription refills/i })).toHaveValue(0);
   });
 
   it('does not auto-calculate when quantity unit differs from dose unit', async () => {
@@ -799,5 +938,39 @@ describe('DrugOrderForm - required field validation', () => {
     expect(screen.getByText('Quantity to dispense is required')).toBeInTheDocument();
     expect(screen.getByText('Number of refills is required')).toBeInTheDocument();
     expect(onSave).not.toHaveBeenCalled();
+  });
+});
+
+describe('DrugOrderForm - patient header', () => {
+  beforeEach(() => {
+    mockOpenmrsDatePicker.mockImplementation(({ id, labelText }) => (
+      <>
+        <label htmlFor={id}>{labelText}</label>
+        <input id={id} type="text" />
+      </>
+    ));
+    mockUseMedicationOrders.mockReturnValue({
+      futureOrders: [],
+      activeOrders: [],
+      pastOrders: [],
+      error: null,
+      isLoading: false,
+      isValidating: false,
+    });
+    mockUseRequireOutpatientQuantity.mockReturnValue({
+      requireOutpatientQuantity: true,
+      error: null,
+      isLoading: false,
+    });
+  });
+
+  it.each([
+    { label: 'an exact birthdate', birthDate: '1993-10-14', expected: '14 — Oct — 1993' },
+    { label: 'an estimated birthdate known to the year', birthDate: '1993', expected: '1993' },
+    { label: 'an estimated birthdate known to the month', birthDate: '2024-03', expected: 'Mar — 2024' },
+  ])('shows $label at its recorded precision', ({ birthDate, expected }) => {
+    renderDrugOrderForm(createNewOrderBasketItem(), vi.fn(), { ...mockPatient, birthDate });
+
+    expect(screen.getByText(expected)).toBeInTheDocument();
   });
 });

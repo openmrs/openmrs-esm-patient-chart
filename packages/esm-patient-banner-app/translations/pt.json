@@ -9,6 +9,7 @@
   "deceased": "Deceased",
   "district": "Distrito",
   "from_lower": "from",
+  "pastVisitWithDate": "Past visit: {{date}}",
   "postalCode": "Caixa postal",
   "started": "Started",
   "state": "Estado",

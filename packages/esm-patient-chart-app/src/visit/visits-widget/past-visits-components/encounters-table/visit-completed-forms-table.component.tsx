@@ -1,17 +1,28 @@
 import React, { useMemo, useState } from 'react';
-import { userHasAccess, useSession, type Visit } from '@openmrs/esm-framework';
-import { type EncountersTableProps, encounterHasJsonSchemaForm } from './encounters-table.resource';
+import { type Visit } from '@openmrs/esm-framework';
+import {
+  type EncountersTableProps,
+  encounterHasJsonSchemaForm,
+  useCanPrintEncounters,
+} from './encounters-table.resource';
 import EncountersTable from './encounters-table.component';
 
 interface VisitCompletedFormsTableProps {
   patientUuid: string;
   visit: Visit;
+  onEditEncounter?: EncountersTableProps['onEditEncounter'];
+  patient?: EncountersTableProps['patient'];
 }
 
 /**
  * This component shows a table of only completed forms from a single visit of a patient
  */
-const VisitCompletedFormsTable: React.FC<VisitCompletedFormsTableProps> = ({ patientUuid, visit }) => {
+const VisitCompletedFormsTable: React.FC<VisitCompletedFormsTableProps> = ({
+  patientUuid,
+  visit,
+  onEditEncounter,
+  patient,
+}) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -37,8 +48,7 @@ const VisitCompletedFormsTable: React.FC<VisitCompletedFormsTableProps> = ({ pat
     setCurrentPage(pageNumber);
   };
 
-  const session = useSession();
-  const canPrintEncounters = userHasAccess('App: Print encounter forms', session?.user);
+  const canPrintEncounters = useCanPrintEncounters();
 
   const encountersTableProps: EncountersTableProps = {
     patientUuid,
@@ -53,6 +63,8 @@ const VisitCompletedFormsTable: React.FC<VisitCompletedFormsTableProps> = ({ pat
     setPageSize,
     isSelectable: false,
     canPrintEncounters,
+    onEditEncounter,
+    patient,
   };
 
   return <EncountersTable {...encountersTableProps} />;

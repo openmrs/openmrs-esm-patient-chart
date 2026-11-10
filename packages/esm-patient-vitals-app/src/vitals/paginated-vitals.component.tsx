@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
@@ -12,10 +12,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  type DataTableSortState,
 } from '@carbon/react';
 import { NumericObservation, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import { noopSortRow, useTableSorting } from '../common';
 import type { VitalsTableHeader, VitalsTableRow } from './types';
 import { VitalsAndBiometricsActionMenu } from '../components/action-menu/vitals-biometrics-action-menu.component';
 import styles from './paginated-vitals.scss';
@@ -44,42 +44,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
 
-  const [sortParams, setSortParams] = useState<{ key: string; sortDirection: 'ASC' | 'DESC' | 'NONE' }>({
-    key: '',
-    sortDirection: 'NONE',
-  });
-
-  const handleSorting = (
-    _cellA: any,
-    _cellB: any,
-    { key, sortDirection }: { key: string; sortDirection: DataTableSortState },
-  ) => {
-    if (sortDirection === 'NONE') {
-      setSortParams({ key: '', sortDirection });
-    } else {
-      setSortParams({ key, sortDirection });
-    }
-    return 0;
-  };
-
-  const sortedData: Array<VitalsTableRow> = useMemo(() => {
-    if (sortParams.sortDirection === 'NONE') {
-      return tableRows;
-    }
-
-    const header = tableHeaders.find((header) => header.key === sortParams.key);
-
-    if (!header) {
-      return tableRows;
-    }
-
-    const sortedRows = tableRows.slice().sort((rowA, rowB) => {
-      const sortingNum = header.sortFunc(rowA, rowB);
-      return sortParams.sortDirection === 'DESC' ? sortingNum : -sortingNum;
-    });
-
-    return sortedRows;
-  }, [tableHeaders, tableRows, sortParams]);
+  const { handleSortHeaderClick, sortedData } = useTableSorting<VitalsTableRow>(tableRows, tableHeaders);
 
   const { results: paginatedVitals, goTo, currentPage } = usePagination(sortedData, pageSize);
 
@@ -99,7 +64,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
         overflowMenuOnHover={!isTablet}
         rows={displayedRows}
         size={isTablet ? 'lg' : 'sm'}
-        sortRow={handleSorting}
+        sortRow={noopSortRow}
         useZebraStyles
       >
         {({ rows, headers, getTableProps, getHeaderProps, getExpandHeaderProps, getRowProps, getExpandedRowProps }) => (
@@ -109,7 +74,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
                 <TableRow>
                   {hasAnyNotes && <TableExpandHeader {...getExpandHeaderProps()} />}
                   {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })} key={header.key}>
+                    <TableHeader {...getHeaderProps({ header, onClick: handleSortHeaderClick })} key={header.key}>
                       {header.header}
                     </TableHeader>
                   ))}

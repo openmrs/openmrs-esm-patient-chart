@@ -1,9 +1,9 @@
 {
-  "addEncounter": "Новый прием",
+  "addEncounter": "Новое событие",
   "date": "Дата",
   "dateAndTime": "Дата и время",
   "editabilityNote": "Нажмите на значение для редактирования",
-  "encounterType": "Вид приема",
+  "encounterType": "Тип события",
   "errorSavingObservation": "Ошибка при сохранении значения",
   "noValue": "Нет значения",
   "observationSaved": "Значение сохранено"

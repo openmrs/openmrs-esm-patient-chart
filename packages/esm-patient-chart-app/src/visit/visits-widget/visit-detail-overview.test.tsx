@@ -32,7 +32,7 @@ const mockPaginatedVisitsData: ReturnType<typeof usePaginatedVisits> = {
   totalPages: 1,
   totalCount: 1,
   currentPage: 1,
-  currentPageSize: { current: 10 },
+  currentPageSize: 10,
   paginated: false,
   showNextButton: false,
   showPreviousButton: false,
@@ -146,11 +146,11 @@ describe('VisitDetailOverview', () => {
     expect(visitsTab).toHaveAttribute('aria-selected', 'true');
     expect(allEncountersTab).toHaveAttribute('aria-selected', 'false');
 
-    await screen.getByRole('button', { name: /expand current row/i }).click();
+    await user.click(screen.getByRole('button', { name: /expand current row/i }));
     expect(screen.getByRole('tab', { name: /notes/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /tests/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /medications/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /^encounters$/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /timeline/i })).toBeInTheDocument();
 
     expect(screen.getByText(/no diagnoses found/i)).toBeInTheDocument();
     expect(screen.getByText(/There are no notes to display for this patient/i)).toBeInTheDocument();
@@ -163,6 +163,7 @@ describe('VisitDetailOverview', () => {
   });
 
   it('should render only the visit summary tab when showAllEncountersTab is false', async () => {
+    const user = userEvent.setup();
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(esmPatientChartSchema),
@@ -180,11 +181,11 @@ describe('VisitDetailOverview', () => {
     expect(visitsTab).toHaveAttribute('aria-selected', 'true');
     expect(screen.queryByText('/All encounters/i')).not.toBeInTheDocument();
 
-    await screen.getByRole('button', { name: /expand current row/i }).click();
+    await user.click(screen.getByRole('button', { name: /expand current row/i }));
     expect(screen.getByRole('tab', { name: /notes/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /tests/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /medications/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /^encounters$/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /timeline/i })).toBeInTheDocument();
 
     expect(screen.getByText(/no diagnoses found/i)).toBeInTheDocument();
     expect(screen.getByText(/There are no notes to display for this patient/i)).toBeInTheDocument();

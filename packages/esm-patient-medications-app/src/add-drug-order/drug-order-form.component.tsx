@@ -36,15 +36,15 @@ import {
   AddIcon,
   age,
   ExtensionSlot,
-  formatDate,
+  formatPartialDate,
   getPatientName,
   OpenmrsDatePicker,
-  parseDate,
   useConfig,
   useLayoutType,
   Workspace2,
   type Visit,
 } from '@openmrs/esm-framework';
+import { usePatientIdentifier } from '@openmrs/esm-patient-common-lib';
 import { useMedicationOrders, useRequireOutpatientQuantity } from '../api';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
@@ -62,30 +62,41 @@ export interface DrugOrderFormProps {
    */
   initialOrderBasketItem: DrugOrderBasketItem | null;
   patient: fhir.Patient;
+  patientUuid?: string;
   visitContext: Visit;
   onSave: (finalizedOrder: DrugOrderBasketItem) => Promise<void>;
   saveButtonText: string;
   onCancel: () => void;
   workspaceTitle: string;
+  showPatientBanner?: boolean;
   launchAllergyForm?: () => void;
 }
 
-export function getOrderStartDateForSubmission(selectedDate: Date, startDateMin?: Date, now = new Date()) {
+/**
+ * Resolves the start date to persist on the basket item. Returns `undefined` for a same-day
+ * selection so the posting layer can supply the datetime (server-stamped, or the retrospective
+ * encounter's datetime). An explicit future/past day is preserved, raised to `startDateMin` when
+ * it falls below the earliest allowed start.
+ */
+export function getOrderStartDateForSubmission(selectedDate: Date, startDateMin?: Date): Date | undefined {
+  const now = new Date();
   const isToday =
     selectedDate.getFullYear() === now.getFullYear() &&
     selectedDate.getMonth() === now.getMonth() &&
     selectedDate.getDate() === now.getDate();
-  const selectedStartDate = isToday ? now : selectedDate;
-  return startDateMin && selectedStartDate < startDateMin ? startDateMin : selectedStartDate;
+  if (isToday) {
+    return undefined;
+  }
+  return startDateMin && selectedDate < startDateMin ? startDateMin : selectedDate;
 }
 
 function isFutureRevisionOfActiveMedication(
   action: DrugOrderBasketItem['action'] | undefined,
-  selectedStartDate: Date,
+  selectedStartDate: Date | undefined,
   initialScheduledDate?: Date,
   now = new Date(),
 ) {
-  if (action !== 'REVISE' || selectedStartDate <= now) {
+  if (action !== 'REVISE' || !selectedStartDate || selectedStartDate <= now) {
     return false;
   }
 
@@ -149,16 +160,20 @@ function InputWrapper({ children }) {
 export function DrugOrderForm({
   initialOrderBasketItem,
   patient,
+  patientUuid,
   onSave,
   saveButtonText,
   onCancel,
   visitContext,
   workspaceTitle,
+  showPatientBanner: showPatientBannerProp,
   launchAllergyForm,
 }: DrugOrderFormProps) {
   const { t } = useTranslation();
   const { daysDurationUnit, durationUnitsDaysMap } = useConfig<ConfigObject>();
   const isTablet = useLayoutType() === 'tablet';
+  const showPatientBanner = showPatientBannerProp ?? isTablet;
+  const bannerPatientUuid = patientUuid ?? patient?.id;
   const { orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
   const { requireOutpatientQuantity } = useRequireOutpatientQuantity();
 
@@ -183,22 +198,6 @@ export function DrugOrderForm({
     setValue,
     watch,
   } = drugOrderForm;
-
-  // reset the dosage information if set to free text dosage
-  const handleIsFreeTextDosageAfterChange = useCallback(
-    (newValue: MedicationOrderFormData['isFreeTextDosage']) => {
-      if (newValue) {
-        setValue('dosage', null, { shouldValidate: true });
-        setValue('unit', null, { shouldValidate: true });
-        setValue('route', null, { shouldValidate: true });
-        setValue('frequency', null, { shouldValidate: true });
-        setValue('patientInstructions', null, { shouldValidate: true });
-      } else {
-        setValue('freeTextDosage', null, { shouldValidate: true });
-      }
-    },
-    [setValue],
-  );
 
   const handleUnitAfterChange = useCallback(
     (newValue: MedicationOrderFormData['unit'], prevValue: MedicationOrderFormData['unit']) => {
@@ -310,10 +309,10 @@ export function DrugOrderForm({
   }, [calculatedQuantity, setValue, watchedQuantityUnits, watchedUnit]);
 
   const handleFormSubmission = async (data: MedicationOrderFormData) => {
-    // OpenmrsDatePicker is date-only, so same-day selections can be earlier than the datetime
-    // minimum; snap them up before saving.
+    // A same-day selection resolves to no scheduledDate (the posting layer supplies the datetime);
+    // an explicit future/past day is kept.
     const now = new Date();
-    const scheduledDate = getOrderStartDateForSubmission(data.scheduledDate, startDateMin, now);
+    const scheduledDate = getOrderStartDateForSubmission(data.scheduledDate, startDateMin);
 
     if (
       isFutureRevisionOfActiveMedication(
@@ -337,11 +336,11 @@ export function DrugOrderForm({
       ...initialOrderBasketItem,
       drug: data.drug,
       isFreeTextDosage: data.isFreeTextDosage,
-      freeTextDosage: data.freeTextDosage,
-      dosage: data.dosage,
-      unit: data.unit,
-      route: data.route,
-      patientInstructions: data.patientInstructions,
+      freeTextDosage: data.isFreeTextDosage ? data.freeTextDosage : null,
+      dosage: data.isFreeTextDosage ? null : data.dosage,
+      unit: data.isFreeTextDosage ? null : data.unit,
+      route: data.isFreeTextDosage ? null : data.route,
+      patientInstructions: data.isFreeTextDosage ? null : data.patientInstructions,
       asNeeded: data.asNeeded,
       asNeededCondition: data.asNeededCondition,
       duration: data.duration,
@@ -351,7 +350,7 @@ export function DrugOrderForm({
       quantityUnits: data.quantityUnits,
       numRefills: data.numRefills,
       indication: data.indication,
-      frequency: data.frequency,
+      frequency: data.isFreeTextDosage ? null : data.frequency,
       scheduledDate,
       action: initialOrderBasketItem?.action ?? 'NEW',
       commonMedicationName: data.drug.display,
@@ -359,7 +358,11 @@ export function DrugOrderForm({
       visit: initialOrderBasketItem?.visit ?? visitContext, // TODO: they really should be the same
     } as DrugOrderBasketItem;
 
-    await onSave(newBasketItem);
+    try {
+      await onSave(newBasketItem);
+    } catch (error) {
+      console.error('Error saving drug order', error);
+    }
   };
 
   const handleFormSubmissionError = (errors: FieldErrors<MedicationOrderFormData>) => {
@@ -420,6 +423,7 @@ export function DrugOrderForm({
 
   const [showStickyMedicationHeader, setShowMedicationHeader] = useState(false);
   const patientName = patient ? getPatientName(patient) : '';
+  const patientIdentifier = usePatientIdentifier(patient);
 
   const observer = useRef(null);
   const medicationInfoHeaderRef = useCallback(
@@ -463,20 +467,28 @@ export function DrugOrderForm({
         {showStickyMedicationHeader && (
           <div className={styles.stickyMedicationInfo}>
             <MedicationInfoHeader
-              dosage={watchedDosage}
+              dosage={watchedIsFreeText ? null : watchedDosage}
               drug={drug}
-              routeValue={routeValue}
-              unitValue={watchedUnitValue}
+              routeValue={watchedIsFreeText ? '' : routeValue}
+              unitValue={watchedIsFreeText ? '' : watchedUnitValue}
             />
           </div>
         )}
-        <div className={styles.patientHeader}>
-          <span className={styles.bodyShort02}>{patientName}</span>
-          <span className={classNames(styles.text02, styles.bodyShort01)}>
-            {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
-            <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
-          </span>
-        </div>
+        {showPatientBanner && patient && bannerPatientUuid ? (
+          <ExtensionSlot
+            name="patient-header-slot"
+            state={{ patient, patientUuid: bannerPatientUuid, hideActionsOverflow: true }}
+          />
+        ) : (
+          <div className={styles.patientHeader}>
+            <span className={styles.bodyShort02}>{patientName}</span>
+            <span className={classNames(styles.text02, styles.bodyShort01)}>
+              {patientIdentifier && <>{patientIdentifier} &middot; </>}
+              {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
+              <span>{formatPartialDate(patient?.birthDate, { mode: 'wide', time: false })}</span>
+            </span>
+          </div>
+        )}
         <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id, launchAllergyForm }} />
         <Form
           className={styles.orderForm}
@@ -497,10 +509,10 @@ export function DrugOrderForm({
             <h1 className={styles.orderFormHeading}>{t('orderForm', 'Order Form')}</h1>
             <div ref={medicationInfoHeaderRef}>
               <MedicationInfoHeader
-                dosage={watchedDosage}
+                dosage={watchedIsFreeText ? null : watchedDosage}
                 drug={drug}
-                routeValue={routeValue}
-                unitValue={watchedUnitValue}
+                routeValue={watchedIsFreeText ? '' : routeValue}
+                unitValue={watchedIsFreeText ? '' : watchedUnitValue}
               />
             </div>
             <section className={styles.formSection}>
@@ -517,7 +529,6 @@ export function DrugOrderForm({
                     id="freeTextDosageToggle"
                     aria-label={t('freeTextDosage', 'Free text dosage')}
                     labelText={t('freeTextDosage', 'Free text dosage')}
-                    handleAfterChange={handleIsFreeTextDosageAfterChange}
                   />
                 </Column>
               </Grid>
@@ -831,6 +842,19 @@ export function DrugOrderForm({
               },
             }}
           />
+          {drugAlreadyPrescribedForNewOrder && (
+            <InlineNotification
+              kind="warning"
+              lowContrast
+              className={styles.inlineNotification}
+              title={t('drugAlreadyPrescribed', 'Already prescribed')}
+              subtitle={t(
+                'drugAlreadyPrescribedNotificationBody',
+                'An active or scheduled order already exists for this drug',
+              )}
+              hideCloseButton
+            />
+          )}
           <ButtonSet className={styles.buttonSet}>
             <Button kind="secondary" onClick={onCancel} size="xl">
               {t('discard', 'Discard')}
@@ -969,8 +993,8 @@ const ControlledFieldInput = ({
           ref={ref}
           // @ts-ignore
           size={isTablet ? 'md' : 'sm'}
-          labelA={t('on', 'On')}
-          labelB={t('off', 'Off')}
+          labelA={t('off', 'Off')}
+          labelB={t('on', 'On')}
           {...restProps}
         />
       );

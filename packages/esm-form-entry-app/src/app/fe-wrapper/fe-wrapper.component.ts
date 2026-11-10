@@ -7,12 +7,11 @@ import { OpenmrsEsmApiService } from '../openmrs-api/openmrs-esm-api.service';
 import { FormSchemaService } from '../form-schema/form-schema.service';
 import { FormSubmissionService } from '../form-submission/form-submission.service';
 import { EncounterResourceService } from '../openmrs-api/encounter-resource.service';
-import { Encounter, EncounterCreate, FormSchema, Identifier, Order } from '../types';
-import { showSnackbar, getSynchronizationItems, createGlobalStore, showModal } from '@openmrs/esm-framework';
+import { ConceptReferenceRange, Encounter, EncounterCreate, FormSchema, Identifier, Order } from '../types';
+import { showSnackbar, createGlobalStore, showModal } from '@openmrs/esm-framework';
 
 import { PatientPreviousEncounterService } from '../openmrs-api/patient-previous-encounter.service';
 
-import { patientFormSyncItem, PatientFormSyncItemContent } from '../offline/sync';
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
 import { CreateFormParams, FormCreationService } from '../form-creation/form-creation.service';
 import { TranslateService } from '@ngx-translate/core';
@@ -20,6 +19,8 @@ import { ProgramResourceService } from '../openmrs-api/program-resource.service'
 import { FormDataSourceService } from '../form-data-source/form-data-source.service';
 import { PatientResourceService } from '../openmrs-api/patient-resource.service';
 import { VisitResourceService } from '../openmrs-api/visit-resource.service';
+import { ConceptReferenceRangeResourceService } from '../openmrs-api/concept-reference-range-resource.service';
+import { getNumericQuestionConcepts } from '../form-schema/concept-reference-ranges';
 
 type FormState =
   | 'initial'
@@ -66,6 +67,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     private readonly formDataSourceService: FormDataSourceService,
     private readonly patientResourceService: PatientResourceService,
     private readonly visitResourceService: VisitResourceService,
+    private readonly conceptReferenceRangeResourceService: ConceptReferenceRangeResourceService,
   ) {}
 
   public ngOnInit() {
@@ -125,7 +127,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
 
   private loadAllFormDependencies(): Observable<CreateFormParams> {
     this.formUuid = this.singleSpaPropsService.getPropOrThrow('formUuid');
-    const encounterOrSyncItemId = this.singleSpaPropsService.getPropOrThrow('encounterUuid');
+    const encounterUuid = this.singleSpaPropsService.getPropOrThrow('encounterUuid');
 
     const patient = this.singleSpaPropsService.getPropOrThrow('patient');
     const identifiers = this.formDataSourceService.getPatientObject(patient)?.identifiers ?? [];
@@ -134,24 +136,27 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     this.translateService.use(locale);
 
     import(
-      /* webpackInclude: /\.mjs$/ */
+      /* webpackInclude: /locales[\/\\][a-z]{2}\.js$/ */
       /* webpackChunkName: "./assets/l10n/locales/[request]"*/
       /* webpackMode: "lazy" */
-      `../../../node_modules/@angular/common/locales/${locale}.mjs`
-    ).then((module) => registerLocaleData(module.default));
+      `../../../node_modules/@angular/common/locales/${locale}.js`
+    )
+      .then((module) => registerLocaleData(module.default))
+      .catch((err) => {
+        console.warn(`Could not load Angular locale data for "${locale}":`, err);
+      });
 
     return forkJoin({
       formSchema: this.fetchCompiledFormSchema(this.formUuid, locale).pipe(take(1)),
       session: this.openmrsApi.getCurrentSession().pipe(take(1)),
-      encounter: encounterOrSyncItemId
-        ? this.getEncounterToEdit(encounterOrSyncItemId).pipe(take(1))
-        : of<Encounter>(null),
+      encounter: encounterUuid ? this.getEncounterToEdit(encounterUuid).pipe(take(1)) : of<Encounter>(null),
       patientIdentifiers: of<Array<Identifier>>(identifiers),
     }).pipe(
       mergeMap((result) =>
-        this.loadPatientPreviousEncounters(result.formSchema).pipe(
-          map((previousEncounter) => ({ ...result, previousEncounter })),
-        ),
+        forkJoin({
+          previousEncounter: this.loadPatientPreviousEncounters(result.formSchema).pipe(take(1)),
+          conceptReferenceRanges: this.loadConceptReferenceRanges(result.formSchema).pipe(take(1)),
+        }).pipe(map((schemaDependentData) => ({ ...result, ...schemaDependentData }))),
       ),
       catchError((err) =>
         throwError(
@@ -166,40 +171,23 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     return this.formSchemaService.getFormSchemaByUuid(uuid, language).pipe(take(1));
   }
 
-  private getEncounterToEdit(encounterOrSyncItemId: string): Observable<Encounter | undefined> {
-    const isOffline = this.singleSpaPropsService.getProp('isOffline', false);
-
-    // Special handling here. We generally allow the following depending on the app mode:
-    // While online:
-    //   - Edit remote encounters.
-    //   - Edit queued offline encounters.
-    // While offline:
-    //   - Edit queued offline encounters.
-    //
-    // Editing (cached) remote encounters while offline is explicitly excluded at this point in time
-    // due to the easy potential of later conflicts when syncing.
-    return isOffline
-      ? from(this.getOfflineEncounterToEdit(encounterOrSyncItemId))
-      : this.encounterResourceService
-          .getEncounterByUuid(encounterOrSyncItemId)
-          .pipe(catchError(() => from(this.getOfflineEncounterToEdit(encounterOrSyncItemId))));
-  }
-
-  private async getOfflineEncounterToEdit(syncItemId: string) {
-    const syncItems = await getSynchronizationItems<PatientFormSyncItemContent>(patientFormSyncItem);
-    const item = syncItems.find((item) => item._id === syncItemId);
-    return item.encounter as Encounter;
+  private getEncounterToEdit(encounterUuid: string): Observable<Encounter | undefined> {
+    return this.encounterResourceService.getEncounterByUuid(encounterUuid);
   }
 
   private loadPatientPreviousEncounters(formSchema: FormSchema): Observable<Encounter | undefined> {
     const patientUuid = this.singleSpaPropsService.getProp('patientUuid');
-    const isOffline = this.singleSpaPropsService.getProp('isOffline', false);
-
-    if (isOffline) {
-      return of(undefined);
-    }
 
     return from(this.patientPreviousEncounter.getPreviousEncounter(formSchema.encounterType?.uuid, patientUuid));
+  }
+
+  private loadConceptReferenceRanges(formSchema: FormSchema): Observable<Map<string, ConceptReferenceRange>> {
+    const patientUuid = this.singleSpaPropsService.getProp('patientUuid');
+
+    return this.conceptReferenceRangeResourceService.getConceptReferenceRanges(
+      patientUuid,
+      getNumericQuestionConcepts(formSchema),
+    );
   }
 
   private handleFormSubmission() {
@@ -217,9 +205,8 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
         this.formSubmissionService.submitPayload(this.form).subscribe({
           next: ({ encounter }) => {
             this.onPostResponse(encounter);
-            const isOffline = this.singleSpaPropsService.getProp('isOffline', false);
 
-            if (!isOffline && encounter?.uuid) {
+            if (encounter?.uuid) {
               this.encounterResourceService
                 .getEncounterByUuid(encounter.uuid)
                 .pipe(take(1))

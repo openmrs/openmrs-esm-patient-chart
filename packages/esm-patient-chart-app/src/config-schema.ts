@@ -1,4 +1,7 @@
-import { Type } from '@openmrs/esm-framework';
+import { Type, validator } from '@openmrs/esm-framework';
+
+// The Timeline falls back to this when the configured page size is unusable
+export const defaultVisitTimelinePageSize = 10;
 
 export const esmPatientChartSchema = {
   defaultFacilityUrl: {
@@ -14,7 +17,7 @@ export const esmPatientChartSchema = {
   disableEmptyTabs: {
     _type: Type.Boolean,
     _default: false,
-    _description: 'Disable notes/tests/medications/encounters tabs when empty',
+    _description: 'Disable notes/tests/medications/completed forms tabs when empty',
   },
   encounterEditableDuration: {
     _type: Type.Number,
@@ -67,11 +70,6 @@ export const esmPatientChartSchema = {
     _description:
       'An array of concept UUIDs. If an observation has a concept UUID that matches any of the ones in this array, it will be hidden from the observations list in the Encounters summary table.',
     _default: [],
-  },
-  offlineVisitTypeUuid: {
-    _type: Type.UUID,
-    _description: 'The UUID of the visit type to be used for the automatically created offline visits.',
-    _default: 'a22733fa-3501-4020-a520-da024eeff088',
   },
   restrictByVisitLocationTag: {
     _type: Type.Boolean,
@@ -135,6 +133,14 @@ export const esmPatientChartSchema = {
   visitDiagnosisConceptUuid: {
     _type: Type.ConceptUuid,
     _default: '159947AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  },
+  visitTimelinePageSize: {
+    _type: Type.Number,
+    _validators: [
+      validator((v: unknown) => typeof v === 'number' && Number.isInteger(v) && v >= 1, 'Must be a positive integer'),
+    ],
+    _default: defaultVisitTimelinePageSize,
+    _description: 'The number of encounters shown per page in the visit summary Timeline',
   },
   visitTypeResourceUrl: {
     _type: Type.String,
@@ -204,12 +210,12 @@ export interface ChartConfig {
     src: string;
   };
   notesConceptUuids: string[];
-  offlineVisitTypeUuid: string;
   restrictByVisitLocationTag: boolean;
   showAllEncountersTab: boolean;
   showRecommendedVisitTypeTab: boolean;
   showServiceQueueFields: boolean; // used by extension from esm-service-queues-app
   showUpcomingAppointments: boolean; // used by extension from esm-appointments-app
+  visitTimelinePageSize: number;
   visitTypeResourceUrl: string;
   visitAttributeTypes: Array<{
     displayInThePatientBanner: boolean;

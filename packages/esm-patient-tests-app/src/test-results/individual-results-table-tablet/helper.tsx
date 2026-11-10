@@ -8,7 +8,7 @@ import {
 } from '../../types';
 import styles from './lab-set-panel.scss';
 
-export const getConceptUuid = (obs: FHIRObservationResource | ObsRecord) => obs?.code.coding?.[0]?.code;
+export const getConceptUuid = (obs: FHIRObservationResource | ObsRecord) => obs?.code?.coding?.[0]?.code;
 
 export const getClass = (interpretation: OBSERVATION_INTERPRETATION) => {
   switch (interpretation) {

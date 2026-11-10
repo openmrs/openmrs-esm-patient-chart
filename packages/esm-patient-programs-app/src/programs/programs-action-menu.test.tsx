@@ -30,7 +30,7 @@ describe('ProgramActionsMenu', () => {
     const user = userEvent.setup();
     renderProgramActionsMenu();
 
-    const overflowMenuButton = screen.getByRole('button', { name: /options/i });
+    const overflowMenuButton = screen.getByRole('button', { name: /edit or delete program/i });
     await user.click(overflowMenuButton);
 
     await waitFor(() => {

@@ -311,7 +311,7 @@ test('Record and edit test results', async ({ page, patient }) => {
     await page
       .getByRole('row')
       .filter({ hasText: /laboratory test results/i })
-      .getByRole('button', { name: /options/i })
+      .getByRole('button', { name: /encounter table actions menu/i })
       .click();
   });
 

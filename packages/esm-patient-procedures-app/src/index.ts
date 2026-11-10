@@ -4,7 +4,6 @@ import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 import { moduleName } from './constants';
 import ProceduresDetailedSummary from './components/detailed-summary/procedures-detailed-summary.component';
-import ProceduresFormWorkspace from './workspaces/procedures-form/procedures-form.workspace';
 
 const options = {
   featureName: 'patient-procedures-app',
@@ -22,7 +21,10 @@ export const proceduresDetailedSummary = getSyncLifecycle(ProceduresDetailedSumm
 
 export const proceduresDashboardLink = getSyncLifecycle(createDashboardLink({ ...dashboardMeta }), options);
 
-export const proceduresFormWorkspace = getSyncLifecycle(ProceduresFormWorkspace, options);
+export const proceduresFormWorkspace = getAsyncLifecycle(
+  () => import('./workspaces/procedures-form/procedures-form.workspace'),
+  options,
+);
 
 export const procedureDeleteConfirmationDialog = getAsyncLifecycle(
   () => import('./modals/delete-procedure/delete-procedure.modal'),

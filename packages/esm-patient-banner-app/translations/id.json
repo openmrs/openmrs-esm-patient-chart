@@ -9,6 +9,7 @@
   "deceased": "Meninggal",
   "district": "Kecamatan",
   "from_lower": "dari",
+  "pastVisitWithDate": "Past visit: {{date}}",
   "postalCode": "Kode pos",
   "started": "Dimulai",
   "state": "Provinsi",

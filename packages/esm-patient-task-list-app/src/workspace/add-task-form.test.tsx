@@ -382,10 +382,52 @@ describe('AddTaskForm', () => {
             }),
             dueDate: expect.objectContaining({
               type: 'DATE',
+              date: baseTask.dueDate.date,
             }),
           }),
         );
       });
+    });
+
+    it('should display the correct local due date when editing a task near a UTC day boundary', async () => {
+      vi.stubEnv('TZ', 'Africa/Nairobi');
+      try {
+        const taskWithBoundaryDate: Task = {
+          ...baseTask,
+          dueDate: {
+            type: 'DATE',
+            // 22:00 UTC on Jan 19 = 01:00 EAT on Jan 20 — the real due date is the 20th,
+            // but the pre-fix code (.toISOString().split('T')[0]) would show the 19th.
+            date: new Date('2024-01-19T22:00:00.000Z'),
+          },
+        };
+
+        mockUseTask.mockReturnValue({
+          task: taskWithBoundaryDate,
+          isLoading: false,
+          error: null,
+          mutate: vi.fn(),
+        });
+
+        render(
+          <AddTaskForm
+            patientUuid={patientUuid}
+            activeVisit={mockActiveVisit}
+            onClose={mockOnClose}
+            editTaskUuid={editTaskUuid}
+          />,
+        );
+
+        await waitFor(() => {
+          expect(screen.getByLabelText(/task name/i)).toHaveValue('Existing Task');
+        });
+
+        await waitFor(() => {
+          expect(screen.getByRole('textbox', { name: /due date/i })).toHaveValue('20/01/2024');
+        });
+      } finally {
+        vi.unstubAllEnvs();
+      }
     });
   });
 

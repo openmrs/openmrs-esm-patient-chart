@@ -1,21 +1,19 @@
-import React, { type ComponentProps, useMemo, useState } from 'react';
-import classNames from 'classnames';
-import { capitalize } from 'lodash-es';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@carbon/react';
 import {
-  age,
-  ArrowLeftIcon,
-  getPatientName,
-  formatDate,
-  parseDate,
+  ExtensionSlot,
   useLayoutType,
   useConfig,
   Workspace2,
   type Visit,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
-import { useOrderType, type OrderBasketItem, type TestOrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import {
+  useOrderType,
+  type OrderBasketItem,
+  type TestOrderBasketItem,
+  WorkspaceBackButton,
+} from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../../config-schema';
 import { LabOrderForm } from './test-order-form.component';
 import { TestTypeSearch } from './test-type-search.component';
@@ -30,20 +28,26 @@ export interface AddLabOrderProps {
   orderToEditOrdererUuid?: string;
   orderTypeUuid?: string;
   patient: fhir.Patient;
+  patientUuid?: string;
   visitContext: Visit;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
+  showPatientBanner?: boolean;
 }
 
 const AddLabOrder: React.FC<AddLabOrderProps> = ({
   patient,
+  patientUuid,
   orderToEditOrdererUuid,
   visitContext,
   initialOrder,
   orderTypeUuid,
   closeWorkspace,
+  showPatientBanner: showPatientBannerProp,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
+  const showPatientBanner = showPatientBannerProp ?? isTablet;
+  const bannerPatientUuid = patientUuid ?? patient?.id;
   const [currentLabOrder, setCurrentLabOrder] = useState(initialOrder as TestOrderBasketItem);
   const [searchTerm, setSearchTerm] = useState('');
   const { additionalTestOrderTypes, orders } = useConfig<ConfigObject>();
@@ -82,32 +86,20 @@ const AddLabOrder: React.FC<AddLabOrderProps> = ({
     );
   }, [additionalTestOrderTypes, resolvedOrderTypeUuid, orders.labOrderTypeUuid, orders.labOrderableConcepts, t]);
 
-  const patientName = patient ? getPatientName(patient) : '';
-
   return (
     <Workspace2 title={title} hasUnsavedChanges={hasUnsavedChanges}>
+      {showPatientBanner && patient && bannerPatientUuid && (
+        <ExtensionSlot
+          name="patient-header-slot"
+          state={{ patient, patientUuid: bannerPatientUuid, hideActionsOverflow: true }}
+        />
+      )}
       <div className={styles.container}>
-        {isTablet && (
-          <div className={styles.patientHeader}>
-            <span className={styles.bodyShort02}>{patientName}</span>
-            <span className={classNames(styles.text02, styles.bodyShort01)}>
-              {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
-              <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
-            </span>
-          </div>
-        )}
         {!isTablet && (
-          <div className={styles.backButton}>
-            <Button
-              kind="ghost"
-              renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
-              iconDescription={t('backToOrderBasket', 'Back to order basket')}
-              size="sm"
-              onClick={() => closeWorkspace()}
-            >
-              <span>{t('backToOrderBasket', 'Back to order basket')}</span>
-            </Button>
-          </div>
+          <WorkspaceBackButton
+            label={t('backToOrderBasket', 'Back to order basket')}
+            onClick={() => closeWorkspace()}
+          />
         )}
         {currentLabOrder ? (
           <LabOrderForm

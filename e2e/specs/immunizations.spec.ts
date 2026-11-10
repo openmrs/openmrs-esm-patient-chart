@@ -152,7 +152,7 @@ test('Record, edit and delete an immunization', async ({ page, patient }) => {
   });
 
   await test.step('Then the immunization form should launch in edit mode with the current values pre-filled', async () => {
-    await expect(page.getByText(/immunization form/i)).toBeVisible();
+    await expect(page.getByText('Edit immunization', { exact: true })).toBeVisible();
   });
 
   await test.step('Then the vaccine field should show "Hepatitis B vaccination" and be disabled', async () => {
@@ -232,7 +232,10 @@ test('Record, edit and delete an immunization', async ({ page, patient }) => {
   });
 
   await test.step('And when I confirm the deletion', async () => {
-    await page.getByRole('button', { name: 'danger Delete' }).click();
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: /delete/i })
+      .click();
   });
 
   await test.step('Then I should see a success notification', async () => {

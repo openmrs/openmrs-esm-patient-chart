@@ -9,6 +9,7 @@
   "deceased": "Deceased",
   "district": "Huyện",
   "from_lower": "from",
+  "pastVisitWithDate": "Past visit: {{date}}",
   "postalCode": "Mã bưu chính",
   "started": "Started",
   "state": "State",

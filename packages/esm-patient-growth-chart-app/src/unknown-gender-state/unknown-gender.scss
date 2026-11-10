@@ -1,0 +1,43 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.tileContainer {
+  background-color: var(--cds-background, #fff);
+  padding: layout.$spacing-11 0;
+}
+
+.tile {
+  margin: auto;
+  width: fit-content;
+  background-color: var(--cds-layer-01, #f4f4f4) !important;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.content {
+  @include type.type-style('heading-compact-02');
+  color: var(--cds-text-secondary);
+  margin-bottom: layout.$spacing-05;
+}
+
+.helper {
+  @include type.type-style('body-compact-01');
+  color: var(--cds-text-secondary);
+  margin-bottom: layout.$spacing-07;
+}
+
+.radioGroup {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  :global(.cds--radio-button-group) {
+    justify-content: center;
+    gap: layout.$spacing-07;
+  }
+}

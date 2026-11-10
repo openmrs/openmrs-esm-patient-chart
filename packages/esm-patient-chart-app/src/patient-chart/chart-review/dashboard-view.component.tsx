@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useMatch } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { launchWorkspace2, Extension, ExtensionSlot, useExtensionSlotMeta } from '@openmrs/esm-framework';
+import { launchWorkspace2, Extension, ExtensionSlot } from '@openmrs/esm-framework';
 import { launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 import { dashboardPath } from '../../constants';
 import styles from './dashboard-view.scss';
@@ -32,7 +32,6 @@ interface DashboardViewProps {
 }
 
 export function DashboardView({ dashboard, patientUuid, patient }: DashboardViewProps) {
-  const widgetMetas = useExtensionSlotMeta(dashboard.slot);
   const { t } = useTranslation();
   const {
     params: { view },
@@ -71,7 +70,10 @@ export function DashboardView({ dashboard, patientUuid, patient }: DashboardView
       <div className={styles.dashboardContainer}>
         <ExtensionSlot key={dashboard.slot} name={dashboard.slot} className={styles.dashboard}>
           {(extension) => {
-            const { fullWidth = false } = widgetMetas[extension.id] || {};
+            // The extension's config is null until the extension mounts, and only
+            // some widgets declare fullWidth in their config schema, so the value
+            // from the extension's routes.json meta acts as the fallback.
+            const fullWidth = Boolean(extension.config?.fullWidth ?? extension.meta?.fullWidth);
             return (
               <div className={classNames(styles.extension, fullWidth && styles.fullWidth)}>
                 <Extension state={state} className={styles.extensionWrapper} />

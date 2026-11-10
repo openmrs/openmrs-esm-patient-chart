@@ -12,6 +12,7 @@ The `openmrs-esm-patient-chart` is a frontend module for the OpenMRS SPA. It con
 - [Flags](packages/esm-patient-flags-app/README.md)
 - [Forms](packages/esm-patient-forms-app/README.md)
 - [Generic patient widgets](packages/esm-generic-patient-widgets-app/README.md)
+- [Growth chart](packages/esm-patient-growth-chart-app/README.md)
 - [Immunizations](packages/esm-patient-immunizations-app/README.md)
 - [Label printing](packages/esm-patient-label-printing-app/README.md)
 - [Lists](packages/esm-patient-lists-app/README.md)
@@ -103,7 +104,7 @@ To generate a `coverage` report, run:
 yarn turbo run coverage
 ```
 
-By default, `turbo` will cache test runs. This means that re-running tests wihout changing any of the related files will return the cached logs from the last run. To bypass the cache, run tests with the `force` flag, as follows:
+By default, `turbo` will cache test runs. This means that re-running tests without changing any of the related files will return the cached logs from the last run. To bypass the cache, run tests with the `force` flag, as follows:
 
 ```bash
 yarn turbo run test --force

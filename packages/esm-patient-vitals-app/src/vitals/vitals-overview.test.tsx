@@ -1,7 +1,7 @@
 import React from 'react';
-import { vi, describe, it, expect } from 'vitest';
+import { vi, describe, it, expect, afterEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject, configSchema } from '../config-schema';
@@ -43,8 +43,15 @@ vi.mock('../common', async () => {
 
 mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
-  mockVitalsConfig,
+  ...mockVitalsConfig,
 } as ConfigObject);
+
+const getRowDates = () =>
+  screen
+    .getAllByRole('row')
+    .slice(1) // Exclude the header row
+    .map((row) => row.textContent?.match(/\d{1,2} — \w{3} — \d{4}/)?.[0])
+    .filter(Boolean);
 
 describe('VitalsOverview', () => {
   it('renders an empty state view if vitals data is unavailable', async () => {
@@ -111,6 +118,95 @@ describe('VitalsOverview', () => {
     expectedTableRows.map((row) => expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument());
   });
 
+  it('sorts the vitals table in the direction indicated by the column header', async () => {
+    const user = userEvent.setup();
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: formattedVitals,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsOverview {...testProps} />);
+
+    await waitForLoadingToFinish();
+    expect(screen.getByRole('table', { name: /vitals/i })).toBeInTheDocument();
+
+    const expectedDescendingOrder = ['19 — May — 2021', '10 — May — 2021', '07 — May — 2021', '08 — Apr — 2021'];
+    const expectedAscendingOrder = [...expectedDescendingOrder].reverse();
+
+    expect(getRowDates()).toEqual(expectedDescendingOrder);
+
+    const sortRowsButton = screen.getByRole('button', { name: /date and time/i });
+    const dateColumnHeader = () => screen.getByRole('columnheader', { name: /date and time/i });
+
+    // The first click sorts in ascending order, putting the oldest reading first
+    await user.click(sortRowsButton);
+    expect(dateColumnHeader()).toHaveAttribute('aria-sort', 'ascending');
+    expect(getRowDates()).toEqual(expectedAscendingOrder);
+
+    // The second click sorts in descending order, putting the newest reading first
+    await user.click(sortRowsButton);
+    expect(dateColumnHeader()).toHaveAttribute('aria-sort', 'descending');
+    expect(getRowDates()).toEqual(expectedDescendingOrder);
+  });
+
+  it('sorts across the whole dataset even when the visible page holds a single row', async () => {
+    const user = userEvent.setup();
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: formattedVitals,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    // With one row per page Carbon's comparator is never invoked, because
+    // `Array.prototype.sort` performs no comparisons on a single-element array.
+    renderWithSwr(<VitalsOverview {...testProps} pageSize={1} />);
+
+    await waitForLoadingToFinish();
+
+    expect(getRowDates()).toEqual(['19 — May — 2021']);
+
+    const dateColumnHeader = () => screen.getByRole('columnheader', { name: /date and time/i });
+
+    await user.click(screen.getByRole('button', { name: /date and time/i }));
+
+    expect(dateColumnHeader()).toHaveAttribute('aria-sort', 'ascending');
+    expect(getRowDates()).toEqual(['08 — Apr — 2021']);
+  });
+
+  it('restores the unsorted order once the header cycles back to none', async () => {
+    const user = userEvent.setup();
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: [
+        { id: '0', date: '2021-05-19T04:26:51.000Z', pulse: 90 },
+        { id: '1', date: '2021-05-10T06:41:46.000Z', pulse: 60 },
+        { id: '2', date: '2021-05-07T09:04:51.000Z', pulse: 75 },
+      ],
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsOverview {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    const unsortedOrder = ['19 — May — 2021', '10 — May — 2021', '07 — May — 2021'];
+    expect(getRowDates()).toEqual(unsortedOrder);
+
+    const sortRowsButton = screen.getByRole('button', { name: /pulse/i });
+    const pulseColumnHeader = () => screen.getByRole('columnheader', { name: /pulse/i });
+
+    await user.click(sortRowsButton);
+    expect(pulseColumnHeader()).toHaveAttribute('aria-sort', 'ascending');
+    expect(getRowDates()).toEqual(['10 — May — 2021', '07 — May — 2021', '19 — May — 2021']);
+
+    await user.click(sortRowsButton);
+    expect(pulseColumnHeader()).toHaveAttribute('aria-sort', 'descending');
+    expect(getRowDates()).toEqual(['19 — May — 2021', '07 — May — 2021', '10 — May — 2021']);
+
+    // The third click clears the sort, so the rows return to their original order
+    await user.click(sortRowsButton);
+    expect(pulseColumnHeader()).toHaveAttribute('aria-sort', 'none');
+    expect(getRowDates()).toEqual(unsortedOrder);
+  });
+
   it('expands a vitals row to show an associated note', async () => {
     const user = userEvent.setup();
 
@@ -166,11 +262,64 @@ describe('VitalsOverview', () => {
 
     await user.click(chartViewButton);
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByText(/vital sign displayed/i)).toBeInTheDocument();
+    expect(await screen.findByText(/vital sign displayed/i)).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /bp/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /pulse/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /spo2/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /temp/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /r\. rate/i })).toBeInTheDocument();
+  });
+
+  describe('chart loading', () => {
+    const loadChart = vi.fn();
+
+    // Fresh module instances give each test its own React.lazy state and chart import.
+    const renderWithMockedChart = async () => {
+      vi.resetModules();
+      vi.doMock('./vitals-chart.component', () => loadChart());
+      const { useConfig: freshUseConfig } = await import('@openmrs/esm-framework');
+      const { useVitalsAndBiometrics: freshUseVitalsAndBiometrics } = await import('../common');
+      const { default: FreshVitalsOverview } = await import('./vitals-overview.component');
+      vi.mocked(freshUseConfig<ConfigObject>).mockReturnValue({
+        ...getDefaultsFromConfigSchema(configSchema),
+        ...mockVitalsConfig,
+      } as ConfigObject);
+      vi.mocked(freshUseVitalsAndBiometrics).mockReturnValue({
+        data: formattedVitals,
+      } as ReturnType<typeof useVitalsAndBiometrics>);
+      renderWithSwr(<FreshVitalsOverview {...testProps} />);
+      await waitForLoadingToFinish();
+    };
+
+    afterEach(() => {
+      vi.doUnmock('./vitals-chart.component');
+      loadChart.mockReset();
+    });
+
+    it('starts loading the chart when the view switcher is hovered', async () => {
+      const user = userEvent.setup();
+      loadChart.mockReturnValue({ default: () => <p>Mock vitals chart</p> });
+
+      await renderWithMockedChart();
+      expect(loadChart).not.toHaveBeenCalled();
+
+      await user.hover(screen.getByRole('tab', { name: /chart view/i }));
+
+      await waitFor(() => expect(loadChart).toHaveBeenCalledTimes(1));
+      expect(screen.getByRole('table', { name: /vitals/i })).toBeInTheDocument();
+    });
+
+    it('ignores a failed prefetch', async () => {
+      const user = userEvent.setup();
+      loadChart.mockImplementation(() => {
+        throw new Error('Loading chunk failed');
+      });
+
+      await renderWithMockedChart();
+      await user.hover(screen.getByRole('tab', { name: /chart view/i }));
+
+      await waitFor(() => expect(loadChart).toHaveBeenCalledTimes(1));
+      expect(screen.getByRole('table', { name: /vitals/i })).toBeInTheDocument();
+    });
   });
 });

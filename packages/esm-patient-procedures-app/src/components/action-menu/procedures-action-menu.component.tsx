@@ -33,7 +33,13 @@ export const ProceduresActionMenu = ({ procedure, patientUuid }: ProceduresActio
 
   return (
     <Layer className={styles.layer}>
-      <OverflowMenu aria-label={t('options', 'Options')} align="left" size={isTablet ? 'lg' : 'sm'} flipped>
+      <OverflowMenu
+        aria-label={t('editOrDeleteProcedure', 'Edit or delete procedure')}
+        iconDescription={t('editOrDeleteProcedure', 'Edit or delete procedure')}
+        align="left"
+        size={isTablet ? 'lg' : 'sm'}
+        flipped
+      >
         <OverflowMenuItem
           className={styles.menuItem}
           id="editProcedure"

@@ -1,17 +1,58 @@
 import React from 'react';
 import { vi, describe, it, expect, test, beforeEach, type Mock } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { screen, render } from '@testing-library/react';
-import { ExtensionSlot, getConfig, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { screen, render, waitFor, within } from '@testing-library/react';
+import {
+  ExtensionSlot,
+  getConfig,
+  getDefaultsFromConfigSchema,
+  showModal,
+  useConfig,
+  userHasAccess,
+} from '@openmrs/esm-framework';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { type ChartConfig, esmPatientChartSchema } from '../../../config-schema';
-import { mockPatient } from 'tools';
-import { visitOverviewDetailMockData, visitOverviewDetailMockDataNotEmpty } from '__mocks__';
+import { jsonSchemaResourceName } from '../../../constants';
+import { mockPatient, renderWithSwr } from 'tools';
+import {
+  mockEncounterTypes,
+  mockFhirPatient,
+  visitOverviewDetailMockData,
+  visitOverviewDetailMockDataNotEmpty,
+} from '__mocks__';
 import VisitSummary from './visit-summary.component';
 
 const mockExtensionSlot = ExtensionSlot as Mock;
 const mockGetConfig = vi.mocked(getConfig);
 const mockUseConfig = vi.mocked(useConfig<ChartConfig>);
+const mockUserHasAccess = vi.mocked(userHasAccess);
+const mockUsePatientChartStore = vi.mocked(usePatientChartStore);
+const mockShowModal = vi.mocked(showModal);
 const mockVisit = visitOverviewDetailMockData.data.results[0];
+
+const mockDeleteEncounter = vi.fn();
+
+// Without this the encounters table stays in its loading state and renders a skeleton instead of rows
+vi.mock('./encounters-table/encounters-table.resource', async () => ({
+  ...((await vi.importActual('./encounters-table/encounters-table.resource')) as object),
+  useEncounterTypes: () => ({ data: mockEncounterTypes, isLoading: false }),
+  deleteEncounter: (...args: Array<unknown>) => mockDeleteEncounter(...args),
+}));
+
+vi.mock('@openmrs/esm-patient-common-lib', async () => ({
+  ...((await vi.importActual('@openmrs/esm-patient-common-lib')) as object),
+  usePatientChartStore: vi.fn(),
+}));
+
+beforeEach(() => {
+  mockUsePatientChartStore.mockReturnValue({
+    patientUuid: mockPatient.id,
+    patient: mockFhirPatient,
+    activeVisit: null,
+    setPatient: vi.fn(),
+    setActiveVisit: vi.fn(),
+  } as any);
+});
 
 describe('VisitSummary', () => {
   beforeEach(() => {
@@ -70,6 +111,29 @@ describe('VisitSummary', () => {
     expect(hivTag).toBeInTheDocument();
   });
 
+  it('marks provisional diagnoses with a leading question mark', () => {
+    const visit = visitOverviewDetailMockDataNotEmpty.data.results[0];
+    const visitWithCertainty = {
+      ...visit,
+      encounters: visit.encounters.map((encounter) =>
+        encounter.diagnoses
+          ? {
+              ...encounter,
+              diagnoses: encounter.diagnoses.map((diagnosis) => ({
+                ...diagnosis,
+                certainty: diagnosis.rank === 1 ? 'CONFIRMED' : 'PROVISIONAL',
+              })),
+            }
+          : encounter,
+      ),
+    };
+
+    render(<VisitSummary patientUuid={mockPatient.id} visit={visitWithCertainty} />);
+
+    expect(screen.getByText(/^malaria, confirmed$/i)).toBeInTheDocument();
+    expect(screen.getByText(/^\? human immunodeficiency virus \(hiv\) disease$/i)).toBeInTheDocument();
+  });
+
   it('should display notes, tests and medication summary', async () => {
     const user = userEvent.setup();
 
@@ -103,3 +167,148 @@ describe('VisitSummary', () => {
     expect(screen.getByText(/test-results-filtered-overview/)).toBeInTheDocument();
   });
 });
+
+describe('VisitSummary encounter editing', () => {
+  const mockVisitWithEncounters = visitOverviewDetailMockDataNotEmpty.data.results[0];
+  const [mockAdmissionEncounter, mockVisitNoteEncounter] = mockVisitWithEncounters.encounters;
+
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(esmPatientChartSchema));
+    mockUserHasAccess.mockReturnValue(true);
+  });
+
+  it('passes onEditEncounter down to the timeline', async () => {
+    const user = userEvent.setup();
+    const onEditEncounter = vi.fn();
+    // The timeline offers one actions menu per encounter, so keep the visit to the one being edited
+    const visitWithVisitNoteOnly = { ...mockVisitWithEncounters, encounters: [mockVisitNoteEncounter] };
+
+    renderWithSwr(
+      <VisitSummary patientUuid={mockPatient.id} visit={visitWithVisitNoteOnly} onEditEncounter={onEditEncounter} />,
+    );
+
+    // The timeline is the tab the visit summary opens on
+    await user.click(screen.getByRole('button', { name: /encounter table actions menu/i }));
+
+    const actionsMenu = screen.getByRole('menu', { hidden: true });
+    const editItem = within(actionsMenu)
+      .getAllByRole('menuitem', { hidden: true })
+      .find((menuItem) => /edit this encounter/i.test(menuItem.textContent));
+    await user.click(editItem);
+
+    expect(onEditEncounter).toHaveBeenCalledTimes(1);
+    expect(onEditEncounter).toHaveBeenCalledWith(expect.objectContaining({ uuid: mockVisitNoteEncounter.uuid }), true);
+  });
+
+  it('passes onEditEncounter down to the completed forms tab', async () => {
+    const user = userEvent.setup();
+    const onEditEncounter = vi.fn();
+    const mockCompletedFormEncounter = {
+      ...mockAdmissionEncounter,
+      uuid: 'enc-with-schema',
+      form: {
+        uuid: 'form-with-schema',
+        display: 'POC Consent Form',
+        resources: [{ uuid: 'r1', name: jsonSchemaResourceName, valueReference: '{}' }],
+      },
+    };
+    const visitWithCompletedForm = {
+      ...mockVisitWithEncounters,
+      encounters: [...mockVisitWithEncounters.encounters, mockCompletedFormEncounter],
+    };
+
+    renderWithSwr(
+      <VisitSummary patientUuid={mockPatient.id} visit={visitWithCompletedForm} onEditEncounter={onEditEncounter} />,
+    );
+
+    await user.click(screen.getByRole('tab', { name: /completed forms/i }));
+    await clickEditEncounter(/poc consent form/i);
+
+    expect(onEditEncounter).toHaveBeenCalledTimes(1);
+    expect(onEditEncounter).toHaveBeenCalledWith(expect.objectContaining(mockCompletedFormEncounter), false);
+  });
+});
+
+describe('VisitSummary encounter deletion', () => {
+  const mockVisitWithEncounters = visitOverviewDetailMockDataNotEmpty.data.results[0];
+  const [mockAdmissionEncounter, mockVisitNoteEncounter] = mockVisitWithEncounters.encounters;
+
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(esmPatientChartSchema));
+    mockUserHasAccess.mockReturnValue(true);
+    mockDeleteEncounter.mockResolvedValue({});
+    // confirmAndDeleteEncounter calls the disposer showModal hands back.
+    mockShowModal.mockReturnValue(vi.fn());
+    mockUsePatientChartStore.mockReturnValue({
+      patientUuid: mockPatient.id,
+      patient: mockFhirPatient,
+      activeVisit: null,
+      setPatient: vi.fn(),
+      setActiveVisit: vi.fn(),
+    } as any);
+  });
+
+  it('deletes an encounter from the timeline', async () => {
+    const user = userEvent.setup();
+    // The timeline offers one actions menu per encounter, so keep the visit to the one being deleted
+    const visitWithVisitNoteOnly = { ...mockVisitWithEncounters, encounters: [mockVisitNoteEncounter] };
+
+    renderWithSwr(<VisitSummary patientUuid={mockPatient.id} visit={visitWithVisitNoteOnly} />);
+
+    // The timeline is the tab the visit summary opens on
+    await user.click(screen.getByRole('button', { name: /encounter table actions menu/i }));
+
+    const actionsMenu = screen.getByRole('menu', { hidden: true });
+    const deleteItem = within(actionsMenu)
+      .getAllByRole('menuitem', { hidden: true })
+      .find((menuItem) => /delete this encounter/i.test(menuItem.textContent));
+    await user.click(deleteItem);
+    confirmDeletion();
+
+    await waitFor(() => expect(mockDeleteEncounter).toHaveBeenCalledTimes(1));
+  });
+
+  it('deletes an encounter from the completed forms tab', async () => {
+    const user = userEvent.setup();
+    const mockCompletedFormEncounter = {
+      ...mockAdmissionEncounter,
+      uuid: 'enc-with-schema',
+      form: {
+        uuid: 'form-with-schema',
+        display: 'POC Consent Form',
+        resources: [{ uuid: 'r1', name: jsonSchemaResourceName, valueReference: '{}' }],
+      },
+    };
+    const visitWithCompletedForm = {
+      ...mockVisitWithEncounters,
+      encounters: [...mockVisitWithEncounters.encounters, mockCompletedFormEncounter],
+    };
+
+    renderWithSwr(<VisitSummary patientUuid={mockPatient.id} visit={visitWithCompletedForm} />);
+
+    await user.click(screen.getByRole('tab', { name: /completed forms/i }));
+    await clickDeleteEncounter(/poc consent form/i);
+    confirmDeletion();
+
+    await waitFor(() => expect(mockDeleteEncounter).toHaveBeenCalledTimes(1));
+  });
+});
+
+async function clickDeleteEncounter(rowName: RegExp) {
+  const user = userEvent.setup();
+  const row = screen.getByRole('row', { name: rowName });
+  await user.click(within(row).getByRole('button', { name: /expand current row/i }));
+  await user.click(screen.getByRole('button', { name: /danger\s*Delete this encounter/i }));
+}
+
+function confirmDeletion() {
+  const [, modalProps] = mockShowModal.mock.calls[0];
+  (modalProps as { onConfirmation: () => void }).onConfirmation();
+}
+
+async function clickEditEncounter(rowName: RegExp) {
+  const user = userEvent.setup();
+  const row = screen.getByRole('row', { name: rowName });
+  await user.click(within(row).getByRole('button', { name: /expand current row/i }));
+  await user.click(screen.getByRole('button', { name: /edit this encounter/i }));
+}
