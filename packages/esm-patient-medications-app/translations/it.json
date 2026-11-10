@@ -46,7 +46,7 @@
   "errorFetchingDrugOrderTemplates": "Errore nel recupero dei modelli di ordine farmaci",
   "errorFetchingDrugResults": "Errore nel recupero dei risultati per \"{{searchTerm}}\"",
   "errorFetchingDrugs": "Error fetching drugs",
-  "errorFetchingOrderConfig": "Errore nel recupero della configurazione dell'ordine",
+  "errorFetchingOrderConfig": "Error occurred when fetching Order config",
   "errorLoadingCategories": "Error loading drug categories",
   "errorLoadingTree": "Error loading category structure",
   "errorSavingDrugOrder": "Error saving drug order",

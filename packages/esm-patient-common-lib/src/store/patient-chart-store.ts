@@ -4,18 +4,18 @@ import { type PatientWorkspaceGroupProps } from '../workspaces';
 export interface PatientChartStore {
   patientUuid: string;
   patient: fhir.Patient;
-  visitContext: Visit;
+  activeVisit: Visit;
   /**
-   * The uuid of the visit context the patient-chart workspace group was last launched with.
-   * Note that when the visit context is changed, the workspaces group (with stale visit context)
-   * must close and reopen, and during that process its visitContext might differ from
-   * `store.visitContext`
+   * The uuid of the active visit the patient-chart workspace group was last launched with.
+   * Note that when the active visit is changed, the workspaces group (with the stale active visit)
+   * must close and reopen, and during that process its activeVisit might differ from
+   * `store.activeVisit`
    */
   workspaceGroupVisitUuid?: string | null;
   /**
    * The group props the patient-chart workspace group was last launched with. The workspace system
    * only relaunches the group when the patient or visit uuid changes, so these objects can be older
-   * than `patient` / `visitContext` above. See `getPatientChartWindowProps`.
+   * than `patient` / `activeVisit` above. See `getPatientChartWindowProps`.
    */
   workspaceGroupProps?: PatientWorkspaceGroupProps | null;
 }
@@ -25,7 +25,7 @@ const patientChartStoreName = 'patient-chart-global-store';
 const patientChartStore = createGlobalStore<PatientChartStore>(patientChartStoreName, {
   patientUuid: null,
   patient: null,
-  visitContext: null,
+  activeVisit: null,
   workspaceGroupVisitUuid: null,
   workspaceGroupProps: null,
 });
@@ -34,13 +34,13 @@ const patientChartStoreActions = {
   setPatient(_, patient: fhir.Patient) {
     return { patient, patientUuid: patient?.id ?? null };
   },
-  setVisitContext(_, visitContext: Visit) {
-    return { visitContext };
+  setActiveVisit(_, activeVisit: Visit) {
+    return { activeVisit };
   },
 } satisfies Actions<PatientChartStore>;
 
 /**
- * Records the visit context the patient-chart workspace group was last launched with.
+ * Records the active visit the patient-chart workspace group was last launched with.
  * Only the patient chart should call this, after it launches its workspace group.
  */
 export function setPatientChartWorkspaceGroupVisitUuid(
@@ -73,7 +73,7 @@ export function getPatientChartStoreState(patientUuid?: string): PatientChartSto
  *
  * Workspaces / extensions that can be mounted by other apps (ex: the start visit form in the queue's app,
  * the clinical forms workspace in the ward app)
- * should have the patient / visitContext explicitly passed in as props.
+ * should have the patient / visit explicitly passed in as props.
  *
  * As a safety feature, this hook requires the patientUuid as the input, and only
  * returns the actual store values if input patientUuid matches that in the store.
@@ -85,10 +85,10 @@ export function usePatientChartStore(patientUuid: string) {
   } else {
     const fakeStore: typeof store = {
       ...store,
-      setVisitContext: () => {},
+      setActiveVisit: () => {},
       patient: null,
       patientUuid: null,
-      visitContext: null,
+      activeVisit: null,
       workspaceGroupVisitUuid: null,
       workspaceGroupProps: null,
     };
