@@ -185,13 +185,26 @@ export function prepareObsForSubmission(
  * Uses the patient's birthDate to calculate their age in years.
  * Returns null if birthDate is missing or invalid.
  */
-export const getPatientAge = (patient: fhir.Patient): number | null => {
-  if (!patient.birthDate) {
+export const getPatientAge = (patient?: fhir.Patient | null): number | null => {
+  if (!patient?.birthDate) {
     return null;
   }
 
   const birthDate = dayjs(patient.birthDate);
   return birthDate.isValid() ? dayjs().diff(birthDate, 'years') : null;
+};
+
+/**
+ * Uses the patient's birthDate to calculate their completed age in months.
+ * Returns null if birthDate is missing or invalid.
+ */
+export const getPatientAgeInMonths = (patient?: fhir.Patient | null): number | null => {
+  if (!patient?.birthDate) {
+    return null;
+  }
+
+  const birthDate = dayjs(patient.birthDate);
+  return birthDate.isValid() ? dayjs().diff(birthDate, 'months') : null;
 };
 
 /**
