@@ -234,6 +234,8 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
                     </IconSwitch>
                   </ContentSwitcher>
                   <>
+                    {(showPrintButton || canRecordVitals) && <span className={styles.divider}>|</span>}
+
                     {showPrintButton && (
                       <Button
                         kind="ghost"
@@ -245,8 +247,6 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
                         {t('print', 'Print')}
                       </Button>
                     )}
-
-                    {(showPrintButton || canRecordVitals) && <span className={styles.divider}>|</span>}
 
                     {canRecordVitals && (
                       <Button
