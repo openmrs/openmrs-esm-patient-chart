@@ -9,8 +9,6 @@ interface VisitSummaryExtensionProps {
   /** Hosts outside the chart should pass this — see `EncountersTableProps`. */
   onEditEncounter?: EncountersTableProps['onEditEncounter'];
   /** Hosts outside the chart should pass this — see `EncountersTableProps`. */
-  mutateVisitContext?: EncountersTableProps['mutateVisitContext'];
-  /** Hosts outside the chart should pass this — see `EncountersTableProps`. */
   patient?: EncountersTableProps['patient'];
 }
 
@@ -22,22 +20,13 @@ const VisitSummaryExtension: React.FC<VisitSummaryExtensionProps> = ({
   visit,
   patientUuid,
   onEditEncounter,
-  mutateVisitContext,
   patient,
 }) => {
   if (!visit || !patientUuid) {
     return null;
   }
 
-  return (
-    <VisitSummary
-      visit={visit}
-      patientUuid={patientUuid}
-      onEditEncounter={onEditEncounter}
-      mutateVisitContext={mutateVisitContext}
-      patient={patient}
-    />
-  );
+  return <VisitSummary visit={visit} patientUuid={patientUuid} onEditEncounter={onEditEncounter} patient={patient} />;
 };
 
 export default VisitSummaryExtension;

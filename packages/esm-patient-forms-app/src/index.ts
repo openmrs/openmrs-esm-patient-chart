@@ -16,15 +16,17 @@ export function startupApp() {
 
 export const patientFormEntryWorkspace = getAsyncLifecycle(() => import('./forms/form-entry.workspace'), options);
 
+// The `exported…` names are referenced by other apps' routes.json. They are the same components as
+// the patient chart's: all of them take the patient / visit as window props.
 export const exportedPatientFormEntryWorkspace = getAsyncLifecycle(
-  () => import('./forms/exported-form-entry.workspace'),
+  () => import('./forms/form-entry.workspace'),
   options,
 );
 
 export const clinicalFormsWorkspace = getAsyncLifecycle(() => import('./forms/forms-dashboard.workspace'), options);
 
 export const exportedClinicalFormsWorkspace = getAsyncLifecycle(
-  () => import('./forms/exported-forms-dashboard.workspace'),
+  () => import('./forms/forms-dashboard.workspace'),
   options,
 );
 

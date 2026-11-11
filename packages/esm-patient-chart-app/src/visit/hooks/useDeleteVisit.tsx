@@ -4,7 +4,6 @@ import { useSWRConfig } from 'swr';
 import { type Visit, showSnackbar } from '@openmrs/esm-framework';
 import {
   invalidateVisitAndEncounterData,
-  invalidateVisitByUuid,
   usePatientChartStore,
 } from '@openmrs/esm-patient-common-lib';
 import { deleteVisit, restoreVisit } from '../visits-widget/visit.resource';
@@ -14,14 +13,13 @@ export function useDeleteVisit(activeVisit: Visit, onVisitDelete = () => {}, onV
   const { mutate: globalMutate } = useSWRConfig();
   const [isDeletingVisit, setIsDeletingVisit] = useState(false);
   const patientUuid = activeVisit?.patient?.uuid || '';
-  const { visitContext, setVisitContext } = usePatientChartStore(patientUuid);
+  const { activeVisit: storeActiveVisit, setActiveVisit } = usePatientChartStore(patientUuid);
 
   const restoreDeletedVisit = () => {
     restoreVisit(activeVisit?.uuid)
       .then(({ data: updatedVisit }) => {
         if (!updatedVisit.stopDatetime) {
-          const mutateSavedOrUpdatedVisit = () => invalidateVisitByUuid(globalMutate, updatedVisit.uuid);
-          setVisitContext(updatedVisit, mutateSavedOrUpdatedVisit);
+          setActiveVisit(updatedVisit);
         }
 
         // Use targeted SWR invalidation instead of global mutateVisit
@@ -55,8 +53,8 @@ export function useDeleteVisit(activeVisit: Visit, onVisitDelete = () => {}, onV
 
     deleteVisit(activeVisit?.uuid)
       .then(() => {
-        if (activeVisit.uuid == visitContext?.uuid) {
-          setVisitContext(null, null);
+        if (activeVisit.uuid == storeActiveVisit?.uuid) {
+          setActiveVisit(null);
         }
 
         // Use targeted SWR invalidation instead of global mutateVisit

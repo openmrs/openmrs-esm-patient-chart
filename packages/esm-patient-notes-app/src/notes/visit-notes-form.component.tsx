@@ -145,7 +145,7 @@ export interface VisitNotesFormProps {
   patient: fhir.Patient;
   visitContext: Visit;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
-  showPatientHeader?: boolean;
+  showPatientBanner?: boolean;
 }
 
 /**
@@ -159,7 +159,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   patient: patientProp,
   visitContext,
   closeWorkspace,
-  showPatientHeader = false,
+  showPatientBanner: showPatientBannerProp,
 }) => {
   const isEditing: boolean = Boolean(formContext === 'editing' && encounter?.uuid);
   const { t } = useTranslation();
@@ -168,9 +168,10 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   const { isPrimaryDiagnosisRequired, ...config } = useConfig<ConfigObject>();
   const patientUuid = propPatientUuid ?? patientProp?.id;
   const patient = usePatientForBanner(patientProp, patientUuid);
-  const showWorkspacePatientHeader = Boolean(showPatientHeader && hasPatientBannerData(patient) && patientUuid);
+  const showWorkspacePatientHeader = Boolean(
+    (showPatientBannerProp ?? isTablet) && hasPatientBannerData(patient) && patientUuid,
+  );
   const visitContextHeaderState = useMemo(() => ({ patientUuid }), [patientUuid]);
-  const memoizedState = useMemo(() => ({ patientUuid, patient }), [patientUuid, patient]);
   const { clinicianEncounterRole, encounterNoteTextConceptUuid, encounterTypeUuid, formConceptUuid } =
     config.visitNoteConfig;
   const [isLoadingDiagnoses, setIsLoadingDiagnoses] = useState(false);
@@ -650,21 +651,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       )}
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
         <ExtensionSlot name="visit-context-header-slot" state={visitContextHeaderState} />
-
-        {isTablet && (
-          <Row className={styles.headerGridRow}>
-            <ExtensionSlot
-              name="visit-form-header-slot"
-              className={styles.dataGridRow}
-              select={
-                showWorkspacePatientHeader
-                  ? (extensions) => extensions.filter((extension) => extension.name !== 'patient-details-tile')
-                  : undefined
-              }
-              state={memoizedState}
-            />
-          </Row>
-        )}
 
         <div className={styles.formContainer}>
           <Stack gap={2}>

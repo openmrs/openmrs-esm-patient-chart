@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import { Button, Tag, TagSkeleton, Tooltip } from '@carbon/react';
 import { AddIcon, getCoreTranslation, launchWorkspace2, translateFrom } from '@openmrs/esm-framework';
 import { useAllergies } from './allergy-intolerance.resource';
+import { getPatientChartWindowProps } from '@openmrs/esm-patient-common-lib';
 import { patientAllergiesFormWorkspace } from '../constants';
 import { severityOrder } from '../utils';
 import styles from './allergies-list.scss';
@@ -25,8 +26,12 @@ const AllergyList: React.FC<AllergyListProps> = ({ patientUuid, launchAllergyFor
     () =>
       launchAllergyForm
         ? launchAllergyForm()
-        : launchWorkspace2(patientAllergiesFormWorkspace, { formContext: 'creating' }),
-    [launchAllergyForm],
+        : launchWorkspace2(
+            patientAllergiesFormWorkspace,
+            { formContext: 'creating' },
+            getPatientChartWindowProps(patientUuid),
+          ),
+    [launchAllergyForm, patientUuid],
   );
 
   const sortedAllergies = allergies
