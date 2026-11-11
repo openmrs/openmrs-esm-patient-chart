@@ -21,7 +21,7 @@ import {
 } from '@carbon/react';
 import { Subtract } from '@carbon/react/icons';
 import { capitalize } from 'lodash-es';
-import { type Control, Controller, type FieldErrors, useController } from 'react-hook-form';
+import { type Control, Controller, type FieldErrors, type SetValueConfig, useController } from 'react-hook-form';
 import type {
   CommonMedicationValueCoded,
   DosingUnit,
@@ -875,7 +875,7 @@ export function DrugOrderForm({
 }
 
 interface CustomNumberInputProps {
-  setValue: (name: keyof MedicationOrderFormData, value: number) => void;
+  setValue: (name: keyof MedicationOrderFormData, value: number, options?: SetValueConfig) => void;
   control: Control<MedicationOrderFormData>;
   name: keyof MedicationOrderFormData;
   labelText: string;
@@ -889,6 +889,7 @@ const CustomNumberInput = ({ setValue, control, name, labelText, isTablet, ...in
 
   const {
     field: { onBlur, onChange, value, ref },
+    fieldState: { error },
   } = useController<MedicationOrderFormData>({ name, control });
 
   const handleChange = useCallback(
@@ -900,11 +901,11 @@ const CustomNumberInput = ({ setValue, control, name, labelText, isTablet, ...in
   );
 
   const increment = () => {
-    setValue(name, Number(value) + 1);
+    setValue(name, Number(value) + 1, { shouldValidate: true, shouldDirty: true });
   };
 
   const decrement = () => {
-    setValue(name, Math.max(Number(value) - 1, 0));
+    setValue(name, Math.max(Number(value) - 1, 0), { shouldValidate: true, shouldDirty: true });
   };
 
   return (
@@ -926,6 +927,8 @@ const CustomNumberInput = ({ setValue, control, name, labelText, isTablet, ...in
           id={name}
           labelText=""
           aria-labelledby={`${name}-label`}
+          invalid={Boolean(error?.message)}
+          invalidText={error?.message}
           {...inputProps}
         />
         <IconButton onClick={increment} label={t('increment', 'Increment')} size={responsiveSize}>

@@ -72,7 +72,7 @@ export function drugOrderBasketItemToFormValue(
 function useCreateMedicationOrderFormSchema() {
   const { t } = useTranslation();
   const { requireOutpatientQuantity } = useRequireOutpatientQuantity();
-  const { requireIndication } = useConfig<ConfigObject>();
+  const { requireIndication, requireDuration } = useConfig<ConfigObject>();
 
   const schema = useMemo(() => {
     const comboSchema = {
@@ -133,8 +133,18 @@ function useCreateMedicationOrderFormSchema() {
       patientInstructions: z.string().nullable(),
       asNeeded: z.boolean(),
       asNeededCondition: z.string().nullable(),
-      duration: z.number().nullable(),
-      durationUnit: z.object({ ...comboSchema }).nullable(),
+      duration: z
+        .number()
+        .nullable()
+        .refine((value) => !requireDuration || (typeof value === 'number' && value > 0), {
+          message: t('durationRequiredErrorMessage', 'Duration is required'),
+        }),
+      durationUnit: z
+        .object({ ...comboSchema })
+        .nullable()
+        .refine((value) => !requireDuration || Boolean(value), {
+          message: t('durationUnitRequiredErrorMessage', 'Duration unit is required'),
+        }),
       indication: requireIndication
         ? z.string().refine((value) => value !== '', {
             message: t('indicationErrorMessage', 'Indication is required'),
@@ -212,7 +222,7 @@ function useCreateMedicationOrderFormSchema() {
     });
 
     return z.discriminatedUnion('isFreeTextDosage', [nonFreeTextDosageSchema, freeTextDosageSchema]);
-  }, [requireIndication, requireOutpatientQuantity, t]);
+  }, [requireDuration, requireIndication, requireOutpatientQuantity, t]);
 
   return schema;
 }
