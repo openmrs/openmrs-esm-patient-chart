@@ -44,7 +44,6 @@ import {
   useOrderBasket,
   useOrderTypes,
   usePatientOrders,
-  useSystemVisitSetting,
 } from '@openmrs/esm-patient-common-lib';
 import { prepMedicationOrderPostData } from '@openmrs/esm-patient-medications-app/src/api/api';
 import { prepTestOrderPostData } from '@openmrs/esm-patient-tests-app/src/test-orders/api';
@@ -649,10 +648,6 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
   );
 
   const handleCancelOrder = useCallback(() => {
-    if (visitRequired && !visitContext) {
-      return;
-    }
-
     if (orderItem.type === ORDER_TYPES.DRUG_ORDER) {
       getDrugOrderByUuid(orderItem.uuid)
         .then((res) => {
@@ -673,7 +668,7 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
       setOrders([...orders, order]);
       launchWorkspace2('order-basket', {}, windowProps, groupProps);
     }
-  }, [groupProps, orderItem, orders, setOrders, visitContext, visitRequired, windowProps]);
+  }, [orderItem, setOrders, orders, windowProps, groupProps]);
 
   const handleModifyOrder = useCallback(() => {
     if (orderItem.type === ORDER_TYPES.DRUG_ORDER) {
@@ -712,7 +707,7 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
         groupProps,
       );
     }
-  }, [groupProps, orderItem, windowProps]);
+  }, [orderItem, windowProps, groupProps]);
 
   const handleAddOrEditTestResults = useCallback(() => {
     launchWorkspace2(
@@ -758,7 +753,7 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
         )}
         <OverflowMenuItem
           className={styles.menuItem}
-          disabled={alreadyInBasket || orderItem?.action === 'DISCONTINUE' || (visitRequired && !visitContext)}
+          disabled={alreadyInBasket || orderItem?.action === 'DISCONTINUE'}
           hasDivider
           id="discontinue"
           isDelete

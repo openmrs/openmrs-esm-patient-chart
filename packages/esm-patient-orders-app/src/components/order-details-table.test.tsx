@@ -1,7 +1,7 @@
 import React from 'react';
 import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import { useReactToPrint } from 'react-to-print';
-import { screen, render, within } from '@testing-library/react';
+import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
   type ConfigObject,
@@ -17,7 +17,6 @@ import {
   useOrderTypes,
   usePatientOrders,
   useOrderBasket,
-  useSystemVisitSetting,
 } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from '../config-schema';
 import { mockOrders, mockSessionDataResponse } from '__mocks__';
@@ -27,7 +26,6 @@ import OrderDetailsTable from './order-details-table.component';
 const mockUsePatientOrders = vi.mocked(usePatientOrders);
 const mockUseOrderTypes = vi.mocked(useOrderTypes);
 const mockUseOrderBasket = vi.mocked(useOrderBasket);
-const mockUseSystemVisitSetting = vi.mocked(useSystemVisitSetting);
 const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 const mockSession = vi.mocked(useSession);
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
@@ -51,7 +49,6 @@ vi.mock('@openmrs/esm-patient-common-lib', async () => {
     useOrderTypes: vi.fn(),
     usePatient: vi.fn(),
     useOrderBasket: vi.fn(),
-    useSystemVisitSetting: vi.fn(),
   };
 });
 
@@ -137,11 +134,6 @@ describe('OrderDetailsTable', () => {
       isLoading: false,
       isValidating: false,
       mutate: vi.fn(),
-    });
-    mockUseSystemVisitSetting.mockReturnValue({
-      systemVisitEnabled: true,
-      isLoadingSystemVisitSetting: false,
-      errorFetchingSystemVisitSetting: null,
     });
   });
 
@@ -472,7 +464,7 @@ describe('OrderDetailsTable', () => {
 
     await screen.findByRole('table');
 
-    const addButton = screen.getByRole('button', { name: /add addicon/i });
+    const addButton = screen.getByRole('button', { name: /add/i });
     expect(addButton).toBeInTheDocument();
   });
 
@@ -489,7 +481,7 @@ describe('OrderDetailsTable', () => {
 
     await screen.findByRole('table');
 
-    const addButton = screen.queryByRole('button', { name: /^add$/i });
+    const addButton = screen.queryByRole('button', { name: /add/i });
     expect(addButton).not.toBeInTheDocument();
   });
 

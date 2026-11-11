@@ -29,7 +29,6 @@ import {
   type Order,
   type OrderBasketWindowProps,
   type PatientWorkspaceGroupProps,
-  useSystemVisitSetting,
   useLaunchWorkspaceRequiringVisit,
   useOrderBasket,
   useStartVisitIfNeeded,
@@ -425,10 +424,6 @@ function OrderBasketItemActions({
     [patient, medication.encounter.visit],
   );
   const handleDiscontinueClick = useCallback(() => {
-    if (visitRequired && !visitContext) {
-      return;
-    }
-
     setItems([...items, buildMedicationOrder(medication, 'DISCONTINUE')]);
     launchWorkspace2<{}, OrderBasketWindowProps, PatientWorkspaceGroupProps>(
       'order-basket',
@@ -482,7 +477,7 @@ function OrderBasketItemActions({
       {showRenewButton && (
         <OverflowMenuItem
           className={styles.menuItem}
-          disabled={alreadyInBasket || (visitRequired && !visitContext)}
+          disabled={alreadyInBasket}
           id="renew"
           itemText={t('orderActionRenew', 'Renew')}
           onClick={handleRenewClick}
@@ -491,7 +486,7 @@ function OrderBasketItemActions({
       {showDiscontinueButton && (
         <OverflowMenuItem
           className={styles.menuItem}
-          disabled={alreadyInBasket || (visitRequired && !visitContext)}
+          disabled={alreadyInBasket}
           hasDivider
           id="discontinue"
           isDelete
