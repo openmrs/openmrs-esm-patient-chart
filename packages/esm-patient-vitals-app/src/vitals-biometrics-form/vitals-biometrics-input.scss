@@ -153,6 +153,12 @@
   margin-top: layout.$spacing-03;
 }
 
+.normalRange {
+  @include type.type-style('helper-text-01');
+  color: $text-02;
+  margin: layout.$spacing-02 0 layout.$spacing-03;
+}
+
 .invalidInputError {
   max-width: 11rem;
   color: $danger;
