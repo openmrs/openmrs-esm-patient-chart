@@ -21,6 +21,8 @@ import {
   useConfig,
   useLayoutType,
   UserHasAccess,
+  useSession,
+  userHasAccess,
 } from '@openmrs/esm-framework';
 import type { ConfigObject } from '../config-schema';
 import type { VitalsTableHeader, VitalsTableRow } from './types';
@@ -61,6 +63,9 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
   const { data: vitals, error, isLoading, isValidating } = useVitalsAndBiometrics(patientUuid);
   const { conceptUnits } = useConceptUnits();
   const showPrintButton = config.vitals.showPrintButton && !chartView;
+  const session = useSession();
+  const canRecordVitals =
+    userHasAccess('Add Encounters', session?.user) && userHasAccess('Add Observations', session?.user);
 
   const patientDetails = useMemo(() => {
     const getGender = (gender: string): string => {
@@ -240,10 +245,10 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
                         {t('print', 'Print')}
                       </Button>
                     )}
-                    <UserHasAccess
-                      privilege="Add Vitals"
-                    >
-                      <span className={styles.divider}>|</span>
+
+                    {(showPrintButton || canRecordVitals) && <span className={styles.divider}>|</span>}
+
+                    {canRecordVitals && (
                       <Button
                         kind="ghost"
                         renderIcon={AddIcon}
@@ -252,7 +257,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
                       >
                         {t('add', 'Add')}
                       </Button>
-                    </UserHasAccess>
+                    )}
                   </>
                 </div>
               </CardHeader>
