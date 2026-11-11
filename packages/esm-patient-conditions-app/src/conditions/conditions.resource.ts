@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react';
 import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 import { type DataTableSortState } from '@carbon/react';
 import { fhirBaseUrl, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject } from '../config-schema';
 
 export interface FHIRConditionResponse {
   entry: Array<{
@@ -151,15 +153,114 @@ export function useConditions(patientUuid: string) {
   };
 }
 
+interface ConceptSetMember {
+  uuid: string;
+  display: string;
+  names?: Array<{ display: string }>;
+}
+
+interface ConceptSetResponse {
+  uuid: string;
+  setMembers?: Array<ConceptSetMember>;
+}
+
+const conceptSetMembersRepresentation = 'custom:(uuid,setMembers:(uuid,display,names:(display)))';
+
+function normalizeSearchText(text: string) {
+  return (text ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase()
+    .trim();
+}
+
+/**
+ * Loads the members of the configured condition concept sets once, de-duplicated by UUID.
+ */
+function useConditionConceptSetMembers(conceptSetUuids: Array<string>) {
+  const { data, error, isLoading } = useSWRImmutable<Array<ConceptSetMember>, Error>(
+    conceptSetUuids?.length ? ['conditionConceptSets', ...conceptSetUuids] : null,
+    async ([, ...uuids]: Array<string>) => {
+      const responses = await Promise.all(
+        uuids.map((uuid) =>
+          openmrsFetch<ConceptSetResponse>(`${restBaseUrl}/concept/${uuid}?v=${conceptSetMembersRepresentation}`),
+        ),
+      );
+      const membersByUuid = new Map<string, ConceptSetMember>();
+      responses.forEach((response) =>
+        (response?.data?.setMembers ?? []).forEach((member) => {
+          if (member?.uuid && !membersByUuid.has(member.uuid)) {
+            membersByUuid.set(member.uuid, member);
+          }
+        }),
+      );
+      return Array.from(membersByUuid.values());
+    },
+  );
+
+  return { members: data, error, isLoading };
+}
+
+/**
+ * Returns the set members whose display name or any other name contains every word of the search term,
+ * ignoring case and accents. Members whose display name starts with the search term are listed first.
+ */
+export function filterConditionConceptSetMembers(
+  members: Array<ConceptSetMember>,
+  searchTerm: string,
+): Array<CodedCondition> {
+  const normalizedTerm = normalizeSearchText(searchTerm);
+  if (!normalizedTerm || !members?.length) {
+    return [];
+  }
+  const words = normalizedTerm.split(/\s+/);
+
+  return members
+    .map((member) => ({
+      member,
+      display: normalizeSearchText(member.display),
+      names: [member.display, ...(member.names ?? []).map((name) => name.display)].map(normalizeSearchText),
+    }))
+    .filter(({ names }) => names.some((name) => words.every((word) => name.includes(word))))
+    .sort((a, b) => {
+      const aStarts = a.display.startsWith(normalizedTerm) ? 0 : 1;
+      const bStarts = b.display.startsWith(normalizedTerm) ? 0 : 1;
+      return aStarts - bStarts || a.display.localeCompare(b.display);
+    })
+    .map(({ member }) => ({ uuid: member.uuid, display: member.display }));
+}
+
 export function useConditionsSearch(conditionToLookup: string) {
-  const config = useConfig();
+  const config = useConfig<ConfigObject>();
   const conditionConceptClassUuid = config?.conditionConceptClassUuid;
+  const conditionConceptSets = config?.conditionConceptSets ?? [];
+  const searchByConceptSets = conditionConceptSets.length > 0;
+
   const conditionsSearchUrl = `${restBaseUrl}/concept?name=${conditionToLookup}&searchType=fuzzy&class=${conditionConceptClassUuid}&v=custom:(uuid,display)`;
 
   const { data, error, isLoading } = useSWR<{ data: { results: Array<CodedCondition> } }, Error>(
-    conditionToLookup ? conditionsSearchUrl : null,
+    conditionToLookup && !searchByConceptSets ? conditionsSearchUrl : null,
     openmrsFetch,
   );
+
+  const {
+    members,
+    error: conceptSetError,
+    isLoading: isLoadingConceptSets,
+  } = useConditionConceptSetMembers(searchByConceptSets ? conditionConceptSets : null);
+
+  const conceptSetResults = useMemo(
+    () => (searchByConceptSets ? filterConditionConceptSetMembers(members, conditionToLookup) : []),
+    [searchByConceptSets, members, conditionToLookup],
+  );
+
+  if (searchByConceptSets) {
+    return {
+      searchResults: conceptSetResults,
+      error: conceptSetError,
+      isSearching: Boolean(conditionToLookup) && isLoadingConceptSets,
+    };
+  }
 
   return {
     searchResults: data?.data?.results ?? [],
