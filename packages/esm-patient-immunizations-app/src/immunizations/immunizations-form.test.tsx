@@ -80,10 +80,10 @@ vi.mock('./immunizations.resource', () => ({
 const testProps: PatientWorkspace2DefinitionProps<{}, {}> = {
   closeWorkspace: mockCloseWorkspace,
   groupProps: {
+    showPatientBanner: 'tabletOnly',
     patientUuid: mockPatient.id,
     patient: mockPatient,
-    visitContext: mockCurrentVisit,
-    mutateVisitContext: null,
+    activeVisit: mockCurrentVisit,
   },
   workspaceName: '',
   launchChildWorkspace: vi.fn(),

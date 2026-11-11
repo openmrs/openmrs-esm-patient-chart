@@ -973,4 +973,25 @@ describe('DrugOrderForm - patient header', () => {
 
     expect(screen.getByText(expected)).toBeInTheDocument();
   });
+
+  describe('with a birthdate in the current year, month or day', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-11-02T12:00:00Z'));
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it.each([
+      { label: 'an estimated birthdate known to the year', birthDate: '2026', expected: '2026' },
+      { label: 'an estimated birthdate known to the month', birthDate: '2026-11', expected: 'Nov — 2026' },
+      { label: 'an exact birthdate', birthDate: '2026-11-02', expected: '02 — Nov — 2026' },
+    ])('shows $label as a date instead of "Today"', ({ birthDate, expected }) => {
+      renderDrugOrderForm(createNewOrderBasketItem(), vi.fn(), { ...mockPatient, birthDate });
+
+      expect(screen.getByText(expected)).toBeInTheDocument();
+    });
+  });
 });

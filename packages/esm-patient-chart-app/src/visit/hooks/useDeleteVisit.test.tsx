@@ -32,7 +32,7 @@ const mockUsePatientChartStore = vi.mocked(usePatientChartStore);
 const mockInvalidateVisitAndEncounterData = vi.mocked(invalidateVisitAndEncounterData);
 
 const mockGlobalMutate = vi.fn();
-const mockSetVisitContext = vi.fn();
+const mockSetActiveVisit = vi.fn();
 
 const mockVisitType = {
   uuid: 'visit-type-123',
@@ -59,10 +59,9 @@ describe('useDeleteVisit', () => {
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: 'patient-123',
       patient: null,
-      visitContext: null,
-      mutateVisitContext: vi.fn(),
+      activeVisit: null,
       setPatient: vi.fn(),
-      setVisitContext: mockSetVisitContext,
+      setActiveVisit: mockSetActiveVisit,
     });
 
     mockUseSWRConfig.mockReturnValue({
@@ -138,10 +137,9 @@ describe('useDeleteVisit', () => {
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: 'patient-123',
       patient: null,
-      visitContext: null,
-      mutateVisitContext: vi.fn(),
+      activeVisit: null,
       setPatient: vi.fn(),
-      setVisitContext: mockSetVisitContext,
+      setActiveVisit: mockSetActiveVisit,
     });
     mockUseSWRConfig.mockReturnValue({
       mutate: mockGlobalMutate,
@@ -184,10 +182,9 @@ describe('useDeleteVisit', () => {
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: 'patient-123',
       patient: null,
-      visitContext: null,
-      mutateVisitContext: vi.fn(),
+      activeVisit: null,
       setPatient: vi.fn(),
-      setVisitContext: mockSetVisitContext,
+      setActiveVisit: mockSetActiveVisit,
     });
     mockUseSWRConfig.mockReturnValue({
       mutate: mockGlobalMutate,
