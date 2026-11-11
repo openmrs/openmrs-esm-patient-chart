@@ -21,7 +21,6 @@ const testProps = {
 
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const mockUseVitalsAndBiometrics = vi.mocked(useVitalsAndBiometrics);
-//add after UserHasAccess Changes
 const mockUserHasAccess = vi.mocked(UserHasAccess)
 
 
