@@ -1105,6 +1105,62 @@ describe('LabResultsForm', () => {
     expect(updateOrderResult).not.toHaveBeenCalled();
   });
 
+  test('fills in a saved numeric result of 0', async () => {
+    mockUseCompletedLabResultsArray.mockReturnValue({
+      completeLabResults: [{ uuid: 'saved-obs-uuid', concept: { uuid: 'concept-uuid' }, value: 0 } as Observation],
+      isLoading: false,
+      error: null,
+      mutate: vi.fn(),
+    });
+
+    render(<LabResultsForm {...testProps} />);
+
+    const input = await screen.findByLabelText(`Test Concept (0 - 100 mg/dL)`);
+    await waitFor(() => expect(input).toHaveValue(0));
+  });
+
+  test('fills in a saved numeric result of 0 for a panel member', async () => {
+    mockUseOrderConceptByUuids.mockReturnValue({
+      concepts: [
+        {
+          uuid: 'concept-uuid',
+          display: 'Test Panel',
+          set: true,
+          datatype: { display: 'N/A', hl7Abbreviation: 'ZZ' },
+          setMembers: [
+            {
+              uuid: 'member-uuid',
+              display: 'Panel Member',
+              setMembers: [],
+              datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+            },
+          ],
+        },
+      ] as LabOrderConcept[],
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+    mockUseCompletedLabResultsArray.mockReturnValue({
+      completeLabResults: [
+        {
+          uuid: 'saved-obs-uuid',
+          concept: { uuid: 'concept-uuid' },
+          groupMembers: [{ uuid: 'member-obs-uuid', concept: { uuid: 'member-uuid' }, value: 0 }],
+        } as unknown as Observation,
+      ],
+      isLoading: false,
+      error: null,
+      mutate: vi.fn(),
+    });
+
+    render(<LabResultsForm {...testProps} />);
+
+    const input = await screen.findByRole('spinbutton', { name: /panel member/i });
+    await waitFor(() => expect(input).toHaveValue(0));
+  });
+
   test('completes results saved by an earlier attempt when the retry runs before the loaded results refresh', async () => {
     const user = userEvent.setup();
     mockFetchSavedLabResults.mockResolvedValueOnce([
