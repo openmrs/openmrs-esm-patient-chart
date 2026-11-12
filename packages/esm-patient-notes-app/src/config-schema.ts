@@ -17,6 +17,13 @@ export const configSchema = {
     _default: '165095AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     _description: 'The concept UUID for storing sticky notes as observations',
   },
+  providerRoles: {
+    _type: Type.Array,
+    _elements: { _type: Type.UUID },
+    _default: [],
+    _description:
+      'Array of provider role uuids. Users with the "Edit Encounters On Behalf Of Others" privilege can choose the clinician of a visit note; if this is specified, only providers with one of these roles are listed. Empty means all providers.',
+  },
   visitNoteConfig: notesConfigSchema,
 };
 
@@ -24,5 +31,6 @@ export interface ConfigObject {
   diagnosisConceptClass: string;
   isPrimaryDiagnosisRequired: boolean;
   stickyNoteConceptUuid: string;
+  providerRoles: Array<string>;
   visitNoteConfig: VisitNoteConfigObject;
 }

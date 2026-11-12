@@ -5,8 +5,10 @@ import {
   fhirBaseUrl,
   restBaseUrl,
   openmrsFetch,
+  toOmrsIsoString,
   useConfig,
   type OpenmrsResource,
+  type Visit,
 } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
@@ -31,7 +33,7 @@ const pageSize = 100;
 /** We use this as the first value to the SWR key to be able to invalidate all relevant cached entries */
 const swrKeyNeedle = Symbol('vitalsAndBiometrics');
 const encounterRepresentation =
-  'custom:(uuid,encounterDatetime,encounterType:(uuid,display),obs:(uuid,concept:(uuid,display),value,interpretation))';
+  'custom:(uuid,encounterDatetime,encounterType:(uuid,display),encounterProviders:(uuid,encounterRole:(uuid),provider:(uuid,display,person:(display))),visit:(uuid,startDatetime,stopDatetime),obs:(uuid,concept:(uuid,display),value,interpretation))';
 
 type ConceptRange = {
   display: string;
@@ -79,6 +81,12 @@ export type VitalsAndBiometricsFieldValuesMap = Map<string, { value: number | st
 interface PartialEncounter extends OpenmrsResource {
   encounterType: OpenmrsResource;
   encounterDatetime: string;
+  visit?: Pick<Visit, 'uuid' | 'startDatetime' | 'stopDatetime'> | null;
+  encounterProviders?: Array<{
+    uuid: string;
+    encounterRole?: { uuid: string };
+    provider?: { uuid: string; display?: string; person?: { display?: string } };
+  }>;
   obs: Array<OpenmrsResource>;
 }
 
@@ -524,6 +532,15 @@ function mapVitalsAndBiometrics(resource: FHIRObservationResource): MappedVitals
   };
 }
 
+export interface VitalsEncounterOptions {
+  /** A backdated encounter datetime. Omitted when the server should stamp (or keep) the datetime. */
+  encounterDatetime?: Date | null;
+  /** The clinician the encounter is placed on behalf of. Omitted when the server should attribute it to the user. */
+  encounterProviders?: Array<{ provider: string; encounterRole: string }>;
+  /** The visit to attach a new encounter to. Required to date an encounter explicitly. */
+  visitUuid?: string;
+}
+
 export function createOrUpdateVitalsAndBiometrics(
   patientUuid: string,
   encounterTypeUuid: string,
@@ -531,6 +548,7 @@ export function createOrUpdateVitalsAndBiometrics(
   location: string,
   vitalsAndBiometricsObs: Array<OpenmrsResource>,
   abortController: AbortController,
+  options: VitalsEncounterOptions = {},
 ) {
   const url = encounterUuid ? `${restBaseUrl}/encounter/${encounterUuid}` : `${restBaseUrl}/encounter`;
 
@@ -541,6 +559,16 @@ export function createOrUpdateVitalsAndBiometrics(
   if (!encounterUuid) {
     encounter['location'] = location;
     encounter['encounterType'] = encounterTypeUuid;
+    // Attach the encounter to its visit explicitly, as the server can't infer the right visit for a backdated one
+    if (options.visitUuid) {
+      encounter['visit'] = options.visitUuid;
+    }
+  }
+  if (options.encounterDatetime) {
+    encounter['encounterDatetime'] = toOmrsIsoString(options.encounterDatetime);
+  }
+  if (options.encounterProviders?.length) {
+    encounter['encounterProviders'] = options.encounterProviders;
   }
   return openmrsFetch(url, {
     method: 'POST',
