@@ -3,7 +3,8 @@
   "extends": ["//"],
   "tasks": {
     "extract-translations": {
-      "inputs": ["src/app/**/*.ts", "src/app/**/*.html", "translations/en.json", "tools/extract-translations.mjs"]
+      "inputs": ["src/app/**/*.ts", "src/app/**/*.html", "translations/en.json", "tools/extract-translations.mjs"],
+      "outputs": ["translations/en.json"]
     }
   }
 }
