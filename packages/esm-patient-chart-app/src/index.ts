@@ -12,6 +12,7 @@ import markPatientDeceasedActionButtonComponent from './actions-buttons/mark-pat
 import pastVisitsOverviewComponent from './visit/visits-widget/visit-detail-overview.component';
 import patientChartPageComponent from './root.component';
 import patientDetailsTileComponent from './patient-details-tile/patient-details-tile.component';
+import encounterActionButtonComponent from './exported-workspaces/encounter-action-button.component';
 import startVisitActionButtonComponent from './actions-buttons/start-visit.component';
 import startVisitActionButtonOnPatientSearch from './visit/start-visit-button.component';
 import stopVisitActionButtonComponent from './actions-buttons/stop-visit.component';
@@ -136,6 +137,16 @@ export const markPatientDeceasedForm = getAsyncLifecycle(
     moduleName,
   },
 );
+
+export const encounterActionButton = getSyncLifecycle(encounterActionButtonComponent, {
+  featureName: 'encounter-action-button',
+  moduleName,
+});
+
+export const encounterWorkspace = getAsyncLifecycle(() => import('./exported-workspaces/encounter.workspace'), {
+  featureName: 'encounter-workspace',
+  moduleName,
+});
 
 export const startVisitModal = getAsyncLifecycle(() => import('./visit/visit-prompt/start-visit-dialog.modal'), {
   featureName: 'start visit',
