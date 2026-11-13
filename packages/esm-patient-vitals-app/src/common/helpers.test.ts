@@ -1,4 +1,11 @@
-import { assessValue, interpretBloodPressure, prepareObsForSubmission } from './helpers';
+import {
+  assessValue,
+  getPatientAge,
+  getPatientAgeInMonths,
+  interpretBloodPressure,
+  prepareObsForSubmission,
+} from './helpers';
+import dayjs from 'dayjs';
 import { vi, describe, it, expect } from 'vitest';
 import type { ObsReferenceRanges } from './types';
 import type { VitalsAndBiometricsFieldValuesMap } from './data.resource';
@@ -180,5 +187,31 @@ describe('prepareObsForSubmission', () => {
 
     expect(result.toBeVoided).toEqual([{ uuid: 'old-note-uuid', voided: true }]);
     expect(result.newObs).toEqual([]);
+  });
+});
+
+describe('getPatientAge and getPatientAgeInMonths', () => {
+  it('returns null if patient or birthDate is missing or invalid', () => {
+    expect(getPatientAge(null)).toBeNull();
+    expect(getPatientAge({} as any)).toBeNull();
+    expect(getPatientAge({ birthDate: 'invalid-date' } as any)).toBeNull();
+
+    expect(getPatientAgeInMonths(null)).toBeNull();
+    expect(getPatientAgeInMonths({} as any)).toBeNull();
+    expect(getPatientAgeInMonths({ birthDate: 'invalid-date' } as any)).toBeNull();
+  });
+
+  it('correctly calculates age in years and months', () => {
+    const twoMonthsAgo = dayjs().subtract(2, 'months').format('YYYY-MM-DD');
+    const patient2m: fhir.Patient = { resourceType: 'Patient', birthDate: twoMonthsAgo };
+
+    expect(getPatientAge(patient2m)).toBe(0);
+    expect(getPatientAgeInMonths(patient2m)).toBe(2);
+
+    const fiveYearsAgo = dayjs().subtract(5, 'years').format('YYYY-MM-DD');
+    const patient5y: fhir.Patient = { resourceType: 'Patient', birthDate: fiveYearsAgo };
+
+    expect(getPatientAge(patient5y)).toBe(5);
+    expect(getPatientAgeInMonths(patient5y)).toBe(60);
   });
 });
