@@ -6,6 +6,7 @@ import {
   useDrugFavorites,
   removeDrugFavorite,
   saveDrugFavorites,
+  withUserProperty,
 } from './drug-favorites.resource';
 import type { DrugFavoriteOrder } from './types';
 
@@ -26,25 +27,14 @@ export function useFavoritesActions() {
     async (updatedFavorites: DrugFavoriteOrder[], messages: SnackbarMessages): Promise<boolean> => {
       if (!user?.uuid || isLoading) return false;
 
-      mutate(
-        (currentData) =>
-          currentData
-            ? {
-                data: {
-                  ...currentData.data,
-                  userProperties: {
-                    ...currentData.data.userProperties,
-                    [FAVORITES_PROPERTY_KEY]: JSON.stringify({ favorites: updatedFavorites }),
-                  },
-                },
-              }
-            : currentData,
-        false,
-      );
-
       try {
-        await saveDrugFavorites(user.uuid, updatedFavorites);
-        mutate();
+        // Passing the save to mutate makes SWR discard refetches that land while other saves are still queued.
+        // The optimistic update builds on the displayed data so it keeps other pending optimistic changes.
+        await mutate(saveDrugFavorites(user.uuid, updatedFavorites), {
+          optimisticData: (_, displayedData) =>
+            withUserProperty(displayedData, FAVORITES_PROPERTY_KEY, JSON.stringify({ favorites: updatedFavorites })),
+          populateCache: false,
+        });
         showSnackbar({
           isLowContrast: true,
           kind: 'success',
@@ -53,7 +43,6 @@ export function useFavoritesActions() {
         });
         return true;
       } catch (error: unknown) {
-        mutate();
         reportError(error);
         showSnackbar({
           isLowContrast: false,
