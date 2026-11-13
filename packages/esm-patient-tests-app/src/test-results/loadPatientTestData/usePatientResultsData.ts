@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { type PatientData } from '@openmrs/esm-patient-common-lib';
 import loadPatientData from './loadPatientData';
 
@@ -14,29 +14,29 @@ const usePatientResultsData = (patientUuid: string): LoadingState => {
     loaded: false,
     error: undefined,
   });
-  const isMountedRef = useRef(true);
-
   useEffect(() => {
-    isMountedRef.current = true;
+    // Scoped to this patient request, so an earlier request cannot update a later patient's chart.
+    let active = true;
     if (patientUuid) {
       const [data, reloadedDataPromise] = loadPatientData(patientUuid);
-      if (!!data && isMountedRef.current) {
-        setState({ sortedObs: data, loaded: true, error: undefined });
-      }
+      // Reset previous patient data immediately, even when the new patient has no cache.
+      setState({ sortedObs: data ?? {}, loaded: Boolean(data), error: undefined });
       reloadedDataPromise
         .then((reloadedData) => {
-          if (reloadedData !== data && isMountedRef.current) {
+          if (reloadedData !== data && active) {
             setState({ sortedObs: reloadedData, loaded: true, error: undefined });
           }
         })
         .catch((error) => {
-          if (isMountedRef.current) {
-            setState({ sortedObs: {}, loaded: true, error });
+          if (active) {
+            setState({ sortedObs: data ?? {}, loaded: true, error });
           }
         });
+    } else {
+      setState({ sortedObs: {}, loaded: false, error: undefined });
     }
     return () => {
-      isMountedRef.current = false;
+      active = false;
     };
   }, [patientUuid]);
 
