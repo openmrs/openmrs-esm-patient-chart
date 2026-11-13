@@ -1,3 +1,5 @@
+import type { ConceptReferenceRange as FormEngineConceptReferenceRange } from '@openmrs/ngx-formentry';
+
 interface OpenmrsResource {
   display: string;
   uuid: string;
@@ -199,18 +201,11 @@ interface QuestionOptions {
  * is evaluated by the backend against patient factors such as age or gender, which is why these
  * are fetched per patient.
  */
-export interface ConceptReferenceRange {
+export interface ConceptReferenceRange extends FormEngineConceptReferenceRange {
   uuid: string;
   display?: string;
   /** The UUID of the concept the range belongs to. */
   concept: string;
-  hiNormal?: number | null;
-  hiAbsolute?: number | null;
-  hiCritical?: number | null;
-  lowNormal?: number | null;
-  lowAbsolute?: number | null;
-  lowCritical?: number | null;
-  units?: string | null;
 }
 
 interface QuestionOptionsAnswer {
