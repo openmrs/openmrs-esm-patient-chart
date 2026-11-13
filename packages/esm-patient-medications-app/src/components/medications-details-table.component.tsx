@@ -28,7 +28,6 @@ import {
   type DrugOrderBasketItem,
   type Order,
   type OrderBasketWindowProps,
-  type PatientWorkspaceGroupProps,
   useLaunchWorkspaceRequiringVisit,
   useOrderBasket,
   useStartVisitIfNeeded,
@@ -409,41 +408,27 @@ function OrderBasketItemActions({
     itemsRef.current = items;
   }, [items]);
 
-  const workspaceGroupProps: PatientWorkspaceGroupProps = useMemo(
-    () => ({
-      patient,
-      patientUuid: patient.id,
-      activeVisit: medication.encounter.visit,
-      showPatientBanner: 'tabletOnly',
-    }),
-    [patient, medication],
-  );
-  // The workspaces read the patient / visit from their window props, not from the group props
+  // The workspaces read the patient / visit from their window props. No group props are passed: the chart's
+  // workspace group only changes when the patient's active visit does, and this order's visit may be a past one.
   const workspaceWindowProps = useMemo(
     () => ({ patient, patientUuid: patient.id, visitContext: medication.encounter.visit }),
     [patient, medication.encounter.visit],
   );
   const handleDiscontinueClick = useCallback(() => {
     setItems([...items, buildMedicationOrder(medication, 'DISCONTINUE')]);
-    launchWorkspace2<{}, OrderBasketWindowProps, PatientWorkspaceGroupProps>(
-      'order-basket',
-      {},
-      workspaceWindowProps,
-      workspaceGroupProps,
-    );
-  }, [items, setItems, medication, workspaceWindowProps, workspaceGroupProps]);
+    launchWorkspace2<{}, OrderBasketWindowProps, {}>('order-basket', {}, workspaceWindowProps);
+  }, [items, setItems, medication, workspaceWindowProps]);
 
   const handleModifyClick = useCallback(() => {
-    launchWorkspace2<AddDrugOrderWorkspaceProps, OrderBasketWindowProps, PatientWorkspaceGroupProps>(
+    launchWorkspace2<AddDrugOrderWorkspaceProps, OrderBasketWindowProps, {}>(
       'add-drug-order',
       {
         order: buildMedicationOrder(medication, 'REVISE'),
         orderToEditOrdererUuid: medication.orderer.uuid,
       },
       workspaceWindowProps,
-      workspaceGroupProps,
     );
-  }, [medication, workspaceWindowProps, workspaceGroupProps]);
+  }, [medication, workspaceWindowProps]);
 
   const handleRenewClick = useCallback(async () => {
     const canProceed = await startVisitIfNeeded();
