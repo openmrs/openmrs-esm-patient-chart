@@ -13,7 +13,6 @@ import {
   useFeatureFlag,
   useLayoutType,
   usePagination,
-  userHasAccess,
   useSession,
   type Visit,
 } from '@openmrs/esm-framework';
@@ -29,6 +28,7 @@ import {
   downloadPdf,
   encounterHasJsonSchemaForm,
   mapEncounter,
+  useCanPrintEncounters,
   type EncountersTableProps,
 } from '../../past-visits-components/encounters-table/encounters-table.resource';
 import EncounterObservations from '../../encounter-observations';
@@ -37,7 +37,6 @@ import styles from './visit-timeline.scss';
 interface VisitTimelineProps {
   patientUuid: string;
   onEditEncounter?: EncountersTableProps['onEditEncounter'];
-  mutateVisitContext?: EncountersTableProps['mutateVisitContext'];
   patient?: EncountersTableProps['patient'];
   /**
    * Rendered straight from `visit.encounters`, so the visit must be fetched with the fields
@@ -49,15 +48,15 @@ interface VisitTimelineProps {
   visit: Visit;
 }
 
-function VisitTimeline({ onEditEncounter, mutateVisitContext, patient, patientUuid, visit }: VisitTimelineProps) {
+function VisitTimeline({ onEditEncounter, patient, patientUuid, visit }: VisitTimelineProps) {
   const { t } = useTranslation();
   const session = useSession();
   const responsiveSize = isDesktop(useLayoutType()) ? 'sm' : 'lg';
   const { mutate } = useSWRConfig();
-  const { mutateVisitContext: chartMutateVisitContext, patient: chartPatient } = usePatientChartStore(patientUuid);
+  const { patient: chartPatient } = usePatientChartStore(patientUuid);
   const config = useConfig<ChartConfig>();
   const enableEmbeddedFormView = useFeatureFlag('enable-embedded-form-view');
-  const canPrintEncounters = userHasAccess('App: Print encounter forms', session?.user);
+  const canPrintEncounters = useCanPrintEncounters();
   const [expandedEncounters, setExpandedEncounters] = useState<Set<string>>(new Set());
   const [isPrinting, setIsPrinting] = useState(false);
 
@@ -114,10 +113,9 @@ function VisitTimeline({ onEditEncounter, mutateVisitContext, patient, patientUu
         patientUuid,
         t,
         mutate,
-        mutateVisitContext: mutateVisitContext ?? chartMutateVisitContext,
       });
     },
-    [chartMutateVisitContext, mutate, mutateVisitContext, patientUuid, t],
+    [mutate, patientUuid, t],
   );
 
   if (timelineEntries.length === 0) {

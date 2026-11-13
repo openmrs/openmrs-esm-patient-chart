@@ -1,7 +1,8 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
-import { launchWorkspace2, showSnackbar } from '@openmrs/esm-framework';
+import { showSnackbar } from '@openmrs/esm-framework';
+import { launchStartVisitWorkspace } from './visit-form/launch-start-visit-workspace';
 
 interface StartVisitButtonProps {
   patient: fhir.Patient;
@@ -20,25 +21,18 @@ const StartVisitButton = ({
   hidePatientSearch,
 }: StartVisitButtonProps) => {
   const { t } = useTranslation();
-  const startVisitWorkspaceForm = 'start-visit-workspace-form';
 
   const handleStartVisit = useCallback(() => {
     hidePatientSearch?.();
 
     try {
-      launchWorkspace2(
-        startVisitWorkspaceForm,
+      launchStartVisitWorkspace(
         {
           openedFrom: 'patient-chart-start-visit',
           handleReturnToSearchList,
         },
-        {},
-        {
-          patient,
-          patientUuid,
-          visitContext: null,
-          mutateVisitContext: null,
-        },
+        patientUuid,
+        patient,
       );
     } catch (error) {
       console.error('Error launching visit form workspace:', error);

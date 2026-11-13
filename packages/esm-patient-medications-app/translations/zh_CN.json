@@ -46,7 +46,7 @@
   "errorFetchingDrugOrderTemplates": "获取药物医嘱模板时出现错误",
   "errorFetchingDrugResults": "获取“{{searchTerm}}”的结果时出现错误",
   "errorFetchingDrugs": "获取药物时出现错误",
-  "errorFetchingOrderConfig": "获取医嘱配置时发生错误",
+  "errorFetchingOrderConfig": "Error occurred when fetching Order config",
   "errorLoadingCategories": "加载类别时出错",
   "errorLoadingTree": "加载树时出错",
   "errorSavingDrugOrder": "保存药物医嘱时出错",

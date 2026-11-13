@@ -1,5 +1,5 @@
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { usePrimaryIdentifierCode } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
@@ -44,5 +44,48 @@ describe('PatientDetailsTile', () => {
     render(<PatientDetailsTile patient={mockPatient} />);
 
     expect(screen.getByText('100732HE')).toBeInTheDocument();
+  });
+
+  it.each([
+    { label: 'an exact birthdate', birthDate: '1993-10-14', expected: '14 — Oct — 1993' },
+    { label: 'an estimated birthdate known to the year', birthDate: '1993', expected: '1993' },
+    { label: 'an estimated birthdate known to the month', birthDate: '2024-03', expected: 'Mar — 2024' },
+  ])('shows $label at its recorded precision', ({ birthDate, expected }) => {
+    mockUsePrimaryIdentifierCode.mockReturnValue({
+      primaryIdentifierCode: 'OpenMRS ID',
+      isLoading: false,
+      error: null,
+    });
+
+    render(<PatientDetailsTile patient={{ ...mockPatient, birthDate }} />);
+
+    expect(screen.getByText(expected)).toBeInTheDocument();
+  });
+
+  describe('with a birthdate in the current year, month or day', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-11-02T12:00:00Z'));
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it.each([
+      { label: 'an estimated birthdate known to the year', birthDate: '2026', expected: '2026' },
+      { label: 'an estimated birthdate known to the month', birthDate: '2026-11', expected: 'Nov — 2026' },
+      { label: 'an exact birthdate', birthDate: '2026-11-02', expected: '02 — Nov — 2026' },
+    ])('shows $label as a date instead of "Today"', ({ birthDate, expected }) => {
+      mockUsePrimaryIdentifierCode.mockReturnValue({
+        primaryIdentifierCode: 'OpenMRS ID',
+        isLoading: false,
+        error: null,
+      });
+
+      render(<PatientDetailsTile patient={{ ...mockPatient, birthDate }} />);
+
+      expect(screen.getByText(expected)).toBeInTheDocument();
+    });
   });
 });

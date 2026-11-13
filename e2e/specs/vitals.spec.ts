@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
 import { test } from '../core';
-import { BiometricsAndVitalsPage } from '../pages';
+import { BiometricsAndVitalsPage, VisitsPage } from '../pages';
 
 test('Add, edit and delete patient vitals', async ({ page, patient }) => {
   const vitalsPage = new BiometricsAndVitalsPage(page);
@@ -418,5 +418,46 @@ test('Show an error when saving vitals with a value outside the allowed range', 
 
   await test.step('And no vitals should be recorded for the patient', async () => {
     await expect(vitalsPage.page.getByText(/vitals and biometrics saved/i)).toBeHidden();
+  });
+});
+
+test("Vitals recorded from the visits page show up in the visit table's expanded row", async ({ page, patient }) => {
+  const visitsPage = new VisitsPage(page);
+  const activeVisitRow = page.getByRole('table').locator('tbody > tr').first();
+
+  await test.step('When I visit the visits page', async () => {
+    await visitsPage.goTo(patient.uuid);
+  });
+
+  await test.step('And I click the `Record vitals` button to launch the form', async () => {
+    await page.getByRole('button', { name: /^record vitals$/i }).click();
+  });
+
+  await test.step('Then I should see the `Record Vitals and Biometrics` form launch in the workspace', async () => {
+    await expect(page.getByText(/record vitals and biometrics/i)).toBeVisible();
+  });
+
+  await test.step('When I fill in the vitals', async () => {
+    await page.getByRole('spinbutton', { name: /temperature/i }).fill('37');
+    await page.getByRole('spinbutton', { name: /systolic/i }).fill('120');
+    await page.getByRole('spinbutton', { name: /diastolic/i }).fill('80');
+    await page.getByRole('spinbutton', { name: /pulse/i }).fill('65');
+  });
+
+  await test.step('And I click on the `Save and close` button', async () => {
+    await page.getByRole('button', { name: /save and close/i }).click();
+  });
+
+  await test.step('Then I should see a success notification', async () => {
+    await expect(page.getByText(/vitals and biometrics saved/i)).toBeVisible();
+  });
+
+  await test.step('When I expand the top row of the visits table, which is the active visit', async () => {
+    await activeVisitRow.getByRole('button', { name: /expand current row/i }).click();
+  });
+
+  await test.step('Then I should see the vitals encounter listed in the visit timeline', async () => {
+    const expandedRow = page.getByRole('table').locator('tbody > tr').nth(1);
+    await expect(expandedRow.getByText('Vitals', { exact: true })).toBeVisible();
   });
 });

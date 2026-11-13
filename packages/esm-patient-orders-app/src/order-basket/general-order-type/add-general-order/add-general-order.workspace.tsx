@@ -1,8 +1,11 @@
 import React from 'react';
+import { type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 import {
   type OrderBasketItem,
   type OrderBasketWindowProps,
-  type PatientWorkspace2DefinitionProps,
+  getPatientAndVisitProps,
+  type SharedWorkspaceGroupProps,
+  useShowPatientBanner,
 } from '@openmrs/esm-patient-common-lib';
 import AddGeneralOrder from './add-general-order.component';
 
@@ -14,16 +17,15 @@ interface OrderableConceptSearchWorkspaceProps {
 /**
  * This workspace displays the order form for adding or editing a general order.
  *
- * This workspace must only be used within the patient chart.
- * @see exported-add-general-order.workspace.tsx
+ * It takes the patient and visit from its window props, not from group props, so it can be used
+ * both inside and outside the patient chart.
  */
 const AddGeneralOrderWorkspace: React.FC<
-  PatientWorkspace2DefinitionProps<OrderableConceptSearchWorkspaceProps, OrderBasketWindowProps>
-> = ({
-  workspaceProps: { order: initialOrder, orderTypeUuid },
-  groupProps: { patient, patientUuid, visitContext, mutateVisitContext },
-  closeWorkspace,
-}) => {
+  Workspace2DefinitionProps<OrderableConceptSearchWorkspaceProps, OrderBasketWindowProps, SharedWorkspaceGroupProps>
+> = ({ workspaceProps: { order: initialOrder, orderTypeUuid }, windowProps, closeWorkspace, groupProps }) => {
+  const { patient, patientUuid, visitContext } = getPatientAndVisitProps(windowProps, undefined, groupProps);
+  const shouldShowPatientBanner = useShowPatientBanner(groupProps);
+
   return (
     <AddGeneralOrder
       initialOrder={initialOrder}
@@ -32,6 +34,7 @@ const AddGeneralOrderWorkspace: React.FC<
       patientUuid={patientUuid}
       visitContext={visitContext}
       closeWorkspace={closeWorkspace}
+      showPatientBanner={shouldShowPatientBanner}
     />
   );
 };

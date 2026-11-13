@@ -2,59 +2,25 @@ import type { KeyedMutator } from 'swr';
 import { restBaseUrl } from '@openmrs/esm-framework';
 
 /**
- * Invalidates visit history table data without triggering global visit revalidation cascade.
- *
- * This function provides surgical SWR cache invalidation for visit operations. It targets only
- * the paginated visit data used by the visit history table, avoiding unnecessary revalidation
- * of the 28+ components that use current visit data via the useVisit hook.
- *
- * The implementation uses URL pattern matching to discriminate between:
- * - Current visit keys (includeInactive=false) - these are NOT invalidated
- * - Visit history keys (no includeInactive param, or pagination params) - these ARE invalidated
+ * Invalidates all visit data for a patient: active and past visit lists (e.g. `useVisit`, the visit
+ * history table) as well as individual visits fetched by UUID (e.g. the visit context).
  *
  * Cache key patterns:
- * - Current visit: /visit?patient=123&v=custom&includeInactive=false
+ * - Active visit: /visit?patient=123&v=custom&includeInactive=false
  * - Visit history: /visit?patient=123&v=custom:(uuid,location...)&limit=10&startIndex=0&totalCount=true
+ * - Visit by UUID: /visit/<visit-uuid>?v=custom:(uuid,...)
  *
- * This approach eliminates the 13+ cascade revalidation requests that were previously triggered
- * by global mutateVisit() calls, reducing network traffic and improving performance.
+ * Visit-by-UUID keys do not carry the patient UUID, so all of them are invalidated.
  *
  * @param mutate - SWR mutate function from useSWRConfig()
  * @param patientUuid - Patient UUID to target visit data for
- *
- * @example
- * ```typescript
- * import { useSWRConfig } from 'swr';
- * import { invalidateVisitHistory } from '@openmrs/esm-patient-common-lib';
- *
- * function MyComponent({ patientUuid }) {
- *   const { mutate } = useSWRConfig();
- *
- *   const handleVisitUpdate = async () => {
- *     // Perform visit operation...
- *     await updateVisit(visitData);
- *
- *     // Invalidate only visit history table, not current visit components
- *     invalidateVisitHistory(mutate, patientUuid);
- *   };
- * }
- * ```
  */
-export function invalidateVisitHistory(mutate: KeyedMutator<unknown>, patientUuid: string): void {
+export function invalidateVisits(mutate: KeyedMutator<unknown>, patientUuid: string): void {
   mutate((key) => {
-    if (typeof key === 'string' && key.includes(`${restBaseUrl}/visit?patient=${patientUuid}`)) {
-      // Current visit keys have includeInactive=false
-      const isCurrentVisitKey = key.includes('includeInactive=false');
-
-      // Visit history keys typically have pagination parameters or no includeInactive parameter
-      const hasHistoryParams = key.includes('limit=') || key.includes('startIndex=') || key.includes('totalCount=');
-      const hasNoIncludeInactive = !key.includes('includeInactive');
-
-      // Invalidate if it's clearly a history key OR if it doesn't have includeInactive=false
-      // This ensures we target visit history while preserving current visit cache
-      return !isCurrentVisitKey && (hasHistoryParams || hasNoIncludeInactive);
-    }
-    return false;
+    return (
+      typeof key === 'string' &&
+      (key.includes(`${restBaseUrl}/visit?patient=${patientUuid}`) || key.includes(`${restBaseUrl}/visit/`))
+    );
   });
 }
 
@@ -82,25 +48,7 @@ export function invalidatePatientEncounters(mutate: KeyedMutator<unknown>, patie
 }
 
 /**
- * Invalidates only the current (active) visit cache for a specific patient.
- *
- * This refreshes components using useVisit without triggering the visit revalidation cascade.
- *
- * @param mutate - SWR mutate function from useSWRConfig()
- * @param patientUuid - Patient UUID to target current visit data for
- */
-export function invalidateCurrentVisit(mutate: KeyedMutator<unknown>, patientUuid: string): void {
-  mutate((key) => {
-    return (
-      typeof key === 'string' &&
-      key.includes(`${restBaseUrl}/visit?patient=${patientUuid}`) &&
-      key.includes('includeInactive=false')
-    );
-  });
-}
-
-/**
- * Combination utility that invalidates both visit history and encounter data.
+ * Combination utility that invalidates both visit (active and past) and encounter data.
  *
  * This is commonly needed when operations affect both visit structure and encounter content,
  * such as form submissions, visit note creation, or encounter deletion.
@@ -115,7 +63,7 @@ export function invalidateCurrentVisit(mutate: KeyedMutator<unknown>, patientUui
  * ```
  */
 export function invalidateVisitAndEncounterData(mutate: KeyedMutator<unknown>, patientUuid: string): void {
-  invalidateVisitHistory(mutate, patientUuid);
+  invalidateVisits(mutate, patientUuid);
   invalidatePatientEncounters(mutate, patientUuid);
 }
 

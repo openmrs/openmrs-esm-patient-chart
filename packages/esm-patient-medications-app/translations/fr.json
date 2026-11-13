@@ -46,7 +46,7 @@
   "errorFetchingDrugOrderTemplates": "Erreur lors de l'obtention des modèles de prescription",
   "errorFetchingDrugResults": "Erreur lors de la recherche de « {{searchTerm}} »",
   "errorFetchingDrugs": "Error fetching drugs",
-  "errorFetchingOrderConfig": " Une erreur s'est produite lors de l'obtention de la configuration de prescription",
+  "errorFetchingOrderConfig": "Error occurred when fetching Order config",
   "errorLoadingCategories": "Error loading drug categories",
   "errorLoadingTree": "Error loading category structure",
   "errorSavingDrugOrder": "Error saving drug order",
