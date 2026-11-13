@@ -39,6 +39,7 @@
   "male": "Male",
   "muac": "MUAC",
   "noDataRecorded": "No data has been recorded for this patient",
+  "normalRangeHint": "Normal: {{range}}",
   "normalRanges": "Normal ranges",
   "notes": "Notes",
   "other": "Other",
