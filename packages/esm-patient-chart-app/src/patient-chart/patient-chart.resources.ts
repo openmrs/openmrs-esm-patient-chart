@@ -72,7 +72,8 @@ export function useVisitByUuid(visitUuid: string | null, representation: string 
  */
 export function usePatientChartPatientAndVisit(patientUuid: string) {
   const { t } = useTranslation();
-  const { isLoading: isLoadingPatient, patient } = usePatient(patientUuid);
+  const { isLoading: isLoadingPatient, patient, error } = usePatient(patientUuid);
+  const isPatientUnavailable = Boolean(error) || (!isLoadingPatient && !patient);
   const {
     patientUuid: storePatientUuid,
     setPatient,
@@ -110,6 +111,9 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
       let needsLaunch = true;
       while (needsLaunch) {
         const groupProps = latestWorkspaceGroupProps.current;
+        if (!groupProps || !isMounted.current) {
+          return;
+        }
         const launchKey = getWorkspaceGroupLaunchKey(groupProps);
 
         if (workspaceGroupLaunchKeysEqual(launchKey, launchedWorkspaceGroupKey.current)) {
@@ -117,13 +121,18 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
           continue;
         }
 
+        const launched = await launchWorkspaceGroup2('patient-chart', groupProps);
+
         if (!isMounted.current) {
           return;
         }
 
-        const launched = await launchWorkspaceGroup2('patient-chart', groupProps);
-
-        if (!isMounted.current) {
+        if (!latestWorkspaceGroupProps.current) {
+          // A successful pending request may have changed the framework group after invalidation.
+          // Its current launch key is unknown; do not deduplicate recovery against an older key.
+          if (launched) {
+            launchedWorkspaceGroupKey.current = null;
+          }
           return;
         }
 
@@ -148,6 +157,11 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
 
   useEffect(() => {
     const initializeWorkspaceGroup = async () => {
+      if (isPatientUnavailable || !patient || storePatientUuid !== patient.id) {
+        latestWorkspaceGroupProps.current = null;
+        return;
+      }
+
       if (!isValidatingStoredVisit && !isValidatingActiveVisit && patient) {
         let groupProps: PatientWorkspaceGroupProps = null;
         if (activeVisit) {
@@ -177,7 +191,7 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
 
         latestWorkspaceGroupProps.current = groupProps;
         await launchLatestWorkspaceGroup();
-        if (isMounted.current) {
+        if (isMounted.current && latestWorkspaceGroupProps.current) {
           setPatientChartWorkspaceGroupVisitUuid(
             launchedWorkspaceGroupKey.current?.activeVisitUuid ?? null,
             launchedWorkspaceGroupProps.current,
@@ -204,31 +218,35 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
     isValidatingActiveVisit,
     storePatientUuid,
     patient,
+    isPatientUnavailable,
     t,
     launchLatestWorkspaceGroup,
   ]);
 
   useEffect(() => {
-    if (!isLoadingPatient) {
+    if (isPatientUnavailable) {
+      setPatient(null);
+    } else if (!isLoadingPatient) {
       setPatient(patient);
     }
 
     return () => {
       setPatient(null);
     };
-  }, [patient, setPatient, isLoadingPatient]);
+  }, [patient, setPatient, isLoadingPatient, isPatientUnavailable]);
 
   const state = useMemo(
     () => ({
       patientUuid,
-      patient: patient ?? {},
+      patient,
       // The key stays `visitContext`: it is the slot state of the patient header / info slots,
       // which extensions (possibly from other apps) read.
       visitContext: storedActiveVisit,
       isLoadingPatient,
+      error,
       setPatient,
     }),
-    [patient, patientUuid, storedActiveVisit, isLoadingPatient, setPatient],
+    [patient, patientUuid, storedActiveVisit, isLoadingPatient, error, setPatient],
   );
 
   return state;
