@@ -20,6 +20,9 @@ import {
   parseDate,
   useConfig,
   useLayoutType,
+  UserHasAccess,
+  useSession,
+  userHasAccess,
 } from '@openmrs/esm-framework';
 import type { ConfigObject } from '../config-schema';
 import type { VitalsTableHeader, VitalsTableRow } from './types';
@@ -34,7 +37,7 @@ const VitalsChart = lazy(loadVitalsChart);
 
 // A failed prefetch is ignored. Opening the chart view retries the import through React.lazy.
 const prefetchVitalsChart = () => {
-  loadVitalsChart().catch(() => {});
+  loadVitalsChart().catch(() => { });
 };
 
 interface VitalsOverviewProps {
@@ -60,6 +63,9 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
   const { data: vitals, error, isLoading, isValidating } = useVitalsAndBiometrics(patientUuid);
   const { conceptUnits } = useConceptUnits();
   const showPrintButton = config.vitals.showPrintButton && !chartView;
+  const session = useSession();
+  const canRecordVitals =
+    userHasAccess('Add Encounters', session?.user) && userHasAccess('Add Observations', session?.user);
 
   const patientDetails = useMemo(() => {
     const getGender = (gender: string): string => {
@@ -228,7 +234,8 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
                     </IconSwitch>
                   </ContentSwitcher>
                   <>
-                    <span className={styles.divider}>|</span>
+                    {(showPrintButton || canRecordVitals) && <span className={styles.divider}>|</span>}
+
                     {showPrintButton && (
                       <Button
                         kind="ghost"
@@ -240,14 +247,17 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
                         {t('print', 'Print')}
                       </Button>
                     )}
-                    <Button
-                      kind="ghost"
-                      renderIcon={AddIcon}
-                      iconDescription="Add vitals"
-                      onClick={launchVitalsBiometricsForm}
-                    >
-                      {t('add', 'Add')}
-                    </Button>
+
+                    {canRecordVitals && (
+                      <Button
+                        kind="ghost"
+                        renderIcon={AddIcon}
+                        iconDescription="Add vitals"
+                        onClick={launchVitalsBiometricsForm}
+                      >
+                        {t('add', 'Add')}
+                      </Button>
+                    )}
                   </>
                 </div>
               </CardHeader>
