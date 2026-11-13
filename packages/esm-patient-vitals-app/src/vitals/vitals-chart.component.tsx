@@ -1,5 +1,6 @@
 import React, { useId, useMemo, useState } from 'react';
 import classNames from 'classnames';
+import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Tab, TabListVertical, TabPanel, TabPanels, TabsVertical } from '@carbon/react';
 import { LineChart, ScaleTypes } from '@carbon/charts-react';
@@ -71,36 +72,43 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
     },
   ];
 
+  const monthsToShow = config?.monthsToShow ?? 12;
+  const cutoff = useMemo(() => dayjs().subtract(monthsToShow, 'month'), [monthsToShow]);
+
   const chartData = useMemo(() => {
-    return patientVitals
-      .filter((vitals) => vitals[selectedVitalsSign.value])
-      .slice(0, 10)
-      .sort((vitalA, vitalB) => new Date(vitalA.date).getTime() - new Date(vitalB.date).getTime())
-      .map((vitals) => {
-        if (['systolic', 'diastolic'].includes(selectedVitalsSign.value)) {
-          return [
-            {
-              group: 'Systolic blood pressure',
-              key: formatDate(parseDate(vitals.date), { year: true }),
-              value: vitals.systolic,
-              date: vitals.date,
-            },
-            {
-              group: 'Diastolic blood pressure',
-              key: formatDate(parseDate(vitals.date), { year: true }),
-              value: vitals.diastolic,
-              date: vitals.date,
-            },
-          ];
-        }
-        return {
-          group: selectedVitalsSign.title,
-          key: formatDate(parseDate(vitals.date)),
-          value: vitals[selectedVitalsSign.value],
-          date: vitals.date,
-        };
-      });
-  }, [patientVitals, selectedVitalsSign]);
+    const filtered = patientVitals.filter(
+      (v) => v[selectedVitalsSign.value] != null,
+  );
+
+    const recentData = filtered.filter((v) =>
+      dayjs(v.date).isAfter(cutoff),
+  );
+
+    const finalData =
+      recentData.length > 0 ? recentData : filtered.slice(-10);
+    
+    return finalData
+      .sort(
+        (a, b) =>
+          new Date(a.date).getTime() - new Date(b.date).getTime(),
+    )
+    .map((v) => {
+      if (['systolic', 'diastolic'].includes(selectedVitalsSign.value)) {
+        return [
+          {
+            group: selectedVitalsSign.title,
+            value: v[selectedVitalsSign.value],
+            date: v.date,
+          },
+        ];
+      }
+      return {
+        group: selectedVitalsSign.title,
+        value: v[selectedVitalsSign.value],
+        date: v.date,
+      };
+    });
+  }, [patientVitals, selectedVitalsSign.value, selectedVitalsSign.title, cutoff]);
 
   const chartOptions = {
     title: selectedVitalsSign.title,
@@ -139,24 +147,12 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
       enabled: true,
       numberOfIcons: 4,
       controls: [
-        {
-          type: 'Zoom in',
-        },
-        {
-          type: 'Zoom out',
-        },
-        {
-          type: 'Reset zoom',
-        },
-        {
-          type: 'Export as CSV',
-        },
-        {
-          type: 'Export as PNG',
-        },
-        {
-          type: 'Make fullscreen',
-        },
+        { type: 'Zoom in' },
+        { type: 'Zoom out' },
+        { type: 'Reset zoom' },
+        { type: 'Export as CSV' },
+        { type: 'Export as PNG' },
+        { type: 'Make fullscreen' },
       ],
     },
     zoomBar: {
@@ -187,8 +183,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
                     value,
                     unit,
                   })
-                }
-              >
+                }>
                 {title}
               </Tab>
             ))}
