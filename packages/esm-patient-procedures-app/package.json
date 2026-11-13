@@ -41,7 +41,7 @@
     "@hookform/resolvers": "^3.3.1",
     "@openmrs/esm-patient-common-lib": "next",
     "react-hook-form": "^7.46.2",
-    "zod": "^3.23.8"
+    "zod": "^4.6.6"
   },
   "peerDependencies": {
     "@carbon/react": "1.x",
