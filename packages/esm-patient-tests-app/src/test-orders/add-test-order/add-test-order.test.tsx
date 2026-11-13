@@ -9,9 +9,15 @@ import {
   getDefaultsFromConfigSchema,
   useConfig,
   useLayoutType,
+  usePatient,
   useSession,
 } from '@openmrs/esm-framework';
-import { type PostDataPrepFunction, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
+import {
+  type OrderBasketWindowProps,
+  type PostDataPrepFunction,
+  useOrderBasket,
+  useOrderType,
+} from '@openmrs/esm-patient-common-lib';
 import { configSchema, type ConfigObject } from '../../config-schema';
 import { mockSessionDataResponse } from '__mocks__';
 import { mockPatient } from 'tools';
@@ -24,6 +30,7 @@ const mockExtensionSlot = vi.mocked(ExtensionSlot);
 const mockUseSession = vi.mocked(useSession);
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const mockUseOrderType = vi.mocked(useOrderType);
+const mockUsePatient = vi.mocked(usePatient);
 
 const mockTestTypes = [
   // {
@@ -105,6 +112,12 @@ mockUseOrderType.mockReturnValue({
 describe('AddLabOrder', () => {
   beforeEach(() => {
     _resetOrderBasketStore();
+    mockUsePatient.mockReturnValue({
+      patient: mockPatient,
+      patientUuid: mockPatient.id,
+      isLoading: false,
+      error: null,
+    });
   });
 
   test('happy path fill and submit form', async () => {
@@ -324,6 +337,84 @@ describe('AddLabOrder', () => {
         ([props]) => props.name === 'patient-header-slot' && props.state.patientUuid === mockPatient.id,
       ),
     ).toBe(true);
+  });
+
+  test('should fetch FHIR patient and display patient header when launched with a REST patient', () => {
+    mockUseLayoutType.mockReturnValue('tablet');
+    const restPatient = { uuid: 'rest-patient-uuid' } as unknown as fhir.Patient;
+    mockUsePatient.mockReturnValue({
+      patient: mockPatient,
+      patientUuid: 'rest-patient-uuid',
+      isLoading: false,
+      error: null,
+    });
+
+    render(
+      <AddTestOrderWorkspace
+        closeWorkspace={mockCloseWorkspace}
+        groupProps={{ showPatientBanner: 'tabletOnly' }}
+        workspaceProps={{
+          orderTypeUuid: 'test-lab-order-type-uuid',
+          orderToEditOrdererUuid: '',
+        }}
+        windowProps={
+          {
+            patient: restPatient,
+            visitContext: null,
+          } as unknown as OrderBasketWindowProps
+        }
+        workspaceName={''}
+        launchChildWorkspace={vi.fn()}
+        windowName={''}
+        isRootWorkspace={false}
+        showActionMenu={true}
+      />,
+    );
+
+    expect(mockUsePatient).toHaveBeenCalledWith('rest-patient-uuid');
+    expect(
+      mockExtensionSlot.mock.calls.some(
+        ([props]) =>
+          props.name === 'patient-header-slot' &&
+          props.state.patientUuid === 'rest-patient-uuid' &&
+          props.state.patient === mockPatient,
+      ),
+    ).toBe(true);
+  });
+
+  test('should not display patient header when patient banner data is incomplete or loading', () => {
+    mockUseLayoutType.mockReturnValue('tablet');
+    const restPatient = { uuid: 'rest-patient-uuid' } as unknown as fhir.Patient;
+    mockUsePatient.mockReturnValue({
+      patient: null,
+      patientUuid: 'rest-patient-uuid',
+      isLoading: true,
+      error: null,
+    });
+
+    render(
+      <AddTestOrderWorkspace
+        closeWorkspace={mockCloseWorkspace}
+        groupProps={{ showPatientBanner: 'tabletOnly' }}
+        workspaceProps={{
+          orderTypeUuid: 'test-lab-order-type-uuid',
+          orderToEditOrdererUuid: '',
+        }}
+        windowProps={
+          {
+            patient: restPatient,
+            visitContext: null,
+          } as unknown as OrderBasketWindowProps
+        }
+        workspaceName={''}
+        launchChildWorkspace={vi.fn()}
+        windowName={''}
+        isRootWorkspace={false}
+        showActionMenu={true}
+      />,
+    );
+
+    expect(mockExtensionSlot.mock.calls.some(([props]) => props.name === 'patient-header-slot')).toBe(false);
   });
 
   test('should fall back to the configured lab order type UUID when orderTypeUuid is not provided', () => {

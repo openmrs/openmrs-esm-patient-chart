@@ -5,6 +5,7 @@ import {
   type OrderBasketWindowProps,
   getPatientAndVisitProps,
   type SharedWorkspaceGroupProps,
+  usePatientForBanner,
   useShowPatientBanner,
 } from '@openmrs/esm-patient-common-lib';
 import AddLabOrder from './add-test-order.component';
@@ -33,13 +34,20 @@ export default function AddTestOrderWorkspace({
   closeWorkspace,
   groupProps,
 }: Workspace2DefinitionProps<AddTestOrderWorkspaceProps, OrderBasketWindowProps, SharedWorkspaceGroupProps>) {
-  const { patient, patientUuid, visitContext } = getPatientAndVisitProps(windowProps, undefined, groupProps);
+  const {
+    patient: patientProp,
+    patientUuid: propPatientUuid,
+    visitContext,
+  } = getPatientAndVisitProps(windowProps, undefined, groupProps);
+  const resolvedPatientUuid =
+    propPatientUuid ?? (patientProp as { uuid?: string })?.uuid ?? (patientProp as fhir.Patient)?.id;
+  const patient = usePatientForBanner(patientProp, resolvedPatientUuid);
   const shouldShowPatientBanner = useShowPatientBanner(groupProps);
 
   return (
     <AddLabOrder
       patient={patient}
-      patientUuid={patientUuid}
+      patientUuid={resolvedPatientUuid}
       orderToEditOrdererUuid={orderToEditOrdererUuid}
       visitContext={visitContext}
       initialOrder={initialOrder}

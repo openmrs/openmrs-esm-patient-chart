@@ -9,6 +9,7 @@ import {
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import {
+  hasPatientBannerData,
   useOrderType,
   type OrderBasketItem,
   type TestOrderBasketItem,
@@ -88,7 +89,7 @@ const AddLabOrder: React.FC<AddLabOrderProps> = ({
 
   return (
     <Workspace2 title={title} hasUnsavedChanges={hasUnsavedChanges}>
-      {showPatientBanner && patient && bannerPatientUuid && (
+      {showPatientBanner && patient && bannerPatientUuid && hasPatientBannerData(patient) && (
         <ExtensionSlot
           name="patient-header-slot"
           state={{ patient, patientUuid: bannerPatientUuid, hideActionsOverflow: true }}
