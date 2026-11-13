@@ -5089,6 +5089,7 @@ export const mockVitalsConfig = {
   },
   vitals: {
     encounterTypeUuid: '67a71486-1a54-468f-ac3e-7091a9a79584',
+    clinicianEncounterRole: '240b26f9-dd88-4172-823d-4a8bfeb7841f',
     formUuid: '9f26aad4-244a-46ca-be49-1196df1a8c9a',
     vitalsOverdueThresholdHours: 12,
     useFormEngine: false,
