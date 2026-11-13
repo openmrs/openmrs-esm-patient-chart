@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 
 import { of as observableOf, Observable } from 'rxjs';
-import { map, flatMap, catchError } from 'rxjs/operators';
+import { map, flatMap } from 'rxjs/operators';
 import { WindowRef } from '../window-ref';
 import { Encounter } from '../types';
 
@@ -17,11 +17,11 @@ export class EncounterResourceService {
 
   constructor(
     protected http: HttpClient,
-    protected windoRef: WindowRef,
+    protected windowRef: WindowRef,
   ) {}
 
   public getUrl(): string {
-    return this.windoRef.openmrsRestBase;
+    return this.windowRef.openmrsRestBase;
   }
 
   public getEncountersByPatientUuid(

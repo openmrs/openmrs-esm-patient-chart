@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ReplaySubject, BehaviorSubject, Observable, forkJoin, combineLatest } from 'rxjs';
+import { BehaviorSubject, forkJoin } from 'rxjs';
 import { EncounterResourceService } from '../openmrs-api/encounter-resource.service';
 import { PatientResourceService } from './patient-resource.service';
 

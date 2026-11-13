@@ -3,7 +3,7 @@ import { Observable, forkJoin } from 'rxjs';
 import { first, map, take } from 'rxjs/operators';
 
 import { FormResourceService } from '../openmrs-api/form-resource.service';
-import { FormSchema, FormSchemaAndTranslations, Questions } from '../types';
+import { FormSchema, FormSchemaAndTranslations } from '../types';
 import { TranslateService } from '@ngx-translate/core';
 
 @Injectable()
