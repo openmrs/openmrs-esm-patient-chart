@@ -43,6 +43,10 @@ vi.mock('../api/order-config', () => ({
         { valueCoded: '1072AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 'Days' },
         { valueCoded: '1073AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 'Weeks' },
       ],
+      daysDurationUnit: {
+        uuid: '1072AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        display: 'Days',
+      },
       orderFrequencies: [
         { valueCoded: 'once-daily-uuid', value: 'Once daily', frequencyPerDay: 1.0, names: ['OD', 'Once daily'] },
         { valueCoded: 'twice-daily-uuid', value: 'Twice daily', frequencyPerDay: 2.0, names: ['BD', 'Twice daily'] },
