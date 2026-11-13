@@ -195,6 +195,22 @@ describe('Reference ranges at the measurement date', () => {
     expect(service.isLoading(form)).toBe(false);
   }));
 
+  it('applies the range of a question that names its concept by reference', fakeAsync(() => {
+    const measurement = numericQuestion();
+    const form = createForm([
+      { ...measurement, questionOptions: { ...measurement.questionOptions, concept: 'CIEL:5088' } },
+    ]);
+    form.schema.conceptReferences = { 'CIEL:5088': { uuid: 'temperature-uuid', display: 'Temperature' } };
+    const control = controlFor(form);
+    control.setValue(45);
+    subscription = service.connect(form, 'patient-uuid');
+    tick();
+    expect(resource.getConceptReferenceRanges).toHaveBeenCalledOnceWith('patient-uuid', ['temperature-uuid'], {
+      date: moment('2020-01-01T00:00:00Z').format(),
+    });
+    expect(control.valid).toBe(false);
+  }));
+
   it('uses the observation context for a saved answer dated away from its encounter', fakeAsync(() => {
     const form = createForm();
     form.valueProcessingInfo.encounterUuid = 'historical-encounter';
