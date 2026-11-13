@@ -485,7 +485,7 @@ export function DrugOrderForm({
             <span className={classNames(styles.text02, styles.bodyShort01)}>
               {patientIdentifier && <>{patientIdentifier} &middot; </>}
               {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
-              <span>{formatPartialDate(patient?.birthDate, { mode: 'wide', time: false })}</span>
+              <span>{formatPartialDate(patient?.birthDate, { mode: 'wide', time: false, noToday: true })}</span>
             </span>
           </div>
         )}

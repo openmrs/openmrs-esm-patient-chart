@@ -8,7 +8,7 @@ import {
   showSnackbar,
   userHasAccess,
 } from '@openmrs/esm-framework';
-import { invalidateVisitAndEncounterData } from '@openmrs/esm-patient-common-lib';
+import { getPatientChartWindowProps, invalidateVisitAndEncounterData } from '@openmrs/esm-patient-common-lib';
 import { type ChartConfig } from '../../../../config-schema';
 import { deleteEncounter, type EncountersTableProps, type MappedEncounter } from './encounters-table.resource';
 
@@ -60,16 +60,23 @@ export function editEncounter(
   if (onEditEncounter) {
     onEditEncounter(encounter, isVisitNoteEncounter(encounter));
   } else if (isVisitNoteEncounter(encounter)) {
-    launchWorkspace2('visit-notes-form-workspace', {
-      encounter,
-      formContext: 'editing',
-      patientUuid,
-    });
+    launchWorkspace2(
+      'visit-notes-form-workspace',
+      {
+        encounter,
+        formContext: 'editing',
+      },
+      getPatientChartWindowProps(patientUuid),
+    );
   } else {
-    launchWorkspace2('patient-form-entry-workspace', {
-      form: encounter.form,
-      encounterUuid: encounter.uuid,
-    });
+    launchWorkspace2(
+      'patient-form-entry-workspace',
+      {
+        form: encounter.form,
+        encounterUuid: encounter.uuid,
+      },
+      getPatientChartWindowProps(patientUuid),
+    );
   }
 }
 
@@ -79,7 +86,6 @@ interface ConfirmAndDeleteEncounterArgs {
   patientUuid: string;
   t: TFunction;
   mutate: ReturnType<typeof useSWRConfig>['mutate'];
-  mutateVisitContext?: () => void;
 }
 
 export function confirmAndDeleteEncounter({
@@ -88,7 +94,6 @@ export function confirmAndDeleteEncounter({
   patientUuid,
   t,
   mutate,
-  mutateVisitContext,
 }: ConfirmAndDeleteEncounterArgs) {
   const dispose = showModal('delete-encounter-modal', {
     close: () => dispose(),
@@ -97,10 +102,7 @@ export function confirmAndDeleteEncounter({
       const abortController = new AbortController();
       deleteEncounter(encounterUuid, abortController)
         .then(() => {
-          // Update current visit data for critical components
-          mutateVisitContext?.();
-
-          // Also invalidate visit history and encounter tables since the encounter was deleted
+          // Invalidate visit history and encounter tables since the encounter was deleted
           invalidateVisitAndEncounterData(mutate, patientUuid);
 
           showSnackbar({

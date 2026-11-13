@@ -46,7 +46,7 @@
   "errorFetchingDrugOrderTemplates": "Fehler beim Abrufen der Vorlagen für Arzneimittelbestellungen",
   "errorFetchingDrugResults": "Fehler beim Abrufen der Ergebnisse für „{{searchTerm}}“",
   "errorFetchingDrugs": "Fehler beim Abrufen der Medikamente",
-  "errorFetchingOrderConfig": "Beim Abrufen der Auftragskonfiguration ist ein Fehler aufgetreten",
+  "errorFetchingOrderConfig": "Error occurred when fetching Order config",
   "errorLoadingCategories": "Fehler beim Laden der Medikamentenkategorien",
   "errorLoadingTree": "Fehler beim Laden der Kategoriestruktur",
   "errorSavingDrugOrder": "Fehler beim Speichern der Medikamentenbestellung",
