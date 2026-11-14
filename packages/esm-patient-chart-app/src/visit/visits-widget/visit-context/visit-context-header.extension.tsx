@@ -23,10 +23,10 @@ const VisitContextHeader: React.FC<VisitContextHeaderProps> = ({ patientUuid }) 
   const { systemVisitEnabled } = useSystemVisitSetting();
   const isRdeEnabled = useFeatureFlag('rde');
 
-  const { visitContext } = usePatientChartStore(patientUuid);
-  const isActiveVisit = Boolean(visitContext && !visitContext.stopDatetime);
+  const { activeVisit } = usePatientChartStore(patientUuid);
+  const isActiveVisit = Boolean(activeVisit && !activeVisit.stopDatetime);
 
-  const showVisitContextHeader = systemVisitEnabled && isRdeEnabled && visitContext;
+  const showVisitContextHeader = systemVisitEnabled && isRdeEnabled && activeVisit;
 
   if (!showVisitContextHeader) {
     return null;
@@ -36,9 +36,9 @@ const VisitContextHeader: React.FC<VisitContextHeaderProps> = ({ patientUuid }) 
       className={classNames(styles.visitContextHeader, isActiveVisit ? styles.activeVisit : styles.retroactiveVisit)}
     >
       <div className={styles.addingTo}>{t('addingToVisit', 'Adding to:')}</div>
-      <div className={styles.visitType}>{visitContext.visitType?.display}</div>
+      <div className={styles.visitType}>{activeVisit.visitType?.display}</div>
       <div className={styles.visitInfo}>
-        <VisitContextInfo visit={visitContext} />
+        <VisitContextInfo visit={activeVisit} />
       </div>
     </div>
   );

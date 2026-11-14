@@ -39,7 +39,7 @@ const EditVisitDetailsActionItem: React.FC<EditVisitDetailsActionItemProps> = ({
       'start-visit-workspace-form',
       { openedFrom: 'patient-chart-edit-visit' },
       windowProps,
-      { ...windowProps, showPatientBanner: 'tabletOnly' },
+      { patient, patientUuid, activeVisit: visit, showPatientBanner: 'tabletOnly' },
     );
   };
 

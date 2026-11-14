@@ -20,7 +20,7 @@ interface EncounterListTabsComponentProps {
  */
 const EncounterListTabsExtension: React.FC<EncounterListTabsComponentProps> = ({ patientUuid, patient }) => {
   const { t } = useTranslation();
-  const { visitContext } = usePatientChartStore(patientUuid);
+  const { activeVisit } = usePatientChartStore(patientUuid);
 
   const config = useConfig();
   const { tabDefinitions = [] } = config;
@@ -64,7 +64,7 @@ const EncounterListTabsExtension: React.FC<EncounterListTabsComponentProps> = ({
                 launchOptions={tab.launchOptions}
                 headerTitle={tab.headerTitle}
                 description={tab.description}
-                visit={visitContext}
+                visit={activeVisit}
                 deathStatus={isDead}
               />
             </TabPanel>

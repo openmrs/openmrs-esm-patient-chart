@@ -13,7 +13,8 @@
     "build": "ng build --configuration production",
     "clean": "git clean -fdX -- dist",
     "test": "ng test --no-watch --no-progress --browsers=ChromeHeadless",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "extract-translations": "node tools/extract-translations.mjs"
   },
   "openmrs:develop": {
     "command": "yarn run serve",
