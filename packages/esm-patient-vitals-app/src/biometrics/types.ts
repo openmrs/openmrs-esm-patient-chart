@@ -18,5 +18,5 @@ export interface BiometricsTableHeader {
   conceptUuid?: string;
   header: string;
   isSortable?: boolean;
-  sortFunc: (valueA: BiometricsTableRow, valueB: BiometricsTableRow) => number;
+  sortValues: (row: BiometricsTableRow) => Array<number | null | undefined>;
 }

@@ -26,5 +26,5 @@ export interface VitalsTableHeader {
   conceptUuid?: string;
   header: string;
   isSortable?: boolean;
-  sortFunc: (valueA: VitalsTableRow, valueB: VitalsTableRow) => number;
+  sortValues: (row: VitalsTableRow) => Array<number | null | undefined>;
 }
