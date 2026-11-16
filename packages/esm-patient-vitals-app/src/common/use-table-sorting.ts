@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { type DataTableSortState } from '@carbon/react';
 
-type SortValue = number | null | undefined;
+export type SortValue = number | null | undefined;
 
 interface SortableTableHeader<TableRow> {
   key: string;

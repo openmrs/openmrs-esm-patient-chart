@@ -1,4 +1,4 @@
-import { type PatientVitalsAndBiometrics, type ObservationInterpretation } from '../common';
+import { type PatientVitalsAndBiometrics, type ObservationInterpretation, type SortValue } from '../common';
 
 export interface VitalsTableRow extends PatientVitalsAndBiometrics {
   id: string;
@@ -26,5 +26,5 @@ export interface VitalsTableHeader {
   conceptUuid?: string;
   header: string;
   isSortable?: boolean;
-  sortValues: (row: VitalsTableRow) => Array<number | null | undefined>;
+  sortValues: (row: VitalsTableRow) => Array<SortValue>;
 }
