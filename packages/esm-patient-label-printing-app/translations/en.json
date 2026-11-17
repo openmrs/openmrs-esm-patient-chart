@@ -1,3 +1,16 @@
 {
-  "patientIdNotFound": "Patient ID not found"
+  "download": "Download",
+  "generatingVisitSummary": "Generating visit summary",
+  "patientIdNotFound": "Patient ID not found",
+  "printVisitSummary": "Print visit summary",
+  "visitSummary": "Visit summary",
+  "visitSummaryGenerationFailed": "The server could not generate the visit summary. Try again — if the problem persists, contact your administrator.",
+  "visitSummaryGenerationFailedTitle": "PDF generation failed",
+  "visitSummaryNetworkError": "The visit summary could not be retrieved. Check your network connection and try again.",
+  "visitSummaryNetworkErrorTitle": "Network error",
+  "visitSummaryNotAuthorized": "You do not have permission to generate visit summaries. Contact your administrator for access.",
+  "visitSummaryNotAuthorizedTitle": "Not authorized",
+  "visitSummaryPreview": "Visit summary preview",
+  "visitSummaryVisitNotFound": "This visit could not be found on the server. Refresh the page and try again.",
+  "visitSummaryVisitNotFoundTitle": "Visit not found"
 }

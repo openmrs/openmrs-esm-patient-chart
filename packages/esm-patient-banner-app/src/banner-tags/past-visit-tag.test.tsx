@@ -30,10 +30,9 @@ describe('PastVisitTag', () => {
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: mockPatient.id,
       patient: mockPatient,
-      visitContext: mockVisit,
-      mutateVisitContext: null,
+      activeVisit: mockVisit,
       setPatient: vi.fn(),
-      setVisitContext: vi.fn(),
+      setActiveVisit: vi.fn(),
     });
 
     render(<PastVisitTag patientUuid={mockPatient.id} />);
@@ -49,10 +48,9 @@ describe('PastVisitTag', () => {
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: mockPatient.id,
       patient: mockPatient,
-      visitContext: { ...mockVisit, stopDatetime: null },
-      mutateVisitContext: null,
+      activeVisit: { ...mockVisit, stopDatetime: null },
       setPatient: vi.fn(),
-      setVisitContext: vi.fn(),
+      setActiveVisit: vi.fn(),
     });
 
     render(<PastVisitTag patientUuid={mockPatient.id} />);
@@ -65,10 +63,9 @@ describe('PastVisitTag', () => {
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: mockPatient.id,
       patient: mockPatient,
-      visitContext: mockVisit,
-      mutateVisitContext: null,
+      activeVisit: mockVisit,
       setPatient: vi.fn(),
-      setVisitContext: vi.fn(),
+      setActiveVisit: vi.fn(),
     });
 
     render(<PastVisitTag patientUuid={mockPatient.id} />);

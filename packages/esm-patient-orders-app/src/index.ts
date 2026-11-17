@@ -19,8 +19,10 @@ export function startupApp() {
 
 export const orderBasketWorkspace = getAsyncLifecycle(() => import('./order-basket/order-basket.workspace'), options);
 
+// The `exported…` names are referenced by other apps' routes.json. They are the same components as
+// the patient chart's: all of them take the patient / visit as window props.
 export const exportedOrderBasketWorkspace = getAsyncLifecycle(
-  () => import('./order-basket/exported-order-basket.workspace'),
+  () => import('./order-basket/order-basket.workspace'),
   options,
 );
 
@@ -29,8 +31,11 @@ export const testResultsFormWorkspace = getAsyncLifecycle(
   options,
 );
 
+// Referenced by other apps' routes.json (e.g. the Laboratory app). The same component as
+// `testResultsFormWorkspace`: it takes the patient as a window prop (still accepting it as a deprecated
+// workspace prop).
 export const exportedTestResultsFormWorkspace = getAsyncLifecycle(
-  () => import('./lab-results/exported-lab-results-form.workspace'),
+  () => import('./lab-results/lab-results-form.workspace'),
   options,
 );
 
@@ -70,7 +75,7 @@ export const addGeneralOrderWorkspace = getAsyncLifecycle(
 );
 
 export const exportedAddGeneralOrderWorkspace = getAsyncLifecycle(
-  () => import('./order-basket/general-order-type/add-general-order/exported-add-general-order.workspace'),
+  () => import('./order-basket/general-order-type/add-general-order/add-general-order.workspace'),
   options,
 );
 

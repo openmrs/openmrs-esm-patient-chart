@@ -9,16 +9,13 @@ import {
   openmrsFetch,
   restBaseUrl,
   useConfig,
-  useConnectivity,
   useEmrConfiguration,
   useFeatureFlag,
   useSession,
-  useVisitTypes,
   type Visit,
 } from '@openmrs/esm-framework';
 import { time12HourFormatRegex, type amPm } from '@openmrs/esm-patient-common-lib';
 import { useDefaultVisitLocation } from '../hooks/useDefaultVisitLocation';
-import { useOfflineVisitType } from '../hooks/useOfflineVisitType';
 import { type ChartConfig } from '../../config-schema';
 
 export const visitStatuses = ['new', 'ongoing', 'past'] as const;
@@ -75,15 +72,6 @@ export function extractErrorMessagesFromResponse(errorObject: ErrorObject, t: TF
   }
 
   return message ?? code ?? t('unknownError', 'Unknown error');
-}
-// *****************
-
-export function useConditionalVisitTypes() {
-  const isOnline = useConnectivity();
-
-  const visitTypesHook = isOnline ? useVisitTypes : useOfflineVisitType;
-
-  return visitTypesHook();
 }
 
 interface PatientPersonResponse {
@@ -164,9 +152,8 @@ export function useEarliestAllowedVisitStartDate(patientUuid: string) {
 }
 
 export function useAllowOverlappingVisits() {
-  const isOnline = useConnectivity();
   const { data, error, isLoading } = useSWRImmutable<FetchResponse<{ value: string }>>(
-    isOnline ? `${restBaseUrl}/systemsetting/visits.allowOverlappingVisits?v=custom:(value)` : null,
+    `${restBaseUrl}/systemsetting/visits.allowOverlappingVisits?v=custom:(value)`,
     openmrsFetch,
   );
   return {
@@ -238,7 +225,7 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit, earliestA
     // precision) because the backend doesn't necessarily preserve the exact 23:59:59.999 the
     // frontend computes via dayjs(...).endOf('day') on round-trip through the REST API. Visits
     // with specific manual times must not be misrepresented as full-day. New visits are handled
-    // separately by a useEffect in exported-visit-form.workspace.tsx that defaults this to true
+    // separately by a useEffect in visit-form.workspace.tsx that defaults this to true
     // when the user switches a brand new visit's status to "past" via the content switcher.
     const isVisitToEditFullDay =
       Boolean(visitToEdit?.startDatetime) &&
@@ -363,7 +350,7 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit, earliestA
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: t('endDateTimeRequired', 'End date and time are required'),
-              path: ['visitStopDate'],
+              path: [isFullDay ? 'visitStartDate' : 'visitStopDate'],
             });
           } else if (visitStopDateTime > now) {
             ctx.addIssue({
@@ -371,11 +358,14 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit, earliestA
               message: t('futureEndTime', 'End time cannot be in the future'),
               path: [isFullDay ? 'visitStartDate' : 'visitStopTime'],
             });
-          } else if (visitStopDateTime < visitStartDateTime) {
+          } else if (visitStartDateTime !== null && visitStopDateTime < visitStartDateTime) {
+            // When both fall on the same day it is the time, not the date, that is out of
+            // order, so flag the time field. Otherwise the stop date itself is the culprit.
+            const isSameDay = dayjs(visitStopDate).isSame(visitStartDate, 'day');
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: t('endTimeMustBeAfterStartTime', 'End time must be after start time'),
-              path: ['visitStopDate'],
+              path: [isFullDay ? 'visitStartDate' : isSameDay ? 'visitStopTime' : 'visitStopDate'],
             });
           } else if (visitStopDateTime.getTime() < lastEncounterDateTime) {
             ctx.addIssue({

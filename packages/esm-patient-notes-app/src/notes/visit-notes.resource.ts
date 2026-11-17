@@ -1,6 +1,9 @@
+import { useMemo } from 'react';
 import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 import useSWRInfinite from 'swr/infinite';
-import { openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, useAttachments, useConfig, type FetchResponse } from '@openmrs/esm-framework';
+import { getAttachmentBytesUrl } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 import type {
   Concept,
@@ -10,6 +13,36 @@ import type {
   RESTPatientNote,
   VisitNotePayload,
 } from '../types';
+
+export interface SavedVisitNoteImage {
+  id: string;
+  src: string;
+  description?: string;
+  filename?: string;
+}
+
+/**
+ * The images already recorded on a visit note's encounter. Nothing is fetched until an
+ * encounter UUID is known, so the create form makes no request.
+ */
+export function useVisitNoteImages(patientUuid: string, encounterUuid?: string) {
+  const { data, isLoading, error } = useAttachments(encounterUuid ? patientUuid : null, false, encounterUuid);
+
+  const images = useMemo<Array<SavedVisitNoteImage>>(
+    () =>
+      data
+        .filter((attachment) => attachment.bytesContentFamily === 'IMAGE')
+        .map((attachment) => ({
+          id: attachment.uuid,
+          src: getAttachmentBytesUrl(attachment.uuid),
+          description: attachment.comment,
+          filename: attachment.filename,
+        })),
+    [data],
+  );
+
+  return { images, isLoading, error };
+}
 
 interface UseVisitNotes {
   visitNotes: Array<PatientNote> | null;
@@ -72,6 +105,32 @@ export function fetchDiagnosisConceptsByName(searchTerm: string, diagnosisConcep
   return openmrsFetch<Array<Concept>>(url).then(({ data }) => Promise.resolve(data['results']));
 }
 
+/**
+ * Fetch classes for stored coded diagnoses in one cached request. Unresolved references
+ * are omitted by the endpoint; return null so the form can retain its certainty action.
+ */
+export function useDiagnosisConceptClasses(conceptUuids: Array<string>) {
+  const { data, error, isLoading } = useSWRImmutable<
+    FetchResponse<Record<string, { conceptClass?: { uuid: string } }>>,
+    Error
+  >(
+    conceptUuids.length > 0
+      ? `${restBaseUrl}/conceptreferences?references=${conceptUuids.join(',')}&v=custom:(uuid,conceptClass:(uuid))`
+      : null,
+    openmrsFetch,
+  );
+
+  const conceptClassByUuid = useMemo<Record<string, string | null>>(
+    () =>
+      data?.data
+        ? Object.fromEntries(conceptUuids.map((uuid) => [uuid, data.data[uuid]?.conceptClass?.uuid ?? null]))
+        : {},
+    [conceptUuids, data],
+  );
+
+  return { conceptClassByUuid, error, isLoading };
+}
+
 export function saveVisitNote(abortController: AbortController, payload: VisitNotePayload) {
   return openmrsFetch(`${restBaseUrl}/encounter`, {
     headers: {
@@ -110,4 +169,9 @@ export function deletePatientDiagnosis(abortController: AbortController, diagnos
     method: 'DELETE',
     signal: abortController.signal,
   });
+}
+
+/** Void only the image obs. The attachment DELETE endpoint can also void its encounter. */
+export function removeVisitNoteImage(imageUuid: string) {
+  return openmrsFetch(`${restBaseUrl}/obs/${imageUuid}?reason=Removed%20from%20visit%20note`, { method: 'DELETE' });
 }

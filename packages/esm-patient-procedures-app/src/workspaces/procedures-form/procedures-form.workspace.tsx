@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Workspace2 } from '@openmrs/esm-framework';
-import type { PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
+import { ExtensionSlot, Workspace2 } from '@openmrs/esm-framework';
+import { type PatientWorkspace2DefinitionProps, useShowPatientBanner } from '@openmrs/esm-patient-common-lib';
 import ProceduresForm from './procedures.form.component';
 import type { Procedure } from '../../types';
 
@@ -66,10 +66,12 @@ export type ProceduresFormSchema = z.infer<ReturnType<typeof createSchema>>;
 
 const ProceduresFormWorkspace: React.FC<PatientWorkspace2DefinitionProps<ProceduresFormProps, object>> = ({
   closeWorkspace,
-  groupProps: { patientUuid },
+  groupProps,
   workspaceProps: { procedure, formContext },
 }) => {
+  const { patient, patientUuid } = groupProps;
   const { t } = useTranslation();
+  const shouldShowPatientBanner = useShowPatientBanner(groupProps);
   const schema = useMemo(() => createSchema(t), [t]);
 
   const methods = useForm<ProceduresFormSchema>({
@@ -100,6 +102,9 @@ const ProceduresFormWorkspace: React.FC<PatientWorkspace2DefinitionProps<Procedu
       }
       hasUnsavedChanges={methods.formState.isDirty}
     >
+      {shouldShowPatientBanner && patient && patientUuid && (
+        <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
+      )}
       <FormProvider {...methods}>
         <ProceduresForm closeWorkspace={closeWorkspaceHandler} patientUuid={patientUuid} procedure={procedure} />
       </FormProvider>

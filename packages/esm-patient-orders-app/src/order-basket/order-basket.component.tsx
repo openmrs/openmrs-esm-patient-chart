@@ -31,14 +31,12 @@ import {
 import { type ConfigObject } from '../config-schema';
 import { type Provider, useOrderEncounterForSystemWithVisitDisabled, useProviders } from '../api/api';
 import GeneralOrderPanel from './general-order-type/general-order-panel.component';
-import { getEarliestStartDate } from './order-basket.utils';
 import styles from './order-basket.scss';
 
 interface OrderBasketProps {
   patientUuid: string;
   patient: fhir.Patient;
   visitContext: Visit;
-  mutateVisitContext: () => void;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   orderBasketExtensionProps: OrderBasketExtensionProps;
   showPatientBanner?: boolean;
@@ -49,7 +47,6 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
   patientUuid,
   patient,
   visitContext,
-  mutateVisitContext,
   closeWorkspace,
   orderBasketExtensionProps,
   showPatientBanner,
@@ -113,11 +110,6 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
     // If orderEncounterUuid is present, then just post the orders to that encounter.
     if (!orderEncounterUuid) {
       try {
-        // Backend rejects orders whose dateActivated is before the encounter's encounterDatetime,
-        // so set encounterDatetime to the earliest selected start date among basket items.
-        // postOrdersOnNewEncounter clamps this to the visit window before posting.
-        const encounterDate = getEarliestStartDate(orders);
-
         const postedEncounter = await postOrdersOnNewEncounter(
           patientUuid,
           orderEncounterType,
@@ -125,12 +117,9 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
           orderLocationUuid,
           orderer.uuid,
           abortController,
-          encounterDate,
         );
         await closeWorkspace({ discardUnsavedChanges: true });
         mutateEncounterUuid();
-        // Only revalidate current visit since orders create new encounters
-        mutateVisitContext?.();
         invalidateVisitAndEncounterData(mutate, patientUuid);
         clearOrders();
         await mutateOrders();
@@ -175,8 +164,6 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
           setOrdersWithErrors(erroredItems);
         }
         clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
-        // Only revalidate current visit since orders create new encounters
-        mutateVisitContext?.();
         await mutateOrders();
         invalidateVisitAndEncounterData(mutate, patientUuid);
         onOrderBasketSubmitted?.(orderEncounterUuid, postedOrders);
@@ -198,7 +185,6 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
     orderEncounterUuid,
     mutateEncounterUuid,
     mutateOrders,
-    mutateVisitContext,
     orders,
     patientUuid,
     t,

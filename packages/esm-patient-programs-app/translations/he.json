@@ -8,6 +8,7 @@
   "chooseProgram": "בחר תוכנית",
   "chooseStatus": "Choose a program status",
   "completedOn": "הושלם בתאריך",
+  "completionDateCannotBeBeforeEnrollmentDate": "Completion date cannot be before the enrollment date",
   "configurePrograms": "אנא הגדר תוכניות כדי להמשיך.",
   "dateCompleted": "תאריך השלמה",
   "dateEnrolled": "תאריך הרשמה",

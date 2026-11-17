@@ -39,7 +39,6 @@ export function buildBasketItem(
     patientInstructions: '',
     asNeeded: false,
     asNeededCondition: null,
-    scheduledDate: new Date(),
     duration: null,
     durationUnit: daysDurationUnit ? { value: daysDurationUnit.display, valueCoded: daysDurationUnit.uuid } : null,
     pillsDispensed: null,

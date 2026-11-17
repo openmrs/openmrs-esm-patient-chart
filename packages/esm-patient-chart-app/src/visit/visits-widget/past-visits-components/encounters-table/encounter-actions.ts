@@ -1,0 +1,129 @@
+import type { TFunction } from 'i18next';
+import type { useSWRConfig } from 'swr';
+import {
+  type Encounter,
+  launchWorkspace2,
+  type LoggedInUser,
+  showModal,
+  showSnackbar,
+  userHasAccess,
+} from '@openmrs/esm-framework';
+import { getPatientChartWindowProps, invalidateVisitAndEncounterData } from '@openmrs/esm-patient-common-lib';
+import { type ChartConfig } from '../../../../config-schema';
+import { deleteEncounter, type EncountersTableProps, type MappedEncounter } from './encounters-table.resource';
+
+/**
+ * A "Visit Note" encounter created outside of a form is edited through the visit notes workspace
+ * rather than the generic form entry workspace.
+ */
+export function isVisitNoteEncounter(encounter: Encounter): boolean {
+  return encounter.encounterType?.display === 'Visit Note' && !encounter.form;
+}
+
+/**
+ * An encounter can be modified by users holding its edit privilege, but only while it is within the
+ * configured editable window, unless they hold one of the privileges that overrides that window.
+ */
+export function canModifyEncounter(
+  encounter: MappedEncounter,
+  user: LoggedInUser,
+  {
+    encounterEditableDuration,
+    encounterEditableDurationOverridePrivileges,
+  }: Pick<ChartConfig, 'encounterEditableDuration' | 'encounterEditableDurationOverridePrivileges'>,
+): boolean {
+  if (!userHasAccess(encounter.editPrivilege, user)) {
+    return false;
+  }
+
+  if (encounterEditableDuration === 0) {
+    return true;
+  }
+
+  const encounterAgeInMinutes = (Date.now() - new Date(encounter.rawDatetime).getTime()) / (1000 * 60);
+
+  return (
+    encounterAgeInMinutes <= encounterEditableDuration ||
+    encounterEditableDurationOverridePrivileges.some((privilege) => userHasAccess(privilege, user))
+  );
+}
+
+/**
+ * Hands the encounter to the host's `onEditEncounter` if it supplied one, and otherwise launches the
+ * chart's own edit workspace for it.
+ */
+export function editEncounter(
+  encounter: Encounter,
+  patientUuid: string,
+  onEditEncounter?: EncountersTableProps['onEditEncounter'],
+) {
+  if (onEditEncounter) {
+    onEditEncounter(encounter, isVisitNoteEncounter(encounter));
+  } else if (isVisitNoteEncounter(encounter)) {
+    launchWorkspace2(
+      'visit-notes-form-workspace',
+      {
+        encounter,
+        formContext: 'editing',
+      },
+      getPatientChartWindowProps(patientUuid),
+    );
+  } else {
+    launchWorkspace2(
+      'patient-form-entry-workspace',
+      {
+        form: encounter.form,
+        encounterUuid: encounter.uuid,
+      },
+      getPatientChartWindowProps(patientUuid),
+    );
+  }
+}
+
+interface ConfirmAndDeleteEncounterArgs {
+  encounterUuid: string;
+  encounterTypeName?: string;
+  patientUuid: string;
+  t: TFunction;
+  mutate: ReturnType<typeof useSWRConfig>['mutate'];
+}
+
+export function confirmAndDeleteEncounter({
+  encounterUuid,
+  encounterTypeName,
+  patientUuid,
+  t,
+  mutate,
+}: ConfirmAndDeleteEncounterArgs) {
+  const dispose = showModal('delete-encounter-modal', {
+    close: () => dispose(),
+    encounterTypeName: encounterTypeName || '',
+    onConfirmation: () => {
+      const abortController = new AbortController();
+      deleteEncounter(encounterUuid, abortController)
+        .then(() => {
+          // Invalidate visit history and encounter tables since the encounter was deleted
+          invalidateVisitAndEncounterData(mutate, patientUuid);
+
+          showSnackbar({
+            isLowContrast: true,
+            title: t('encounterDeleted', 'Encounter deleted'),
+            subtitle: t('encounterSuccessfullyDeleted', 'The encounter has been deleted successfully'),
+            kind: 'success',
+          });
+        })
+        .catch(() => {
+          showSnackbar({
+            isLowContrast: false,
+            title: t('error', 'Error'),
+            subtitle: t(
+              'encounterWithError',
+              'The encounter could not be deleted successfully. If the error persists, please contact your system administrator.',
+            ),
+            kind: 'error',
+          });
+        });
+      dispose();
+    },
+  });
+}

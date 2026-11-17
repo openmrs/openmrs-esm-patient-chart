@@ -19,10 +19,9 @@ describe('CurrentVisitSummary', () => {
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: mockPatient.id,
       patient: mockPatient,
-      visitContext: null,
-      mutateVisitContext: null,
+      activeVisit: null,
       setPatient: vi.fn(),
-      setVisitContext: vi.fn(),
+      setActiveVisit: vi.fn(),
     });
     render(<CurrentVisitSummary patientUuid={mockPatient.id} />);
     expect(screen.getByText(/current visit/i)).toBeInTheDocument();
@@ -33,10 +32,9 @@ describe('CurrentVisitSummary', () => {
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: 'different-patient-id',
       patient: mockPatient,
-      visitContext: null,
-      mutateVisitContext: null,
+      activeVisit: null,
       setPatient: vi.fn(),
-      setVisitContext: vi.fn(),
+      setActiveVisit: vi.fn(),
     });
     render(<CurrentVisitSummary patientUuid={mockPatient.id} />);
     expect(screen.queryByText(/current visit/i)).not.toBeInTheDocument();
@@ -47,7 +45,7 @@ describe('CurrentVisitSummary', () => {
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: mockPatient.id,
       patient: mockPatient,
-      visitContext: {
+      activeVisit: {
         uuid: 'some-uuid',
         display: 'Visit 1',
         startDatetime: '2021-03-23T10:00:00.000+0300',
@@ -66,9 +64,8 @@ describe('CurrentVisitSummary', () => {
           display: 'Test Patient',
         },
       },
-      mutateVisitContext: null,
       setPatient: vi.fn(),
-      setVisitContext: vi.fn(),
+      setActiveVisit: vi.fn(),
     });
 
     render(<CurrentVisitSummary patientUuid={mockPatient.id} />);
@@ -77,7 +74,7 @@ describe('CurrentVisitSummary', () => {
 
     expect(screen.getByText(/current visit/i)).toBeInTheDocument();
     expect(screen.getByText('Diagnoses')).toBeInTheDocument();
-    const buttonNames = ['Notes', 'Tests', 'Medications', 'Encounters'];
+    const buttonNames = ['Timeline', 'Notes', 'Tests', 'Medications', 'Completed forms'];
     buttonNames.forEach((buttonName) => {
       expect(screen.getByRole('tab', { name: buttonName })).toBeInTheDocument();
     });

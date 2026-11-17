@@ -94,7 +94,7 @@ function PrintModal({
       name: patient ? getPatientName(patient) : '',
       age: age(patient?.birthDate),
       gender: getGender(patient?.gender),
-      location: patient?.address?.[0].city,
+      location: patient?.address?.[0]?.city,
       identifiers: identifiers?.length ? identifiers.map(({ value }) => value) : [],
     };
   }, [patient, excludePatientIdentifierCodeTypes?.uuids]);

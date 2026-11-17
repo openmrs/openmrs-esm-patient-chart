@@ -53,7 +53,6 @@ function renderOrderBasket(visibleOrderPanels?: string[]) {
       patientUuid={mockPatient.id}
       patient={mockPatient}
       visitContext={null}
-      mutateVisitContext={vi.fn()}
       closeWorkspace={vi.fn().mockResolvedValue(true)}
       orderBasketExtensionProps={orderBasketExtensionProps}
     />,

@@ -20,12 +20,10 @@ import {
 import { capitalize } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
-import { useSWRConfig } from 'swr';
 import {
   CardHeader,
   compare,
-  invalidateVisitAndEncounterData,
-  invalidateVisitByUuid,
+  getPatientChartWindowProps,
   PatientChartPagination,
   type DrugOrderBasketItem,
   type Order,
@@ -33,6 +31,7 @@ import {
   type PatientWorkspaceGroupProps,
   useLaunchWorkspaceRequiringVisit,
   useOrderBasket,
+  useStartVisitIfNeeded,
 } from '@openmrs/esm-patient-common-lib';
 import {
   AddIcon,
@@ -230,14 +229,14 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
 
     const identifiers =
       patient?.identifier?.filter(
-        (identifier) => !excludePatientIdentifierCodeTypes?.uuids.includes(identifier.type.coding[0].code),
+        (identifier) => !excludePatientIdentifierCodeTypes?.uuids.includes(identifier.type?.coding?.[0]?.code),
       ) ?? [];
 
     return {
       name: patient ? getPatientName(patient) : '',
       age: age(patient?.birthDate),
       gender: getGender(patient?.gender),
-      location: patient?.address?.[0].city,
+      location: patient?.address?.[0]?.city,
       identifiers: identifiers?.length ? identifiers.map(({ value }) => value) : [],
     };
   }, [patient, t, excludePatientIdentifierCodeTypes?.uuids]);
@@ -397,32 +396,42 @@ function OrderBasketItemActions({
   items: Array<DrugOrderBasketItem>;
   setItems: (items: Array<DrugOrderBasketItem>) => void;
 }) {
-  const { mutate: globalMutate } = useSWRConfig();
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const alreadyInBasket = items.some((x) => x.uuid === medication.uuid);
+  const startVisitIfNeeded = useStartVisitIfNeeded(patient.id);
+
+  // Renewing awaits the visit prompt, which stays open for as long as the user takes to answer
+  // it. Reading the basket through a ref means the renewal is appended to whatever the basket
+  // holds by then, rather than to a snapshot taken before the prompt opened.
+  const itemsRef = useRef(items);
+  useEffect(() => {
+    itemsRef.current = items;
+  }, [items]);
 
   const workspaceGroupProps: PatientWorkspaceGroupProps = useMemo(
     () => ({
       patient,
       patientUuid: patient.id,
-      visitContext: medication.encounter.visit,
-      mutateVisitContext: () => {
-        invalidateVisitByUuid(globalMutate, medication.encounter.visit?.uuid);
-        invalidateVisitAndEncounterData(globalMutate, patient.id);
-      },
+      activeVisit: medication.encounter.visit,
+      showPatientBanner: 'tabletOnly',
     }),
-    [patient, medication, globalMutate],
+    [patient, medication],
+  );
+  // The workspaces read the patient / visit from their window props, not from the group props
+  const workspaceWindowProps = useMemo(
+    () => ({ patient, patientUuid: patient.id, visitContext: medication.encounter.visit }),
+    [patient, medication.encounter.visit],
   );
   const handleDiscontinueClick = useCallback(() => {
     setItems([...items, buildMedicationOrder(medication, 'DISCONTINUE')]);
     launchWorkspace2<{}, OrderBasketWindowProps, PatientWorkspaceGroupProps>(
       'order-basket',
       {},
-      { encounterUuid: medication.encounter.uuid },
+      workspaceWindowProps,
       workspaceGroupProps,
     );
-  }, [items, setItems, medication, workspaceGroupProps]);
+  }, [items, setItems, medication, workspaceWindowProps, workspaceGroupProps]);
 
   const handleModifyClick = useCallback(() => {
     launchWorkspace2<AddDrugOrderWorkspaceProps, OrderBasketWindowProps, PatientWorkspaceGroupProps>(
@@ -431,24 +440,26 @@ function OrderBasketItemActions({
         order: buildMedicationOrder(medication, 'REVISE'),
         orderToEditOrdererUuid: medication.orderer.uuid,
       },
-      { encounterUuid: medication.encounter.uuid },
+      workspaceWindowProps,
       workspaceGroupProps,
     );
-  }, [medication, workspaceGroupProps]);
+  }, [medication, workspaceWindowProps, workspaceGroupProps]);
 
-  const handleRenewClick = useCallback(() => {
-    setItems([...items, buildMedicationOrder(medication, 'RENEW')]);
-    launchWorkspace2<{}, OrderBasketWindowProps, PatientWorkspaceGroupProps>(
-      'order-basket',
-      {},
-      { encounterUuid: medication.encounter.uuid },
-      workspaceGroupProps,
-    );
-  }, [items, setItems, medication, workspaceGroupProps]);
+  const handleRenewClick = useCallback(async () => {
+    const canProceed = await startVisitIfNeeded();
+    if (!canProceed) {
+      return;
+    }
+
+    setItems([...itemsRef.current, buildMedicationOrder(medication, 'RENEW')]);
+    // Launched without group props so that the basket uses the chart's current visit
+    launchWorkspace2('order-basket', {}, getPatientChartWindowProps(patient.id));
+  }, [startVisitIfNeeded, setItems, medication, patient.id]);
 
   return (
     <OverflowMenu
       aria-label={t('actionsMenu', 'Actions menu')}
+      iconDescription={t('actionsMenu', 'Actions menu')}
       align="left"
       selectorPrimaryFocus={'#modify'}
       flipped

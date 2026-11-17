@@ -1,5 +1,4 @@
-import { Button } from '@carbon/react';
-import { showModal, useFeatureFlag } from '@openmrs/esm-framework';
+import { useFeatureFlag } from '@openmrs/esm-framework';
 import classNames from 'classnames';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,18 +23,10 @@ const VisitContextHeader: React.FC<VisitContextHeaderProps> = ({ patientUuid }) 
   const { systemVisitEnabled } = useSystemVisitSetting();
   const isRdeEnabled = useFeatureFlag('rde');
 
-  const { visitContext } = usePatientChartStore(patientUuid);
-  const isActiveVisit = Boolean(visitContext && !visitContext.stopDatetime);
+  const { activeVisit } = usePatientChartStore(patientUuid);
+  const isActiveVisit = Boolean(activeVisit && !activeVisit.stopDatetime);
 
-  const showVisitContextHeader = systemVisitEnabled && isRdeEnabled && visitContext;
-
-  const openVisitSwitcherModal = () => {
-    const dispose = showModal('visit-context-switcher', {
-      patientUuid,
-      closeModal: () => dispose(),
-      size: 'sm',
-    });
-  };
+  const showVisitContextHeader = systemVisitEnabled && isRdeEnabled && activeVisit;
 
   if (!showVisitContextHeader) {
     return null;
@@ -45,14 +36,9 @@ const VisitContextHeader: React.FC<VisitContextHeaderProps> = ({ patientUuid }) 
       className={classNames(styles.visitContextHeader, isActiveVisit ? styles.activeVisit : styles.retroactiveVisit)}
     >
       <div className={styles.addingTo}>{t('addingToVisit', 'Adding to:')}</div>
-      <div className={styles.visitType}>{visitContext.visitType?.display}</div>
-      <div className={styles.changeVisitButton}>
-        <Button kind="ghost" size="sm" onClick={openVisitSwitcherModal}>
-          {t('change', 'Change')}
-        </Button>
-      </div>
+      <div className={styles.visitType}>{activeVisit.visitType?.display}</div>
       <div className={styles.visitInfo}>
-        <VisitContextInfo visit={visitContext} />
+        <VisitContextInfo visit={activeVisit} />
       </div>
     </div>
   );

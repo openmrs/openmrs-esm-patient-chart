@@ -133,17 +133,6 @@
   @extend .button;
 }
 
-@media print {
-  html,
-  body {
-    margin: 0 !important;
-    width: fit-content;
-    padding: 0 !important;
-    overflow: hidden;
-    page-break-inside: avoid;
-  }
-}
-
 .filterContainer {
   display: flex;
   align-items: center;

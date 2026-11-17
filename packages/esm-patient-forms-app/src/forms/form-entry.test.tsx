@@ -1,10 +1,16 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { BehaviorSubject } from 'rxjs';
-import { ExtensionSlot, openmrsFetch, useConnectivity } from '@openmrs/esm-framework';
+import { ExtensionSlot, openmrsFetch, usePatient, Workspace2 } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import FormEntry, { type FormEntryProps } from './form-entry.component';
+import FormEntryWorkspace from './form-entry.workspace';
+
+vi.mock('../htmlformentry/html-form-entry-wrapper.component', () => ({
+  default: () => <iframe title="Legacy HTML form" />,
+}));
 
 const defaultProps: FormEntryProps = {
   form: {
@@ -18,19 +24,18 @@ const defaultProps: FormEntryProps = {
   patientUuid: mockPatient.id,
   patient: mockPatient,
   visitContext: null,
-  mutateVisitContext: null,
   closeWorkspace: vi.fn(),
 };
 
 const mockFormEntrySub = vi.fn();
-const mockUseConnectivity = vi.mocked(useConnectivity);
 const mockOpenmrsFetch = vi.mocked(openmrsFetch);
+const mockUsePatient = vi.mocked(usePatient);
 
 const mockExtensionSlot = vi.mocked(ExtensionSlot);
+const mockWorkspace2 = vi.mocked(Workspace2);
 
 describe('FormEntry', () => {
   beforeEach(() => {
-    mockUseConnectivity.mockReturnValue(true);
     mockFormEntrySub.mockReturnValue(
       new BehaviorSubject({ encounterUuid: null, formUuid: 'some-form-uuid', patient: mockPatient }),
     );
@@ -42,6 +47,51 @@ describe('FormEntry', () => {
 
     await screen.findByText(/form-widget-slot/);
     expect(screen.getByText(/form-widget-slot/)).toBeInTheDocument();
+  });
+
+  it('keeps the unsaved-changes prompt when going back from a form with changes', async () => {
+    const user = userEvent.setup();
+    const closeWorkspace = vi.fn();
+    render(<FormEntry {...defaultProps} showBackButton closeWorkspace={closeWorkspace} />);
+
+    const { state } = mockExtensionSlot.mock.calls.find(([props]) => props.name === 'form-widget-slot')[0];
+    const setHasUnsavedChanges = state.setHasUnsavedChanges as (hasUnsavedChanges: boolean) => void;
+    act(() => setHasUnsavedChanges(true));
+
+    expect(mockWorkspace2.mock.lastCall[0].hasUnsavedChanges).toBe(true);
+
+    await user.click(screen.getByRole('button', { name: /Back to clinical forms/ }));
+
+    expect(closeWorkspace).toHaveBeenCalledExactlyOnceWith();
+  });
+
+  it('does not offer Back when opened without a parent', () => {
+    render(<FormEntry {...defaultProps} />);
+
+    expect(screen.queryByRole('button', { name: /Back to clinical forms/ })).not.toBeInTheDocument();
+  });
+
+  it('does not offer Back for legacy HTML forms without unsaved-change tracking', () => {
+    render(
+      <FormEntry
+        {...defaultProps}
+        showBackButton
+        form={{
+          ...defaultProps.form,
+          resources: [
+            {
+              uuid: 'html-form-engine-resource',
+              name: 'formEngine',
+              dataType: 'java.lang.String',
+              valueReference: 'htmlformentry',
+            },
+          ],
+        }}
+      />,
+    );
+
+    expect(screen.queryByRole('button', { name: /Back to clinical forms/ })).not.toBeInTheDocument();
+    expect(screen.getByTitle('Legacy HTML form')).toBeInTheDocument();
   });
 
   it('uses the encounter visit when editing an existing encounter', async () => {
@@ -91,5 +141,63 @@ describe('FormEntry', () => {
     const state = mockExtensionSlot.mock.calls.find((call) => call[0].name === 'form-widget-slot')?.[0].state;
     expect(state.visitUuid).toBeNull();
     expect(state.visit).toBeNull();
+  });
+});
+
+describe('Form entry workspaces', () => {
+  const workspaceDefinitionProps = {
+    closeWorkspace: vi.fn(),
+    launchChildWorkspace: vi.fn(),
+    workspaceName: 'patient-form-entry-workspace',
+    windowName: 'patient-chart-clinical-forms',
+    showActionMenu: true,
+  };
+
+  it('offers Back in the workspace only when it has a parent', () => {
+    const props = {
+      ...workspaceDefinitionProps,
+      workspaceProps: { form: defaultProps.form },
+      windowProps: { patient: mockPatient, patientUuid: mockPatient.id, visitContext: null },
+      groupProps: {},
+    };
+    const { rerender } = render(<FormEntryWorkspace {...props} isRootWorkspace={false} />);
+
+    expect(screen.getByRole('button', { name: /Back to clinical forms/ })).toBeInTheDocument();
+
+    rerender(<FormEntryWorkspace {...props} isRootWorkspace />);
+
+    expect(screen.queryByRole('button', { name: /Back to clinical forms/ })).not.toBeInTheDocument();
+  });
+
+  it('shows the patient banner with the full patient when the window supplies a partial patient', () => {
+    // E.g. the ward passes a REST patient, and child workspaces inherit the window props of their parent
+    const partialPatient = { id: mockPatient.id, birthDate: mockPatient.birthDate } as fhir.Patient;
+    mockUsePatient.mockReturnValue({
+      patient: mockPatient,
+      patientUuid: mockPatient.id,
+      isLoading: false,
+      error: null,
+    });
+    mockExtensionSlot.mockImplementation((ext) => ext.name as any);
+
+    render(
+      <FormEntryWorkspace
+        {...workspaceDefinitionProps}
+        workspaceProps={{ form: defaultProps.form }}
+        windowProps={{ patient: partialPatient, patientUuid: mockPatient.id, visitContext: null }}
+        groupProps={{ showPatientBanner: 'always' }}
+        isRootWorkspace
+      />,
+    );
+
+    expect(mockUsePatient).toHaveBeenCalledWith(mockPatient.id);
+    expect(
+      mockExtensionSlot.mock.calls.some(
+        ([props]) =>
+          props.name === 'patient-header-slot' &&
+          props.state.patientUuid === mockPatient.id &&
+          props.state.patient === mockPatient,
+      ),
+    ).toBe(true);
   });
 });

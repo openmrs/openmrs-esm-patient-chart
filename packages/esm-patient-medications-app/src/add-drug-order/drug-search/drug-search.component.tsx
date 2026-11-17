@@ -23,6 +23,9 @@ export interface DrugSearchProps {
   searchTerm: string;
   onSearchTermChange: (term: string) => void;
   launchAllergyForm?: () => void;
+  prescribedDrugUuids?: Set<string>;
+  isLoadingOrders?: boolean;
+  ordersError?: Error;
 }
 
 export default function DrugSearch({
@@ -33,6 +36,9 @@ export default function DrugSearch({
   searchTerm,
   onSearchTermChange,
   launchAllergyForm,
+  prescribedDrugUuids = new Set<string>(),
+  isLoadingOrders = false,
+  ordersError,
 }: DrugSearchProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -72,7 +78,15 @@ export default function DrugSearch({
       </ResponsiveWrapper>
       <ExtensionSlot
         name="drug-search-slot"
-        state={{ openOrderForm, isSearching: Boolean(debouncedSearchTerm), visit, daysDurationUnit }}
+        state={{
+          openOrderForm,
+          isSearching: Boolean(debouncedSearchTerm),
+          visit,
+          daysDurationUnit,
+          prescribedDrugUuids,
+          isLoadingOrders,
+          ordersError,
+        }}
       />
       <OrderBasketSearchResults
         searchTerm={debouncedSearchTerm}

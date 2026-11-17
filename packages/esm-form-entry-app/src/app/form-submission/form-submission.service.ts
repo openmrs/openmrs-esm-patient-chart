@@ -1,23 +1,15 @@
 import { Injectable } from '@angular/core';
 
-import { forkJoin, Observable, of, from } from 'rxjs';
-import { catchError, mergeMap, switchMap } from 'rxjs/operators';
-import { EncounterAdapter, Form, NodeBase, PersonAttributeAdapter } from '@openmrs/ngx-formentry';
-import { Form as ReactForm } from '@openmrs/esm-patient-common-lib';
+import { defer, forkJoin, Observable, of } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
+import { EncounterAdapter, Form, PersonAttributeAdapter } from '@openmrs/ngx-formentry';
 import { EncounterResourceService } from '../openmrs-api/encounter-resource.service';
 import { PersonResourceService } from '../openmrs-api/person-resource.service';
 import { FormDataSourceService } from '../form-data-source/form-data-source.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Person, PersonUpdate, EncounterCreate, Encounter, IdentifierPayload, Identifier, ErrorObject } from '../types';
-import {
-  findQueuedPatientFormSyncItemByContentId,
-  PatientFormSyncItemContent,
-  queuePatientFormSyncItem,
-} from '../offline/sync';
-import { cloneDeep, isEmpty } from 'lodash-es';
-import { mutateEncounterCreateToPartialEncounter } from '../offline/syncItemMutation';
+import { isEmpty } from 'lodash-es';
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
-import { v4 } from 'uuid';
 import { VisitResourceService } from '../openmrs-api/visit-resource.service';
 import { PatientResourceService } from '../openmrs-api/patient-resource.service';
 import { ConfigResourceService } from '../services/config-resource.service';
@@ -47,73 +39,19 @@ export class FormSubmissionService {
   ) {}
 
   public submitPayload(form: Form): Observable<FormSubmissionResult> {
-    const isOffline = this.singleSpaPropsService.getProp('isOffline', false);
-    const encounterOrSyncItemIdToEdit = this.singleSpaPropsService.getProp('encounterUuid');
-    const existingSyncItem = from(findQueuedPatientFormSyncItemByContentId(encounterOrSyncItemIdToEdit));
+    return defer(() => {
+      const encounterCreate = this.onEncounterCreate(this.buildEncounterPayload(form));
+      const personUpdate = this.buildPersonUpdatePayload(form);
+      const identifierPayload = this.patientResourceService.buildIdentifierPayload(form);
 
-    return existingSyncItem.pipe(
-      mergeMap((syncItem) => {
-        const isOfflineSubmission = isOffline || !!syncItem;
-
-        if (isOfflineSubmission) {
-          this.deepClearInitialNodeValues(form.rootNode);
-        }
-
-        const encounterCreate = this.onEncounterCreate(this.buildEncounterPayload(form));
-        const personUpdate = this.buildPersonUpdatePayload(form);
-        const identifierPayload = this.patientResourceService.buildIdentifierPayload(form);
-
-        return isOfflineSubmission
-          ? this.submitPayloadOffline(form, encounterCreate, personUpdate, syncItem?.content._id)
-          : this.submitPayloadOnline(encounterCreate, personUpdate, identifierPayload);
-      }),
-    );
-  }
-
-  /**
-   * Recursively clears all `initialValue` attributes of the given form node and of all its children.
-   * This ensures that the form node returns the final entities (e.g. encounters) in the "Create" format
-   * (and not the diffed "Update" format).
-   * @param node The form node whose `initialValue` attributes should be cleared (recursively, i.e. including
-   * all of the nodes children).
-   */
-  private deepClearInitialNodeValues(node: NodeBase) {
-    node.initialValue = undefined;
-
-    if (node.children && typeof node.children === 'object') {
-      for (const child of Object.values(node.children)) {
-        this.deepClearInitialNodeValues(child as NodeBase);
-      }
-    }
+      return this.submitPayloadOnline(encounterCreate, personUpdate, identifierPayload);
+    });
   }
 
   private onEncounterCreate(encounterCreate: EncounterCreate): EncounterCreate {
     const handleEncounterCreate = this.singleSpaPropsService.getProp('handleEncounterCreate');
     if (handleEncounterCreate && typeof handleEncounterCreate === 'function') handleEncounterCreate(encounterCreate);
     return encounterCreate;
-  }
-
-  private submitPayloadOffline(
-    form: Form,
-    encounterCreate: EncounterCreate,
-    personUpdate: PersonUpdate,
-    syncItemIdToEdit: string | undefined,
-  ): Observable<FormSubmissionResult> {
-    const encounter = mutateEncounterCreateToPartialEncounter(cloneDeep(encounterCreate));
-    const result: FormSubmissionResult = { encounter: encounter as any };
-    const syncItem: PatientFormSyncItemContent = {
-      _id: syncItemIdToEdit ?? v4(),
-      form: {
-        uuid: form.schema.uuid,
-      } as ReactForm,
-      encounter,
-      _payloads: {
-        encounterCreate,
-        personUpdate,
-      },
-    };
-
-    return from(queuePatientFormSyncItem(syncItem).then(() => result));
   }
 
   private submitPayloadOnline(

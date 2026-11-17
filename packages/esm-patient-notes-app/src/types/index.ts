@@ -151,12 +151,18 @@ export interface ObsData {
   obsDatetime: string;
 }
 
+export type DiagnosisCertainty = 'CONFIRMED' | 'PROVISIONAL';
+
+/** Exactly one of `coded` (concept uuid) or `nonCoded` (free text) is set. */
+export interface CodedOrNonCodedDiagnosis {
+  coded?: string;
+  nonCoded?: string;
+}
+
 export interface Diagnosis {
   patient: string;
-  diagnosis: {
-    coded: string;
-  };
-  certainty: string;
+  diagnosis: CodedOrNonCodedDiagnosis;
+  certainty: DiagnosisCertainty;
   rank: number;
   display: string;
 }
@@ -165,10 +171,8 @@ export interface DiagnosisPayload {
   encounter: string;
   patient: string;
   condition: null;
-  diagnosis: {
-    coded: string;
-  };
-  certainty: string;
+  diagnosis: CodedOrNonCodedDiagnosis;
+  certainty: DiagnosisCertainty;
   rank: number;
 }
 

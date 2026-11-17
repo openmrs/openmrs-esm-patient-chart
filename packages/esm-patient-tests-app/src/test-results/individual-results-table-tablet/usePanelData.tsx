@@ -126,7 +126,7 @@ export default function usePanelData(patientUuid: string) {
         const meta = conceptData[conceptUuid];
         const interpretation = meta?.getInterpretation(value);
 
-        const name = observation?.code.coding[0].display;
+        const name = observation?.code?.coding?.[0]?.display;
         return {
           ...observation,
           conceptUuid,

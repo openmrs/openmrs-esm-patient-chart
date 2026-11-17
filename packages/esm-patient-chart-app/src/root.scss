@@ -33,17 +33,13 @@
 
 // Overriding styles for RTL support
 html[dir='rtl'] {
-  :global(.cds--date-picker-input__wrapper) {
-    svg {
-      left: layout.$spacing-05;
-      right: unset;
-    }
-  }
-  :global(.cds--side-nav) {
-    right: 0;
-    :global(.active-left-nav-link) {
-      border-right: layout.$spacing-02 solid var(--brand-01);
-      border-left: unset;
+  .patientChartWrapper {
+    :global(.cds--side-nav) {
+      right: 0;
+      :global(.active-left-nav-link) {
+        border-right: layout.$spacing-02 solid var(--brand-01);
+        border-left: unset;
+      }
     }
   }
 

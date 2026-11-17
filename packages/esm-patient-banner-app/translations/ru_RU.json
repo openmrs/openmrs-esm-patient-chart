@@ -1,5 +1,5 @@
 {
-  "activeVisit": "Текущее посещение",
+  "activeVisit": "Текущий визит",
   "address1": "Адресная строка 1",
   "address2": "Адресная строка 2",
   "city": "Город",
@@ -9,7 +9,7 @@
   "deceased": "Умер",
   "district": "Район",
   "from_lower": "с",
-  "pastVisitWithDate": "Past visit: {{date}}",
+  "pastVisitWithDate": "Прошлый визит: {{date}}",
   "postalCode": "Почтовый индекс",
   "started": "Начато",
   "state": "Область",

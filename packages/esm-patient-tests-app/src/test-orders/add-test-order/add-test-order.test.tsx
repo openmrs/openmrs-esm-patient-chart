@@ -1,29 +1,36 @@
 import React from 'react';
-import { vi, describe, it, expect, test, beforeEach, type Mock } from 'vitest';
+import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, renderHook, screen, waitFor } from '@testing-library/react';
 import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 import { type PostDataPrepLabOrderFunction } from '../api';
 import {
-  age,
-  closeWorkspace,
+  ExtensionSlot,
   getDefaultsFromConfigSchema,
   useConfig,
   useLayoutType,
+  usePatient,
   useSession,
 } from '@openmrs/esm-framework';
-import { type PostDataPrepFunction, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
+import {
+  type OrderBasketWindowProps,
+  type PostDataPrepFunction,
+  useOrderBasket,
+  useOrderType,
+} from '@openmrs/esm-patient-common-lib';
 import { configSchema, type ConfigObject } from '../../config-schema';
 import { mockSessionDataResponse } from '__mocks__';
 import { mockPatient } from 'tools';
 import { createEmptyLabOrder } from './test-order';
 import AddTestOrderWorkspace from './add-test-order.workspace';
 
-const mockCloseWorkspace = closeWorkspace as Mock;
+const mockCloseWorkspace = vi.fn();
 const mockUseLayoutType = vi.mocked(useLayoutType);
+const mockExtensionSlot = vi.mocked(ExtensionSlot);
 const mockUseSession = vi.mocked(useSession);
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const mockUseOrderType = vi.mocked(useOrderType);
+const mockUsePatient = vi.mocked(usePatient);
 
 const mockTestTypes = [
   // {
@@ -65,16 +72,11 @@ function renderAddLabOrderWorkspace() {
         orderTypeUuid: 'test-lab-order-type-uuid',
         orderToEditOrdererUuid: '',
       }}
-      groupProps={{
-        patientUuid: mockPatient.id,
-        patient: mockPatient,
-        visitContext: null,
-        mutateVisitContext: null,
-      }}
+      groupProps={{ showPatientBanner: 'tabletOnly' }}
       workspaceName={''}
       launchChildWorkspace={vi.fn()}
       windowName={''}
-      windowProps={{ encounterUuid: '' }}
+      windowProps={{ patientUuid: mockPatient.id, patient: mockPatient, visitContext: null }}
       isRootWorkspace={false}
       showActionMenu={true}
     />,
@@ -110,6 +112,12 @@ mockUseOrderType.mockReturnValue({
 describe('AddLabOrder', () => {
   beforeEach(() => {
     _resetOrderBasketStore();
+    mockUsePatient.mockReturnValue({
+      patient: mockPatient,
+      patientUuid: mockPatient.id,
+      isLoading: false,
+      error: null,
+    });
   });
 
   test('happy path fill and submit form', async () => {
@@ -238,16 +246,15 @@ describe('AddLabOrder', () => {
             action: 'REVISE',
           },
         }}
-        groupProps={{
-          patientUuid: mockPatient.id,
-          patient: mockPatient,
-          visitContext: null,
-          mutateVisitContext: null,
-        }}
+        groupProps={{}}
         workspaceName={''}
         launchChildWorkspace={vi.fn()}
         windowName={''}
-        windowProps={{ encounterUuid: '' }}
+        windowProps={{
+          patientUuid: mockPatient.id,
+          patient: mockPatient,
+          visitContext: null,
+        }}
         isRootWorkspace={false}
         showActionMenu={true}
       />,
@@ -286,13 +293,130 @@ describe('AddLabOrder', () => {
     expect(mockCloseWorkspace).toHaveBeenCalled();
   });
 
-  test('should display a patient header on tablet', () => {
+  test('should display the patient header in the chart on tablet only', () => {
     mockUseLayoutType.mockReturnValue('tablet');
+    const { unmount } = renderAddLabOrderWorkspace();
+    expect(
+      mockExtensionSlot.mock.calls.some(
+        ([props]) => props.name === 'patient-header-slot' && props.state.patientUuid === mockPatient.id,
+      ),
+    ).toBe(true);
+    unmount();
+
+    mockExtensionSlot.mockClear();
+    mockUseLayoutType.mockReturnValue('large-desktop');
     renderAddLabOrderWorkspace();
-    expect(screen.getByText(/john wilson/i)).toBeInTheDocument();
-    expect(screen.getByText(/male/i)).toBeInTheDocument();
-    expect(screen.getByText(new RegExp(age(mockPatient.birthDate), 'i'))).toBeInTheDocument();
-    expect(screen.getByText('04 — Apr — 1972')).toBeInTheDocument();
+    expect(mockExtensionSlot.mock.calls.some(([props]) => props.name === 'patient-header-slot')).toBe(false);
+  });
+
+  test('should display the patient header at every width outside the chart', () => {
+    mockUseLayoutType.mockReturnValue('large-desktop');
+    render(
+      <AddTestOrderWorkspace
+        closeWorkspace={mockCloseWorkspace}
+        groupProps={{}}
+        workspaceProps={{
+          orderTypeUuid: 'test-lab-order-type-uuid',
+          orderToEditOrdererUuid: '',
+        }}
+        windowProps={{
+          patient: mockPatient,
+          patientUuid: mockPatient.id,
+          visitContext: null,
+        }}
+        workspaceName={''}
+        launchChildWorkspace={vi.fn()}
+        windowName={''}
+        isRootWorkspace={false}
+        showActionMenu={true}
+      />,
+    );
+
+    expect(
+      mockExtensionSlot.mock.calls.some(
+        ([props]) => props.name === 'patient-header-slot' && props.state.patientUuid === mockPatient.id,
+      ),
+    ).toBe(true);
+  });
+
+  test('should fetch FHIR patient and display patient header when launched with a REST patient', () => {
+    mockUseLayoutType.mockReturnValue('tablet');
+    const restPatient = { uuid: 'rest-patient-uuid' } as unknown as fhir.Patient;
+    mockUsePatient.mockReturnValue({
+      patient: mockPatient,
+      patientUuid: 'rest-patient-uuid',
+      isLoading: false,
+      error: null,
+    });
+
+    render(
+      <AddTestOrderWorkspace
+        closeWorkspace={mockCloseWorkspace}
+        groupProps={{ showPatientBanner: 'tabletOnly' }}
+        workspaceProps={{
+          orderTypeUuid: 'test-lab-order-type-uuid',
+          orderToEditOrdererUuid: '',
+        }}
+        windowProps={
+          {
+            patient: restPatient,
+            patientUuid: 'rest-patient-uuid',
+            visitContext: null,
+          } as unknown as OrderBasketWindowProps
+        }
+        workspaceName={''}
+        launchChildWorkspace={vi.fn()}
+        windowName={''}
+        isRootWorkspace={false}
+        showActionMenu={true}
+      />,
+    );
+
+    expect(mockUsePatient).toHaveBeenCalledWith('rest-patient-uuid');
+    expect(
+      mockExtensionSlot.mock.calls.some(
+        ([props]) =>
+          props.name === 'patient-header-slot' &&
+          props.state.patientUuid === 'rest-patient-uuid' &&
+          props.state.patient === mockPatient,
+      ),
+    ).toBe(true);
+  });
+
+  test('should not display patient header when patient banner data is incomplete or loading', () => {
+    mockUseLayoutType.mockReturnValue('tablet');
+    const restPatient = { uuid: 'rest-patient-uuid' } as unknown as fhir.Patient;
+    mockUsePatient.mockReturnValue({
+      patient: null,
+      patientUuid: 'rest-patient-uuid',
+      isLoading: true,
+      error: null,
+    });
+
+    render(
+      <AddTestOrderWorkspace
+        closeWorkspace={mockCloseWorkspace}
+        groupProps={{ showPatientBanner: 'tabletOnly' }}
+        workspaceProps={{
+          orderTypeUuid: 'test-lab-order-type-uuid',
+          orderToEditOrdererUuid: '',
+        }}
+        windowProps={
+          {
+            patient: restPatient,
+            patientUuid: 'rest-patient-uuid',
+            visitContext: null,
+          } as unknown as OrderBasketWindowProps
+        }
+        workspaceName={''}
+        launchChildWorkspace={vi.fn()}
+        windowName={''}
+        isRootWorkspace={false}
+        showActionMenu={true}
+      />,
+    );
+
+    expect(mockExtensionSlot.mock.calls.some(([props]) => props.name === 'patient-header-slot')).toBe(false);
   });
 
   test('should fall back to the configured lab order type UUID when orderTypeUuid is not provided', () => {
@@ -304,16 +428,15 @@ describe('AddLabOrder', () => {
         workspaceProps={{
           orderToEditOrdererUuid: '',
         }}
-        groupProps={{
-          patientUuid: mockPatient.id,
-          patient: mockPatient,
-          visitContext: null,
-          mutateVisitContext: null,
-        }}
+        groupProps={{}}
         workspaceName={''}
         launchChildWorkspace={vi.fn()}
         windowName={''}
-        windowProps={{ encounterUuid: '' }}
+        windowProps={{
+          patientUuid: mockPatient.id,
+          patient: mockPatient,
+          visitContext: null,
+        }}
         isRootWorkspace={false}
         showActionMenu={true}
       />,

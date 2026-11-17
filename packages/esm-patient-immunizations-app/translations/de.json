@@ -9,6 +9,7 @@
   "doses": "Dosen",
   "due": "Fällig",
   "duplicateDoseWarning": "Die Dosis {{dose}} wurde für diesen Impfstoff bereits erfasst",
+  "editImmunization": "Edit immunization",
   "error": "Fehler",
   "errorSaving": "Fehler beim Speichern der Impfung",
   "expirationDate": "Verfallsdatum",

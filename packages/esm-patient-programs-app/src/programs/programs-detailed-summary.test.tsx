@@ -65,7 +65,7 @@ describe('ProgramsDetailedSummary', () => {
     expect(row).toBeInTheDocument();
     expect(within(row).getByRole('cell', { name: /16-Jan-2020/i })).toBeInTheDocument();
     expect(within(row).getByRole('cell', { name: /active$/i })).toBeInTheDocument();
-    const actionMenuButton = within(row).getByRole('button', { name: /options$/i });
+    const actionMenuButton = within(row).getByRole('button', { name: /edit or delete program/i });
     expect(actionMenuButton).toBeInTheDocument();
 
     await user.click(actionMenuButton);

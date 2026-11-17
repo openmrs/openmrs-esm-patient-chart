@@ -48,6 +48,7 @@ test('Start and end a new visit', async ({ page, patient, api }) => {
   await test.step('When I select visit status: Ongoing', async () => {
     await chartPage.page.getByRole('tab', { name: /ongoing/i }).click();
   });
+
   await test.step('Then I should see Start date and time picker', async () => {
     // FIXME: make the date input work
     // await expect(chartPage.page.getByRole('textbox', { name: /start date/i })).toBeVisible();
@@ -188,7 +189,7 @@ test('Verify visit context when starting / ending / deleting / restoring active 
     await page.getByRole('button', { name: /visit note/i }).click();
   });
 
-  await test.step("And I click the 'start new visit' button in the prompt modal ", async () => {
+  await test.step("And I click the 'start new visit' button in the prompt modal", async () => {
     await chartPage.page.getByRole('button', { name: /start new visit/i }).click();
   });
 
@@ -197,6 +198,7 @@ test('Verify visit context when starting / ending / deleting / restoring active 
     await expect(chartPage.page.getByRole('tab', { name: /ongoing/i })).toBeVisible();
     await expect(chartPage.page.getByRole('tab', { name: /in the past/i })).toBeVisible();
   });
+
   await test.step('When I select visit status: new', async () => {
     const newTab = chartPage.page.getByRole('tab', { name: /new/i });
     await newTab.click();
@@ -228,6 +230,24 @@ test('Verify visit context when starting / ending / deleting / restoring active 
 
   await test.step('And I should see the Active Visit tag on the patient header', async () => {
     await expect(chartPage.page.getByLabel(/active visit/i)).toBeVisible();
+  });
+
+  await test.step('Then I should see the visit note form launch in the workspace', async () => {
+    await expect(page.getByText('Add visit note', { exact: true })).toBeVisible();
+  });
+
+  await test.step('And I should be able to write a note', async () => {
+    await page.getByPlaceholder('Write any notes here').fill('This is a note');
+    await expect(page.getByPlaceholder('Write any notes here')).toHaveValue('This is a note');
+  });
+
+  await test.step('When I discard the visit note', async () => {
+    await page.getByRole('button', { name: /discard/i }).click();
+    await page.getByRole('button', { name: /discard changes/i }).click();
+  });
+
+  await test.step('Then the visit note form should close', async () => {
+    await expect(page.getByText('Add visit note', { exact: true })).toBeHidden();
   });
 
   await test.step('When I click the patient header action menu', async () => {
@@ -264,7 +284,7 @@ test('Verify visit context when starting / ending / deleting / restoring active 
   });
 
   await test.step('Then I should see the visit note form launch in the workspace', async () => {
-    await expect(page.getByText('Visit Note', { exact: true })).toBeVisible();
+    await expect(page.getByText('Add visit note', { exact: true })).toBeVisible();
   });
 
   await test.step('When I close the workspace', async () => {

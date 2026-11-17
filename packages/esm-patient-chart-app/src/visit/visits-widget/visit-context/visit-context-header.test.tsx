@@ -32,10 +32,9 @@ describe('VisitContextHeader', () => {
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: mockPatient.id,
       patient: mockPatient,
-      visitContext: null,
-      mutateVisitContext: null,
+      activeVisit: null,
       setPatient: vi.fn(),
-      setVisitContext: vi.fn(),
+      setActiveVisit: vi.fn(),
     });
 
     render(<VisitContextHeader patientUuid="some-uuid" />);
@@ -46,10 +45,9 @@ describe('VisitContextHeader', () => {
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: mockPatient.id,
       patient: mockPatient,
-      visitContext: mockCurrentVisit,
-      mutateVisitContext: null,
+      activeVisit: mockCurrentVisit,
       setPatient: vi.fn(),
-      setVisitContext: vi.fn(),
+      setActiveVisit: vi.fn(),
     });
 
     render(<VisitContextHeader patientUuid={mockPatient.id} />);

@@ -86,13 +86,18 @@ function filterAndMapObservations(
           dataType: conceptByUuid[resource.code.coding.find((c) => isUuid(c.code))?.code]?.dataType,
         };
 
-        const encounter = encounters.find(
-          (e) =>
-            e.reference === (resource as fhir.Observation & { encounter: { reference?: string } }).encounter.reference,
-        );
-
-        observation.encounter.name = encounter?.display;
-        observation.encounter.encounterTypeUuid = encounter?.encounterTypeUuid;
+        // Observation.encounter is optional in FHIR; obs created without an
+        // encounter (e.g. via REST integrations) simply don't have one.
+        const encounterReference = (resource as fhir.Observation & { encounter?: { reference?: string } }).encounter
+          ?.reference;
+        if (encounterReference) {
+          const encounter = encounters.find((e) => e.reference === encounterReference);
+          observation.encounter = {
+            reference: encounterReference,
+            name: encounter?.display,
+            encounterTypeUuid: encounter?.encounterTypeUuid,
+          };
+        }
 
         return observation;
       }) || []

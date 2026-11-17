@@ -19,7 +19,7 @@ import {
   Tile,
 } from '@carbon/react';
 import { EmptyDataIllustration, type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
-import { launchWorkspace, useLayoutType, Workspace2 } from '@openmrs/esm-framework';
+import { useLayoutType, Workspace2 } from '@openmrs/esm-framework';
 import { usePatientLists } from '../patient-lists.resource';
 import styles from './patient-lists.scss';
 

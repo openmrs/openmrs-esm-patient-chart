@@ -89,12 +89,10 @@ test.describe('Drug Order Tests', () => {
         .getByRole('listitem')
         .filter({ hasText: /aspirin 325mg — 325mg — tablet/i });
 
-      await expect(incompleteAspirinBasketItem)
-        .toBeVisible({ timeout: 5_000 })
-        .catch(async () => {
-          await orderBasketLauncher.click();
-          await expect(incompleteAspirinBasketItem).toBeVisible();
-        });
+      await incompleteAspirinBasketItem
+        .waitFor({ state: 'visible', timeout: 5_000 })
+        .catch(() => orderBasketLauncher.click());
+      await expect(incompleteAspirinBasketItem).toBeVisible();
       await expect(incompleteAspirinBasketItem.getByRole('status', { name: /incomplete/i })).toBeVisible();
     });
 
@@ -181,11 +179,12 @@ test.describe('Drug Order Tests', () => {
     await test.step('When I visit the medications page', async () => {
       await medicationsPage.goTo(patient.uuid);
     });
+
     await test.step('When I click the overflow menu in the table row with the newly created medication', async () => {
       await page
         .getByRole('row')
         .filter({ hasText: existingDrugOrder.drugOrder.drug.display })
-        .getByRole('button', { name: /options/i })
+        .getByRole('button', { name: /actions menu/i })
         .click();
     });
 
@@ -261,7 +260,7 @@ test.describe('Drug Order Tests', () => {
 
     await test.step('And I open the options menu for the created medication', async () => {
       const row = page.getByRole('row').filter({ hasText: existingDrugOrder.drugOrder.drug.display }).first();
-      await row.getByRole('button', { name: /options/i }).click();
+      await row.getByRole('button', { name: /actions menu/i }).click();
     });
 
     await test.step('And I click on the "Renew" action', async () => {
@@ -307,7 +306,7 @@ test.describe('Drug Order Tests', () => {
       await page
         .getByRole('row')
         .filter({ hasText: existingDrugOrder.drugOrder.drug.display })
-        .getByRole('button', { name: /options/i })
+        .getByRole('button', { name: /actions menu/i })
         .click();
       await page.getByRole('menuitem', { name: /discontinue/i }).click();
     });
@@ -348,7 +347,7 @@ test.describe('Drug Order Tests', () => {
       await page
         .getByRole('row')
         .filter({ hasText: existingDrugOrder.drugOrder.drug.display })
-        .getByRole('button', { name: /options/i })
+        .getByRole('button', { name: /actions menu/i })
         .click();
     });
 
@@ -412,12 +411,10 @@ test.describe('Drug Order Tests', () => {
         .getByRole('listitem')
         .filter({ hasText: /aspirin 325mg — 325mg — tablet/i });
 
-      await expect(incompleteAspirinBasketItem)
-        .toBeVisible({ timeout: 5_000 })
-        .catch(async () => {
-          await orderBasketLauncher.click();
-          await expect(incompleteAspirinBasketItem).toBeVisible();
-        });
+      await incompleteAspirinBasketItem
+        .waitFor({ state: 'visible', timeout: 5_000 })
+        .catch(() => orderBasketLauncher.click());
+      await expect(incompleteAspirinBasketItem).toBeVisible();
       await incompleteAspirinBasketItem.getByRole('status', { name: /incomplete/i }).click();
       await expect(page.getByText(/order form/i)).toBeVisible();
     });
@@ -505,12 +502,10 @@ test.describe('Drug Order Tests', () => {
         .getByRole('listitem')
         .filter({ hasText: /aspirin 325mg — 325mg — tablet/i });
 
-      await expect(incompleteAspirinBasketItem)
-        .toBeVisible({ timeout: 5_000 })
-        .catch(async () => {
-          await orderBasketLauncher.click();
-          await expect(incompleteAspirinBasketItem).toBeVisible();
-        });
+      await incompleteAspirinBasketItem
+        .waitFor({ state: 'visible', timeout: 5_000 })
+        .catch(() => orderBasketLauncher.click());
+      await expect(incompleteAspirinBasketItem).toBeVisible();
       await incompleteAspirinBasketItem.getByRole('status', { name: /incomplete/i }).click();
       await expect(page.getByText(/order form/i)).toBeVisible();
     });

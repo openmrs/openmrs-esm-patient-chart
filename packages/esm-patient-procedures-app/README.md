@@ -38,7 +38,7 @@ yarn start --sources 'packages/esm-patient-procedures-app'
 
 ## Configuration
 
-The app is configured through the [OpenMRS config system](https://o3-docs.openmrs.org/docs/frontend-modules/loading-modules#module-configuration). All keys live under `@openmrs/esm-patient-procedures-app`.
+The app is configured through the [OpenMRS config system](https://o3-docs.openmrs.org/en-US/docs/configure-o3/overview#configuring-individual-frontend-modules). All keys live under `@openmrs/esm-patient-procedures-app`.
 
 | Key | Type | Default | Description |
 |---|---|---|---|

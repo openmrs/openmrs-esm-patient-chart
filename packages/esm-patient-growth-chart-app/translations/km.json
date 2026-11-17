@@ -1,0 +1,19 @@
+{
+  "ageInMonths": "Age (months)",
+  "editPatientDetails": "Edit patient details",
+  "errorDataUnavailable": "Patient data not available",
+  "femaleReference": "Female reference",
+  "Growth chart": "Growth chart",
+  "growthChart": "Growth chart",
+  "growthChartAgeUnavailable": "Growth charts are available for children from birth through 5 years of age.",
+  "growthChartUnavailable": "Growth chart unavailable",
+  "maleReference": "Male reference",
+  "noGrowthChartsToDisplay": "No growth charts to display",
+  "patientWeight": "Patient weight",
+  "referenceChart": "Reference chart",
+  "referenceChartPrompt": "Choose a reference chart to continue.",
+  "showingReferenceChart": "Showing the {{selectedReferenceChart}} chart. The patient's recorded gender is {{patientGender}}.",
+  "unknownGender": "This patient's recorded gender is unknown or other.",
+  "weightForAge": "Weight-for-age, birth to 5 years",
+  "weightKg": "Weight (kg)"
+}

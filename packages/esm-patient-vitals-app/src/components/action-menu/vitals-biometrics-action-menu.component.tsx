@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { launchWorkspace2, showModal, useLayoutType } from '@openmrs/esm-framework';
+import { getPatientChartWindowProps } from '@openmrs/esm-patient-common-lib';
 import { patientVitalsBiometricsFormWorkspace } from '../../constants';
 import styles from './vitals-biometrics-action-menu.scss';
 
@@ -16,12 +17,16 @@ export const VitalsAndBiometricsActionMenu = ({ encounterUuid, patient }: Vitals
   const isTablet = useLayoutType() === 'tablet';
 
   const handleLaunchVitalsAndBiometricsForm = useCallback(() => {
-    launchWorkspace2(patientVitalsBiometricsFormWorkspace, {
-      workspaceTitle: t('editVitalsAndBiometrics', 'Edit Vitals and Biometrics'),
-      editEncounterUuid: encounterUuid,
-      formContext: 'editing',
-    });
-  }, [encounterUuid, t]);
+    launchWorkspace2(
+      patientVitalsBiometricsFormWorkspace,
+      {
+        workspaceTitle: t('editVitalsAndBiometrics', 'Edit Vitals and Biometrics'),
+        editEncounterUuid: encounterUuid,
+        formContext: 'editing',
+      },
+      getPatientChartWindowProps(patientUuid),
+    );
+  }, [encounterUuid, patientUuid, t]);
 
   const handleLaunchDeleteVitalsAndBiometricsModal = useCallback(() => {
     const dispose = showModal('vitals-biometrics-delete-confirmation-modal', {
@@ -35,6 +40,7 @@ export const VitalsAndBiometricsActionMenu = ({ encounterUuid, patient }: Vitals
     <Layer className={styles.layer}>
       <OverflowMenu
         aria-label={t('editOrDeleteVitalsAndBiometrics', 'Edit or delete Vitals and Biometrics')}
+        iconDescription={t('editOrDeleteVitalsAndBiometrics', 'Edit or delete Vitals and Biometrics')}
         align="left"
         size={isTablet ? 'lg' : 'sm'}
         flipped

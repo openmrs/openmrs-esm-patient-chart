@@ -4,10 +4,6 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import FormError from './form-error.component';
 
-vi.mock('@openmrs/esm-patient-common-lib', () => ({
-  launchWorkspace: vi.fn(),
-}));
-
 describe('FormError', () => {
   test('renders correctly', () => {
     const closeWorkspace = vi.fn();

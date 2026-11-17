@@ -49,6 +49,8 @@ interface RequiredFieldLabelProps {
 }
 
 interface SearchResultsProps {
+  resultsRef: React.Ref<HTMLUListElement>;
+  onKeyDown: React.KeyboardEventHandler<HTMLUListElement>;
   isSearching: boolean;
   onConditionChange: (condition: CodedCondition) => void;
   searchResults: CodedCondition[];
@@ -78,6 +80,13 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   } = useFormContext<ConditionsFormSchema>();
   const session = useSession();
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const resultsRef = useRef<HTMLUListElement | null>(null);
+  const setResultsRef = useCallback((node: HTMLUListElement | null) => {
+    if (!node && resultsRef.current?.contains(document.activeElement)) {
+      searchInputRef.current?.focus();
+    }
+    resultsRef.current = node;
+  }, []);
   const clinicalStatus = watch('clinicalStatus');
   const matchingCondition = conditions?.find((condition) => condition?.id === conditionToEdit?.id);
 
@@ -107,6 +116,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     (selectedCondition: CodedCondition) => {
       setSelectedCondition(selectedCondition);
       setValue('conditionUuid', selectedCondition.uuid, { shouldValidate: true });
+      searchInputRef.current?.focus();
     },
     [setValue],
   );
@@ -241,6 +251,15 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                 render={({ field: { onChange, value } }) => (
                   <ResponsiveWrapper>
                     <Search
+                      onKeyDown={(event) => {
+                        if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                          const results = resultsRef.current?.querySelectorAll('button');
+                          if (results?.length) {
+                            event.preventDefault();
+                            results[event.key === 'ArrowDown' ? 0 : results.length - 1].focus();
+                          }
+                        }
+                      }}
                       autoFocus
                       className={classNames({
                         [styles.conditionsError]: errors?.conditionUuid,
@@ -275,6 +294,27 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                 </p>
               )}
               <SearchResults
+                resultsRef={setResultsRef}
+                onKeyDown={(event) => {
+                  if (event.key === 'Escape') {
+                    event.preventDefault();
+                    searchInputRef.current?.focus();
+                  } else if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+                    const results = Array.from(event.currentTarget.querySelectorAll('button'));
+                    const index = results.findIndex((result) => result === document.activeElement);
+                    if (index < 0) {
+                      return;
+                    }
+                    event.preventDefault();
+                    const nextIndex =
+                      event.key === 'Home'
+                        ? 0
+                        : event.key === 'End'
+                          ? results.length - 1
+                          : (index + (event.key === 'ArrowDown' ? 1 : -1) + results.length) % results.length;
+                    results[nextIndex].focus();
+                  }
+                }}
                 isSearching={isSearching}
                 onConditionChange={handleConditionChange}
                 searchResults={searchResults}
@@ -393,6 +433,8 @@ function RequiredFieldLabel({ label, t }: RequiredFieldLabelProps) {
 }
 
 function SearchResults({
+  resultsRef,
+  onKeyDown,
   isSearching,
   onConditionChange,
   searchResults,
@@ -410,15 +452,17 @@ function SearchResults({
 
   if (!isSearching && searchResults?.length > 0) {
     return (
-      <ul className={styles.conditionsList}>
+      <ul
+        ref={resultsRef}
+        onKeyDown={onKeyDown}
+        className={styles.conditionsList}
+        aria-label={t('conditionSearchResults', 'Condition search results')}
+      >
         {searchResults?.map((searchResult) => (
-          <li
-            className={styles.condition}
-            key={searchResult?.uuid}
-            onClick={() => onConditionChange(searchResult)}
-            role="menuitem"
-          >
-            {searchResult.display}
+          <li className={styles.condition} key={searchResult?.uuid}>
+            <button type="button" className={styles.conditionButton} onClick={() => onConditionChange(searchResult)}>
+              {searchResult.display}
+            </button>
           </li>
         ))}
       </ul>

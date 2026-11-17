@@ -71,7 +71,7 @@ describe('ProgramsOverview', () => {
     expect(previousPageButton).toBeDisabled();
     const row = screen.getByRole('row', { name: /HIV Care and Treatment/i });
     expect(row).toBeInTheDocument();
-    const actionMenuButton = within(row).getByRole('button', { name: /options$/i });
+    const actionMenuButton = within(row).getByRole('button', { name: /edit or delete program/i });
     expect(actionMenuButton).toBeInTheDocument();
 
     expect(addButton).toBeEnabled();
