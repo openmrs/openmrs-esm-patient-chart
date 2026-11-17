@@ -1,5 +1,5 @@
 import React from 'react';
-import { vi, describe, it, expect, test, beforeEach, afterEach } from 'vitest';
+import { vi, describe, it, expect, test, beforeEach, afterEach, onTestFinished } from 'vitest';
 import dayjs from 'dayjs';
 import { fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -1300,6 +1300,142 @@ describe('Visit form', () => {
     // Re-entering "In the past" re-applies config.defaultToFullDayVisit rather than reflecting
     // whatever the checkbox happened to be left at during the earlier "past" session.
     expect(screen.getByRole('switch', { name: /full day visit/i })).toBeChecked();
+  });
+
+  // Regression test: turning full-day ON clears the four time fields. Leaving "In the past" used to
+  // drop the saved values without restoring them, so the time fields stayed `undefined` in the form
+  // state. The UI hides this (react-hook-form's Controller falls back to the default value, so the
+  // boxes still show e.g. "04:50 PM"), but validation fails with "Start date and time are required".
+  // That is why this test asserts on what is submitted rather than on what the inputs display.
+  it('keeps the time fields populated after toggling full day ON, leaving "In the past", coming back, and toggling OFF', async () => {
+    const user = userEvent.setup();
+
+    // Earlier tests leave mockUseVisit / mockUseAllowOverlappingVisits set to "active visit exists,
+    // overlapping disallowed" (mockReturnValue persists across tests), which swaps the "Ongoing"
+    // form for a conflict warning. Override them here so this test doesn't depend on test order,
+    // and put back exactly what was there once the test is done (even if it fails) so later tests
+    // see the same mock state as before this test existed.
+    const previousUseVisitImplementation = mockUseVisit.getMockImplementation();
+    const previousUseAllowOverlappingVisitsImplementation = mockUseAllowOverlappingVisits.getMockImplementation();
+    onTestFinished(() => {
+      if (previousUseVisitImplementation) {
+        mockUseVisit.mockImplementation(previousUseVisitImplementation);
+      } else {
+        mockUseVisit.mockReset();
+      }
+      if (previousUseAllowOverlappingVisitsImplementation) {
+        mockUseAllowOverlappingVisits.mockImplementation(previousUseAllowOverlappingVisitsImplementation);
+      } else {
+        mockUseAllowOverlappingVisits.mockReset();
+      }
+    });
+    mockUseVisit.mockReturnValue({ activeVisit: null } as ReturnType<typeof useVisit>);
+    mockUseAllowOverlappingVisits.mockReturnValue({ allowOverlappingVisits: true, isLoading: false });
+
+    renderVisitForm();
+
+    const selectVisitTypeAndLocation = async () => {
+      await user.click(screen.getByLabelText(/Outpatient visit/i));
+      await user.click(screen.getByRole('combobox', { name: /Select a location/i }));
+      await user.click(screen.getByText('Inpatient Ward'));
+    };
+
+    // "In the past" defaults the toggle to ON, which clears the time fields.
+    await user.click(screen.getByRole('tab', { name: /in the past/i }));
+    expect(screen.getByRole('switch', { name: /full day visit/i })).toBeChecked();
+
+    // Leave "In the past" while the toggle is ON. The "Ongoing" start time must be usable, i.e.
+    // submitting must not fail with "Start date and time are required".
+    await user.click(screen.getByRole('tab', { name: /ongoing/i }));
+    await selectVisitTypeAndLocation();
+    await user.click(screen.getByRole('button', { name: /Start visit/i }));
+
+    await waitFor(() => expect(mockSaveVisit).toHaveBeenCalledTimes(1));
+    expect(screen.queryByText(/start date and time are required/i)).not.toBeInTheDocument();
+    expect(mockSaveVisit).toHaveBeenLastCalledWith(
+      expect.objectContaining({ startDatetime: expect.any(Date), stopDatetime: null }),
+      expect.any(Object),
+    );
+
+    // Come back to "In the past" (toggle ON again) and switch it OFF. All four time values must be
+    // present, so the manual start and end datetimes can be computed and the form can submit.
+    await user.click(screen.getByRole('tab', { name: /in the past/i }));
+    await user.click(screen.getByRole('switch', { name: /full day visit/i }));
+    expect(screen.getByRole('switch', { name: /full day visit/i })).not.toBeChecked();
+
+    await user.click(screen.getByRole('button', { name: /Start visit/i }));
+
+    await waitFor(() => expect(mockSaveVisit).toHaveBeenCalledTimes(2));
+    expect(screen.queryByText(/start date and time are required/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/end date and time are required/i)).not.toBeInTheDocument();
+    expect(mockSaveVisit).toHaveBeenLastCalledWith(
+      expect.objectContaining({ startDatetime: expect.any(Date), stopDatetime: expect.any(Date) }),
+      expect.any(Object),
+    );
+  });
+
+  // Regression test for the case where the date/time section is UNMOUNTED while full-day is ON: for
+  // a new visit, when the patient already has an active visit and overlapping visits are not
+  // allowed, switching to "Ongoing" replaces the whole form (including the date/time section) with
+  // an "active visit exists" notice. The section's local refs (the saved time values) are lost, but
+  // the form state still holds the `undefined` times that turning full-day ON cleared. Turning the
+  // toggle OFF after coming back must therefore fall back to the form's default times.
+  it('populates the time fields from the defaults when the date/time section was unmounted while full day was ON', async () => {
+    const user = userEvent.setup();
+
+    // Restore whatever these mocks were returning before this test once it finishes (even on failure).
+    const previousUseVisitImplementation = mockUseVisit.getMockImplementation();
+    const previousUseAllowOverlappingVisitsImplementation = mockUseAllowOverlappingVisits.getMockImplementation();
+    onTestFinished(() => {
+      if (previousUseVisitImplementation) {
+        mockUseVisit.mockImplementation(previousUseVisitImplementation);
+      } else {
+        mockUseVisit.mockReset();
+      }
+      if (previousUseAllowOverlappingVisitsImplementation) {
+        mockUseAllowOverlappingVisits.mockImplementation(previousUseAllowOverlappingVisitsImplementation);
+      } else {
+        mockUseAllowOverlappingVisits.mockReset();
+      }
+    });
+    mockUseVisit.mockReturnValue({
+      activeVisit: { uuid: 'some-active-visit-uuid' } as Visit,
+    } as ReturnType<typeof useVisit>);
+    mockUseAllowOverlappingVisits.mockReturnValue({ allowOverlappingVisits: false, isLoading: false });
+
+    renderVisitForm();
+
+    // "In the past" is allowed even with an active visit, and defaults the toggle to ON, which
+    // clears the four time fields.
+    await user.click(screen.getByRole('tab', { name: /in the past/i }));
+    expect(screen.getByRole('switch', { name: /full day visit/i })).toBeChecked();
+
+    // "Ongoing" shows the active-visit notice and removes the form fields, which unmounts the
+    // date/time section (and with it the saved time values).
+    await user.click(screen.getByRole('tab', { name: /ongoing/i }));
+    expect(screen.getByText(/This patient already has an active visit/i)).toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: /Select a location/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('switch', { name: /full day visit/i })).not.toBeInTheDocument();
+
+    // Back to "In the past" (a fresh date/time section) and switch the toggle OFF.
+    await user.click(screen.getByRole('tab', { name: /in the past/i }));
+    await user.click(screen.getByRole('switch', { name: /full day visit/i }));
+    expect(screen.getByRole('switch', { name: /full day visit/i })).not.toBeChecked();
+
+    await user.click(screen.getByLabelText(/Outpatient visit/i));
+    await user.click(screen.getByRole('combobox', { name: /Select a location/i }));
+    await user.click(screen.getByText('Inpatient Ward'));
+    await user.click(screen.getByRole('button', { name: /Start visit/i }));
+
+    // The inputs display default times even when the form state is empty, so assert on what is
+    // submitted: non-null datetimes mean the date, time and AM/PM were all present in the form.
+    await waitFor(() => expect(mockSaveVisit).toHaveBeenCalledTimes(1));
+    expect(screen.queryByText(/start date and time are required/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/end date and time are required/i)).not.toBeInTheDocument();
+    expect(mockSaveVisit).toHaveBeenLastCalledWith(
+      expect.objectContaining({ startDatetime: expect.any(Date), stopDatetime: expect.any(Date) }),
+      expect.any(Object),
+    );
   });
 
   it('does not default the full day visit checkbox to checked when config.defaultToFullDayVisit is false', async () => {

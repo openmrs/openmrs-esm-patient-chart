@@ -38,7 +38,7 @@ const VisitDateTimeSection: React.FC<VisitDateTimeSectionProps> = ({
   lastEncounterDateTime,
 }) => {
   const { t } = useTranslation();
-  const { getValues, setValue } = useFormContext<VisitFormData>();
+  const { getValues, setValue, formState } = useFormContext<VisitFormData>();
   const [
     visitStatus,
     visitStartDate,
@@ -76,9 +76,52 @@ const VisitDateTimeSection: React.FC<VisitDateTimeSectionProps> = ({
   const previousManualStartDateRef = React.useRef<Date | null>(null);
   const autoCorrectedStartDateRef = React.useRef<Date | null>(null);
   const wasFullDayRef = React.useRef(false);
+  // Always holds the latest form defaults. Read inside the effect below via the ref so the effect
+  // does not need to re-run when the defaults change.
+  const defaultValuesRef = React.useRef(formState.defaultValues);
+  defaultValuesRef.current = formState.defaultValues;
 
   React.useEffect(() => {
+    // Full-day mode clears the four time fields; this puts them back. It is used both when the
+    // toggle goes OFF and when the user leaves "In the past" while the toggle is ON, so neither
+    // path can leave the time fields empty (an `undefined` form value is invisible in the UI - the
+    // inputs fall back to their default value - but fails validation on submit).
+    //
+    // Each field gets its saved value if there is one. The saved copy lives in a ref, so it is lost
+    // whenever this section unmounts while full-day is ON (e.g. the user switches to "Ongoing" and
+    // the "active visit exists" notice replaces the form). With `fallBackToDefaults`, a field that
+    // is still empty then gets the form's default value instead - the same value the input is
+    // already displaying - so the form state matches what the user sees.
+    const restoreManualTimeValues = ({ fallBackToDefaults }: { fallBackToDefaults: boolean }) => {
+      const previousManualTimeValues = previousManualTimeValuesRef.current;
+      const defaultValues = fallBackToDefaults ? defaultValuesRef.current : undefined;
+
+      for (const fieldName of [
+        'visitStartTime',
+        'visitStartTimeFormat',
+        'visitStopTime',
+        'visitStopTimeFormat',
+      ] as const) {
+        const value =
+          previousManualTimeValues?.[fieldName] || (getValues(fieldName) ? undefined : defaultValues?.[fieldName]);
+        if (!value) {
+          continue;
+        }
+
+        setValue(fieldName, value, {
+          shouldDirty: true,
+          shouldTouch: true,
+          shouldValidate: true,
+        });
+      }
+
+      previousManualTimeValuesRef.current = null;
+    };
+
     if (!hasStopTime) {
+      if (wasFullDayRef.current) {
+        restoreManualTimeValues({ fallBackToDefaults: false });
+      }
       previousManualTimeValuesRef.current = null;
       previousManualStartDateRef.current = null;
       autoCorrectedStartDateRef.current = null;
@@ -87,12 +130,17 @@ const VisitDateTimeSection: React.FC<VisitDateTimeSectionProps> = ({
     }
 
     if (isFullDay && !wasFullDayRef.current) {
-      previousManualTimeValuesRef.current = {
+      // Only save the current values if they are all present. If they are already empty there is
+      // nothing worth restoring, and saving them would overwrite a good copy with an empty one.
+      const currentTimeValues = {
         visitStartTime: getValues('visitStartTime'),
         visitStartTimeFormat: getValues('visitStartTimeFormat'),
         visitStopTime: getValues('visitStopTime'),
         visitStopTimeFormat: getValues('visitStopTimeFormat'),
       };
+      if (Object.values(currentTimeValues).every(Boolean)) {
+        previousManualTimeValuesRef.current = currentTimeValues;
+      }
 
       setValue('visitStartTime', undefined as unknown as VisitFormData['visitStartTime'], {
         shouldDirty: true,
@@ -133,32 +181,7 @@ const VisitDateTimeSection: React.FC<VisitDateTimeSectionProps> = ({
         autoCorrectedStartDateRef.current = null;
       }
     } else if (!isFullDay && wasFullDayRef.current) {
-      if (previousManualTimeValuesRef.current) {
-        const previousManualTimeValues = previousManualTimeValuesRef.current;
-
-        setValue('visitStartTime', previousManualTimeValues.visitStartTime, {
-          shouldDirty: true,
-          shouldTouch: true,
-          shouldValidate: true,
-        });
-        setValue('visitStartTimeFormat', previousManualTimeValues.visitStartTimeFormat, {
-          shouldDirty: true,
-          shouldTouch: true,
-          shouldValidate: true,
-        });
-        setValue('visitStopTime', previousManualTimeValues.visitStopTime, {
-          shouldDirty: true,
-          shouldTouch: true,
-          shouldValidate: true,
-        });
-        setValue('visitStopTimeFormat', previousManualTimeValues.visitStopTimeFormat, {
-          shouldDirty: true,
-          shouldTouch: true,
-          shouldValidate: true,
-        });
-
-        previousManualTimeValuesRef.current = null;
-      }
+      restoreManualTimeValues({ fallBackToDefaults: true });
 
       if (previousManualStartDateRef.current) {
         // Only restore if the date is still exactly what the auto-correct set it to — if the
