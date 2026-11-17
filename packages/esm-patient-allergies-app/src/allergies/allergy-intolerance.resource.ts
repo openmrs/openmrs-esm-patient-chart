@@ -8,8 +8,14 @@ export function useAllergies(patientUuid: string): UseAllergies {
 
   const { data, error, isLoading, isValidating, mutate } = useFhirFetchAll<FHIRAllergy>(allergiesUrl);
 
+  // A bundle with no results has no `entry` field, which useFhirFetchAll returns as `[undefined]`
+  // rather than `[]`, so drop empty entries before treating them as allergies.
+  const allergyResources = data?.filter(Boolean) ?? [];
+
   const formattedAllergies =
-    data?.length > 0 ? data.map(mapAllergyProperties).sort((a, b) => (b.lastUpdated > a.lastUpdated ? 1 : -1)) : null;
+    allergyResources.length > 0
+      ? allergyResources.map(mapAllergyProperties).sort((a, b) => (b.lastUpdated > a.lastUpdated ? 1 : -1))
+      : null;
 
   return {
     allergies: data ? formattedAllergies : null,

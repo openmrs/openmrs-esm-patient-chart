@@ -33,6 +33,15 @@ describe('useAllergies', () => {
     expect(result.current.allergies.map((allergy) => allergy.display)).toContain('Allergen 11');
   });
 
+  it('returns no allergies when the patient has none', () => {
+    // A FHIR bundle with no results has no `entry` field, which useFhirFetchAll returns as `[undefined]`.
+    mockUseFhirFetchAll.mockReturnValue({ data: [undefined] });
+
+    const { result } = renderHook(() => useAllergies(mockPatient.id));
+
+    expect(result.current.allergies).toBeNull();
+  });
+
   it('stops loading and returns the error when a later page fails', () => {
     const error = new Error('Failed to fetch the second page');
     // What useFhirFetchAll returns when the first page loaded but the next one failed:

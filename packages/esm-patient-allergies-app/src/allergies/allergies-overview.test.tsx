@@ -12,7 +12,8 @@ const mockAllergyResources = mockFhirAllergyIntoleranceResponse.entry.map((entry
 
 describe('AllergiesOverview', () => {
   it('renders an empty state view if allergy data is unavailable', async () => {
-    mockUseFhirFetchAll.mockReturnValueOnce({ data: [] });
+    // What useFhirFetchAll returns for a FHIR bundle with no results (no `entry` field).
+    mockUseFhirFetchAll.mockReturnValueOnce({ data: [undefined] });
     renderWithSwr(<AllergiesOverview patient={mockPatient} basePath={patientChartBasePath} />);
 
     await waitForLoadingToFinish();
