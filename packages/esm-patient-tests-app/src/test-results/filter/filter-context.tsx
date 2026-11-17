@@ -1,4 +1,5 @@
 import React, { createContext, useReducer, useEffect, useMemo } from 'react';
+import dayjs from 'dayjs';
 import { formatDate, formatTime, parseDate } from '@openmrs/esm-framework';
 import { type MappedObservation, type TestResult, type GroupedObservation, type Observation } from '../../types';
 import {
@@ -204,7 +205,7 @@ const FilterProvider = ({ roots, isLoading, children }: FilterProviderProps) => 
     flattenedObs.forEach((curr: MappedObservation) => {
       const groupKey = deriveGroupKey(curr.flatName);
 
-      const dateKey = new Date(curr.obsDatetime).toISOString().split('T')[0];
+      const dateKey = dayjs(curr.obsDatetime).format('YYYY-MM-DD');
 
       const compositeKey = `${groupKey}__${dateKey}`;
       if (!groupedObs[compositeKey]) {
