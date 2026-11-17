@@ -1,28 +1,15 @@
-import useSWR from 'swr';
-import { fhirBaseUrl, openmrsFetch, restBaseUrl, type OpenmrsResource } from '@openmrs/esm-framework';
-import {
-  type Allergy,
-  type FHIRAllergy,
-  type FHIRAllergyResponse,
-  type PatientAllergyPayload,
-  type UseAllergies,
-} from '../types';
+import { fhirBaseUrl, openmrsFetch, restBaseUrl, useFhirFetchAll, type OpenmrsResource } from '@openmrs/esm-framework';
+import { type Allergy, type FHIRAllergy, type PatientAllergyPayload, type UseAllergies } from '../types';
 
 export function useAllergies(patientUuid: string): UseAllergies {
-  const allergiesUrl = `${fhirBaseUrl}/AllergyIntolerance?patient=${patientUuid}`;
+  // The FHIR server pages its results (10 per page by default), so fetch every page.
+  // Reading only the first page would leave allergies out of the chart and the drug order form.
+  const allergiesUrl = patientUuid ? `${fhirBaseUrl}/AllergyIntolerance?patient=${patientUuid}` : null;
 
-  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: FHIRAllergyResponse }, Error>(
-    patientUuid ? allergiesUrl : null,
-    openmrsFetch,
-  );
+  const { data, error, isLoading, isValidating, mutate } = useFhirFetchAll<FHIRAllergy>(allergiesUrl);
 
   const formattedAllergies =
-    data?.data?.total > 0
-      ? data?.data.entry
-          .map((entry) => entry.resource ?? [])
-          .map(mapAllergyProperties)
-          .sort((a, b) => (b.lastUpdated > a.lastUpdated ? 1 : -1))
-      : null;
+    data?.length > 0 ? data.map(mapAllergyProperties).sort((a, b) => (b.lastUpdated > a.lastUpdated ? 1 : -1)) : null;
 
   return {
     allergies: data ? formattedAllergies : null,
