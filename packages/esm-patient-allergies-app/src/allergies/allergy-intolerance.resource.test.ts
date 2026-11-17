@@ -33,6 +33,18 @@ describe('useAllergies', () => {
     expect(result.current.allergies.map((allergy) => allergy.display)).toContain('Allergen 11');
   });
 
+  it('stops loading and returns the error when a later page fails', () => {
+    const error = new Error('Failed to fetch the second page');
+    // What useFhirFetchAll returns when the first page loaded but the next one failed:
+    // it still has a page left to fetch, so it keeps reporting that it is loading.
+    mockUseFhirFetchAll.mockReturnValue({ data: undefined, error, isLoading: true });
+
+    const { result } = renderHook(() => useAllergies(mockPatient.id));
+
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.error).toBe(error);
+  });
+
   it('does not fetch when there is no patient', () => {
     mockUseFhirFetchAll.mockReturnValue({ data: undefined });
 

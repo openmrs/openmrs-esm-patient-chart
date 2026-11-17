@@ -40,6 +40,16 @@ describe('AllergiesOverview', () => {
     expect(ErrorState).toHaveBeenCalledWith(expect.objectContaining({ error, headerTitle: 'Allergies' }), {});
   });
 
+  it('renders an error state view instead of loading forever if a later page of allergies fails', async () => {
+    const error = new Error('Failed to fetch the second page');
+    // useFhirFetchAll keeps reporting that it is loading when a page after the first one fails.
+    mockUseFhirFetchAll.mockReturnValueOnce({ data: undefined, error, isLoading: true });
+    renderWithSwr(<AllergiesOverview patient={mockPatient} basePath={patientChartBasePath} />);
+
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+    expect(ErrorState).toHaveBeenCalledWith(expect.objectContaining({ error, headerTitle: 'Allergies' }), {});
+  });
+
   it("renders an overview of the patient's allergic reactions and their manifestations", async () => {
     mockUseFhirFetchAll.mockReturnValueOnce({ data: mockAllergyResources });
 

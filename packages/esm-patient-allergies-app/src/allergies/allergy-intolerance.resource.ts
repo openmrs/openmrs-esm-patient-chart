@@ -14,7 +14,9 @@ export function useAllergies(patientUuid: string): UseAllergies {
   return {
     allergies: data ? formattedAllergies : null,
     error,
-    isLoading,
+    // useFhirFetchAll stays "loading" when a later page fails, because it still has a page
+    // left to fetch. Report the error instead, so the views don't show a skeleton forever.
+    isLoading: isLoading && !error,
     isValidating,
     mutate,
   };
