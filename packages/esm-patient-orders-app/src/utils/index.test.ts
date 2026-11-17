@@ -1,6 +1,6 @@
 import type { Order } from '@openmrs/esm-patient-common-lib';
 import { describe, it, expect } from 'vitest';
-import { buildMedicationOrder } from './index';
+import { buildGeneralOrder, buildLabOrder, buildMedicationOrder } from './index';
 
 const medicationOrder = {
   uuid: 'order-uuid',
@@ -148,5 +148,60 @@ describe('buildMedicationOrder', () => {
     const result = buildMedicationOrder(medicationOrder, 'REVISE');
 
     expect(result.previousOrderDateActivated).toBe(medicationOrder.dateActivated);
+  });
+
+  it('returns a medication basket item with a null visit when encounter visit is unavailable', () => {
+    const orderWithoutVisit = {
+      ...medicationOrder,
+      encounter: {
+        ...medicationOrder.encounter,
+        visit: null,
+      },
+    } as Order;
+
+    expect(buildMedicationOrder(orderWithoutVisit, 'RENEW')).toEqual(
+      expect.objectContaining({
+        encounterUuid: medicationOrder.encounter.uuid,
+        visit: null,
+      }),
+    );
+  });
+});
+
+describe('buildLabOrder', () => {
+  it('returns a lab basket item with a null visit when encounter visit is unavailable', () => {
+    const orderWithoutVisit = {
+      ...medicationOrder,
+      encounter: {
+        ...medicationOrder.encounter,
+        visit: null,
+      },
+    } as Order;
+
+    expect(buildLabOrder(orderWithoutVisit, 'REVISE')).toEqual(
+      expect.objectContaining({
+        encounterUuid: medicationOrder.encounter.uuid,
+        visit: null,
+      }),
+    );
+  });
+});
+
+describe('buildGeneralOrder', () => {
+  it('returns a general basket item with a null visit when encounter visit is unavailable', () => {
+    const orderWithoutVisit = {
+      ...medicationOrder,
+      encounter: {
+        ...medicationOrder.encounter,
+        visit: null,
+      },
+    } as Order;
+
+    expect(buildGeneralOrder(orderWithoutVisit, 'DISCONTINUE')).toEqual(
+      expect.objectContaining({
+        encounterUuid: medicationOrder.encounter.uuid,
+        visit: null,
+      }),
+    );
   });
 });

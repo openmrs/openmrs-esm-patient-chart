@@ -637,7 +637,7 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
       showPatientBanner: 'tabletOnly',
       patient,
       patientUuid: patient.id,
-      visitContext: orderItem.encounter.visit,
+      activeVisit: orderItem.encounter.visit,
     }),
     [patient, orderItem.encounter.visit],
   );

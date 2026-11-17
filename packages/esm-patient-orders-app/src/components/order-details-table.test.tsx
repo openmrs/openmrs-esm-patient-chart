@@ -608,7 +608,7 @@ describe('OrderDetailsTable', () => {
       {},
       expect.objectContaining({ visitContext: mockOrders[1].encounter.visit }),
       expect.objectContaining({
-        visitContext: mockOrders[1].encounter.visit,
+        activeVisit: mockOrders[1].encounter.visit,
         // Without it the group is relaunched with the default 'always' and a second patient banner shows up
         showPatientBanner: 'tabletOnly',
       }),

@@ -52,7 +52,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
   const { sequenceDefinitions } = useConfig<ImmunizationConfigObject>();
   const displayText = t('immunizations__lower', 'immunizations');
   const headerTitle = t('immunizations', 'Immunizations');
-  const { visitContext } = usePatientChartStore(patientUuid);
+  const { activeVisit } = usePatientChartStore(patientUuid);
   const isTablet = useLayoutType() === 'tablet';
 
   const { data: existingImmunizations, isLoading, error, isValidating } = useImmunizations(patientUuid);
@@ -62,12 +62,12 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
   }, [existingImmunizations, sequenceDefinitions]);
 
   const launchImmunizationsForm = useCallback(() => {
-    if (!visitContext) {
+    if (!activeVisit) {
       launchStartVisitPrompt();
       return;
     }
     launchWorkspace2('immunization-form-workspace');
-  }, [visitContext, launchStartVisitPrompt]);
+  }, [activeVisit, launchStartVisitPrompt]);
 
   const sortedImmunizations = useMemo(() => {
     return orderBy(

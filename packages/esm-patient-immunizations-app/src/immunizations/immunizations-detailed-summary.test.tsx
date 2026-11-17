@@ -84,9 +84,9 @@ describe('ImmunizationsDetailedSummary', () => {
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: 'patient-123',
       patient: null,
-      visitContext: null,
+      activeVisit: null,
       setPatient: vi.fn(),
-      setVisitContext: vi.fn(),
+      setActiveVisit: vi.fn(),
     });
   });
 
@@ -175,9 +175,9 @@ describe('ImmunizationsDetailedSummary', () => {
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: 'patient-123',
       patient: null,
-      visitContext: mockCurrentVisit,
+      activeVisit: mockCurrentVisit,
       setPatient: vi.fn(),
-      setVisitContext: vi.fn(),
+      setActiveVisit: vi.fn(),
     });
 
     const user = userEvent.setup();
@@ -210,9 +210,9 @@ describe('ImmunizationsDetailedSummary', () => {
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: mockPatient.id,
       patient: mockPatient,
-      visitContext: null,
+      activeVisit: null,
       setPatient: vi.fn(),
-      setVisitContext: vi.fn(),
+      setActiveVisit: vi.fn(),
     });
     mockUseImmunizations.mockReturnValueOnce({
       data: mockImmunizationData,

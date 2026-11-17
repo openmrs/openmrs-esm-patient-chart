@@ -34,7 +34,7 @@ it('renders an Edit form that enables users to toggle flags on or off', async ()
         showPatientBanner: 'tabletOnly',
         patientUuid: mockPatient.id,
         patient: mockPatient,
-        visitContext: null,
+        activeVisit: null,
       }}
       workspaceProps={{}}
       windowProps={{}}
@@ -76,7 +76,7 @@ it('sorts by active and retired correctly via controlled dropdown', async () => 
         showPatientBanner: 'tabletOnly',
         patientUuid: mockPatient.id,
         patient: mockPatient,
-        visitContext: null,
+        activeVisit: null,
       }}
       workspaceProps={{}}
       windowProps={{}}

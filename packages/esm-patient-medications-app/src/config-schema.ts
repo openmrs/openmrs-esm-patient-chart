@@ -42,6 +42,12 @@ export const configSchema = {
     _description: 'Whether to require an indication when placing a medication order',
     _default: true,
   },
+  requireDuration: {
+    _type: Type.Boolean,
+    _description:
+      'Whether to require a duration (greater than zero) and a duration unit when placing a medication order',
+    _default: false,
+  },
   durationUnitsDaysMap: {
     _type: Type.Object,
     _description:
@@ -83,6 +89,7 @@ export interface ConfigObject {
   showPrintButton: boolean;
   debounceDelayInMs: number;
   requireIndication: boolean;
+  requireDuration: boolean;
   durationUnitsDaysMap: Record<string, number>;
   drugCategoryConceptSets: Array<string>;
   minimumCharacterLengthForDrugSearch: number;
