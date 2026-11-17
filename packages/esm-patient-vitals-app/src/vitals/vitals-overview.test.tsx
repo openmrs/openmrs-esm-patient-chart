@@ -207,6 +207,88 @@ describe('VitalsOverview', () => {
     expect(getRowDates()).toEqual(unsortedOrder);
   });
 
+  it('sorts a column with missing values, keeping the rows without a value last in either direction', async () => {
+    const user = userEvent.setup();
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: [
+        { id: '0', date: '2021-05-19T09:00:00.000Z', temperature: 39.1 },
+        { id: '1', date: '2021-05-10T09:00:00.000Z', pulse: 80 },
+        { id: '2', date: '2021-05-07T09:00:00.000Z', temperature: 36.5 },
+        { id: '3', date: '2021-04-08T09:00:00.000Z', temperature: 38.2 },
+        { id: '4', date: '2021-04-01T09:00:00.000Z', pulse: 72 },
+      ],
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsOverview {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    const sortRowsButton = screen.getByRole('button', { name: /temp/i });
+    const temperatureColumnHeader = () => screen.getByRole('columnheader', { name: /temp/i });
+
+    await user.click(sortRowsButton);
+    expect(temperatureColumnHeader()).toHaveAttribute('aria-sort', 'ascending');
+    expect(getRowDates()).toEqual([
+      '07 — May — 2021', // 36.5
+      '08 — Apr — 2021', // 38.2
+      '19 — May — 2021', // 39.1
+      '10 — May — 2021', // no temperature
+      '01 — Apr — 2021', // no temperature
+    ]);
+
+    await user.click(sortRowsButton);
+    expect(temperatureColumnHeader()).toHaveAttribute('aria-sort', 'descending');
+    expect(getRowDates()).toEqual([
+      '19 — May — 2021', // 39.1
+      '08 — Apr — 2021', // 38.2
+      '07 — May — 2021', // 36.5
+      '10 — May — 2021', // no temperature
+      '01 — Apr — 2021', // no temperature
+    ]);
+  });
+
+  it('sorts blood pressure by systolic, then diastolic, keeping missing readings last in either direction', async () => {
+    const user = userEvent.setup();
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: [
+        { id: '0', date: '2021-05-19T09:00:00.000Z', systolic: 120, diastolic: 85 },
+        { id: '1', date: '2021-05-10T09:00:00.000Z', systolic: 120, diastolic: 75 },
+        { id: '2', date: '2021-05-07T09:00:00.000Z', temperature: 37 },
+        { id: '3', date: '2021-04-08T09:00:00.000Z', systolic: 110, diastolic: 70 },
+        { id: '4', date: '2021-04-01T09:00:00.000Z', systolic: 120 },
+      ],
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsOverview {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    const sortRowsButton = screen.getByRole('button', { name: /\bbp\b/i });
+    const bloodPressureColumnHeader = () => screen.getByRole('columnheader', { name: /\bbp\b/i });
+
+    await user.click(sortRowsButton);
+    expect(bloodPressureColumnHeader()).toHaveAttribute('aria-sort', 'ascending');
+    expect(getRowDates()).toEqual([
+      '08 — Apr — 2021', // 110 / 70
+      '10 — May — 2021', // 120 / 75
+      '19 — May — 2021', // 120 / 85
+      '01 — Apr — 2021', // 120 / no diastolic
+      '07 — May — 2021', // no blood pressure
+    ]);
+
+    await user.click(sortRowsButton);
+    expect(bloodPressureColumnHeader()).toHaveAttribute('aria-sort', 'descending');
+    expect(getRowDates()).toEqual([
+      '19 — May — 2021', // 120 / 85
+      '10 — May — 2021', // 120 / 75
+      '01 — Apr — 2021', // 120 / no diastolic
+      '08 — Apr — 2021', // 110 / 70
+      '07 — May — 2021', // no blood pressure
+    ]);
+  });
+
   it('expands a vitals row to show an associated note', async () => {
     const user = userEvent.setup();
 

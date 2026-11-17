@@ -224,6 +224,53 @@ describe('Biometrics Overview', () => {
     expect(getRowDates()).toEqual(unsortedOrder);
   });
 
+  it('sorts a column with missing values, keeping the rows without a value last in either direction', async () => {
+    const user = userEvent.setup();
+
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      ...mockBiometricsConfig,
+    } as ConfigObject);
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: [
+        { id: '0', date: '2021-08-12T09:00:00.000Z', weight: 90 },
+        { id: '1', date: '2021-07-20T09:00:00.000Z', height: 170 },
+        { id: '2', date: '2021-06-18T09:00:00.000Z', weight: 50 },
+        { id: '3', date: '2021-06-10T09:00:00.000Z', weight: 70 },
+        { id: '4', date: '2021-05-02T09:00:00.000Z', height: 171 },
+      ],
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<BiometricsOverview {...testProps} />);
+
+    await waitForLoadingToFinish();
+    await screen.findByRole('table', { name: /biometrics/i });
+
+    const sortRowsButton = screen.getByRole('button', { name: /weight/i });
+    const weightColumnHeader = () => screen.getByRole('columnheader', { name: /weight/i });
+
+    await user.click(sortRowsButton);
+    expect(weightColumnHeader()).toHaveAttribute('aria-sort', 'ascending');
+    expect(getRowDates()).toEqual([
+      '18 — Jun — 2021', // 50
+      '10 — Jun — 2021', // 70
+      '12 — Aug — 2021', // 90
+      '20 — Jul — 2021', // no weight
+      '02 — May — 2021', // no weight
+    ]);
+
+    await user.click(sortRowsButton);
+    expect(weightColumnHeader()).toHaveAttribute('aria-sort', 'descending');
+    expect(getRowDates()).toEqual([
+      '12 — Aug — 2021', // 90
+      '10 — Jun — 2021', // 70
+      '18 — Jun — 2021', // 50
+      '20 — Jul — 2021', // no weight
+      '02 — May — 2021', // no weight
+    ]);
+  });
+
   it('toggles between rendering either a tabular view or a chart view', async () => {
     const user = userEvent.setup();
 

@@ -54,21 +54,21 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, patient, p
       key: 'dateRender',
       header: t('dateAndTime', 'Date and time'),
       isSortable: true,
-      sortFunc: (valueA, valueB) => new Date(valueA.date).getTime() - new Date(valueB.date).getTime(),
+      sortValues: (row) => [new Date(row.date).getTime()],
     },
     {
       key: 'weightRender',
       conceptUuid: config.concepts.weightUuid,
       header: withUnit(t('weight', 'Weight'), conceptUnits.get(config.concepts.weightUuid) ?? ''),
       isSortable: true,
-      sortFunc: (valueA, valueB) => (valueA.weight && valueB.weight ? valueA.weight - valueB.weight : 0),
+      sortValues: (row) => [row.weight],
     },
     {
       key: 'heightRender',
       conceptUuid: config.concepts.heightUuid,
       header: withUnit(t('height', 'Height'), conceptUnits.get(config.concepts.heightUuid) ?? ''),
       isSortable: true,
-      sortFunc: (valueA, valueB) => (valueA.height && valueB.height ? valueA.height - valueB.height : 0),
+      sortValues: (row) => [row.height],
     },
     ...(showBmi
       ? [
@@ -77,7 +77,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, patient, p
             conceptUuid: config.concepts.bodyMassIndexUuid,
             header: `${t('bmi', 'BMI')} (${bmiUnit})`,
             isSortable: true,
-            sortFunc: (valueA, valueB) => (valueA.bmi && valueB.bmi ? valueA.bmi - valueB.bmi : 0),
+            sortValues: (row) => [row.bmi],
           },
         ]
       : []),
@@ -86,7 +86,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, patient, p
       conceptUuid: config.concepts.midUpperArmCircumferenceUuid,
       header: withUnit(t('muac', 'MUAC'), conceptUnits.get(config.concepts.midUpperArmCircumferenceUuid) ?? ''),
       isSortable: true,
-      sortFunc: (valueA, valueB) => (valueA.muac && valueB.muac ? valueA.muac - valueB.muac : 0),
+      sortValues: (row) => [row.muac],
     },
   ];
 
