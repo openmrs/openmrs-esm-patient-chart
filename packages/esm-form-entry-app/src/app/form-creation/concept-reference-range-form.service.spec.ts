@@ -211,6 +211,19 @@ describe('Reference ranges at the measurement date', () => {
     expect(control.valid).toBe(false);
   }));
 
+  it('applies the range of a question that uses the numeric rendering', fakeAsync(() => {
+    const measurement = numericQuestion();
+    const form = createForm([
+      { ...measurement, questionOptions: { ...measurement.questionOptions, rendering: 'numeric' } },
+    ]);
+    const control = controlFor(form);
+    control.setValue(45);
+    subscription = service.connect(form, 'patient-uuid');
+    tick();
+    expect(control.conceptReferenceRange).toBe(early.get('temperature-uuid'));
+    expect(control.valid).toBe(false);
+  }));
+
   it('uses the observation context for a saved answer dated away from its encounter', fakeAsync(() => {
     const form = createForm();
     form.valueProcessingInfo.encounterUuid = 'historical-encounter';
