@@ -23,6 +23,7 @@ import {
 import { useLabEncounter, useOrderConceptByUuid, useOrderConceptsByUuids } from '../lab-results/lab-results.resource';
 import { getConceptUuids, getEffectiveRanges, getInterpretationClass, interpretObservation } from '../utils';
 import styles from './test-order.scss';
+import OrderPriceDetailsComponent from './order-price-details.component';
 
 interface TestOrderProps {
   testOrder: Order;
@@ -133,6 +134,7 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder, patientUuid: patientUu
 
   return (
     <div className={styles.testOrder}>
+      <OrderPriceDetailsComponent orderItemUuid={testOrder?.concept?.uuid} />
       <DataTable rows={testRows} headers={tableHeaders} size={isTablet ? 'lg' : 'sm'} useZebraStyles>
         {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
           <TableContainer {...getTableContainerProps()}>
@@ -144,7 +146,7 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder, patientUuid: patientUu
                     return (
                       <TableHeader
                         {...headerProps}
-                        className={classNames(headerProps.className, styles[`col-${header.key}`])}
+                        className={classNames(headerProps.className as string | undefined, styles[`col-${header.key}`])}
                       >
                         {header.header}
                       </TableHeader>
