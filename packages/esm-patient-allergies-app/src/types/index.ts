@@ -1,18 +1,5 @@
 import { type OpenmrsResource } from '@openmrs/esm-framework';
 
-export interface FHIRAllergyResponse {
-  entry: Array<{
-    resource: FHIRAllergy;
-  }>;
-  id: string;
-  meta: {
-    lastUpdated: string;
-  };
-  resourceType: string;
-  total: number;
-  type: string;
-}
-
 export interface FHIRAllergy {
   category: Array<string>;
   clinicalStatus: {

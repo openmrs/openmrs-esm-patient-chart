@@ -3,7 +3,6 @@ import { type Allergy, type FHIRAllergy, type PatientAllergyPayload, type UseAll
 
 export function useAllergies(patientUuid: string): UseAllergies {
   // The FHIR server pages its results (10 per page by default), so fetch every page.
-  // Reading only the first page would leave allergies out of the chart and the drug order form.
   const allergiesUrl = patientUuid ? `${fhirBaseUrl}/AllergyIntolerance?patient=${patientUuid}` : null;
 
   const { data, error, isLoading, isValidating, mutate } = useFhirFetchAll<FHIRAllergy>(allergiesUrl);
