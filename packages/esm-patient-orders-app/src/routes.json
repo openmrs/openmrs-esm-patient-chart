@@ -70,6 +70,12 @@
       "name": "drug-order-pin-action",
       "component": "drugOrderPinAction",
       "slot": "drug-order-form-actions-slot"
+    },
+    {
+      "name": "order-payment-panel",
+      "component": "orderPaymentPanel",
+      "slot": "order-basket-slot",
+      "order": 99
     }
   ],
   "workspaces2": [
