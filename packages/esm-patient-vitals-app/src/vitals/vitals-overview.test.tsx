@@ -387,6 +387,31 @@ describe('VitalsOverview', () => {
     expect(screen.getByText(`2 / ${formattedVitals.length} items`)).toBeInTheDocument();
   });
 
+  it('prints once and restores the table when Print is double-clicked', async () => {
+    const user = userEvent.setup();
+    const printJobs = capturePrintJobs();
+
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      ...mockVitalsConfig,
+      vitals: { ...mockVitalsConfig.vitals, showPrintButton: true },
+    } as ConfigObject);
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: formattedVitals,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsOverview {...testProps} pageSize={2} />);
+    await waitForLoadingToFinish();
+
+    const printButton = screen.getByRole('button', { name: /print/i });
+    await user.dblClick(printButton);
+
+    await waitFor(() => expect(printJobs).toHaveLength(1));
+    await waitFor(() => expect(printButton).toBeEnabled());
+    expect(getRowDates()).toHaveLength(2);
+    expect(screen.getByText(`2 / ${formattedVitals.length} items`)).toBeInTheDocument();
+  });
+
   describe('chart loading', () => {
     const loadChart = vi.fn();
 

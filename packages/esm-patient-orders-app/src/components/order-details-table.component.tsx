@@ -434,6 +434,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                       className={styles.printButton}
                       iconDescription={t('printOrder', 'Print order')}
                       kind="ghost"
+                      disabled={isPrinting}
                       onClick={handlePrint}
                       renderIcon={PrinterIcon}
                     >

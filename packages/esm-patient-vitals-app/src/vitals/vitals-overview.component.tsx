@@ -228,6 +228,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
                         renderIcon={PrinterIcon}
                         iconDescription="Add vitals"
                         className={styles.printButton}
+                        disabled={isPrinting}
                         onClick={handlePrint}
                       >
                         {t('print', 'Print')}

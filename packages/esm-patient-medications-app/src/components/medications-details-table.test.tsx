@@ -289,9 +289,22 @@ describe('MedicationsDetailsTable - Print', () => {
     expect(within(content).getAllByRole('heading', { name: 'Active Medications' })).toHaveLength(1);
     expect(content).toHaveTextContent(/Aspirin 162.5mg/i);
     expect(within(content).queryByRole('button', { name: /actions menu/i })).not.toBeInTheDocument();
-    expect(within(content).queryByRole('button', { name: 'Admin User' })).not.toBeInTheDocument();
+    expect(content).not.toHaveTextContent('Admin User');
 
     await waitFor(() => expect(getActionsMenuButton()).toBeInTheDocument());
     expect(screen.getByRole('button', { name: 'Admin User' })).toBeInTheDocument();
+  });
+
+  test('prints once and restores the row actions when Print is double-clicked', async () => {
+    const user = userEvent.setup();
+    const printJobs = capturePrintJobs();
+    renderMedicationsDetailsTable();
+
+    const printButton = screen.getByRole('button', { name: /print/i });
+    await user.dblClick(printButton);
+
+    await waitFor(() => expect(printJobs).toHaveLength(1));
+    await waitFor(() => expect(printButton).toBeEnabled());
+    expect(getActionsMenuButton()).toBeInTheDocument();
   });
 });

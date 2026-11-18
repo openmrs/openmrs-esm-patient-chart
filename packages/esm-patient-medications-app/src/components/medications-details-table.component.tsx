@@ -280,6 +280,7 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
               renderIcon={PrinterIcon}
               iconDescription={t('printMedications', 'Print medications')}
               className={styles.printButton}
+              disabled={isPrinting}
               onClick={handlePrint}
             >
               {t('print', 'Print')}

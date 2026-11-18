@@ -273,6 +273,25 @@ describe('OrderDetailsTable', () => {
     expect(screen.getByText(`${mockOrders.length} / ${mockOrders.length} items`)).toBeInTheDocument();
   });
 
+  it('prints once and restores the table controls when Print is double-clicked', async () => {
+    const printJobs = capturePrintJobs();
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      showPrintButton: true,
+    });
+
+    renderOrderDetailsTable();
+    await screen.findByRole('table');
+
+    const printButton = screen.getByRole('button', { name: /print/i });
+    await user.dblClick(printButton);
+
+    await waitFor(() => expect(printJobs).toHaveLength(1));
+    await waitFor(() => expect(printButton).toBeEnabled());
+    expect(screen.getByRole('searchbox')).toBeInTheDocument();
+    expect(screen.getByText(`${mockOrders.length} / ${mockOrders.length} items`)).toBeInTheDocument();
+  });
+
   it('renders a date range picker with a default value of today', async () => {
     renderOrderDetailsTable();
 
