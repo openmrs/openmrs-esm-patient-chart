@@ -6,7 +6,7 @@ import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject, configSchema } from '../config-schema';
 import { formattedVitals, mockConceptUnits, mockVitalsConfig } from '__mocks__';
-import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
+import { capturePrintJobs, mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { useVitalsAndBiometrics } from '../common';
 import VitalsOverview from './vitals-overview.component';
 
@@ -46,8 +46,8 @@ mockUseConfig.mockReturnValue({
   ...mockVitalsConfig,
 } as ConfigObject);
 
-const getRowDates = () =>
-  screen
+const getRowDates = (container: HTMLElement = document.body) =>
+  within(container)
     .getAllByRole('row')
     .slice(1) // Exclude the header row
     .map((row) => row.textContent?.match(/\d{1,2} — \w{3} — \d{4}/)?.[0])
@@ -350,6 +350,41 @@ describe('VitalsOverview', () => {
     expect(screen.getByRole('tab', { name: /spo2/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /temp/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /r\. rate/i })).toBeInTheDocument();
+  });
+
+  it('prints every vitals row with notes expanded, then restores the paginated table', async () => {
+    const user = userEvent.setup();
+    const printJobs = capturePrintJobs();
+
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      ...mockVitalsConfig,
+      vitals: { ...mockVitalsConfig.vitals, showPrintButton: true },
+    } as ConfigObject);
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: formattedVitals,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsOverview {...testProps} pageSize={2} />);
+    await waitForLoadingToFinish();
+
+    expect(getRowDates()).toHaveLength(2);
+
+    await user.click(screen.getByRole('button', { name: /print/i }));
+    await waitFor(() => expect(printJobs).toHaveLength(1));
+
+    const [{ content, documentTitle }] = printJobs;
+    expect(documentTitle).toBe('OpenMRS - John Wilson - Vitals');
+    expect(content).toHaveTextContent('John Wilson');
+    expect(within(content).getAllByRole('heading', { name: 'Vitals' })).toHaveLength(1);
+    expect(getRowDates(content)).toHaveLength(formattedVitals.length);
+    expect(content).toHaveTextContent(/Pt reports severe L chest pain/i);
+    expect(content).toHaveTextContent(/Follow up in 2 weeks/i);
+    expect(content).not.toHaveTextContent(/items/i);
+
+    await waitFor(() => expect(getRowDates()).toHaveLength(2));
+    expect(screen.queryByText(/Pt reports severe L chest pain/i)).not.toBeInTheDocument();
+    expect(screen.getByText(`2 / ${formattedVitals.length} items`)).toBeInTheDocument();
   });
 
   describe('chart loading', () => {

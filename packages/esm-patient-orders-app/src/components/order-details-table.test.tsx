@@ -1,7 +1,6 @@
 import React from 'react';
 import { vi, describe, it, expect, test, beforeEach } from 'vitest';
-import { useReactToPrint } from 'react-to-print';
-import { screen, render } from '@testing-library/react';
+import { screen, render, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
   type ConfigObject,
@@ -20,7 +19,7 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from '../config-schema';
 import { mockOrders, mockSessionDataResponse } from '__mocks__';
-import { mockPatient } from 'tools';
+import { capturePrintJobs, mockPatient } from 'tools';
 import OrderDetailsTable from './order-details-table.component';
 
 const mockUsePatientOrders = vi.mocked(usePatientOrders);
@@ -29,16 +28,10 @@ const mockUseOrderBasket = vi.mocked(useOrderBasket);
 const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 const mockSession = vi.mocked(useSession);
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
-const mockUseReactToPrint = vi.mocked(useReactToPrint);
 const mockLaunchWorkspace2 = vi.mocked(launchWorkspace2);
 
 mockSession.mockReturnValue(mockSessionDataResponse.data);
 mockOpenmrsFetch.mockImplementation(vi.fn());
-
-vi.mock('react-to-print', async () => ({
-  ...((await vi.importActual('react-to-print')) as object),
-  useReactToPrint: vi.fn(),
-}));
 
 vi.mock('@openmrs/esm-patient-common-lib', async () => {
   const originalModule = (await vi.importActual('@openmrs/esm-patient-common-lib')) as object;
@@ -247,22 +240,37 @@ describe('OrderDetailsTable', () => {
     expect(screen.getByText(/check the filters above/i)).toBeInTheDocument();
   });
 
-  it('prints the orders in the list when the print button is clicked', async () => {
-    const mockHandlePrint = vi.fn();
-    mockUseReactToPrint.mockReturnValue(mockHandlePrint);
+  it('prints the orders in the list without the table controls, then restores them', async () => {
+    const printJobs = capturePrintJobs();
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
       showPrintButton: true,
     });
 
     renderOrderDetailsTable();
+    await screen.findByRole('table');
 
-    const printButton = screen.getByRole('button', { name: /print/i });
-    expect(printButton).toBeInTheDocument();
+    expect(screen.getByRole('searchbox')).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /actions menu/i }).length).toBeGreaterThan(0);
+    expect(screen.getByText(`${mockOrders.length} / ${mockOrders.length} items`)).toBeInTheDocument();
 
-    await user.click(printButton);
+    await user.click(screen.getByRole('button', { name: /print/i }));
+    await waitFor(() => expect(printJobs).toHaveLength(1));
 
-    expect(mockHandlePrint).toHaveBeenCalledTimes(1);
+    const [{ content, documentTitle, styles }] = printJobs;
+    expect(documentTitle).toBe('OpenMRS - John Wilson - Patient Orders');
+    expect(content).toHaveTextContent('John Wilson');
+    expect(within(content).getAllByRole('heading', { name: 'Patient Orders' })).toHaveLength(1);
+    expect(content).toHaveTextContent(/Permethrin: 1\.0 Ampule\(s\) Oral Once daily 1 Days take after eating/i);
+    expect(content).toHaveTextContent(/ORD-321/);
+    expect(within(content).queryByRole('searchbox')).not.toBeInTheDocument();
+    expect(within(content).queryAllByRole('button', { name: /actions menu/i })).toHaveLength(0);
+    expect(content).not.toHaveTextContent(/items/i);
+    expect(styles.join('\n')).toMatch(/@page\s*{[^}]*margin: 0;/);
+
+    expect(await screen.findByRole('searchbox')).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /actions menu/i }).length).toBeGreaterThan(0);
+    expect(screen.getByText(`${mockOrders.length} / ${mockOrders.length} items`)).toBeInTheDocument();
   });
 
   it('renders a date range picker with a default value of today', async () => {

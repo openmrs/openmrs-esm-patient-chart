@@ -3,14 +3,16 @@ import dayjs from 'dayjs';
 import { vi, describe, test, expect, beforeEach, type Mock } from 'vitest';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { launchWorkspace2, useSession } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, launchWorkspace2, useConfig, useSession } from '@openmrs/esm-framework';
 import { type DrugOrderBasketItem, type Order } from '@openmrs/esm-patient-common-lib';
 import { _resetOrderBasketStore, orderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 import { mockSessionDataResponse } from '__mocks__';
-import { mockPatient, renderWithSwr } from 'tools';
+import { capturePrintJobs, mockPatient, renderWithSwr } from 'tools';
+import { type ConfigObject, configSchema } from '../config-schema';
 import MedicationsDetailsTable from './medications-details-table.component';
 
 const mockLaunchWorkspace2 = launchWorkspace2 as Mock;
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const mockUseSession = vi.mocked(useSession);
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
 
@@ -258,5 +260,38 @@ describe('MedicationsDetailsTable - Modify', () => {
       expect.objectContaining({ patientUuid: mockPatient.id }),
     );
     expect(mockStartVisitIfNeeded).not.toHaveBeenCalled();
+  });
+});
+
+describe('MedicationsDetailsTable - Print', () => {
+  beforeEach(() => {
+    _resetOrderBasketStore();
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      showPrintButton: true,
+    } as ConfigObject);
+  });
+
+  test('prints the medications without the row actions, then restores them', async () => {
+    const user = userEvent.setup();
+    const printJobs = capturePrintJobs();
+    renderMedicationsDetailsTable();
+
+    expect(getActionsMenuButton()).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Admin User' })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /print/i }));
+    await waitFor(() => expect(printJobs).toHaveLength(1));
+
+    const [{ content, documentTitle }] = printJobs;
+    expect(documentTitle).toBe('OpenMRS - John Wilson - Active Medications');
+    expect(content).toHaveTextContent('John Wilson');
+    expect(within(content).getAllByRole('heading', { name: 'Active Medications' })).toHaveLength(1);
+    expect(content).toHaveTextContent(/Aspirin 162.5mg/i);
+    expect(within(content).queryByRole('button', { name: /actions menu/i })).not.toBeInTheDocument();
+    expect(within(content).queryByRole('button', { name: 'Admin User' })).not.toBeInTheDocument();
+
+    await waitFor(() => expect(getActionsMenuButton()).toBeInTheDocument());
+    expect(screen.getByRole('button', { name: 'Admin User' })).toBeInTheDocument();
   });
 });

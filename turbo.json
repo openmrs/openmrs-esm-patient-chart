@@ -26,6 +26,7 @@
         "$TURBO_ROOT$/tools/vitest.shared.ts",
         "$TURBO_ROOT$/tools/setup-tests.ts",
         "$TURBO_ROOT$/tools/test-utils.tsx",
+        "$TURBO_ROOT$/tools/print-test-utils.ts",
         "$TURBO_ROOT$/tools/index.ts",
         "$TURBO_ROOT$/__mocks__/**"
       ]
@@ -41,6 +42,7 @@
         "$TURBO_ROOT$/tools/vitest.shared.ts",
         "$TURBO_ROOT$/tools/setup-tests.ts",
         "$TURBO_ROOT$/tools/test-utils.tsx",
+        "$TURBO_ROOT$/tools/print-test-utils.ts",
         "$TURBO_ROOT$/tools/index.ts",
         "$TURBO_ROOT$/__mocks__/**"
       ],

@@ -37,8 +37,8 @@ const PrintResultsModal: React.FC<PrintResultsModalProps> = ({ orders, closeModa
   }, [orders, selectedOrders]);
 
   const handlePrint = useReactToPrint({
-    content: () => contentToPrintRef.current,
-    onBeforeGetContent: () => {
+    contentRef: contentToPrintRef,
+    onBeforePrint: () => {
       setIsPrinting(true);
       return Promise.resolve();
     },
