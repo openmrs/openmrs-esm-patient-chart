@@ -1,17 +1,19 @@
 import React from 'react';
-import { vi, describe, it, expect, type Mock } from 'vitest';
+import { describe, it, expect, type Mock } from 'vitest';
 import { screen } from '@testing-library/react';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { useFhirFetchAll } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { mockFhirAllergyIntoleranceResponse } from '__mocks__';
 import { mockPatient, patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import AllergiesOverview from './allergies-overview.component';
 
-const mockOpenmrsFetch = openmrsFetch as Mock;
+const mockUseFhirFetchAll = useFhirFetchAll as Mock;
+const mockAllergyResources = mockFhirAllergyIntoleranceResponse.entry.map((entry) => entry.resource);
 
 describe('AllergiesOverview', () => {
   it('renders an empty state view if allergy data is unavailable', async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: [] });
+    // What useFhirFetchAll returns for a FHIR bundle with no results (no `entry` field).
+    mockUseFhirFetchAll.mockReturnValueOnce({ data: [undefined] });
     renderWithSwr(<AllergiesOverview patient={mockPatient} basePath={patientChartBasePath} />);
 
     await waitForLoadingToFinish();
@@ -30,7 +32,7 @@ describe('AllergiesOverview', () => {
         statusText: 'Unauthorized',
       },
     };
-    mockOpenmrsFetch.mockRejectedValueOnce(error);
+    mockUseFhirFetchAll.mockReturnValueOnce({ data: undefined, error });
     renderWithSwr(<AllergiesOverview patient={mockPatient} basePath={patientChartBasePath} />);
 
     await waitForLoadingToFinish();
@@ -39,8 +41,18 @@ describe('AllergiesOverview', () => {
     expect(ErrorState).toHaveBeenCalledWith(expect.objectContaining({ error, headerTitle: 'Allergies' }), {});
   });
 
+  it('renders an error state view instead of loading forever if a later page of allergies fails', async () => {
+    const error = new Error('Failed to fetch the second page');
+    // useFhirFetchAll keeps reporting that it is loading when a page after the first one fails.
+    mockUseFhirFetchAll.mockReturnValueOnce({ data: undefined, error, isLoading: true });
+    renderWithSwr(<AllergiesOverview patient={mockPatient} basePath={patientChartBasePath} />);
+
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+    expect(ErrorState).toHaveBeenCalledWith(expect.objectContaining({ error, headerTitle: 'Allergies' }), {});
+  });
+
   it("renders an overview of the patient's allergic reactions and their manifestations", async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: mockFhirAllergyIntoleranceResponse });
+    mockUseFhirFetchAll.mockReturnValueOnce({ data: mockAllergyResources });
 
     renderWithSwr(<AllergiesOverview patient={mockPatient} basePath={patientChartBasePath} />);
 
