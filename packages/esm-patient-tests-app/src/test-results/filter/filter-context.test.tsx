@@ -419,6 +419,49 @@ describe('FilterContext', () => {
       const groups = screen.getAllByTestId(/^group-/);
       expect(groups.length).toBeGreaterThan(0);
     });
+
+    it('should group observations by their local date in timezones ahead of UTC', async () => {
+      // 22:00 UTC on 15 Jan is 01:00 on 16 Jan in Nairobi (UTC+3). The suite runs in UTC,
+      // where the local and UTC dates are the same, so switch zones to exercise that case.
+      const originalTz = process.env.TZ;
+      process.env.TZ = 'Africa/Nairobi';
+
+      try {
+        const lateNightRoots: Array<TreeNode> = [
+          {
+            display: 'Complete Blood Count',
+            flatName: 'CBC',
+            hasData: true,
+            subSets: [
+              {
+                display: 'Hemoglobin',
+                flatName: 'CBC: Hemoglobin',
+                hasData: true,
+                obs: [{ obsDatetime: '2024-01-15T22:00:00.000Z', value: '12.5', interpretation: 'NORMAL' }],
+                subSets: [],
+              },
+            ],
+          },
+        ];
+
+        const GroupDateConsumer = () => {
+          const { tableData } = useContext(FilterContext);
+          return <div data-testid="group-date">{tableData?.[0]?.date}</div>;
+        };
+
+        render(
+          <FilterProvider roots={lateNightRoots} isLoading={false}>
+            <GroupDateConsumer />
+          </FilterProvider>,
+        );
+
+        await waitFor(() => {
+          expect(screen.getByTestId('group-date')).toHaveTextContent('2024-01-16');
+        });
+      } finally {
+        process.env.TZ = originalTz;
+      }
+    });
   });
 
   describe('Table data de-duplication by conceptUuid', () => {
