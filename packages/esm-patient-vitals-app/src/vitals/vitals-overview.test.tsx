@@ -389,6 +389,10 @@ describe('VitalsOverview', () => {
     expect(content).not.toHaveTextContent(/items/i);
     expect(within(content).queryAllByRole('columnheader', { name: /actions/i })).toHaveLength(0);
     expect(within(content).queryAllByRole('button', { name: /edit or delete/i })).toHaveLength(0);
+    const printedColumns = within(content).getAllByRole('columnheader').length;
+    const noteCell = within(content).getByText(/Pt reports severe L chest pain/i);
+    // eslint-disable-next-line testing-library/no-node-access
+    expect(noteCell.closest('td')).toHaveAttribute('colspan', String(printedColumns));
 
     await waitFor(() => expect(getRowDates()).toHaveLength(2));
     expect(screen.queryByText(/Pt reports severe L chest pain/i)).not.toBeInTheDocument();

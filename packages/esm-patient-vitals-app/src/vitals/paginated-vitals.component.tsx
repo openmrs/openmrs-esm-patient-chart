@@ -156,7 +156,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
                       {(isPrinting || row.isExpanded) && hasNote ? (
                         <TableExpandedRow
                           className={styles.expandedRow}
-                          colSpan={headers.length + 2}
+                          colSpan={headers.length + (isPrinting ? 1 : 2)}
                           {...getExpandedRowProps({ row })}
                         >
                           <div className={styles.container}>
@@ -166,7 +166,10 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
                           </div>
                         </TableExpandedRow>
                       ) : (
-                        <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
+                        <TableExpandedRow
+                          className={styles.hiddenRow}
+                          colSpan={headers.length + (isPrinting ? 1 : 2)}
+                        />
                       )}
                     </React.Fragment>
                   );
