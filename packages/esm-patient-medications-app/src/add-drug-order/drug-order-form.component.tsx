@@ -175,7 +175,6 @@ export function DrugOrderForm({
   const showPatientBanner = showPatientBannerProp ?? isTablet;
   const bannerPatientUuid = patientUuid ?? patient?.id;
   const { orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
-  const daysDurationUnit = orderConfigObject?.daysDurationUnit;
   const { requireOutpatientQuantity } = useRequireOutpatientQuantity();
 
   const drugOrderForm = useDrugOrderForm(initialOrderBasketItem);
@@ -397,10 +396,8 @@ export function DrugOrderForm({
   );
 
   const durationUnits: Array<DurationUnit> = useMemo(
-    () =>
-      orderConfigObject?.durationUnits ??
-      (daysDurationUnit ? [{ valueCoded: daysDurationUnit.uuid, value: daysDurationUnit.display }] : []),
-    [orderConfigObject, daysDurationUnit],
+    () => orderConfigObject?.durationUnits ?? [],
+    [orderConfigObject?.durationUnits],
   );
 
   const orderFrequencies: Array<MedicationFrequency> = useMemo(() => {

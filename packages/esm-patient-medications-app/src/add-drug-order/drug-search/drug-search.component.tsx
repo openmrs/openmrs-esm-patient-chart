@@ -44,7 +44,7 @@ export default function DrugSearch({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { debounceDelayInMs, minimumCharacterLengthForDrugSearch } = useConfig<ConfigObject>();
-  const { orderConfigObject } = useOrderConfig();
+  const { orderConfigObject, isLoading: isLoadingOrderConfig } = useOrderConfig();
   const daysDurationUnit = orderConfigObject?.daysDurationUnit;
   const debouncedSearchTerm = useDebounce(
     searchTerm?.length >= minimumCharacterLengthForDrugSearch ? searchTerm : '',
@@ -87,7 +87,7 @@ export default function DrugSearch({
           visit,
           daysDurationUnit,
           prescribedDrugUuids,
-          isLoadingOrders,
+          isLoadingOrders: isLoadingOrders || isLoadingOrderConfig,
           ordersError,
         }}
       />

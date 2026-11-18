@@ -18,7 +18,7 @@ interface ConceptMapping {
   conceptMapType?: { uuid?: string };
   conceptReferenceTerm?: {
     code?: string;
-    conceptSource?: { hl7Code?: string };
+    conceptSource?: { hl7Code?: string; name?: string };
   };
 }
 
@@ -47,7 +47,8 @@ export function findDaysDurationUnit(durationUnits: Array<CommonConfigProps> = [
     unit.mappings?.some(
       (mapping) =>
         mapping.conceptMapType?.uuid === '35543629-7d8c-11e1-909d-c80aa9edcf4e' &&
-        mapping.conceptReferenceTerm?.conceptSource?.hl7Code === 'SCT' &&
+        (mapping.conceptReferenceTerm?.conceptSource?.hl7Code === 'SCT' ||
+          mapping.conceptReferenceTerm?.conceptSource?.name?.toLowerCase() === 'snomed ct') &&
         mapping.conceptReferenceTerm?.code === SNOMED_CT_DAYS_CODE,
     ),
   );
@@ -66,7 +67,7 @@ export function useOrderConfig(): {
   };
 } {
   const { data, error, isLoading } = useSWRImmutable<{ data: OrderConfig }, Error>(
-    `${restBaseUrl}/orderentryconfig?v=custom:(uuid,display,mappings:(conceptMapType:(uuid),conceptReferenceTerm:(code,conceptSource:(hl7Code))))`,
+    `${restBaseUrl}/orderentryconfig?v=custom:(uuid,display,mappings:(conceptMapType:(uuid),conceptReferenceTerm:(code,conceptSource:(hl7Code,name))))`,
     openmrsFetch,
   );
   const {

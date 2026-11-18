@@ -147,6 +147,12 @@ describe('AddDrugOrderWorkspace drug search', () => {
     const { rerender } = renderAddDrugOrderWorkspace();
     await user.type(screen.getByRole('searchbox'), 'Aspirin');
 
+    expect(
+      mockExtensionSlot.mock.calls.some(
+        ([props]) => props.name === 'drug-search-slot' && props.state.isLoadingOrders === true,
+      ),
+    ).toBe(true);
+
     const aspirin325Div = getByTextWithMarkup(/Aspirin 325mg/i).closest('[role="listitem"]') as HTMLElement;
     expect(within(aspirin325Div).getByRole('button', { name: /Add to basket/i })).toBeDisabled();
     expect(within(aspirin325Div).getByRole('button', { name: /Order form/i })).toBeDisabled();

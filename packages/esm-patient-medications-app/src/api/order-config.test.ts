@@ -20,6 +20,24 @@ describe('findDaysDurationUnit', () => {
     expect(findDaysDurationUnit([unit('258705008'), days])).toBe(days);
   });
 
+  it('selects the backend concept when SNOMED CT is identified by source name only', () => {
+    const days: CommonConfigProps = {
+      uuid: 'local-days-uuid',
+      display: 'Local days label',
+      mappings: [
+        {
+          conceptMapType: { uuid: '35543629-7d8c-11e1-909d-c80aa9edcf4e' },
+          conceptReferenceTerm: {
+            code: '258703001',
+            conceptSource: { name: 'sNoMeD cT' },
+          },
+        },
+      ],
+    };
+
+    expect(findDaysDurationUnit([days])).toBe(days);
+  });
+
   it.each([
     ['same code in another source', unit('258703001', 'CIEL')],
     ['non-equivalent mapping', unit('258703001', 'SCT', 'narrower-than')],
