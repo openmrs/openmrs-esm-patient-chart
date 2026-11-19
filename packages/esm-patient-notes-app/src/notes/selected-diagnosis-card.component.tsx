@@ -34,6 +34,7 @@ export function DiagnosisListHeader() {
 interface SelectedDiagnosisCardProps {
   canMarkProvisional: boolean;
   diagnosis: DiagnosisDraft;
+  disabled?: boolean;
   onRemove: (diagnosis: DiagnosisDraft) => void;
   onUpdate: (diagnosis: DiagnosisDraft, patch: Partial<Pick<DiagnosisDraft, 'rank' | 'certainty'>>) => void;
 }
@@ -41,6 +42,7 @@ interface SelectedDiagnosisCardProps {
 export default function SelectedDiagnosisCard({
   canMarkProvisional,
   diagnosis,
+  disabled = false,
   onRemove,
   onUpdate,
 }: SelectedDiagnosisCardProps) {
@@ -52,6 +54,7 @@ export default function SelectedDiagnosisCard({
       <Checkbox
         aria-describedby="primary-diagnosis-requirement"
         checked={diagnosis.rank === 1}
+        disabled={disabled}
         hideLabel
         id={`diagnosis-${diagnosis.draftId}-primary`}
         labelText={t('primary', 'Primary')}
@@ -74,11 +77,13 @@ export default function SelectedDiagnosisCard({
             align="left"
             aria-label={t('diagnosisActions', 'Actions for {{diagnosis}}', { diagnosis: diagnosis.display })}
             flipped
+            disabled={disabled}
             iconDescription={t('diagnosisActions', 'Actions for {{diagnosis}}', { diagnosis: diagnosis.display })}
             menuOptionsClass={styles.diagnosisActionsMenu}
             size="sm"
           >
             <OverflowMenuItem
+              disabled={disabled}
               itemText={
                 isProvisional
                   ? t('markAsConfirmed', 'Mark as confirmed')
@@ -90,6 +95,7 @@ export default function SelectedDiagnosisCard({
         )}
       </div>
       <Button
+        disabled={disabled}
         hasIconOnly
         iconDescription={t('removeDiagnosisNamed', 'Remove {{diagnosis}}', { diagnosis: diagnosis.display })}
         kind="ghost"

@@ -39,6 +39,7 @@
   "noMatchingDiagnoses": "No diagnoses found matching",
   "note": "Note",
   "noVisitNoteToDisplay": "No visit note to display",
+  "patientRecordUnavailable": "Patient record unavailable",
   "primary": "Primary",
   "provisional": "Provisional",
   "reAddImagesFromNote_one": "Open the note to add it again.",
@@ -63,11 +64,13 @@
   "undoRemoveImage": "Undo removal: {{name}}",
   "visitDate": "Visit date",
   "visitNote": "Visit note",
+  "visitNoteDraftRetained": "Your draft is retained. Editing and saving are paused.",
   "visitNoteNowVisible": "It is now visible on the Encounters page",
   "visitNotePartialSaveError": "Could not save all changes. Some changes may already be saved. Try saving again.",
   "visitNotes": "Visit notes",
   "visitNoteSaved": "Visit note saved",
   "visitNoteSavedImagesFailed_one": "Visit note saved, but {{count}} image was not uploaded",
   "visitNoteSavedImagesFailed_other": "Visit note saved, but {{count}} images were not uploaded",
-  "visitNoteSaveError": "Error saving visit note"
+  "visitNoteSaveError": "Error saving visit note",
+  "visitNoteSaveInterrupted": "Saving stopped because the patient record is unavailable. Some changes may already be saved. Your draft is retained."
 }
