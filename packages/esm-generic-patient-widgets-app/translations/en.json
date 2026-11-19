@@ -6,5 +6,6 @@
   "encounterType": "Encounter type",
   "errorSavingObservation": "Error saving observation",
   "noValue": "No value",
-  "observationSaved": "Observation saved successfully"
+  "observationSaved": "Observation saved successfully",
+  "obsTabs": "Obs tabs"
 }
