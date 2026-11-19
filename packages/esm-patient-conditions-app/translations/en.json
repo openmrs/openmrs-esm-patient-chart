@@ -9,6 +9,7 @@
   "clinicalStatusRequired": "A clinical status is required",
   "condition": "Condition",
   "conditionDeleted": "Condition deleted",
+  "conditionDeleteErrorDescription": "The condition could not be deleted. Please try again, or contact your system administrator if the problem continues.",
   "conditionNowVisible": "It is now visible on the Conditions page",
   "conditionRequired": "A condition is required",
   "conditions": "Conditions",

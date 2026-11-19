@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { showSnackbar } from '@openmrs/esm-framework';
-import { deleteCondition, useConditions } from './conditions.resource';
+import { OpenmrsFetchError, showSnackbar } from '@openmrs/esm-framework';
+import { deleteCondition, getConditionErrorReason, useConditions } from './conditions.resource';
 import styles from './delete-condition.scss';
 
 interface DeleteConditionModalProps {
@@ -39,7 +39,16 @@ const DeleteConditionModal: React.FC<DeleteConditionModalProps> = ({ closeDelete
         isLowContrast: false,
         kind: 'error',
         title: t('errorDeletingCondition', 'Error deleting condition'),
-        subtitle: error?.message,
+        // The subtitle is, in order of preference:
+        // 1. For an OpenmrsFetchError (the server responded with an error), the reason the server gave in the response body
+        // 2. For any other error (no response, e.g. a network failure, or a bug in this code), the error's own message
+        // 3. When neither gives any text, a translated fallback
+        subtitle:
+          (error instanceof OpenmrsFetchError ? getConditionErrorReason(error.responseBody) : error?.message) ||
+          t(
+            'conditionDeleteErrorDescription',
+            'The condition could not be deleted. Please try again, or contact your system administrator if the problem continues.',
+          ),
       });
     } finally {
       setIsDeleting(false);
