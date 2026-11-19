@@ -1,5 +1,5 @@
 import React from 'react';
-import { vi, describe, it, expect, test, beforeEach } from 'vitest';
+import { vi, describe, it, expect, test, beforeEach, onTestFinished } from 'vitest';
 import { screen, render, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
@@ -271,6 +271,61 @@ describe('OrderDetailsTable', () => {
     expect(await screen.findByRole('searchbox')).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: /actions menu/i }).length).toBeGreaterThan(0);
     expect(screen.getByText(`${mockOrders.length} / ${mockOrders.length} items`)).toBeInTheDocument();
+  });
+
+  it('prints every order across pages, then restores the current page', async () => {
+    const printJobs = capturePrintJobs();
+    const manyOrders = Array.from({ length: 12 }, (_, index) => ({
+      ...mockOrders[0],
+      uuid: `print-order-${index}`,
+      orderNumber: `ORD-PRINT-${index + 1}`,
+    }));
+    mockUsePatientOrders.mockReturnValue({
+      data: manyOrders as unknown as Array<Order>,
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+
+    renderOrderDetailsTable();
+    await screen.findByRole('table');
+
+    expect(screen.getAllByRole('cell', { name: /^ORD-PRINT-\d+$/ })).toHaveLength(10);
+    await user.click(screen.getByRole('button', { name: /next page/i }));
+    expect(screen.getAllByRole('cell', { name: /^ORD-PRINT-\d+$/ })).toHaveLength(2);
+    await user.click(screen.getAllByRole('button', { name: /expand current row/i })[0]);
+
+    // Clicks outside act() so that React schedules the updates as a browser would. act() renders every update
+    // before react-to-print copies the content, so a table that is a render behind would still print in full.
+    vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', false);
+    onTestFinished(() => {
+      vi.unstubAllGlobals();
+    });
+    // eslint-disable-next-line testing-library/no-node-access
+    screen.getByRole('button', { name: /print/i }).click();
+    await waitFor(() => expect(printJobs).toHaveLength(1));
+
+    const [{ content }] = printJobs;
+    expect(within(content).getAllByRole('cell', { name: /^ORD-PRINT-\d+$/ })).toHaveLength(manyOrders.length);
+    manyOrders.forEach(({ orderNumber }) => {
+      expect(within(content).getByRole('cell', { name: orderNumber })).toHaveTextContent(orderNumber);
+    });
+    expect(within(content).queryByRole('searchbox')).not.toBeInTheDocument();
+    expect(within(content).queryAllByRole('button', { name: /actions menu/i })).toHaveLength(0);
+    expect(content).not.toHaveTextContent(/items/i);
+    const printedColumns = within(content).getAllByRole('columnheader').length;
+    expect(within(content).getByRole('cell', { name: 'Medication details' })).toHaveAttribute(
+      'colspan',
+      String(printedColumns),
+    );
+
+    await waitFor(() => expect(screen.getAllByRole('cell', { name: /^ORD-PRINT-\d+$/ })).toHaveLength(2));
+    expect(screen.getByRole('cell', { name: 'ORD-PRINT-11' })).toBeInTheDocument();
+    expect(screen.getByRole('cell', { name: 'ORD-PRINT-12' })).toBeInTheDocument();
+    expect(screen.getByRole('searchbox')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /previous page/i })).toBeEnabled();
+    expect(screen.getByRole('button', { name: /next page/i })).toBeDisabled();
   });
 
   it('prints once and restores the table controls when Print is double-clicked', async () => {

@@ -285,6 +285,12 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
 
   const { results: paginatedOrders, goTo, currentPage } = usePagination(tableRows, defaultPageSize);
 
+  // The table gets every row and renders only the displayed ones. Passing it just the displayed rows
+  // would print the current page, because Carbon copies new rows into its state in an effect that runs
+  // after react-to-print has cloned the content.
+  const displayedRows = isPrinting ? tableRows : paginatedOrders;
+  const displayedRowIds = useMemo(() => new Set(displayedRows.map((row) => row.id)), [displayedRows]);
+
   const patientDetails = useMemo(() => {
     const getGender = (gender: string): string => {
       switch (gender) {
@@ -462,7 +468,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                   headers={tableHeaders}
                   isSortable
                   overflowMenuOnHover={!isTablet}
-                  rows={paginatedOrders}
+                  rows={tableRows}
                   size={responsiveSize}
                   useZebraStyles
                 >
@@ -508,6 +514,10 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                           </TableHead>
                           <TableBody>
                             {rows.map((row) => {
+                              if (!displayedRowIds.has(row.id)) {
+                                return null;
+                              }
+
                               const matchingOrder = allOrders?.find((order) => order.uuid === row.id);
                               const isExpandable =
                                 matchingOrder?.type === ORDER_TYPES.DRUG_ORDER ||
@@ -553,7 +563,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                                   {isExpandable &&
                                     (row.isExpanded ? (
                                       <TableExpandedRow
-                                        colSpan={headers.length + 2}
+                                        colSpan={headers.length + (isPrinting ? 1 : 2)}
                                         {...getExpandedRowProps({
                                           row,
                                         })}
@@ -565,7 +575,10 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                                         )}
                                       </TableExpandedRow>
                                     ) : (
-                                      <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
+                                      <TableExpandedRow
+                                        className={styles.hiddenRow}
+                                        colSpan={headers.length + (isPrinting ? 1 : 2)}
+                                      />
                                     ))}
                                 </React.Fragment>
                               );
