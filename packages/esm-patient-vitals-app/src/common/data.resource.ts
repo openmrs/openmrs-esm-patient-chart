@@ -6,9 +6,9 @@ import {
   restBaseUrl,
   openmrsFetch,
   useConfig,
+  useFhirFetchAll,
   type OpenmrsResource,
 } from '@openmrs/esm-framework';
-import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import useSWRInfinite from 'swr/infinite';
 import { type ConfigObject } from '../config-schema';
@@ -174,10 +174,10 @@ export const withUnit = (label: string, unit: string | null | undefined) => {
 
 // We need to track a bound mutator for basically every hook, because there does not appear to be
 // a way to invalidate an SWRInfinite key that works other than using the bound mutator
-// Each mutator is stored in the vitalsHooksMutates map and removed (via a useEffect hook) when the
-// hook is unmounted.
+// Each hook stores one function that reloads both its vitals and its notes in the vitalsHooksMutates
+// map, and removes it (via a useEffect hook) when the hook is unmounted.
 let vitalsHooksCounter = 0;
-const vitalsHooksMutates = new Map<number, ReturnType<typeof useSWRInfinite<VitalsFetchResponse>>['mutate']>();
+const vitalsHooksMutates = new Map<number, () => Promise<unknown>>();
 
 /**
  * Hook to get concepts for vitals, biometrics or both
@@ -247,23 +247,21 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
 
   // Fetch note observations separately so that note-only encounters are never included
   // as standalone vitals entries. Notes are merged into existing vitals encounters below.
-  // We omit _count so that every note for this patient is returned; notes are lightweight
-  // and typically few, so unbounded fetching is acceptable here.
-  const { data: notesData } = useSWR<VitalsFetchResponse, Error>(
+  // The FHIR server pages its results (10 per page by default), so fetch every page.
+  const { data: notes, mutate: mutateNotes } = useFhirFetchAll<FHIRObservationResource>(
     concepts.generalPatientNoteUuid && patientUuid
       ? `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=${concepts.generalPatientNoteUuid}&_sort=-date`
       : null,
-    openmrsFetch,
   );
 
   // see the comments above for why this is here
   useEffect(() => {
     const index = ++vitalsHooksCounter;
-    vitalsHooksMutates.set(index, mutate);
+    vitalsHooksMutates.set(index, () => Promise.all([mutate(), mutateNotes()]));
     return () => {
       vitalsHooksMutates.delete(index);
     };
-  }, [mutate]);
+  }, [mutate, mutateNotes]);
 
   const getVitalsMapKey = useCallback(
     (conceptUuid: string): string => {
@@ -338,18 +336,17 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
     // Attach notes to their existing vitals encounters. Encounters that contain only
     // a note observation (no numeric vitals) are intentionally skipped so they never
     // surface as standalone entries in the vitals list.
-    notesData?.data?.entry
-      ?.map((entry) => entry.resource)
-      .filter(Boolean)
-      .forEach((resource) => {
-        const encounterId = extractEncounterUuid(resource.encounter);
-        if (encounterId && vitalsHashTable.has(encounterId)) {
-          vitalsHashTable.set(encounterId, {
-            ...vitalsHashTable.get(encounterId),
-            note: resource.valueString,
-          });
-        }
-      });
+    // A bundle with no results has no `entry` field, which useFhirFetchAll returns as
+    // `[undefined]`, so drop empty entries.
+    notes?.filter(Boolean).forEach((resource) => {
+      const encounterId = extractEncounterUuid(resource.encounter);
+      if (encounterId && vitalsHashTable.has(encounterId)) {
+        vitalsHashTable.set(encounterId, {
+          ...vitalsHashTable.get(encounterId),
+          note: resource.valueString,
+        });
+      }
+    });
 
     return Array.from(vitalsHashTable).map(([encounterId, vitalSigns]) => {
       const result = {
@@ -383,7 +380,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
 
       return result;
     });
-  }, [conceptRanges, concepts, data, getVitalsMapKey, mode, notesData]);
+  }, [conceptRanges, concepts, data, getVitalsMapKey, mode, notes]);
 
   return {
     data: data ? formattedObs : undefined,
