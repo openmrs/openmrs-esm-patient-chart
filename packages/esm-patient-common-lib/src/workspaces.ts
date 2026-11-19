@@ -182,16 +182,14 @@ export function launchPatientChartWithWorkspaceOpen({
 export function useLaunchWorkspaceRequiringVisit<T extends object>(patientUuid: string, workspaceName: string) {
   const startVisitIfNeeded = useStartVisitIfNeeded(patientUuid);
   const launchPatientWorkspaceCb = useCallback(
-    (workspaceProps?: T, windowProps?: any, groupProps?: any) => {
+    (workspaceProps?: T, windowProps?: any) => {
       startVisitIfNeeded().then((didStartVisit) => {
         if (didStartVisit) {
           // Read at launch time: the visit may have just been started by the prompt above.
-          launchWorkspace2(
-            workspaceName,
-            workspaceProps,
-            { ...getPatientChartWindowProps(patientUuid), ...windowProps },
-            groupProps,
-          );
+          launchWorkspace2(workspaceName, workspaceProps, {
+            ...getPatientChartWindowProps(patientUuid),
+            ...windowProps,
+          });
         }
       });
     },

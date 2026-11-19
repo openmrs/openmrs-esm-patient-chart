@@ -297,7 +297,6 @@ describe('useLaunchWorkspaceRequiringVisit', () => {
       'some-workspace',
       { a: 1 },
       { patient, patientUuid: patient.id, visitContext: visit, extra: true },
-      undefined,
     );
   });
 

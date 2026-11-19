@@ -124,8 +124,11 @@ const mockCreateVisitAttribute = vi.mocked(createVisitAttribute).mockResolvedVal
 const mockUpdateVisitAttribute = vi.mocked(updateVisitAttribute).mockResolvedValue({} as unknown as FetchResponse);
 const mockDeleteVisitAttribute = vi.mocked(deleteVisitAttribute).mockResolvedValue({} as unknown as FetchResponse);
 
+const { mockSetActiveVisit } = vi.hoisted(() => ({ mockSetActiveVisit: vi.fn() }));
+
 vi.mock('@openmrs/esm-patient-common-lib', async () => ({
   ...((await vi.importActual('@openmrs/esm-patient-common-lib')) as object),
+  usePatientChartStore: vi.fn(() => ({ setActiveVisit: mockSetActiveVisit })),
   useActivePatientEnrollment: vi.fn().mockReturnValue({
     activePatientEnrollment: [],
     isLoading: false,
@@ -510,6 +513,83 @@ describe('Visit form', () => {
     await waitFor(() => expect(onVisitStarted).toHaveBeenCalledTimes(1));
     expect(onVisitStarted).toHaveBeenCalledWith(expect.objectContaining({ uuid: visitUuid }));
     expect(mockCloseWorkspace.mock.invocationCallOrder[0]).toBeLessThan(onVisitStarted.mock.invocationCallOrder[0]);
+  });
+
+  describe('chart active visit store', () => {
+    beforeEach(() => {
+      mockSetActiveVisit.mockClear();
+    });
+
+    it('sets the newly started active visit in the chart store', async () => {
+      const user = userEvent.setup();
+      mockSaveVisit.mockResolvedValueOnce({
+        status: 201,
+        data: { uuid: visitUuid, stopDatetime: null, visitType: { display: 'Facility Visit' } },
+      } as unknown as FetchResponse<Visit>);
+
+      renderVisitForm();
+
+      await user.click(screen.getByLabelText(/Outpatient visit/i));
+      await user.click(screen.getByRole('combobox', { name: /Select a location/i }));
+      await user.click(screen.getByText('Inpatient Ward'));
+      await user.click(screen.getByRole('button', { name: /Start visit/i }));
+
+      await waitFor(() =>
+        expect(mockSetActiveVisit).toHaveBeenCalledWith(expect.objectContaining({ uuid: visitUuid })),
+      );
+    });
+
+    it('does not set an ended visit in the chart store when editing a past visit', async () => {
+      const user = userEvent.setup();
+      const onVisitStarted = vi.fn();
+      const pastVisit = {
+        ...mockVisitWithAttributes,
+        startDatetime: dayjs().subtract(3, 'day').toISOString(),
+        stopDatetime: dayjs().subtract(2, 'day').toISOString(),
+      } as Visit;
+      mockUpdateVisit.mockResolvedValueOnce({
+        status: 200,
+        data: { ...pastVisit, uuid: visitUuid, visitType: { display: 'Facility Visit' } },
+      } as unknown as FetchResponse<Visit>);
+
+      render(
+        <VisitForm
+          {...defaultProps}
+          workspaceProps={{ ...defaultProps.workspaceProps, onVisitStarted }}
+          windowProps={{ ...defaultProps.windowProps, visitContext: pastVisit }}
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name: /Update visit/i }));
+
+      await waitFor(() => expect(onVisitStarted).toHaveBeenCalledTimes(1));
+      expect(mockUpdateVisit).toHaveBeenCalled();
+      expect(mockSetActiveVisit).not.toHaveBeenCalled();
+    });
+
+    it('does not set an ended visit in the chart store when creating a past visit', async () => {
+      const user = userEvent.setup();
+      const onVisitStarted = vi.fn();
+      mockSaveVisit.mockResolvedValueOnce({
+        status: 201,
+        data: {
+          uuid: visitUuid,
+          startDatetime: dayjs().subtract(3, 'day').toISOString(),
+          stopDatetime: dayjs().subtract(2, 'day').toISOString(),
+          visitType: { display: 'Facility Visit' },
+        },
+      } as unknown as FetchResponse<Visit>);
+
+      render(<VisitForm {...defaultProps} workspaceProps={{ ...defaultProps.workspaceProps, onVisitStarted }} />);
+
+      await user.click(screen.getByLabelText(/Outpatient visit/i));
+      await user.click(screen.getByRole('combobox', { name: /Select a location/i }));
+      await user.click(screen.getByText('Inpatient Ward'));
+      await user.click(screen.getByRole('button', { name: /Start visit/i }));
+
+      await waitFor(() => expect(onVisitStarted).toHaveBeenCalledTimes(1));
+      expect(mockSetActiveVisit).not.toHaveBeenCalled();
+    });
   });
 
   it('reports no unsaved changes after a successful save, even while callbacks are still pending', async () => {

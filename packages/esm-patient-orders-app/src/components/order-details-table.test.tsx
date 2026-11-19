@@ -587,7 +587,7 @@ describe('OrderDetailsTable', () => {
     expect(screen.getByRole('button', { name: /actions menu/i })).toBeInTheDocument();
   });
 
-  it('passes a visit context refresh function to the order basket when cancelling an order', async () => {
+  it("launches the order basket with only the order's visit as window props when cancelling an order", async () => {
     mockUsePatientOrders.mockReturnValue({
       data: [mockOrders[1]] as unknown as Array<Order>,
       error: undefined,
@@ -603,15 +603,11 @@ describe('OrderDetailsTable', () => {
     const menuItems = screen.getAllByRole('menuitem', { hidden: true });
     await user.click(menuItems.find((item) => /cancel order/i.test(item.textContent)));
 
+    // No group props: the order may belong to a past visit, which must not replace the chart's workspace group
     expect(mockLaunchWorkspace2).toHaveBeenCalledWith(
       'order-basket',
       {},
       expect.objectContaining({ visitContext: mockOrders[1].encounter.visit }),
-      expect.objectContaining({
-        activeVisit: mockOrders[1].encounter.visit,
-        // Without it the group is relaunched with the default 'always' and a second patient banner shows up
-        showPatientBanner: 'tabletOnly',
-      }),
     );
   });
 });

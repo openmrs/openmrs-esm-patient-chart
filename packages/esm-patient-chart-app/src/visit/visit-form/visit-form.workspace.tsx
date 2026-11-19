@@ -41,7 +41,6 @@ import {
   getPatientAndVisitProps,
   hasPatientBannerData,
   invalidateVisitAndEncounterData,
-  invalidateVisitByUuid,
   type PatientBannerGroupProps,
   type PatientWorkspaceWindowProps,
   useActivePatientEnrollment,
@@ -165,10 +164,16 @@ const VisitForm: React.FC<Workspace2DefinitionProps<VisitFormProps, VisitFormWin
       // 1. Current visit data (for critical components like visit summary, action buttons)
       // 2. Visit history table (for the paginated visit list)
       mutateActiveVisit();
-      setActiveVisit?.(visit);
+      // The chart's store only holds the patient's active visit. Editing a visit (possibly a past one)
+      // or creating an already-ended past visit must not put that visit in the store: it could overwrite
+      // the real active visit, or make `useStartVisitIfNeeded` skip the start-visit prompt, until the
+      // refresh above completes. The refresh keeps the store in sync for those cases.
+      if (!visitToEdit && !visit.stopDatetime) {
+        setActiveVisit?.(visit);
+      }
       onVisitStartedCallback?.(visit);
     },
-    [mutateActiveVisit, onVisitStartedCallback, setActiveVisit],
+    [mutateActiveVisit, onVisitStartedCallback, setActiveVisit, visitToEdit],
   );
   const allVisitTypes = useVisitTypes();
   const { earliestAllowedStartDate, isLoading: isLoadingBirthdateCheck } =
@@ -393,7 +398,8 @@ const VisitForm: React.FC<Workspace2DefinitionProps<VisitFormProps, VisitFormWin
           setIsVisitSaved(true);
 
           // Use targeted SWR invalidation instead of global mutateVisit
-          // This will invalidate visit history and encounter tables for this patient
+          // This will invalidate visit history and encounter tables for this patient,
+          // and the current visit, which is the visit in the patient chart store
           invalidateVisitAndEncounterData(globalMutate, patientUuid);
 
           const visitAttributesRequest = visitToEdit
