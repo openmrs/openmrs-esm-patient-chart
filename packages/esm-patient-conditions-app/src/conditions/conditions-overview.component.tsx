@@ -29,7 +29,14 @@ import {
 } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { ConditionsActionMenu } from './conditions-action-menu.component';
-import { type Condition, useConditions, useConditionsSorting } from './conditions.resource';
+import {
+  type Condition,
+  type ConditionTableHeader,
+  getOnsetSortValue,
+  noopSortRow,
+  useConditions,
+  useConditionsSorting,
+} from './conditions.resource';
 import { type ConfigObject } from '../config-schema';
 import styles from './conditions-overview.scss';
 
@@ -39,13 +46,6 @@ interface ConditionTableRow extends Condition {
   abatementDateTime: string;
   onsetDateTimeRender: string;
   status: string;
-}
-
-interface ConditionTableHeader {
-  key: 'display' | 'onsetDateTimeRender' | 'status';
-  header: string;
-  isSortable: true;
-  sortFunc: (valueA: ConditionTableRow, valueB: ConditionTableRow) => number;
 }
 
 interface ConditionsOverviewProps {
@@ -85,28 +85,25 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
     return conditions;
   }, [filter, conditions]);
 
-  const headers: Array<ConditionTableHeader> = useMemo(
+  const headers: Array<ConditionTableHeader<ConditionTableRow>> = useMemo(
     () => [
       {
         key: 'display',
         header: t('condition', 'Condition'),
         isSortable: true,
-        sortFunc: (valueA, valueB) => valueA.display?.localeCompare(valueB.display),
+        sortValue: (row) => row.display,
       },
       {
         key: 'onsetDateTimeRender',
         header: t('dateOfOnset', 'Date of onset'),
         isSortable: true,
-        sortFunc: (valueA, valueB) =>
-          valueA.onsetDateTime && valueB.onsetDateTime
-            ? new Date(valueA.onsetDateTime).getTime() - new Date(valueB.onsetDateTime).getTime()
-            : 0,
+        sortValue: (row) => getOnsetSortValue(row.onsetDateTime),
       },
       {
         key: 'status',
         header: t('status', 'Status'),
         isSortable: true,
-        sortFunc: (valueA, valueB) => valueA.status?.localeCompare(valueB.status),
+        sortValue: (row) => row.status,
       },
     ],
     [t],
@@ -127,7 +124,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
     });
   }, [filteredConditions]);
 
-  const { sortedRows, sortRow } = useConditionsSorting(headers, tableRows);
+  const { sortedRows, handleSortHeaderClick } = useConditionsSorting(headers, tableRows);
 
   const { results: paginatedConditions, goTo, currentPage } = usePagination(sortedRows, conditionPageSize);
 
@@ -182,7 +179,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
           overflowMenuOnHover={isDesktop}
           rows={paginatedConditions}
           size={isTablet ? 'lg' : 'sm'}
-          sortRow={sortRow}
+          sortRow={noopSortRow}
           useZebraStyles
         >
           {({ rows, headers, getHeaderProps, getTableProps }) => (
@@ -191,12 +188,13 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
                 <Table {...getTableProps()} className={styles.table}>
                   <TableHead>
                     <TableRow>
-                      {(headers as Array<DataTableHeader & ConditionTableHeader>).map((header) => (
+                      {(headers as Array<DataTableHeader & ConditionTableHeader<ConditionTableRow>>).map((header) => (
                         <TableHeader
                           className={classNames(styles.productiveHeading01, styles.text02)}
                           {...getHeaderProps({
                             header,
                             isSortable: header.isSortable,
+                            onClick: handleSortHeaderClick,
                           })}
                         >
                           {header.header}

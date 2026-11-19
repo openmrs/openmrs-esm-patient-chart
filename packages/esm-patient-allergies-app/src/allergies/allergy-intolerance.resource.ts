@@ -1,33 +1,27 @@
-import useSWR from 'swr';
-import { fhirBaseUrl, openmrsFetch, restBaseUrl, type OpenmrsResource } from '@openmrs/esm-framework';
-import {
-  type Allergy,
-  type FHIRAllergy,
-  type FHIRAllergyResponse,
-  type PatientAllergyPayload,
-  type UseAllergies,
-} from '../types';
+import { fhirBaseUrl, openmrsFetch, restBaseUrl, useFhirFetchAll, type OpenmrsResource } from '@openmrs/esm-framework';
+import { type Allergy, type FHIRAllergy, type PatientAllergyPayload, type UseAllergies } from '../types';
 
 export function useAllergies(patientUuid: string): UseAllergies {
-  const allergiesUrl = `${fhirBaseUrl}/AllergyIntolerance?patient=${patientUuid}`;
+  // The FHIR server pages its results (10 per page by default), so fetch every page.
+  const allergiesUrl = patientUuid ? `${fhirBaseUrl}/AllergyIntolerance?patient=${patientUuid}` : null;
 
-  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: FHIRAllergyResponse }, Error>(
-    patientUuid ? allergiesUrl : null,
-    openmrsFetch,
-  );
+  const { data, error, isLoading, isValidating, mutate } = useFhirFetchAll<FHIRAllergy>(allergiesUrl);
+
+  // A bundle with no results has no `entry` field, which useFhirFetchAll returns as `[undefined]`
+  // rather than `[]`, so drop empty entries before treating them as allergies.
+  const allergyResources = data?.filter(Boolean) ?? [];
 
   const formattedAllergies =
-    data?.data?.total > 0
-      ? data?.data.entry
-          .map((entry) => entry.resource ?? [])
-          .map(mapAllergyProperties)
-          .sort((a, b) => (b.lastUpdated > a.lastUpdated ? 1 : -1))
+    allergyResources.length > 0
+      ? allergyResources.map(mapAllergyProperties).sort((a, b) => (b.lastUpdated > a.lastUpdated ? 1 : -1))
       : null;
 
   return {
     allergies: data ? formattedAllergies : null,
     error,
-    isLoading,
+    // useFhirFetchAll stays "loading" when a later page fails, because it still has a page
+    // left to fetch. Report the error instead, so the views don't show a skeleton forever.
+    isLoading: isLoading && !error,
     isValidating,
     mutate,
   };
