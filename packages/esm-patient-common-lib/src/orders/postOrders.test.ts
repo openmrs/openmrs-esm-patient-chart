@@ -1,7 +1,7 @@
 import { openmrsFetch, parseDate, toOmrsIsoString, type Visit } from '@openmrs/esm-framework';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { orderBasketStore, _resetOrderBasketStore } from './store';
-import { type EncounterPost, postOrdersOnNewEncounter } from './postOrders';
+import { type EncounterPost, postOrders, postOrdersOnNewEncounter } from './postOrders';
 import { type OrderPost, type PostDataPrepFunction } from './types';
 
 const patientUuid = 'patient-uuid';
@@ -157,5 +157,36 @@ describe('postOrdersOnNewEncounter', () => {
       postOrdersOnNewEncounter(patientUuid, encounterType, openVisit, locationUuid, ordererUuid),
     ).rejects.toThrow('not-a-date');
     expect(openmrsFetch).not.toHaveBeenCalled();
+  });
+});
+
+describe('postOrders', () => {
+  beforeEach(() => {
+    _resetOrderBasketStore();
+  });
+
+  it('returns the saved basket items as the same objects that are in the basket', async () => {
+    const saved = { action: 'NEW', concept: 'saved-concept' } as unknown as OrderPost;
+    const rejected = { action: 'NEW', concept: 'rejected-concept' } as unknown as OrderPost;
+    seedBasket([saved, rejected]);
+    vi.mocked(openmrsFetch).mockImplementation((_url, init) =>
+      (init.body as OrderPost) === rejected
+        ? Promise.reject(new Error('Forbidden'))
+        : Promise.resolve({ data: { uuid: 'order-uuid' } } as never),
+    );
+
+    const { postedOrders, postedItems, erroredItems } = await postOrders(
+      patientUuid,
+      'encounter-uuid',
+      new AbortController(),
+      ordererUuid,
+    );
+
+    expect(postedOrders).toHaveLength(1);
+    expect(postedItems).toHaveLength(1);
+    expect(postedItems[0]).toBe(saved);
+    expect(erroredItems).toHaveLength(1);
+    expect(erroredItems[0]).not.toBe(rejected);
+    expect(erroredItems[0]).toMatchObject({ concept: 'rejected-concept' });
   });
 });
