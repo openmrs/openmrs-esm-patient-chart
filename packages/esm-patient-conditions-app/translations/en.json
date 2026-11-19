@@ -15,6 +15,7 @@
   "Conditions": "Conditions",
   "conditions_lower": "conditions",
   "conditionSaved": "Condition saved successfully",
+  "conditionSaveErrorDescription": "The condition could not be saved. Please try again, or contact your system administrator if the problem continues.",
   "conditionSearchResults": "Condition search results",
   "conditionUpdated": "Condition updated",
   "dateOfOnset": "Date of onset",
