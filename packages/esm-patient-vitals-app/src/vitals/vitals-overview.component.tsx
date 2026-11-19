@@ -170,10 +170,10 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
   }, [isPrinting]);
 
   const handlePrint = useReactToPrint({
-    content: () => contentToPrintRef.current,
+    contentRef: contentToPrintRef,
     documentTitle: `OpenMRS - ${patientDetails.name} - ${headerTitle}`,
-    onBeforeGetContent: () =>
-      new Promise((resolve) => {
+    onBeforePrint: () =>
+      new Promise<void>((resolve) => {
         if (patient && headerTitle) {
           onBeforeGetContentResolve.current = resolve;
           setIsPrinting(true);
@@ -228,6 +228,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
                         renderIcon={PrinterIcon}
                         iconDescription="Add vitals"
                         className={styles.printButton}
+                        disabled={isPrinting}
                         onClick={handlePrint}
                       >
                         {t('print', 'Print')}
