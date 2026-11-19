@@ -53,7 +53,11 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
     [tableHeaders],
   );
 
+  // The table gets every row and renders only the displayed ones. Passing it just the displayed rows
+  // would print the current page, because Carbon copies new rows into its state in an effect that runs
+  // after react-to-print has cloned the content.
   const displayedRows = isPrinting ? sortedData : paginatedVitals;
+  const displayedRowIds = useMemo(() => new Set(displayedRows.map((row) => row.id)), [displayedRows]);
   const hasAnyNotes = tableRows.some((row) => Boolean(row.note));
 
   return (
@@ -62,7 +66,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
         headers={tableHeaders}
         isSortable
         overflowMenuOnHover={!isTablet}
-        rows={displayedRows}
+        rows={sortedData}
         size={isTablet ? 'lg' : 'sm'}
         sortRow={noopSortRow}
         useZebraStyles
@@ -78,11 +82,15 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
                       {header.header}
                     </TableHeader>
                   ))}
-                  <TableHeader aria-label={t('actions', 'Actions')} />
+                  {!isPrinting && <TableHeader aria-label={t('actions', 'Actions')} />}
                 </TableRow>
               </TableHead>
               <TableBody>
                 {rows.map((row) => {
+                  if (!displayedRowIds.has(row.id)) {
+                    return null;
+                  }
+
                   const vitalsObj = displayedRows.find((obj) => obj.id === row.id);
                   const hasNote = Boolean(vitalsObj?.note);
 
@@ -106,9 +114,11 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
                             </TableCell>
                           );
                         })}
-                        <TableCell className="cds--table-column-menu" id="actions">
-                          <VitalsAndBiometricsActionMenu patient={patient} encounterUuid={row.id} />
-                        </TableCell>
+                        {!isPrinting && (
+                          <TableCell className="cds--table-column-menu" id="actions">
+                            <VitalsAndBiometricsActionMenu patient={patient} encounterUuid={row.id} />
+                          </TableCell>
+                        )}
                       </TableRow>
                     );
                   }
@@ -137,14 +147,16 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
                             </TableCell>
                           );
                         })}
-                        <TableCell className="cds--table-column-menu" id="actions">
-                          <VitalsAndBiometricsActionMenu patient={patient} encounterUuid={row.id} />
-                        </TableCell>
+                        {!isPrinting && (
+                          <TableCell className="cds--table-column-menu" id="actions">
+                            <VitalsAndBiometricsActionMenu patient={patient} encounterUuid={row.id} />
+                          </TableCell>
+                        )}
                       </TableExpandRow>
                       {(isPrinting || row.isExpanded) && hasNote ? (
                         <TableExpandedRow
                           className={styles.expandedRow}
-                          colSpan={headers.length + 2}
+                          colSpan={headers.length + (isPrinting ? 1 : 2)}
                           {...getExpandedRowProps({ row })}
                         >
                           <div className={styles.container}>
@@ -154,7 +166,10 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
                           </div>
                         </TableExpandedRow>
                       ) : (
-                        <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
+                        <TableExpandedRow
+                          className={styles.hiddenRow}
+                          colSpan={headers.length + (isPrinting ? 1 : 2)}
+                        />
                       )}
                     </React.Fragment>
                   );

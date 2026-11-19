@@ -1,5 +1,5 @@
 import React from 'react';
-import { vi, describe, it, expect, afterEach } from 'vitest';
+import { vi, describe, it, expect, afterEach, onTestFinished } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, waitFor, within } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
@@ -353,7 +353,6 @@ describe('VitalsOverview', () => {
   });
 
   it('prints every vitals row with notes expanded, then restores the paginated table', async () => {
-    const user = userEvent.setup();
     const printJobs = capturePrintJobs();
 
     mockUseConfig.mockReturnValue({
@@ -370,7 +369,14 @@ describe('VitalsOverview', () => {
 
     expect(getRowDates()).toHaveLength(2);
 
-    await user.click(screen.getByRole('button', { name: /print/i }));
+    // Clicks outside act() so that React schedules the updates as a browser would. act() renders every update
+    // before react-to-print copies the content, so a table that is a render behind would still print in full.
+    vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', false);
+    onTestFinished(() => {
+      vi.unstubAllGlobals();
+    });
+    // eslint-disable-next-line testing-library/no-node-access
+    screen.getByRole('button', { name: /print/i }).click();
     await waitFor(() => expect(printJobs).toHaveLength(1));
 
     const [{ content, documentTitle }] = printJobs;
@@ -381,6 +387,12 @@ describe('VitalsOverview', () => {
     expect(content).toHaveTextContent(/Pt reports severe L chest pain/i);
     expect(content).toHaveTextContent(/Follow up in 2 weeks/i);
     expect(content).not.toHaveTextContent(/items/i);
+    expect(within(content).queryAllByRole('columnheader', { name: /actions/i })).toHaveLength(0);
+    expect(within(content).queryAllByRole('button', { name: /edit or delete/i })).toHaveLength(0);
+    const printedColumns = within(content).getAllByRole('columnheader').length;
+    const noteCell = within(content).getByText(/Pt reports severe L chest pain/i);
+    // eslint-disable-next-line testing-library/no-node-access
+    expect(noteCell.closest('td')).toHaveAttribute('colspan', String(printedColumns));
 
     await waitFor(() => expect(getRowDates()).toHaveLength(2));
     expect(screen.queryByText(/Pt reports severe L chest pain/i)).not.toBeInTheDocument();

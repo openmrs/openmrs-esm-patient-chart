@@ -37,9 +37,8 @@ function compareSortValues(valuesA: Array<SortValue>, valuesB: Array<SortValue>,
 }
 
 /**
- * Carbon only ever sorts the rows it was handed, which is a single page. Pass this
- * as the table's `sortRow` to keep its comparator inert so that the hook can sort
- * the full dataset instead.
+ * Keeps Carbon's comparator inert so that `useTableSorting` sorts the full dataset
+ * and Carbon does not sort the rows again. Pass this as the table's `sortRow`.
  */
 export const noopSortRow = () => 0;
 
