@@ -176,6 +176,58 @@ describe('ProgramsForm', () => {
     );
   });
 
+  it.each([
+    {
+      reason: 'a validation error on the enrollment',
+      error: {
+        message: 'Invalid Submission',
+        globalErrors: [{ code: 'patient.dead', message: 'The patient has died' }],
+        fieldErrors: {},
+      },
+      expected: 'The patient has died',
+    },
+    {
+      reason: 'validation errors on several fields',
+      error: {
+        message: 'Invalid Submission',
+        globalErrors: [],
+        fieldErrors: {
+          dateEnrolled: [{ code: 'error.date.future', message: 'Date enrolled cannot be in the future' }],
+          location: [{ code: 'error.null', message: 'Location is required' }],
+        },
+      },
+      expected: 'Date enrolled cannot be in the future, Location is required',
+    },
+    {
+      reason: 'an exception outside validation',
+      error: { message: 'Patient is already enrolled in this program' },
+      expected: 'Patient is already enrolled in this program',
+    },
+  ])('shows the reason the server gives when it refuses an enrollment for $reason', async ({ error, expected }) => {
+    const user = userEvent.setup();
+    mockCreateProgramEnrollment.mockRejectedValueOnce(
+      Object.assign(new Error('Server responded with 400 () for url /openmrs/ws/rest/v1/programenrollment'), {
+        responseBody: { error },
+      }),
+    );
+
+    renderProgramsForm();
+
+    fireEvent.change(screen.getByRole('textbox', { name: /date enrolled/i }), { target: { value: '2020-05-05' } });
+    await user.selectOptions(screen.getByRole('combobox', { name: /program name/i }), [
+      '11b129ca-a5e7-4025-84bf-b92a173e20de',
+    ]);
+    await user.click(screen.getByRole('radio', { name: 'location_2' }));
+    await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+    expect(mockCloseWorkspace).not.toHaveBeenCalled();
+    expect(mockShowSnackbar).toHaveBeenCalledWith({
+      kind: 'error',
+      title: 'Error saving program enrollment',
+      subtitle: expected,
+    });
+  });
+
   it('does not submit the form when completion date is before enrollment date', async () => {
     const user = userEvent.setup();
 

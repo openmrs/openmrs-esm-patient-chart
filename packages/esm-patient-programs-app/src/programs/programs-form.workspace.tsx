@@ -182,7 +182,7 @@ const ProgramsForm: React.FC<PatientWorkspace2DefinitionProps<ProgramsFormProps,
         showSnackbar({
           kind: 'error',
           title: t('programEnrollmentSaveError', 'Error saving program enrollment'),
-          subtitle: error instanceof Error ? error.message : 'An unknown error occurred',
+          subtitle: serverErrorMessage(error) ?? (error instanceof Error ? error.message : 'An unknown error occurred'),
         });
       }
     },
@@ -398,3 +398,21 @@ const ProgramsForm: React.FC<PatientWorkspace2DefinitionProps<ProgramsFormProps,
 };
 
 export default ProgramsForm;
+
+type ServerErrorBody = {
+  error?: {
+    message?: string;
+    globalErrors?: Array<{ message: string }>;
+    fieldErrors?: Record<string, Array<{ message: string }>>;
+  };
+};
+
+function serverErrorMessage(error: unknown): string | undefined {
+  const {
+    message,
+    globalErrors = [],
+    fieldErrors = {},
+  } = (error as { responseBody?: ServerErrorBody })?.responseBody?.error ?? {};
+  const messages = [...globalErrors, ...Object.values(fieldErrors).flat()].map((entry) => entry.message);
+  return messages.length > 0 ? messages.join(', ') : message;
+}
