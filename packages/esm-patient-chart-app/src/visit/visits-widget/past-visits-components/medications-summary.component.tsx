@@ -3,7 +3,7 @@ import { capitalize } from 'lodash-es';
 import { Tag, Tooltip } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { formatDate, useConfig } from '@openmrs/esm-framework';
-import { EmptyState } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, getDurationUnitLabel } from '@openmrs/esm-patient-common-lib';
 import { type OrderItem } from '../visit.resource';
 import { type ChartConfig } from '../../../config-schema';
 import styles from '../visit-detail-overview.scss';
@@ -79,7 +79,11 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
                             &mdash;{' '}
                             {t('orderDurationAndUnit', 'for {{duration}} {{durationUnit}}', {
                               duration: medication?.order?.duration,
-                              durationUnit: medication?.order?.durationUnits?.display?.toLowerCase(),
+                              durationUnit: getDurationUnitLabel(
+                                t,
+                                medication?.order?.durationUnits,
+                                medication?.order?.duration,
+                              ),
                             })}
                           </>
                         )}
@@ -108,7 +112,11 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
                             &mdash;{' '}
                             {t('orderDurationAndUnit', 'for {{duration}} {{durationUnit}}', {
                               duration: medication?.order?.duration,
-                              durationUnit: medication?.order?.durationUnits?.display?.toLowerCase(),
+                              durationUnit: getDurationUnitLabel(
+                                t,
+                                medication?.order?.durationUnits,
+                                medication?.order?.duration,
+                              ),
                             })}
                           </span>
                         )}
