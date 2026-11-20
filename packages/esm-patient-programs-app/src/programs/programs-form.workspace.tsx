@@ -401,14 +401,18 @@ export default ProgramsForm;
 
 type ServerErrorBody = {
   error?: {
+    message?: string;
     globalErrors?: Array<{ message: string }>;
     fieldErrors?: Record<string, Array<{ message: string }>>;
   };
 };
 
 function serverErrorMessage(error: unknown): string | undefined {
-  const { globalErrors = [], fieldErrors = {} } =
-    (error as { responseBody?: ServerErrorBody })?.responseBody?.error ?? {};
-  const messages = [...globalErrors, ...Object.values(fieldErrors).flat()].map(({ message }) => message);
-  return messages.length > 0 ? messages.join('\n') : undefined;
+  const {
+    message,
+    globalErrors = [],
+    fieldErrors = {},
+  } = (error as { responseBody?: ServerErrorBody })?.responseBody?.error ?? {};
+  const messages = [...globalErrors, ...Object.values(fieldErrors).flat()].map((entry) => entry.message);
+  return messages.length > 0 ? messages.join(', ') : message;
 }

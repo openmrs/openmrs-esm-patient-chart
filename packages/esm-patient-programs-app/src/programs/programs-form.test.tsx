@@ -176,17 +176,38 @@ describe('ProgramsForm', () => {
     );
   });
 
-  it('shows the reason the server gives for refusing an enrollment', async () => {
+  it.each([
+    {
+      reason: 'a validation error on the enrollment',
+      error: {
+        message: 'Invalid Submission',
+        globalErrors: [{ code: 'patient.dead', message: 'The patient has died' }],
+        fieldErrors: {},
+      },
+      expected: 'The patient has died',
+    },
+    {
+      reason: 'validation errors on several fields',
+      error: {
+        message: 'Invalid Submission',
+        globalErrors: [],
+        fieldErrors: {
+          dateEnrolled: [{ code: 'error.date.future', message: 'Date enrolled cannot be in the future' }],
+          location: [{ code: 'error.null', message: 'Location is required' }],
+        },
+      },
+      expected: 'Date enrolled cannot be in the future, Location is required',
+    },
+    {
+      reason: 'an exception outside validation',
+      error: { message: 'Patient is already enrolled in this program' },
+      expected: 'Patient is already enrolled in this program',
+    },
+  ])('shows the reason the server gives when it refuses an enrollment for $reason', async ({ error, expected }) => {
     const user = userEvent.setup();
     mockCreateProgramEnrollment.mockRejectedValueOnce(
       Object.assign(new Error('Server responded with 400 () for url /openmrs/ws/rest/v1/programenrollment'), {
-        responseBody: {
-          error: {
-            message: 'Invalid Submission',
-            globalErrors: [{ code: 'patient.dead', message: 'The patient has died' }],
-            fieldErrors: {},
-          },
-        },
+        responseBody: { error },
       }),
     );
 
@@ -203,7 +224,7 @@ describe('ProgramsForm', () => {
     expect(mockShowSnackbar).toHaveBeenCalledWith({
       kind: 'error',
       title: 'Error saving program enrollment',
-      subtitle: 'The patient has died',
+      subtitle: expected,
     });
   });
 
