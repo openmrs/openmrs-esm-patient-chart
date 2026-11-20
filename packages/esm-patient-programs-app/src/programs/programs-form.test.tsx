@@ -176,6 +176,37 @@ describe('ProgramsForm', () => {
     );
   });
 
+  it('shows the reason the server gives for refusing an enrollment', async () => {
+    const user = userEvent.setup();
+    mockCreateProgramEnrollment.mockRejectedValueOnce(
+      Object.assign(new Error('Server responded with 400 () for url /openmrs/ws/rest/v1/programenrollment'), {
+        responseBody: {
+          error: {
+            message: 'Invalid Submission',
+            globalErrors: [{ code: 'patient.dead', message: 'The patient has died' }],
+            fieldErrors: {},
+          },
+        },
+      }),
+    );
+
+    renderProgramsForm();
+
+    fireEvent.change(screen.getByRole('textbox', { name: /date enrolled/i }), { target: { value: '2020-05-05' } });
+    await user.selectOptions(screen.getByRole('combobox', { name: /program name/i }), [
+      '11b129ca-a5e7-4025-84bf-b92a173e20de',
+    ]);
+    await user.click(screen.getByRole('radio', { name: 'location_2' }));
+    await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+    expect(mockCloseWorkspace).not.toHaveBeenCalled();
+    expect(mockShowSnackbar).toHaveBeenCalledWith({
+      kind: 'error',
+      title: 'Error saving program enrollment',
+      subtitle: 'The patient has died',
+    });
+  });
+
   it('does not submit the form when completion date is before enrollment date', async () => {
     const user = userEvent.setup();
 
