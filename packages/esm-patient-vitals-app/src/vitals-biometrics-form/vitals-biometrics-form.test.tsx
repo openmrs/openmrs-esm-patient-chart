@@ -1,4 +1,5 @@
 import React from 'react';
+import dayjs from 'dayjs';
 import { vi, describe, it, expect } from 'vitest';
 import { act, screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -543,6 +544,127 @@ describe('VitalsBiometricsForm', () => {
     expect(screen.getByRole('spinbutton', { name: /weight/i })).toBeInTheDocument();
     expect(screen.getByRole('spinbutton', { name: /height/i })).toBeInTheDocument();
     expect(screen.getByRole('spinbutton', { name: /muac/i })).toBeInTheDocument();
+  });
+
+  it('correctly sets MUAC color code for infants and resets when cleared', async () => {
+    const user = userEvent.setup();
+    const infantBirthDate = dayjs().subtract(11, 'month').format('YYYY-MM-DD');
+    const infantPatient = {
+      ...mockPatient,
+      birthDate: infantBirthDate,
+    };
+
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      ...mockVitalsConfig,
+      vitals: {
+        ...getDefaultsFromConfigSchema(configSchema).vitals,
+        ...mockVitalsConfig.vitals,
+        useMuacColors: true,
+      },
+    } as ConfigObject);
+
+    const props: VitalsFormWorkspaceDefinitionProps = {
+      ...defaultProps,
+      windowProps: {
+        ...defaultProps.windowProps,
+        patient: infantPatient,
+      },
+    };
+
+    render(<VitalsAndBiometricsForm {...props} />);
+
+    const muacInput = screen.getByRole('spinbutton', { name: /muac/i });
+    // eslint-disable-next-line testing-library/no-node-access
+    const muacSection = muacInput.closest('section');
+
+    // Type 12.8 cm (Normal / Green for 6-59m infant)
+    await user.type(muacInput, '12.8');
+    expect(muacSection).toHaveClass('green');
+    expect(muacSection).not.toHaveClass('red');
+
+    // Clear the input
+    await user.clear(muacInput);
+    expect(muacSection).not.toHaveClass('green');
+    expect(muacSection).not.toHaveClass('red');
+    expect(muacSection).not.toHaveClass('yellow');
+
+    // Type 11.0 cm (Severe Acute Malnutrition / Red for 6-59m infant)
+    await user.type(muacInput, '11.0');
+    expect(muacSection).toHaveClass('red');
+    expect(muacSection).not.toHaveClass('green');
+  });
+
+  it('safely handles patients with missing birthDate without crashing when entering MUAC', async () => {
+    const user = userEvent.setup();
+    const patientWithoutBirthDate = {
+      ...mockPatient,
+      birthDate: undefined,
+    };
+
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      ...mockVitalsConfig,
+      vitals: {
+        ...getDefaultsFromConfigSchema(configSchema).vitals,
+        ...mockVitalsConfig.vitals,
+        useMuacColors: true,
+      },
+    } as ConfigObject);
+
+    const props: VitalsFormWorkspaceDefinitionProps = {
+      ...defaultProps,
+      windowProps: {
+        ...defaultProps.windowProps,
+        patient: patientWithoutBirthDate,
+      },
+    };
+
+    render(<VitalsAndBiometricsForm {...props} />);
+
+    const muacInput = screen.getByRole('spinbutton', { name: /muac/i });
+    // eslint-disable-next-line testing-library/no-node-access
+    const muacSection = muacInput.closest('section');
+
+    await user.type(muacInput, '12.8');
+    expect(muacSection).not.toHaveClass('green');
+    expect(muacSection).not.toHaveClass('red');
+  });
+
+  it('does not color-code MUAC for infants under 6 months', async () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      ...mockVitalsConfig,
+      vitals: {
+        ...getDefaultsFromConfigSchema(configSchema).vitals,
+        ...mockVitalsConfig.vitals,
+        useMuacColors: true,
+      },
+    } as ConfigObject);
+
+    const user = userEvent.setup();
+    const infantUnder6Months = {
+      ...mockPatient,
+      birthDate: dayjs().subtract(2, 'months').format('YYYY-MM-DD'),
+    };
+    const props: VitalsFormWorkspaceDefinitionProps = {
+      ...defaultProps,
+      windowProps: {
+        ...defaultProps.windowProps,
+        patient: infantUnder6Months,
+      },
+    };
+
+    render(<VitalsAndBiometricsForm {...props} />);
+
+    const muacInput = screen.getByRole('spinbutton', { name: /muac/i });
+    // eslint-disable-next-line testing-library/no-node-access
+    const muacSection = muacInput.closest('section');
+
+    await user.type(muacInput, '10.5');
+    expect(muacSection).not.toHaveClass('red');
+    expect(muacSection).not.toHaveClass('yellow');
+    expect(muacSection).not.toHaveClass('green');
   });
 });
 
