@@ -149,6 +149,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
 
       closeWorkspaceWithSavedChanges();
     } catch (error) {
+      console.error('Error saving condition: ', error);
       setIsSubmittingForm(false);
       setErrorCreating(error);
     }
@@ -191,6 +192,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
 
       closeWorkspaceWithSavedChanges();
     } catch (error) {
+      console.error('Error saving condition: ', error);
       setIsSubmittingForm(false);
       setErrorUpdating(error);
     }

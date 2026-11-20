@@ -5,10 +5,16 @@ import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
 import { useTranslation } from 'react-i18next';
-import { type FetchResponse, openmrsFetch, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
+import {
+  type FetchResponse,
+  OpenmrsFetchError,
+  openmrsFetch,
+  showSnackbar,
+  useLayoutType,
+} from '@openmrs/esm-framework';
 import { mockFhirConditionsResponse, searchedCondition } from '__mocks__';
 import { getByTextWithMarkup, mockPatient } from 'tools';
-import { createCondition, useConditions, useConditionsSearch } from './conditions.resource';
+import { createCondition, updateCondition, useConditions, useConditionsSearch } from './conditions.resource';
 import ConditionsForm, { type ConditionFormProps } from './conditions-form.workspace';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 
@@ -47,6 +53,7 @@ function renderConditionsForm(workspaceProps?: ConditionFormProps) {
 }
 
 const mockCreateCondition = vi.mocked(createCondition);
+const mockUpdateCondition = vi.mocked(updateCondition);
 const mockUseConditionsSearch = vi.mocked(useConditionsSearch);
 const mockUseConditions = vi.mocked(useConditions);
 const mockShowSnackbar = vi.mocked(showSnackbar);
@@ -55,7 +62,7 @@ const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 vi.mock('./conditions.resource', async () => ({
   ...((await vi.importActual('./conditions.resource')) as object),
   createCondition: vi.fn(),
-  editCondition: vi.fn(),
+  updateCondition: vi.fn(),
   useConditions: vi.fn(),
   useConditionsSearch: vi.fn(),
 }));
@@ -75,6 +82,26 @@ mockUseConditionsSearch.mockReturnValue({
 });
 
 mockCreateCondition.mockResolvedValue({ status: 201, body: 'Condition created' } as unknown as FetchResponse);
+
+// The error openmrsFetch throws when the FHIR module rejects a save because the user lacks a privilege
+function fhirPrivilegeError(url: string) {
+  return new OpenmrsFetchError(
+    url,
+    new Response(null, { status: 500, statusText: 'Internal Server Error' }),
+    {
+      resourceType: 'OperationOutcome',
+      issue: [
+        {
+          severity: 'error',
+          code: 'processing',
+          diagnostics:
+            'HAPI-0389: Failed to call access method: org.openmrs.api.APIAuthenticationException: Privileges required: Edit Conditions',
+        },
+      ],
+    } as never,
+    new Error(),
+  );
+}
 
 describe('Conditions form', () => {
   it('renders the conditions form with all the relevant fields and values', () => {
@@ -186,39 +213,119 @@ describe('Conditions form', () => {
     });
   });
 
-  it('renders an error notification if there was a problem recording a condition', async () => {
+  it("renders the server's reason when recording a condition fails", async () => {
     const user = userEvent.setup();
+    // The form logs the failed save with console.error; silence it so the expected error doesn't clutter the test output
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const error = fhirPrivilegeError('http://localhost/openmrs/ws/fhir2/R4/Condition?_summary=data');
 
     mockUseConditionsSearch.mockReturnValue({
       searchResults: searchedCondition,
       error: null,
       isSearching: false,
     });
+    mockCreateCondition.mockRejectedValueOnce(error);
 
     renderConditionsForm();
 
-    const submitButton = screen.getByRole('button', { name: /save & close/i });
-    const activeStatusInput = screen.getByRole('radio', { name: 'Active' });
-    const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
-    const onsetDateInput = screen.getByRole('textbox', { name: /onset date/i });
+    await user.type(screen.getByRole('searchbox', { name: /enter condition/i }), 'Headache');
+    await user.click(screen.getByRole('button', { name: /headache/i }));
+    await user.click(screen.getByRole('button', { name: /save & close/i }));
 
-    const error = {
-      message: 'Internal Server Error',
-      response: {
-        status: 500,
-        statusText: 'Internal Server Error',
-      },
+    expect(await screen.findByText('Error creating condition')).toBeInTheDocument();
+    expect(screen.getByText('Privileges required: Edit Conditions')).toBeInTheDocument();
+
+    consoleSpy.mockRestore();
+  });
+
+  it('renders the fallback message when recording a condition fails without a usable server reason', async () => {
+    const user = userEvent.setup();
+    // The form logs the failed save with console.error; silence it so the expected error doesn't clutter the test output
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    mockUseConditionsSearch.mockReturnValue({
+      searchResults: searchedCondition,
+      error: null,
+      isSearching: false,
+    });
+    mockCreateCondition.mockRejectedValueOnce(
+      new OpenmrsFetchError(
+        'http://localhost/openmrs/ws/fhir2/R4/Condition',
+        new Response(null, { status: 401, statusText: 'Unauthorized' }),
+        '<!doctype html><html><head><title>HTTP Status 401 – Unauthorized</title></head></html>',
+        new Error(),
+      ),
+    );
+
+    renderConditionsForm();
+
+    await user.type(screen.getByRole('searchbox', { name: /enter condition/i }), 'Headache');
+    await user.click(screen.getByRole('button', { name: /headache/i }));
+    await user.click(screen.getByRole('button', { name: /save & close/i }));
+
+    expect(await screen.findByText('Error creating condition')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'The condition could not be saved. Please try again, or contact your system administrator if the problem continues.',
+      ),
+    ).toBeInTheDocument();
+
+    consoleSpy.mockRestore();
+  });
+
+  it('renders the error message when recording a condition fails without reaching the server', async () => {
+    const user = userEvent.setup();
+    // The form logs the failed save with console.error; silence it so the expected error doesn't clutter the test output
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    mockUseConditionsSearch.mockReturnValue({
+      searchResults: searchedCondition,
+      error: null,
+      isSearching: false,
+    });
+    mockCreateCondition.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+
+    renderConditionsForm();
+
+    await user.type(screen.getByRole('searchbox', { name: /enter condition/i }), 'Headache');
+    await user.click(screen.getByRole('button', { name: /headache/i }));
+    await user.click(screen.getByRole('button', { name: /save & close/i }));
+
+    expect(await screen.findByText('Error creating condition')).toBeInTheDocument();
+    expect(screen.getByText('Failed to fetch')).toBeInTheDocument();
+
+    consoleSpy.mockRestore();
+  });
+
+  it("renders the server's reason when updating a condition fails", async () => {
+    const user = userEvent.setup();
+    // The form logs the failed save with console.error; silence it so the expected error doesn't clutter the test output
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const conditionToEdit = {
+      clinicalStatus: 'Active',
+      conceptId: '117399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Hypertension',
+      abatementDateTime: undefined,
+      onsetDateTime: '2020-08-19T00:00:00+00:00',
+      recordedDate: '2020-08-19T18:34:48+00:00',
+      id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
     };
 
-    mockCreateCondition.mockRejectedValue(error);
-    await user.type(conditionSearchInput, 'Headache');
-    await user.click(screen.getByRole('button', { name: /Headache/i }));
-    await user.click(onsetDateInput);
-    await user.paste('2020-05-05');
-    await user.click(activeStatusInput);
-    expect(activeStatusInput).toBeChecked();
-    expect(submitButton).toBeEnabled();
-    await user.click(submitButton);
+    const error = fhirPrivilegeError(
+      `http://localhost/openmrs/ws/fhir2/R4/Condition/${conditionToEdit.id}?_summary=data`,
+    );
+    mockUpdateCondition.mockRejectedValueOnce(error);
+
+    renderConditionsForm({ condition: conditionToEdit, formContext: 'editing' });
+
+    await user.click(screen.getByLabelText(/inactive/i));
+    await user.click(screen.getByRole('button', { name: /save & close/i }));
+
+    expect(await screen.findByText('Error updating condition')).toBeInTheDocument();
+    expect(screen.getByText('Privileges required: Edit Conditions')).toBeInTheDocument();
+
+    consoleSpy.mockRestore();
   });
 
   it('validates the form against the provided zod schema before submitting it', async () => {

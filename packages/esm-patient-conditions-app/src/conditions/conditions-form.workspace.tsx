@@ -6,9 +6,9 @@ import { useForm, FormProvider, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button, ButtonSet, Form, InlineLoading, InlineNotification } from '@carbon/react';
-import { ExtensionSlot, useLayoutType, Workspace2 } from '@openmrs/esm-framework';
+import { ExtensionSlot, OpenmrsFetchError, useLayoutType, Workspace2 } from '@openmrs/esm-framework';
 import { type PatientWorkspace2DefinitionProps, useShowPatientBanner } from '@openmrs/esm-patient-common-lib';
-import { type Condition, useConditions } from './conditions.resource';
+import { type Condition, getConditionErrorReason, useConditions } from './conditions.resource';
 import ConditionsWidget from './conditions-widget.component';
 import styles from './conditions-form.scss';
 
@@ -60,6 +60,17 @@ const ConditionsForm: React.FC<PatientWorkspace2DefinitionProps<ConditionFormPro
   const isEditing = formContext === 'editing';
 
   const matchingCondition = conditions?.find((c) => c?.id === condition?.id);
+
+  // The subtitle is, in order of preference:
+  // 1. For an OpenmrsFetchError (the server responded with an error), the reason the server gave in the response body
+  // 2. For any other error (no response, e.g. a network failure, or a bug in this code), the error's own message
+  // 3. When neither gives any text, a translated fallback
+  const getErrorSubtitle = (error: unknown) =>
+    (error instanceof OpenmrsFetchError ? getConditionErrorReason(error.responseBody) : (error as Error)?.message) ||
+    t(
+      'conditionSaveErrorDescription',
+      'The condition could not be saved. Please try again, or contact your system administrator if the problem continues.',
+    );
 
   const schema = createSchema(formContext, t);
 
@@ -121,7 +132,7 @@ const ConditionsForm: React.FC<PatientWorkspace2DefinitionProps<ConditionFormPro
                   kind="error"
                   lowContrast
                   title={t('errorCreatingCondition', 'Error creating condition')}
-                  subtitle={errorCreating?.message}
+                  subtitle={getErrorSubtitle(errorCreating)}
                 />
               </div>
             ) : null}
@@ -133,7 +144,7 @@ const ConditionsForm: React.FC<PatientWorkspace2DefinitionProps<ConditionFormPro
                   kind="error"
                   lowContrast
                   title={t('errorUpdatingCondition', 'Error updating condition')}
-                  subtitle={errorUpdating?.message}
+                  subtitle={getErrorSubtitle(errorUpdating)}
                 />
               </div>
             ) : null}

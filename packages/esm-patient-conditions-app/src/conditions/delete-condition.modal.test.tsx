@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { mockPatient } from 'tools';
 import { deleteCondition } from './conditions.resource';
-import { showSnackbar, type FetchResponse } from '@openmrs/esm-framework';
+import { OpenmrsFetchError, showSnackbar, type FetchResponse } from '@openmrs/esm-framework';
 import DeleteConditionModal from './delete-condition.modal';
 
 const mockDeleteCondition = vi.mocked(deleteCondition);
@@ -83,6 +83,71 @@ describe('<DeleteConditionModal />', () => {
       subtitle: 'Internal server error',
     });
     expect(deleteButton).toBeEnabled();
+
+    consoleSpy.mockRestore();
+  });
+
+  it("renders the server's reason if the delete operation is rejected by the server", async () => {
+    // The modal logs the failed delete with console.error; silence it so the expected error doesn't clutter the test output
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const user = userEvent.setup();
+
+    mockDeleteCondition.mockRejectedValueOnce(
+      new OpenmrsFetchError(
+        `http://localhost/openmrs/ws/fhir2/R4/Condition/${defaultProps.conditionId}`,
+        new Response(null, { status: 500, statusText: 'Internal Server Error' }),
+        {
+          resourceType: 'OperationOutcome',
+          issue: [
+            {
+              severity: 'error',
+              code: 'processing',
+              diagnostics:
+                'HAPI-0389: Failed to call access method: org.openmrs.api.APIAuthenticationException: Privileges required: Delete Conditions',
+            },
+          ],
+        } as never,
+        new Error(),
+      ),
+    );
+
+    render(<DeleteConditionModal {...defaultProps} />);
+    await user.click(screen.getByRole('button', { name: /delete/i }));
+
+    expect(mockShowSnackbar).toHaveBeenCalledWith({
+      isLowContrast: false,
+      kind: 'error',
+      title: 'Error deleting condition',
+      subtitle: 'Privileges required: Delete Conditions',
+    });
+
+    consoleSpy.mockRestore();
+  });
+
+  it('renders the fallback message if the server gives no usable reason for a failed delete', async () => {
+    // The modal logs the failed delete with console.error; silence it so the expected error doesn't clutter the test output
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const user = userEvent.setup();
+
+    mockDeleteCondition.mockRejectedValueOnce(
+      new OpenmrsFetchError(
+        `http://localhost/openmrs/ws/fhir2/R4/Condition/${defaultProps.conditionId}`,
+        new Response(null, { status: 401, statusText: 'Unauthorized' }),
+        '<!doctype html><html><head><title>HTTP Status 401 – Unauthorized</title></head></html>',
+        new Error(),
+      ),
+    );
+
+    render(<DeleteConditionModal {...defaultProps} />);
+    await user.click(screen.getByRole('button', { name: /delete/i }));
+
+    expect(mockShowSnackbar).toHaveBeenCalledWith({
+      isLowContrast: false,
+      kind: 'error',
+      title: 'Error deleting condition',
+      subtitle:
+        'The condition could not be deleted. Please try again, or contact your system administrator if the problem continues.',
+    });
 
     consoleSpy.mockRestore();
   });
