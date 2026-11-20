@@ -1,6 +1,7 @@
 import React from 'react';
-import { vi, describe, it, expect } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { act, screen, render, waitFor } from '@testing-library/react';
+import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import {
   type FetchResponse,
@@ -557,3 +558,77 @@ function renderVitalsAndBiometricsForm(formContext?: 'creating' | 'editing', edi
   };
   return render(<VitalsAndBiometricsForm {...props} />);
 }
+
+describe('MUAC color coding', () => {
+  const infantPatient = {
+    ...mockPatient,
+    birthDate: dayjs().subtract(6, 'month').format('YYYY-MM-DD'),
+  } as typeof mockPatient;
+
+  const defaultConfig = {
+    ...getDefaultsFromConfigSchema(configSchema),
+    ...mockVitalsConfig,
+    biometrics: {
+      ...getDefaultsFromConfigSchema(configSchema).biometrics,
+      ...mockVitalsConfig.biometrics,
+    },
+  } as ConfigObject;
+
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue({
+      ...defaultConfig,
+      vitals: { ...defaultConfig.vitals, useMuacColors: true },
+    } as ConfigObject);
+  });
+
+  afterEach(() => {
+    mockUseConfig.mockReturnValue(defaultConfig);
+  });
+
+  function getMuacInputFor(patient: typeof mockPatient) {
+    render(<VitalsAndBiometricsForm {...defaultProps} windowProps={{ ...defaultProps.windowProps, patient }} />);
+    return screen.getByRole('spinbutton', { name: /muac|mid-upper arm/i });
+  }
+
+  function getMuacSection(input: HTMLElement) {
+    // eslint-disable-next-line testing-library/no-node-access
+    return input.closest('section') as HTMLElement;
+  }
+
+  it('applies green for 12.8 cm and red for 11.0 cm on an infant', async () => {
+    const user = userEvent.setup();
+
+    const muacInput = getMuacInputFor(infantPatient);
+
+    await user.type(muacInput, '12.8');
+    await waitFor(() => expect(getMuacSection(muacInput)).toHaveClass('green'));
+
+    await user.clear(muacInput);
+    await user.type(muacInput, '11.0');
+    await waitFor(() => expect(getMuacSection(muacInput)).toHaveClass('red'));
+  });
+
+  it('resets the color when the field is cleared', async () => {
+    const user = userEvent.setup();
+
+    const muacInput = getMuacInputFor(infantPatient);
+
+    await user.type(muacInput, '11.0');
+    await waitFor(() => expect(getMuacSection(muacInput)).toHaveClass('red'));
+
+    await user.clear(muacInput);
+    await waitFor(() => expect(getMuacSection(muacInput)).not.toHaveClass('red'));
+  });
+
+  it('does not crash and applies no color when birthDate is missing', async () => {
+    const user = userEvent.setup();
+
+    const muacInput = getMuacInputFor({ ...mockPatient, birthDate: undefined } as typeof mockPatient);
+
+    await user.type(muacInput, '11.0');
+    const section = getMuacSection(muacInput);
+    expect(section).not.toHaveClass('red');
+    expect(section).not.toHaveClass('yellow');
+    expect(section).not.toHaveClass('green');
+  });
+});

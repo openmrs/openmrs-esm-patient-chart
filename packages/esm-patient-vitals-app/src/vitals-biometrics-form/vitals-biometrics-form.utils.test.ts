@@ -4,6 +4,10 @@ import { getMuacColorCode } from './vitals-biometrics-form.utils';
 describe('getMuacColorCode', () => {
   it.each([
     // under 5 years
+    [0, 11.4, 'red', 'infant (0 completed years): red below 11.5'],
+    [0, 12.0, 'yellow', 'infant (0 completed years): yellow between 11.5 and 12.5'],
+    [0, 12.8, 'green', 'infant (0 completed years): green at 12.8 (regression: "50 wks" was read as age 50)'],
+    [0, 14.8, 'green', 'infant (0 completed years): green at 14.8'],
     [4, 11.0, 'red', 'under-5: red below 11.5'],
     [4, 11.5, 'yellow', 'under-5: yellow at 11.5 boundary'],
     [4, 12.5, 'green', 'under-5: green at 12.5 boundary'],
