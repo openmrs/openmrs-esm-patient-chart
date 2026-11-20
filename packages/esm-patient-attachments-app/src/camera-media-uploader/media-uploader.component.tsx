@@ -100,7 +100,7 @@ const MediaUploaderComponent = () => {
       {errorNotification && (
         <div className={styles.errorContainer}>
           <InlineNotification
-            aria-label={t('uploadErrorNotification', 'Upload error notification')}
+            aria-label={t('closeNotification', 'Close notification')}
             kind="error"
             onClose={() => setErrorNotification(null)}
             subtitle={errorNotification.subtitle}
