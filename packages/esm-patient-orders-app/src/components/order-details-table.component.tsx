@@ -586,7 +586,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                           </TableBody>
                         </Table>
                       </TableContainer>
-                      {rows.length === 0 ? (
+                      {rows.every((row) => !displayedRowIds.has(row.id)) ? (
                         <div className={styles.tileContainer}>
                           <Tile className={styles.emptyStateTile}>
                             <div className={styles.tileContent}>

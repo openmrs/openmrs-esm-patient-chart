@@ -240,6 +240,40 @@ describe('OrderDetailsTable', () => {
     expect(screen.getByText(/check the filters above/i)).toBeInTheDocument();
   });
 
+  it('shows an empty state when the search only matches an order on another page', async () => {
+    const manyOrders = Array.from({ length: 12 }, (_, index) => ({
+      ...mockOrders[0],
+      uuid: `print-order-${index}`,
+      orderNumber: `ORD-PRINT-${index + 1}`,
+    }));
+    mockUsePatientOrders.mockReturnValue({
+      data: manyOrders as unknown as Array<Order>,
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+
+    renderOrderDetailsTable();
+    await screen.findByRole('table');
+
+    expect(screen.getAllByRole('cell', { name: /^ORD-PRINT-\d+$/ })).toHaveLength(10);
+    expect(screen.getByRole('button', { name: /previous page/i })).toBeDisabled();
+    expect(screen.queryByRole('cell', { name: 'ORD-PRINT-12' })).not.toBeInTheDocument();
+
+    const searchbox = screen.getByRole('searchbox');
+    await user.type(searchbox, 'ORD-PRINT-12');
+
+    expect(screen.getByText(/no matching orders to display/i)).toBeInTheDocument();
+    expect(screen.getByText(/check the filters above/i)).toBeInTheDocument();
+    expect(screen.queryAllByRole('cell', { name: /^ORD-PRINT-\d+$/ })).toHaveLength(0);
+
+    await user.click(screen.getByRole('button', { name: /next page/i }));
+
+    expect(screen.getByRole('cell', { name: 'ORD-PRINT-12' })).toBeInTheDocument();
+    expect(screen.queryByText(/no matching orders to display/i)).not.toBeInTheDocument();
+  });
+
   it('prints the orders in the list without the table controls, then restores them', async () => {
     const printJobs = capturePrintJobs();
     mockUseConfig.mockReturnValue({
