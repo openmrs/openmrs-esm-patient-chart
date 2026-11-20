@@ -6,7 +6,7 @@ import { Controller, type ControllerRenderProps, type FieldErrors, useForm } fro
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
-  priorityOptions,
+  getPriorityOptions,
   type OrderBasketItem,
   type OrderUrgency,
   useOrderBasket,
@@ -234,7 +234,7 @@ export function OrderForm({
                       invalidText={fieldState?.error?.message}
                       labelText={t('priority', 'Priority')}
                     >
-                      {priorityOptions.map((option) => (
+                      {getPriorityOptions().map((option) => (
                         <SelectItem key={option.value} text={option.label} value={option.value} />
                       ))}
                     </Select>
