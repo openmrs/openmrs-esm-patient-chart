@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import useSWR from 'swr';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type Encounter } from '../types';
@@ -23,23 +23,20 @@ export function useEncounterRows(
   currentPage?: number,
 ) {
   const startIndex = (currentPage - 1) * pageSize;
-  const [encounters, setEncounters] = useState([]);
   const url = `${restBaseUrl}/encounter?encounterType=${encounterType}&patient=${patientUuid}&v=${encounterRepresentation}&totalCount=true&limit=${pageSize}&startIndex=${startIndex}`;
 
   const { data: response, error, isLoading, mutate } = useSWR<{ data: EncounterResponse }, Error>(url, openmrsFetch);
 
-  useEffect(() => {
-    if (response) {
-      response.data.results.sort(
-        (a, b) => new Date(b.encounterDatetime).getTime() - new Date(a.encounterDatetime).getTime(),
-      );
-
-      if (encounterFilter) {
-        setEncounters(response.data.results.filter((encounter) => encounterFilter(encounter)));
-      } else {
-        setEncounters([...response.data.results]);
-      }
+  const encounters = useMemo(() => {
+    if (!response) {
+      return [];
     }
+
+    const sortedEncounters = [...response.data.results].sort(
+      (a, b) => new Date(b.encounterDatetime).getTime() - new Date(a.encounterDatetime).getTime(),
+    );
+
+    return encounterFilter ? sortedEncounters.filter((encounter) => encounterFilter(encounter)) : sortedEncounters;
   }, [encounterFilter, response]);
 
   const onFormSave = useCallback(() => {
