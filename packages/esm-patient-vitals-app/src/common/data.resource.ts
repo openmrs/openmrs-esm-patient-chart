@@ -247,10 +247,11 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
 
   // Fetch note observations separately so that note-only encounters are never included
   // as standalone vitals entries. Notes are merged into existing vitals encounters below.
-  // The FHIR server pages its results (10 per page by default), so fetch every page.
+  // The FHIR server pages its results (10 per page by default), so ask for `pageSize` per page, like
+  // the vitals request, and fetch every page.
   const { data: notes, mutate: mutateNotes } = useFhirFetchAll<FHIRObservationResource>(
     concepts.generalPatientNoteUuid && patientUuid
-      ? `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=${concepts.generalPatientNoteUuid}&_sort=-date`
+      ? `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=${concepts.generalPatientNoteUuid}&_sort=-date&_count=${pageSize}`
       : null,
   );
 

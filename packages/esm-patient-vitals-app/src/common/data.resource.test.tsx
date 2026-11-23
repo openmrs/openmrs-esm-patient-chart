@@ -19,7 +19,7 @@ const mockUseFhirFetchAll = vi.mocked(useFhirFetchAll);
 
 const config = getDefaultsFromConfigSchema<ConfigObject>(configSchema);
 const { pulseUuid, generalPatientNoteUuid } = config.concepts;
-const notesUrl = `${fhirBaseUrl}/Observation?subject:Patient=${mockPatient.id}&code=${generalPatientNoteUuid}&_sort=-date`;
+const notesUrl = `${fhirBaseUrl}/Observation?subject:Patient=${mockPatient.id}&code=${generalPatientNoteUuid}&_sort=-date&_count=100`;
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <SWRConfig value={{ dedupingInterval: 0, provider: () => new Map() }}>{children}</SWRConfig>
