@@ -90,6 +90,40 @@ describe('ConditionsOverview', () => {
     expect(screen.getAllByRole('row').length).toEqual(3);
   });
 
+  it('sorts conditions in the direction shown by the header sort arrow', async () => {
+    const user = userEvent.setup();
+
+    mockOpenmrsFetch.mockResolvedValueOnce({ data: mockFhirConditionsResponse } as FetchResponse);
+
+    renderWithSwr(<ConditionsOverview patientUuid={mockPatient.id} />);
+
+    await waitForLoadingToFinish();
+
+    const conditionHeader = screen.getByRole('columnheader', { name: /sort rows by condition header/i });
+    const dataRowTexts = () =>
+      screen
+        .getAllByRole('row')
+        .slice(1)
+        .map((row) => row.textContent);
+    const firstDataRow = () => screen.getAllByRole('row')[1];
+    const secondDataRow = () => screen.getAllByRole('row')[2];
+    const initialOrder = dataRowTexts();
+
+    // The whole dataset is sorted, not just the visible page.
+    await user.click(screen.getByRole('button', { name: /^condition$/i }));
+    expect(conditionHeader).toHaveAttribute('aria-sort', 'ascending');
+    expect(firstDataRow()).toHaveTextContent(/anaemia/i);
+    expect(secondDataRow()).toHaveTextContent(/hiv positive/i);
+
+    await user.click(screen.getByRole('button', { name: /^condition$/i }));
+    expect(conditionHeader).toHaveAttribute('aria-sort', 'descending');
+    expect(firstDataRow()).toHaveTextContent(/malaria/i);
+
+    await user.click(screen.getByRole('button', { name: /^condition$/i }));
+    expect(conditionHeader).toHaveAttribute('aria-sort', 'none');
+    expect(dataRowTexts()).toEqual(initialOrder);
+  });
+
   it('clicking the Add button or Record Conditions link launches the conditions form', async () => {
     const user = userEvent.setup();
 
