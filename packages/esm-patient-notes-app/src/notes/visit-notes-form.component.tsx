@@ -44,6 +44,7 @@ import {
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import {
+  extractErrorMessage,
   hasPatientBannerData,
   invalidateVisitAndEncounterData,
   useAllowedFileExtensions,
@@ -549,7 +550,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
               title: t('visitNoteSavedImagesFailed', 'Visit note saved, but {{count}} image was not uploaded', {
                 count: failedUploads.length,
               }),
-              subtitle: [names, reason?.responseBody?.error?.message ?? reason?.message]
+              subtitle: [names, extractErrorMessage(reason)]
                 .filter(Boolean)
                 .join(': ')
                 .concat(
@@ -580,7 +581,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
             title: t('visitNoteSaveError', 'Error saving visit note'),
             kind: 'error',
             isLowContrast: false,
-            subtitle: err?.responseBody?.error?.message ?? err.message,
+            subtitle: extractErrorMessage(err),
           });
         });
     },

@@ -16,6 +16,7 @@ import {
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import {
+  extractErrorMessage,
   type DeprecatedPatientWorkspaceProps,
   getPatientAndVisitProps,
   hasPatientBannerData,
@@ -258,9 +259,6 @@ const LabResultsForm: React.FC<
       });
     };
 
-    const getErrorMessage = (err: { responseBody?: { error?: { message?: string } }; message?: string }) =>
-      err?.responseBody?.error?.message ?? err?.message;
-
     const orderDiscontinuationPayload = {
       previousOrder: order.uuid,
       type: 'testorder',
@@ -282,7 +280,7 @@ const LabResultsForm: React.FC<
       try {
         savedResults = await fetchSavedLabResults(order, abortController);
       } catch (err) {
-        showNotification('error', getErrorMessage(err));
+        showNotification('error', extractErrorMessage(err));
         return setShowEmptyFormErrorNotification(false);
       }
     }
@@ -333,7 +331,7 @@ const LabResultsForm: React.FC<
             abortController,
           );
         } catch (err) {
-          showNotification('error', getErrorMessage(err));
+          showNotification('error', extractErrorMessage(err));
           return setShowEmptyFormErrorNotification(false);
         }
 
@@ -383,7 +381,7 @@ const LabResultsForm: React.FC<
     } catch (err) {
       // Refetch the saved results so the form fills in anything the failed attempt saved
       mutateResults();
-      showNotification('error', getErrorMessage(err));
+      showNotification('error', extractErrorMessage(err));
     } finally {
       setShowEmptyFormErrorNotification(false);
     }

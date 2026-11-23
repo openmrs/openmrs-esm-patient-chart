@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { Button, Tile, ClickableTile } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { TrashCanIcon, useLayoutType, WarningIcon } from '@openmrs/esm-framework';
-import { type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import { extractErrorMessage, type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import styles from './order-basket-item-tile.scss';
 
 export interface OrderBasketItemTileProps {
@@ -38,7 +38,7 @@ const OrderBasketItemTile: React.FC<OrderBasketItemTileProps> = ({ orderBasketIt
                 <WarningIcon size={16} />
                 &nbsp;
                 <span className={styles.label01}>{t('error', 'Error').toUpperCase()}</span> &nbsp;
-                {orderBasketItem.orderError.responseBody?.error?.message ?? orderBasketItem.orderError.message}
+                {extractErrorMessage(orderBasketItem.orderError)}
               </span>
             </>
           )}

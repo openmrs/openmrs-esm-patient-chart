@@ -6,6 +6,7 @@ import { Controller, type ControllerRenderProps, type FieldErrors, useForm } fro
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
+  extractErrorMessage,
   priorityOptions,
   type OrderBasketItem,
   type OrderUrgency,
@@ -148,7 +149,7 @@ export function OrderForm({
             isLowContrast: false,
             kind: 'error',
             title: t('errorSavingDrugOrder', 'Error saving order'),
-            subtitle: error?.responseBody?.error?.message ?? error?.message,
+            subtitle: extractErrorMessage(error),
           });
         });
     },

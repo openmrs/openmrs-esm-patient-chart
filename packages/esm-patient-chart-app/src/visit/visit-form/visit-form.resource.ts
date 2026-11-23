@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { TFunction } from 'i18next';
 import dayjs from 'dayjs';
 import useSWRImmutable from 'swr/immutable';
 import { z } from 'zod';
@@ -39,39 +38,6 @@ export type VisitFormData = {
     [x: string]: string;
   };
 };
-
-// *****************
-// Copied from form-submission.service.ts
-// TODO: consolidate logic for parsing errors from REST API calls
-export type FieldError = {
-  [key: string]: Array<{ code: string; message: string }>;
-};
-
-export type ErrorObject = {
-  error: {
-    code: string;
-    message: string;
-    detail: string;
-    fieldErrors?: FieldError;
-    globalErrors?: Array<{ code: string; message: string }>;
-  };
-};
-
-export function extractErrorMessagesFromResponse(errorObject: ErrorObject, t: TFunction) {
-  const { fieldErrors, globalErrors, message, code } = errorObject?.error ?? {};
-
-  if (fieldErrors && Object.keys(fieldErrors).length > 0) {
-    return Object.values(fieldErrors)
-      .flatMap((errors) => errors.map((error) => error.message))
-      .join('\n');
-  }
-
-  if (globalErrors?.length > 0) {
-    return globalErrors.map((error) => error.message).join('\n');
-  }
-
-  return message ?? code ?? t('unknownError', 'Unknown error');
-}
 
 interface PatientPersonResponse {
   person: {

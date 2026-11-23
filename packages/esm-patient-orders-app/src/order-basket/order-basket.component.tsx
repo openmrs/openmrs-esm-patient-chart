@@ -18,6 +18,7 @@ import {
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import {
+  extractErrorMessage,
   invalidateVisitAndEncounterData,
   type Order,
   type OrderBasketExtensionProps,
@@ -141,8 +142,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
       } catch (e) {
         console.error(e);
         setCreatingEncounterError(
-          e.responseBody?.error?.message ||
-            t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again'),
+          extractErrorMessage(e, t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again')),
         );
       }
     } else {
@@ -170,8 +170,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
       } catch (e) {
         console.error(e);
         setCreatingEncounterError(
-          e.responseBody?.error?.message ||
-            t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again'),
+          extractErrorMessage(e, t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again')),
         );
       }
     }
@@ -307,7 +306,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
               lowContrast
               kind="error"
               title={t('saveDrugOrderFailed', 'Error ordering {{orderName}}', { orderName: order.display })}
-              subtitle={order.extractedOrderError?.fieldErrors?.join(', ')}
+              subtitle={extractErrorMessage(order.orderError)}
               className={styles.inlineNotification}
             />
           ))}
