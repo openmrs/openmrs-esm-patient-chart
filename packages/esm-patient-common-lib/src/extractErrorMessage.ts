@@ -18,7 +18,7 @@ type RestErrorBody = {
 export function extractErrorMessage(error: unknown, fallback?: string): string | undefined {
   const responseBody = (error as { responseBody?: RestErrorBody | string })?.responseBody;
 
-  if (typeof responseBody === 'string' && responseBody.trim()) {
+  if (typeof responseBody === 'string' && responseBody.trim() && !responseBody.trimStart().startsWith('<')) {
     return responseBody;
   }
 

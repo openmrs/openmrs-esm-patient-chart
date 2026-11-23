@@ -50,6 +50,12 @@ describe('extractErrorMessage', () => {
     );
   });
 
+  it("returns the error's own message instead of an HTML error page", () => {
+    expect(extractErrorMessage(restError('<html><body><h1>502 Bad Gateway</h1></body></html>'))).toBe(
+      'Server responded with 400 () for url /openmrs/ws/rest/v1/visit',
+    );
+  });
+
   it('returns undefined when there is no message at all', () => {
     expect(extractErrorMessage(undefined)).toBeUndefined();
     expect(extractErrorMessage({})).toBeUndefined();
