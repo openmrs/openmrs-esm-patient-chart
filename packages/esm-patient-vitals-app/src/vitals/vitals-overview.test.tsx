@@ -1,12 +1,12 @@
 import React from 'react';
-import { vi, describe, it, expect, afterEach } from 'vitest';
+import { vi, describe, it, expect, afterEach, onTestFinished } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, waitFor, within } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject, configSchema } from '../config-schema';
 import { formattedVitals, mockConceptUnits, mockVitalsConfig } from '__mocks__';
-import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
+import { capturePrintJobs, mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { useVitalsAndBiometrics } from '../common';
 import VitalsOverview from './vitals-overview.component';
 
@@ -46,8 +46,8 @@ mockUseConfig.mockReturnValue({
   ...mockVitalsConfig,
 } as ConfigObject);
 
-const getRowDates = () =>
-  screen
+const getRowDates = (container: HTMLElement = document.body) =>
+  within(container)
     .getAllByRole('row')
     .slice(1) // Exclude the header row
     .map((row) => row.textContent?.match(/\d{1,2} — \w{3} — \d{4}/)?.[0])
@@ -207,6 +207,88 @@ describe('VitalsOverview', () => {
     expect(getRowDates()).toEqual(unsortedOrder);
   });
 
+  it('sorts a column with missing values, keeping the rows without a value last in either direction', async () => {
+    const user = userEvent.setup();
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: [
+        { id: '0', date: '2021-05-19T09:00:00.000Z', temperature: 39.1 },
+        { id: '1', date: '2021-05-10T09:00:00.000Z', pulse: 80 },
+        { id: '2', date: '2021-05-07T09:00:00.000Z', temperature: 36.5 },
+        { id: '3', date: '2021-04-08T09:00:00.000Z', temperature: 38.2 },
+        { id: '4', date: '2021-04-01T09:00:00.000Z', pulse: 72 },
+      ],
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsOverview {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    const sortRowsButton = screen.getByRole('button', { name: /temp/i });
+    const temperatureColumnHeader = () => screen.getByRole('columnheader', { name: /temp/i });
+
+    await user.click(sortRowsButton);
+    expect(temperatureColumnHeader()).toHaveAttribute('aria-sort', 'ascending');
+    expect(getRowDates()).toEqual([
+      '07 — May — 2021', // 36.5
+      '08 — Apr — 2021', // 38.2
+      '19 — May — 2021', // 39.1
+      '10 — May — 2021', // no temperature
+      '01 — Apr — 2021', // no temperature
+    ]);
+
+    await user.click(sortRowsButton);
+    expect(temperatureColumnHeader()).toHaveAttribute('aria-sort', 'descending');
+    expect(getRowDates()).toEqual([
+      '19 — May — 2021', // 39.1
+      '08 — Apr — 2021', // 38.2
+      '07 — May — 2021', // 36.5
+      '10 — May — 2021', // no temperature
+      '01 — Apr — 2021', // no temperature
+    ]);
+  });
+
+  it('sorts blood pressure by systolic, then diastolic, keeping missing readings last in either direction', async () => {
+    const user = userEvent.setup();
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: [
+        { id: '0', date: '2021-05-19T09:00:00.000Z', systolic: 120, diastolic: 85 },
+        { id: '1', date: '2021-05-10T09:00:00.000Z', systolic: 120, diastolic: 75 },
+        { id: '2', date: '2021-05-07T09:00:00.000Z', temperature: 37 },
+        { id: '3', date: '2021-04-08T09:00:00.000Z', systolic: 110, diastolic: 70 },
+        { id: '4', date: '2021-04-01T09:00:00.000Z', systolic: 120 },
+      ],
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsOverview {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    const sortRowsButton = screen.getByRole('button', { name: /\bbp\b/i });
+    const bloodPressureColumnHeader = () => screen.getByRole('columnheader', { name: /\bbp\b/i });
+
+    await user.click(sortRowsButton);
+    expect(bloodPressureColumnHeader()).toHaveAttribute('aria-sort', 'ascending');
+    expect(getRowDates()).toEqual([
+      '08 — Apr — 2021', // 110 / 70
+      '10 — May — 2021', // 120 / 75
+      '19 — May — 2021', // 120 / 85
+      '01 — Apr — 2021', // 120 / no diastolic
+      '07 — May — 2021', // no blood pressure
+    ]);
+
+    await user.click(sortRowsButton);
+    expect(bloodPressureColumnHeader()).toHaveAttribute('aria-sort', 'descending');
+    expect(getRowDates()).toEqual([
+      '19 — May — 2021', // 120 / 85
+      '10 — May — 2021', // 120 / 75
+      '01 — Apr — 2021', // 120 / no diastolic
+      '08 — Apr — 2021', // 110 / 70
+      '07 — May — 2021', // no blood pressure
+    ]);
+  });
+
   it('expands a vitals row to show an associated note', async () => {
     const user = userEvent.setup();
 
@@ -268,6 +350,78 @@ describe('VitalsOverview', () => {
     expect(screen.getByRole('tab', { name: /spo2/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /temp/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /r\. rate/i })).toBeInTheDocument();
+  });
+
+  it('prints every vitals row with notes expanded, then restores the paginated table', async () => {
+    const printJobs = capturePrintJobs();
+
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      ...mockVitalsConfig,
+      vitals: { ...mockVitalsConfig.vitals, showPrintButton: true },
+    } as ConfigObject);
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: formattedVitals,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsOverview {...testProps} pageSize={2} />);
+    await waitForLoadingToFinish();
+
+    expect(getRowDates()).toHaveLength(2);
+
+    // Clicks outside act() so that React schedules the updates as a browser would. act() renders every update
+    // before react-to-print copies the content, so a table that is a render behind would still print in full.
+    vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', false);
+    onTestFinished(() => {
+      vi.unstubAllGlobals();
+    });
+    // eslint-disable-next-line testing-library/no-node-access
+    screen.getByRole('button', { name: /print/i }).click();
+    await waitFor(() => expect(printJobs).toHaveLength(1));
+
+    const [{ content, documentTitle }] = printJobs;
+    expect(documentTitle).toBe('OpenMRS - John Wilson - Vitals');
+    expect(content).toHaveTextContent('John Wilson');
+    expect(within(content).getAllByRole('heading', { name: 'Vitals' })).toHaveLength(1);
+    expect(getRowDates(content)).toHaveLength(formattedVitals.length);
+    expect(content).toHaveTextContent(/Pt reports severe L chest pain/i);
+    expect(content).toHaveTextContent(/Follow up in 2 weeks/i);
+    expect(content).not.toHaveTextContent(/items/i);
+    expect(within(content).queryAllByRole('columnheader', { name: /actions/i })).toHaveLength(0);
+    expect(within(content).queryAllByRole('button', { name: /edit or delete/i })).toHaveLength(0);
+    const printedColumns = within(content).getAllByRole('columnheader').length;
+    const noteCell = within(content).getByText(/Pt reports severe L chest pain/i);
+    // eslint-disable-next-line testing-library/no-node-access
+    expect(noteCell.closest('td')).toHaveAttribute('colspan', String(printedColumns));
+
+    await waitFor(() => expect(getRowDates()).toHaveLength(2));
+    expect(screen.queryByText(/Pt reports severe L chest pain/i)).not.toBeInTheDocument();
+    expect(screen.getByText(`2 / ${formattedVitals.length} items`)).toBeInTheDocument();
+  });
+
+  it('prints once and restores the table when Print is double-clicked', async () => {
+    const user = userEvent.setup();
+    const printJobs = capturePrintJobs();
+
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      ...mockVitalsConfig,
+      vitals: { ...mockVitalsConfig.vitals, showPrintButton: true },
+    } as ConfigObject);
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: formattedVitals,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsOverview {...testProps} pageSize={2} />);
+    await waitForLoadingToFinish();
+
+    const printButton = screen.getByRole('button', { name: /print/i });
+    await user.dblClick(printButton);
+
+    await waitFor(() => expect(printJobs).toHaveLength(1));
+    await waitFor(() => expect(printButton).toBeEnabled());
+    expect(getRowDates()).toHaveLength(2);
+    expect(screen.getByText(`2 / ${formattedVitals.length} items`)).toBeInTheDocument();
   });
 
   describe('chart loading', () => {

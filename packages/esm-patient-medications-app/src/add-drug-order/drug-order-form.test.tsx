@@ -2,7 +2,13 @@ import React from 'react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, OpenmrsDatePicker, useConfig, useSession } from '@openmrs/esm-framework';
+import {
+  getDefaultsFromConfigSchema,
+  OpenmrsDatePicker,
+  useConfig,
+  useLayoutType,
+  useSession,
+} from '@openmrs/esm-framework';
 import { type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from 'tools';
 import { mockDrugSearchResultApiData, mockSessionDataResponse } from '__mocks__';
@@ -943,6 +949,86 @@ describe('DrugOrderForm - required field validation', () => {
     expect(screen.getByText('Number of refills is required')).toBeInTheDocument();
     expect(onSave).not.toHaveBeenCalled();
   });
+
+  describe('with requireDuration configured', () => {
+    beforeEach(() => {
+      mockUseRequireOutpatientQuantity.mockReturnValue({
+        requireOutpatientQuantity: false,
+        error: null,
+        isLoading: false,
+      });
+    });
+
+    afterEach(() => {
+      mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema) as ConfigObject);
+      vi.mocked(useLayoutType).mockReturnValue('small-desktop');
+    });
+
+    it('does not require duration by default', async () => {
+      const onSave = vi.fn().mockResolvedValue(undefined);
+      renderDrugOrderForm(
+        createNewOrderBasketItem({ ...completeMedicationOrderFields, duration: null, durationUnit: null }),
+        onSave,
+      );
+
+      fireEvent.submit(screen.getByRole('form', { name: /add drug order/i }));
+
+      await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
+    });
+
+    it('requires duration and duration unit when requireDuration is true', async () => {
+      const onSave = vi.fn().mockResolvedValue(undefined);
+      mockUseConfig.mockReturnValue({
+        ...(getDefaultsFromConfigSchema(configSchema) as ConfigObject),
+        requireDuration: true,
+      });
+      renderDrugOrderForm(
+        createNewOrderBasketItem({ ...completeMedicationOrderFields, duration: null, durationUnit: null }),
+        onSave,
+      );
+
+      fireEvent.submit(screen.getByRole('form', { name: /add drug order/i }));
+
+      expect(await screen.findByText('Duration is required')).toBeInTheDocument();
+      expect(screen.getByText('Duration unit is required')).toBeInTheDocument();
+      expect(onSave).not.toHaveBeenCalled();
+    });
+
+    it('saves when requireDuration is true and a duration is provided', async () => {
+      const onSave = vi.fn().mockResolvedValue(undefined);
+      mockUseConfig.mockReturnValue({
+        ...(getDefaultsFromConfigSchema(configSchema) as ConfigObject),
+        requireDuration: true,
+      });
+      renderDrugOrderForm(createNewOrderBasketItem(completeMedicationOrderFields), onSave);
+
+      fireEvent.submit(screen.getByRole('form', { name: /add drug order/i }));
+
+      await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
+    });
+
+    it('clears the duration error on tablet when the value is fixed with the stepper', async () => {
+      const user = userEvent.setup();
+      vi.mocked(useLayoutType).mockReturnValue('tablet');
+      mockUseConfig.mockReturnValue({
+        ...(getDefaultsFromConfigSchema(configSchema) as ConfigObject),
+        requireDuration: true,
+      });
+      renderDrugOrderForm(createNewOrderBasketItem({ ...completeMedicationOrderFields, duration: null }));
+
+      fireEvent.submit(screen.getByRole('form', { name: /add drug order/i }));
+      expect(await screen.findByText('Duration is required')).toBeInTheDocument();
+
+      const durationInput = screen.getByRole('textbox', { name: 'Duration' });
+      // On tablet, Duration and Prescription refills both use steppers; Duration comes first
+      const incrementButtons = screen.getAllByRole('button', { name: 'Increment' });
+      expect(incrementButtons).toHaveLength(2);
+      await user.click(incrementButtons[0]);
+
+      expect(durationInput).toHaveValue('1');
+      await waitFor(() => expect(screen.queryByText('Duration is required')).not.toBeInTheDocument());
+    });
+  });
 });
 
 describe('DrugOrderForm - patient header', () => {
@@ -976,5 +1062,26 @@ describe('DrugOrderForm - patient header', () => {
     renderDrugOrderForm(createNewOrderBasketItem(), vi.fn(), { ...mockPatient, birthDate });
 
     expect(screen.getByText(expected)).toBeInTheDocument();
+  });
+
+  describe('with a birthdate in the current year, month or day', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-11-02T12:00:00Z'));
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it.each([
+      { label: 'an estimated birthdate known to the year', birthDate: '2026', expected: '2026' },
+      { label: 'an estimated birthdate known to the month', birthDate: '2026-11', expected: 'Nov — 2026' },
+      { label: 'an exact birthdate', birthDate: '2026-11-02', expected: '02 — Nov — 2026' },
+    ])('shows $label as a date instead of "Today"', ({ birthDate, expected }) => {
+      renderDrugOrderForm(createNewOrderBasketItem(), vi.fn(), { ...mockPatient, birthDate });
+
+      expect(screen.getByText(expected)).toBeInTheDocument();
+    });
   });
 });

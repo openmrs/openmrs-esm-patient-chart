@@ -250,10 +250,10 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
   }, [isPrinting]);
 
   const handlePrint = useReactToPrint({
-    content: () => contentToPrintRef.current,
+    contentRef: contentToPrintRef,
     documentTitle: `OpenMRS - ${patientDetails.name} - ${title}`,
-    onBeforeGetContent: () =>
-      new Promise((resolve) => {
+    onBeforePrint: () =>
+      new Promise<void>((resolve) => {
         if (patient && title) {
           onBeforeGetContentResolve.current = resolve;
           setIsPrinting(true);
@@ -280,6 +280,7 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
               renderIcon={PrinterIcon}
               iconDescription={t('printMedications', 'Print medications')}
               className={styles.printButton}
+              disabled={isPrinting}
               onClick={handlePrint}
             >
               {t('print', 'Print')}
@@ -413,7 +414,7 @@ function OrderBasketItemActions({
     () => ({
       patient,
       patientUuid: patient.id,
-      visitContext: medication.encounter.visit,
+      activeVisit: medication.encounter.visit,
       showPatientBanner: 'tabletOnly',
     }),
     [patient, medication],

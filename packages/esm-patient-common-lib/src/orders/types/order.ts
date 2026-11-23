@@ -71,7 +71,7 @@ export interface OrderBasketItem {
   orderNumber?: string;
   scheduledDate?: Date;
   encounterUuid?: string;
-  visit: Visit;
+  visit: Visit | null;
 }
 
 export type OrderUrgency = 'ROUTINE' | 'STAT' | 'ON_SCHEDULED_DATE';

@@ -1,18 +1,18 @@
 import React from 'react';
-import { vi, describe, it, expect, type Mock } from 'vitest';
+import { describe, it, expect, type Mock } from 'vitest';
 import { screen } from '@testing-library/react';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { useFhirFetchAll } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { mockFhirAllergyIntoleranceResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import AllergiesDetailedSummary from './allergies-detailed-summary.component';
 
-const mockOpenmrsFetch = openmrsFetch as Mock;
-mockOpenmrsFetch.mockImplementation(vi.fn());
+const mockUseFhirFetchAll = useFhirFetchAll as Mock;
+const mockAllergyResources = mockFhirAllergyIntoleranceResponse.entry.map((entry) => entry.resource);
 
 describe('AllergiesDetailedSummary', () => {
   it('renders an empty state view if allergy data is unavailable', async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: { entry: [] } });
+    mockUseFhirFetchAll.mockReturnValueOnce({ data: [] });
     renderWithSwr(<AllergiesDetailedSummary patient={mockPatient} />);
     await waitForLoadingToFinish();
 
@@ -30,7 +30,7 @@ describe('AllergiesDetailedSummary', () => {
         statusText: 'Unauthorized',
       },
     };
-    mockOpenmrsFetch.mockRejectedValueOnce(error);
+    mockUseFhirFetchAll.mockReturnValueOnce({ data: undefined, error });
     renderWithSwr(<AllergiesDetailedSummary patient={mockPatient} />);
     await waitForLoadingToFinish();
 
@@ -39,7 +39,7 @@ describe('AllergiesDetailedSummary', () => {
   });
 
   it("renders a detailed summary of the patient's allergic reactions and their manifestations", async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: mockFhirAllergyIntoleranceResponse });
+    mockUseFhirFetchAll.mockReturnValueOnce({ data: mockAllergyResources });
     renderWithSwr(<AllergiesDetailedSummary patient={mockPatient} />);
     await waitForLoadingToFinish();
 
@@ -64,7 +64,7 @@ describe('AllergiesDetailedSummary', () => {
   });
 
   it("renders non-coded allergen name and non-coded allergic reaction name in the detailed summary of the patient's allergies", async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: mockFhirAllergyIntoleranceResponse });
+    mockUseFhirFetchAll.mockReturnValueOnce({ data: mockAllergyResources });
     renderWithSwr(<AllergiesDetailedSummary patient={mockPatient} />);
     await waitForLoadingToFinish();
 

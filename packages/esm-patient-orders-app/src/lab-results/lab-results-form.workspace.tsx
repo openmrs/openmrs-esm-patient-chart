@@ -18,11 +18,14 @@ import {
 import {
   type DeprecatedPatientWorkspaceProps,
   getPatientAndVisitProps,
+  hasPatientBannerData,
   type Order,
   type OrderBasketItem,
   type PatientWorkspaceWindowProps,
   type SharedWorkspaceGroupProps,
   useOrderBasket,
+  usePatientForBanner,
+  useShowPatientBanner,
 } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 import { type ObservationValue } from '../types/encounter';
@@ -57,7 +60,7 @@ export type LabResultsFormProps = {
    * This ensures the orders list stays in sync across the different tabs in the Laboratory app.
    * @see https://github.com/openmrs/openmrs-esm-laboratory-app/pull/117 */
   invalidateLabOrders?: () => void;
-} & Pick<DeprecatedPatientWorkspaceProps, 'patient'>;
+} & Pick<DeprecatedPatientWorkspaceProps, 'patient' | 'patientUuid'>;
 
 function findConceptName(concepts: Array<LabOrderConcept>, conceptUuid: string): string | undefined {
   for (const concept of concepts) {
@@ -82,7 +85,15 @@ const LabResultsForm: React.FC<
   Workspace2DefinitionProps<LabResultsFormProps, Partial<PatientWorkspaceWindowProps>, SharedWorkspaceGroupProps>
 > = ({ workspaceProps, windowProps, groupProps, launchChildWorkspace, closeWorkspace }) => {
   const { order, invalidateLabOrders, launchLabOrderForm, labOrderWorkspaceName } = workspaceProps;
-  const { patient } = getPatientAndVisitProps(windowProps, workspaceProps, groupProps);
+  const { patient: patientProp, patientUuid: propPatientUuid } = getPatientAndVisitProps(
+    windowProps,
+    workspaceProps,
+    groupProps,
+  );
+  const patientUuid =
+    propPatientUuid ?? (patientProp as { uuid?: string })?.uuid ?? patientProp?.id ?? order?.patient?.uuid;
+  const patient = usePatientForBanner(patientProp, patientUuid);
+  const shouldShowPatientBanner = useShowPatientBanner(groupProps);
   const { t } = useTranslation();
   const { enableAddTestsDuringResultEntry } = useConfig<ConfigObject>();
   const abortController = useAbortController();
@@ -383,6 +394,9 @@ const LabResultsForm: React.FC<
       title={isEditMode ? t('editTestResults', 'Edit test results') : t('enterTestResults', 'Enter test results')}
       hasUnsavedChanges={isDirty}
     >
+      {shouldShowPatientBanner && hasPatientBannerData(patient) && patientUuid && (
+        <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid, hideActionsOverflow: true }} />
+      )}
       <Form className={styles.form} onSubmit={handleSubmit(saveLabResults)}>
         <Layer level={isTablet ? 1 : 0}>
           <div className={styles.grid}>

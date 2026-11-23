@@ -9,9 +9,12 @@ import { vi, describe, expect, test, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
+  ExtensionSlot,
   getDefaultsFromConfigSchema,
   showSnackbar,
   useConfig,
+  useLayoutType,
+  usePatient,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import {
@@ -29,6 +32,7 @@ import {
 import LabResultsForm, { type LabResultsFormProps } from './lab-results-form.workspace';
 import {
   type PatientWorkspaceWindowProps,
+  type SharedWorkspaceGroupProps,
   type Order,
   type TestOrderBasketItem,
   useOrderBasket,
@@ -37,6 +41,9 @@ import { configSchema, type ConfigObject } from '../config-schema';
 import { type Encounter, type Observation } from '../types/encounter';
 import { mockPatient } from 'tools';
 
+const mockExtensionSlot = vi.mocked(ExtensionSlot);
+const mockUsePatient = vi.mocked(usePatient);
+const mockUseLayoutType = vi.mocked(useLayoutType);
 const mockUseOrderConceptByUuids = vi.mocked(useOrderConceptsByUuids);
 const mockUseLabEncounter = vi.mocked(useLabEncounter);
 const mockUseObservation = vi.mocked(useObservation);
@@ -79,7 +86,11 @@ const mockOrder = {
 const mockCloseWorkspace = vi.fn();
 
 // As launched by the patient chart: the patient is a window prop, and the chart's lab order form is supplied
-const testProps: Workspace2DefinitionProps<LabResultsFormProps, Partial<PatientWorkspaceWindowProps>, object> = {
+const testProps: Workspace2DefinitionProps<
+  LabResultsFormProps,
+  Partial<PatientWorkspaceWindowProps>,
+  SharedWorkspaceGroupProps
+> = {
   closeWorkspace: mockCloseWorkspace,
   workspaceProps: {
     order: mockOrder as Order,
@@ -167,6 +178,135 @@ describe('LabResultsForm', () => {
       error: null,
       mutate: vi.fn(),
     });
+    mockUsePatient.mockReturnValue({
+      patient: mockPatient,
+      patientUuid: mockPatient.id,
+      isLoading: false,
+      error: null,
+    });
+  });
+
+  test('renders the patient header slot at the top of the workspace', () => {
+    render(<LabResultsForm {...exportedTestProps} />);
+
+    expect(mockExtensionSlot).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'patient-header-slot',
+        state: {
+          patient: mockPatient,
+          patientUuid: mockPatient.id,
+          hideActionsOverflow: true,
+        },
+      }),
+      expect.anything(),
+    );
+  });
+
+  test('renders the patient header slot before the results form', () => {
+    const renderSlot = ({ name }) => {
+      if (name === 'patient-header-slot') {
+        return <div data-testid="patient-header-slot" />;
+      }
+      return null;
+    };
+    mockExtensionSlot.mockImplementationOnce(renderSlot).mockImplementationOnce(renderSlot);
+
+    const { container } = render(<LabResultsForm {...exportedTestProps} />);
+    const headerSlot = screen.getByTestId('patient-header-slot');
+    // eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+    const formElement = container.querySelector('form');
+
+    expect(formElement).toBeInTheDocument();
+    expect(headerSlot.compareDocumentPosition(formElement!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  test('only renders the patient header slot on tablet inside the patient chart', () => {
+    mockUseLayoutType.mockReturnValue('small-desktop');
+    render(<LabResultsForm {...testProps} groupProps={{ showPatientBanner: 'tabletOnly' }} />);
+    expect(mockExtensionSlot.mock.calls.some(([props]) => props.name === 'patient-header-slot')).toBe(false);
+
+    mockUseLayoutType.mockReturnValue('tablet');
+    render(<LabResultsForm {...testProps} groupProps={{ showPatientBanner: 'tabletOnly' }} />);
+    expect(mockExtensionSlot.mock.calls.some(([props]) => props.name === 'patient-header-slot')).toBe(true);
+  });
+
+  test('does not render the patient header slot while patient is loading', () => {
+    mockUsePatient.mockReturnValue({
+      patient: null,
+      patientUuid: null,
+      isLoading: true,
+      error: null,
+    });
+
+    render(
+      <LabResultsForm
+        {...exportedTestProps}
+        workspaceProps={{
+          ...exportedTestProps.workspaceProps,
+          patient: { uuid: 'rest-patient-uuid' } as unknown as fhir.Patient,
+        }}
+      />,
+    );
+
+    const headerSlotCall = mockExtensionSlot.mock.calls.find((call) => call[0].name === 'patient-header-slot');
+    expect(headerSlotCall).toBeUndefined();
+  });
+
+  test('derives patientUuid from REST patient object and fetches FHIR patient', () => {
+    const restPatient = { uuid: 'rest-patient-uuid' } as unknown as fhir.Patient;
+    render(
+      <LabResultsForm
+        {...exportedTestProps}
+        workspaceProps={{
+          ...exportedTestProps.workspaceProps,
+          patient: restPatient,
+        }}
+      />,
+    );
+
+    expect(mockUsePatient).toHaveBeenCalledWith('rest-patient-uuid');
+  });
+
+  test('uses patientUuid directly from workspaceProps if provided', () => {
+    render(
+      <LabResultsForm
+        {...exportedTestProps}
+        workspaceProps={{
+          ...exportedTestProps.workspaceProps,
+          patient: undefined,
+          patientUuid: 'explicit-patient-uuid',
+        }}
+      />,
+    );
+
+    expect(mockUsePatient).toHaveBeenCalledWith('explicit-patient-uuid');
+  });
+
+  test('keeps the add tests section working while the patient loads', () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      enableAddTestsDuringResultEntry: true,
+    });
+    mockUsePatient.mockReturnValue({ patient: null, patientUuid: null, isLoading: true, error: null });
+    const restPatient = { uuid: 'rest-patient-uuid' } as unknown as fhir.Patient;
+
+    render(
+      <LabResultsForm
+        {...exportedTestProps}
+        workspaceProps={{
+          ...exportedTestProps.workspaceProps,
+          patient: restPatient,
+          labOrderWorkspaceName: 'lab-app-test-results-add-lab-order-workspace',
+        }}
+      />,
+    );
+
+    expect(mockUseOrderBasket).toHaveBeenCalledWith(restPatient);
+    expect(
+      mockExtensionSlot.mock.calls.some(
+        ([props]) => props.name === 'result-order-basket-slot' && props.state.patient === restPatient,
+      ),
+    ).toBe(true);
   });
 
   test('hides the add tests basket in patient chart context by default', () => {

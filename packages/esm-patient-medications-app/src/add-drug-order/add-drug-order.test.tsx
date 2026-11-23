@@ -181,6 +181,14 @@ describe('AddDrugOrderWorkspace drug search', () => {
     });
   });
 
+  test('pre-fills the search and shows results when an initial search term is provided', async () => {
+    renderAddDrugOrderWorkspace('Aspirin');
+
+    expect(screen.getByRole('searchbox')).toHaveValue('Aspirin');
+    expect(await screen.findAllByRole('listitem')).toHaveLength(3);
+    expect(mockUseDrugSearch).toHaveBeenCalledWith('Aspirin');
+  });
+
   test('shows a visual cue and disables actions if the medication is already prescribed', async () => {
     mockUseMedicationOrders.mockReturnValue({
       futureOrders: [],
@@ -352,12 +360,13 @@ describe('AddDrugOrderWorkspace drug search', () => {
   });
 });
 
-function getAddDrugOrderWorkspace() {
+function getAddDrugOrderWorkspace(initialSearchTerm?: string) {
   return (
     <AddDrugOrderWorkspace
       workspaceProps={{
         order: null,
         orderToEditOrdererUuid: null,
+        initialSearchTerm,
       }}
       groupProps={{}}
       workspaceName={''}
@@ -375,6 +384,6 @@ function getAddDrugOrderWorkspace() {
   );
 }
 
-function renderAddDrugOrderWorkspace() {
-  return render(getAddDrugOrderWorkspace());
+function renderAddDrugOrderWorkspace(initialSearchTerm?: string) {
+  return render(getAddDrugOrderWorkspace(initialSearchTerm));
 }
