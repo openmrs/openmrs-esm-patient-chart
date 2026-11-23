@@ -504,7 +504,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                               {headers.map((header) => (
                                 <TableHeader
                                   {...getHeaderProps({ header })}
-                                  isSortable={(header as unknown as OrderHeaderProps).isSortable}
+                                  isSortable={!isPrinting && (header as unknown as OrderHeaderProps).isSortable}
                                 >
                                   {header.header}
                                 </TableHeader>
