@@ -86,8 +86,8 @@ const SequenceTable: React.FC<SequenceTableProps> = ({
     nextDoseDate: dose?.nextDoseDate
       ? formatDate(new Date(dose.nextDoseDate), { mode: 'standard', noToday: true, time: false })
       : '--',
-    // The expiration date has no time (e.g. "2026-11-30"). parseDate reads it as local midnight, whereas
-    // new Date() would read it as midnight UTC, which is the previous day in timezones behind UTC.
+        // Unlike nextDoseDate, expirationDate has no time (e.g. "2026-11-30"), so it must be read with parseDate.
+    // new Date() reads it as midnight UTC and shows the previous day in timezones behind UTC.
     expirationDate:
       (dose?.expirationDate &&
         formatDate(parseDate(dose.expirationDate), {
