@@ -88,6 +88,22 @@ describe('fetchAllOrders', () => {
     expect(nextUrl.searchParams.get('startIndex')).toBe('50');
   });
 
+  it("doesn't keep the port from a next link that points at another host", async () => {
+    // A chart served without a port, behind a proxy that passes on the backend's own host and port.
+    vi.stubGlobal('location', new URL('https://emr.example.org/openmrs/spa/patient/123/chart'));
+    mockOpenmrsFetch
+      .mockResolvedValueOnce(page(recentPastOrders, `http://backend:8080/openmrs${ordersPath}&startIndex=50`))
+      .mockResolvedValueOnce(page([olderActiveOrder]));
+
+    try {
+      await fetchAllOrders(ordersPath);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+
+    expect(mockOpenmrsFetch.mock.calls[1][0]).toBe(`https://emr.example.org/openmrs${ordersPath}&startIndex=50`);
+  });
+
   it('fails when a later page fails, instead of returning an incomplete list', async () => {
     mockOpenmrsFetch
       .mockResolvedValueOnce(page(recentPastOrders, nextPageUri))

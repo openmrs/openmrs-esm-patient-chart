@@ -84,11 +84,11 @@ function getNextPageUrl(links: PaginatedOrdersResponse['links']): string | null 
     return null;
   }
 
-  // The server returns an absolute URL; use the current origin so frontend proxies keep working
-  const nextUrl = new URL(uri);
-  nextUrl.host = window.location.host;
-  nextUrl.protocol = window.location.protocol;
-  return nextUrl.toString();
+  // The server returns an absolute URL built from its own host. Keep only its path and query, and
+  // request it from the current origin so frontend proxies keep working. Replacing only the host
+  // would keep the link's port, so a link to http://backend:8080 would go to the chart's host on 8080.
+  const { pathname, search } = new URL(uri);
+  return `${window.location.origin}${pathname}${search}`;
 }
 
 /**
