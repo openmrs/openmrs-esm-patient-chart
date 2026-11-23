@@ -306,7 +306,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
               lowContrast
               kind="error"
               title={t('saveDrugOrderFailed', 'Error ordering {{orderName}}', { orderName: order.display })}
-              subtitle={extractErrorMessage(order.orderError)}
+              subtitle={extractErrorMessage(order.orderError, undefined, ', ')}
               className={styles.inlineNotification}
             />
           ))}

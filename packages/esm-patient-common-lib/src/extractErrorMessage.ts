@@ -11,11 +11,12 @@ type RestErrorBody = {
 /**
  * Returns a message to show the user for an error thrown by an OpenMRS REST call.
  *
- * Validation errors from the server are joined with commas, global errors first, then field errors.
+ * Validation errors from the server are joined with `separator` (a line break by default), global errors first,
+ * then field errors.
  * If there are none, the server's top-level error message is used, then a plain-text response body.
  * If the server gives no reason, `fallback` is returned when given, else the error's own message.
  */
-export function extractErrorMessage(error: unknown, fallback?: string): string | undefined {
+export function extractErrorMessage(error: unknown, fallback?: string, separator = '\n'): string | undefined {
   const responseBody = (error as { responseBody?: RestErrorBody | string })?.responseBody;
 
   if (typeof responseBody === 'string' && responseBody.trim() && !responseBody.trimStart().startsWith('<')) {
@@ -28,7 +29,7 @@ export function extractErrorMessage(error: unknown, fallback?: string): string |
     .filter(Boolean);
 
   if (validationMessages.length > 0) {
-    return validationMessages.join(', ');
+    return validationMessages.join(separator);
   }
 
   if (message) {

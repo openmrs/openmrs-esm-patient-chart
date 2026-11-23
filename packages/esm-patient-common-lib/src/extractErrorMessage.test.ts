@@ -6,7 +6,7 @@ function restError(responseBody: unknown) {
 }
 
 describe('extractErrorMessage', () => {
-  it('returns global and field validation messages, joined with commas', () => {
+  it('returns global and field validation messages, joined with line breaks', () => {
     const error = restError({
       error: {
         message: 'Invalid Submission',
@@ -19,7 +19,23 @@ describe('extractErrorMessage', () => {
     });
 
     expect(extractErrorMessage(error)).toBe(
-      'The patient has died, Date enrolled cannot be in the future, Location is required',
+      'The patient has died\nDate enrolled cannot be in the future\nLocation is required',
+    );
+  });
+
+  it('joins validation messages with the given separator', () => {
+    const error = restError({
+      error: {
+        message: 'Invalid Submission',
+        fieldErrors: {
+          dateEnrolled: [{ code: 'error.date.future', message: 'Date enrolled cannot be in the future' }],
+          location: [{ code: 'error.null', message: 'Location is required' }],
+        },
+      },
+    });
+
+    expect(extractErrorMessage(error, undefined, ', ')).toBe(
+      'Date enrolled cannot be in the future, Location is required',
     );
   });
 
