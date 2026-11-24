@@ -1,5 +1,6 @@
 import React from 'react';
 import { vi, it, expect } from 'vitest';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import PatientListDetailsTable from './patient-list-details-table.component';
@@ -51,6 +52,18 @@ it('renders a tabular overview of the patients enrolled in a list', async () => 
   await user.clear(searchbox);
   await user.type(searchbox, 'Rahul');
   expect(screen.getByRole('link', { name: /rahul ajay jawale/i })).toBeInTheDocument();
+});
+
+it('renders an error state instead of an empty list if the members could not be fetched', () => {
+  const error = new Error('Failed to fetch the second page');
+
+  renderPatientListDetailsTable({ error });
+
+  expect(ErrorState).toHaveBeenCalledWith(
+    expect.objectContaining({ error, headerTitle: 'Patient List Details' }),
+    expect.anything(),
+  );
+  expect(screen.queryByText(/no patients in this list/i)).not.toBeInTheDocument();
 });
 
 function renderPatientListDetailsTable(props = {}) {
