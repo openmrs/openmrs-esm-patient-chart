@@ -61,3 +61,10 @@ Configure the module under `@openmrs/esm-patient-allergies-app` in your implemen
     }
   }
 }
+```
+
+## Key Files
+
+- `src/index.ts` — Module entry point exporting lifecycles, components, and workspaces.
+- `src/routes.json` — Defines registered extensions, slots, workspaces, and modals.
+- `src/config-schema.ts` — Defines configurable concept UUID parameters and defaults.
