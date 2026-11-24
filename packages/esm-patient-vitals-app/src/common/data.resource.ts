@@ -6,11 +6,11 @@ import {
   restBaseUrl,
   openmrsFetch,
   useConfig,
+  useFhirFetchAll,
   type OpenmrsResource,
 } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import useSWRInfinite from 'swr/infinite';
 import { type ConfigObject } from '../config-schema';
 import {
   assessValue,
@@ -18,18 +18,10 @@ import {
   interpretBloodPressure,
   mapFhirInterpretationToObservationInterpretation,
 } from './helpers';
-import type {
-  FHIRObservationResource,
-  FHIRSearchBundleResponse,
-  MappedVitals,
-  PatientVitalsAndBiometrics,
-  VitalsResponse,
-} from './types';
+import type { FHIRObservationResource, MappedVitals, PatientVitalsAndBiometrics, VitalsResponse } from './types';
 
 const pageSize = 100;
 
-/** We use this as the first value to the SWR key to be able to invalidate all relevant cached entries */
-const swrKeyNeedle = Symbol('vitalsAndBiometrics');
 const encounterRepresentation =
   'custom:(uuid,encounterDatetime,encounterType:(uuid,display),obs:(uuid,concept:(uuid,display),value,interpretation))';
 
@@ -46,15 +38,6 @@ type ConceptRange = {
 };
 
 type VitalsAndBiometricsMode = 'vitals' | 'biometrics' | 'both';
-
-type VitalsAndBiometricsSwrKey = {
-  swrKeyNeedle: typeof swrKeyNeedle;
-  mode: VitalsAndBiometricsMode;
-  patientUuid: string;
-  conceptUuids: string;
-  page: number;
-  prevPageData: FHIRSearchBundleResponse;
-};
 
 type VitalsFetchResponse = FetchResponse<VitalsResponse>;
 
@@ -172,12 +155,9 @@ export const withUnit = (label: string, unit: string | null | undefined) => {
   return `${label} ${unit ? `(${unit})` : ''}`;
 };
 
-// We need to track a bound mutator for basically every hook, because there does not appear to be
-// a way to invalidate an SWRInfinite key that works other than using the bound mutator
-// Each mutator is stored in the vitalsHooksMutates map and removed (via a useEffect hook) when the
-// hook is unmounted.
+// Keep mounted collections available to the existing save and delete callbacks.
 let vitalsHooksCounter = 0;
-const vitalsHooksMutates = new Map<number, ReturnType<typeof useSWRInfinite<VitalsFetchResponse>>['mutate']>();
+const vitalsHooksMutates = new Map<number, ReturnType<typeof useFhirFetchAll>['mutate']>();
 
 /**
  * Hook to get concepts for vitals, biometrics or both
@@ -228,22 +208,18 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
   const { concepts } = useConfig<ConfigObject>();
   const { conceptRanges } = useVitalsConceptMetadata(patientUuid);
 
-  const getPage = useCallback(
-    (page: number, prevPageData: FHIRSearchBundleResponse): VitalsAndBiometricsSwrKey => ({
-      swrKeyNeedle,
-      mode,
-      patientUuid,
-      conceptUuids: conceptUuids.join(','),
-      page,
-      prevPageData,
-    }),
-    [mode, conceptUuids, patientUuid],
-  );
+  const searchParams = new URLSearchParams({
+    code: conceptUuids.join(','),
+    _summary: 'data',
+    _sort: '-date',
+    _count: pageSize.toString(),
+  });
+  const url =
+    patientUuid && conceptUuids.length
+      ? `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&${searchParams}`
+      : null;
 
-  const { data, isLoading, isValidating, setSize, error, size, mutate } = useSWRInfinite<VitalsFetchResponse, Error>(
-    getPage,
-    handleFetch,
-  );
+  const { data, isLoading, isValidating, error, mutate } = useFhirFetchAll<FHIRObservationResource>(url);
 
   // Fetch note observations separately so that note-only encounters are never included
   // as standalone vitals entries. Notes are merged into existing vitals encounters below.
@@ -307,9 +283,8 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
   );
 
   const formattedObs: Array<PatientVitalsAndBiometrics> = useMemo(() => {
-    const vitalsHashTable: Map<string, Partial<PatientVitalsAndBiometrics>> = data?.[0]?.data?.entry
-      ?.map((entry) => entry.resource)
-      .filter(Boolean)
+    const vitalsHashTable: Map<string, Partial<PatientVitalsAndBiometrics>> = data
+      ?.filter(Boolean)
       .map(mapVitalsAndBiometrics)
       ?.reduce((vitalsHashTable, vitalSign) => {
         const encounterId = vitalSign.encounterId;
@@ -389,14 +364,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
     data: data ? formattedObs : undefined,
     isLoading,
     error,
-    hasMore: data?.length
-      ? !!data[data.length - 1].data?.link?.some((link: { relation?: string }) => link.relation === 'next')
-      : false,
     isValidating,
-    loadingNewData: isValidating,
-    setPage: setSize,
-    currentPage: size,
-    totalResults: data?.[0]?.data?.total ?? undefined,
     mutate,
   };
 }
@@ -447,30 +415,6 @@ export function useEncounterVitalsAndBiometrics(encounterUuid: string) {
     mutate,
     getRefinedInitialValues,
   };
-}
-
-/**
- * Fetcher for the useVitalsAndBiometricsHook
- * @internal
- */
-function handleFetch({ patientUuid, conceptUuids, page, prevPageData }: VitalsAndBiometricsSwrKey) {
-  if (prevPageData && !prevPageData?.data?.link.some((link) => link.relation === 'next')) {
-    return null;
-  }
-
-  let url = `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&`;
-  let urlSearchParams = new URLSearchParams();
-
-  urlSearchParams.append('code', conceptUuids);
-  urlSearchParams.append('_summary', 'data');
-  urlSearchParams.append('_sort', '-date');
-  urlSearchParams.append('_count', pageSize.toString());
-
-  if (page) {
-    urlSearchParams.append('_getpagesoffset', (page * pageSize).toString());
-  }
-
-  return openmrsFetch<VitalsResponse>(url + urlSearchParams.toString());
 }
 
 /**
