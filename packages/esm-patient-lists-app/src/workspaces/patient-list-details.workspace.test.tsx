@@ -1,11 +1,11 @@
 import React from 'react';
 import { vi, it, expect, type Mock } from 'vitest';
 import { screen, render } from '@testing-library/react';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { useOpenmrsFetchAll } from '@openmrs/esm-framework';
 import PatientListDetailsWorkspace, { type PatientListDetailsWorkspaceProps } from './patient-list-details.workspace';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 
-const mockOpenmrsFetch = openmrsFetch as Mock;
+const mockUseOpenmrsFetchAll = useOpenmrsFetchAll as Mock;
 
 const defaultProps: PatientWorkspace2DefinitionProps<PatientListDetailsWorkspaceProps, object> = {
   groupProps: {
@@ -121,7 +121,7 @@ const mockPatientListData = [
 ];
 
 it('renders the patient list details workspace', async () => {
-  mockOpenmrsFetch.mockResolvedValue({ data: { results: mockPatientListData } });
+  mockUseOpenmrsFetchAll.mockReturnValue({ data: mockPatientListData, isLoading: false });
 
   render(<PatientListDetailsWorkspace {...defaultProps} />);
 
@@ -130,4 +130,30 @@ it('renders the patient list details workspace', async () => {
   expect(screen.getByRole('button', { name: /back to patient lists/i })).toBeInTheDocument();
   expect(screen.getByText(/2 patients/i)).toBeInTheDocument();
   expect(screen.getByText(/created on/i)).toBeInTheDocument();
+});
+
+it('shows every member of a list that is larger than one page of results', async () => {
+  // One more member than the REST API returns on a single page by default (50).
+  const [baseMember] = mockPatientListData;
+  const fiftyOneMembers = Array.from({ length: 51 }, (_, index) => ({
+    ...baseMember,
+    uuid: `membership-${index + 1}`,
+    patient: {
+      ...baseMember.patient,
+      uuid: `patient-${index + 1}`,
+      identifiers: [{ ...baseMember.patient.identifiers[0], identifier: `ID-${index + 1}` }],
+      person: { ...baseMember.patient.person, display: `Patient ${index + 1}` },
+    },
+  }));
+  mockUseOpenmrsFetchAll.mockReturnValue({ data: fiftyOneMembers, isLoading: false });
+
+  render(
+    <PatientListDetailsWorkspace
+      {...defaultProps}
+      workspaceProps={{ list: { ...defaultProps.workspaceProps.list, size: 51 } }}
+    />,
+  );
+
+  expect(await screen.findByText('Patient 51')).toBeInTheDocument();
+  expect(screen.getByText('ID-51')).toBeInTheDocument();
 });
