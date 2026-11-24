@@ -1,55 +1,23 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import useSWRInfinite from 'swr/infinite';
-import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { type FetchResponse, fhirBaseUrl, openmrsFetch, restBaseUrl, useFhirFetchAll } from '@openmrs/esm-framework';
 import { extractMetaInformation, getConceptUuid } from './helper';
-import {
-  type Concept,
-  type ConceptMeta,
-  type FHIRObservationResource,
-  type FhirResponse,
-  type ObsRecord,
-} from '../../types';
+import { type Concept, type ConceptMeta, type FHIRObservationResource, type ObsRecord } from '../../types';
 
 export function useObservations(patientUuid: string) {
-  const getUrl = useCallback(
-    (pageIndex: number, prevPageData: FetchResponse<FhirResponse<FHIRObservationResource>>) => {
-      if (prevPageData && !prevPageData?.data?.link.some(({ relation }) => relation === 'next')) {
-        return null;
-      }
-      if (!patientUuid) {
-        return null;
-      }
-      let url = '/ws/fhir2/R4/Observation';
-      url += '?category=laboratory';
-      url += `&patient=${patientUuid}`;
-      url += `&_count=100`;
-      if (pageIndex) {
-        url += `&_getpagesoffset=${pageIndex * 10}`;
-      }
-      return url;
+  const { data, isLoading } = useFhirFetchAll<FHIRObservationResource>(
+    patientUuid ? `${fhirBaseUrl}/Observation?category=laboratory&patient=${patientUuid}&_count=100` : null,
+    {
+      swrInfiniteConfig: {
+        revalidateIfStale: false,
+        revalidateOnFocus: false,
+      },
     },
-    [patientUuid],
   );
-  const { data, size, setSize, isLoading } = useSWRInfinite<
-    FetchResponse<FhirResponse<FHIRObservationResource>>,
-    Error
-  >(getUrl, openmrsFetch, {
-    revalidateIfStale: false,
-    revalidateOnFocus: false,
-  });
 
-  useEffect(() => {
-    // Infinitely fetching all the data
-    if (data && data?.length === size && data?.[data.length - 1]?.data?.link?.some((x) => x.relation === 'next')) {
-      setSize(size + 1);
-    }
-  }, [size, setSize, data]);
-
-  const results = useMemo(() => {
-    const observations: Array<FHIRObservationResource> = data
-      ? []
-          .concat(...data?.map((resp) => resp?.data?.entry?.map((e) => e.resource) ?? []))
-          .sort((obs1, obs2) => Date.parse(obs2.effectiveDateTime) - Date.parse(obs1.effectiveDateTime))
+  return useMemo(() => {
+    const observations = data
+      ? [...data].sort((obs1, obs2) => Date.parse(obs2.effectiveDateTime) - Date.parse(obs1.effectiveDateTime))
       : null;
     return {
       observations,
@@ -57,8 +25,6 @@ export function useObservations(patientUuid: string) {
       conceptUuids: observations ? [...new Set(observations.map((obs) => getConceptUuid(obs)))] : null,
     };
   }, [data, isLoading]);
-
-  return results;
 }
 
 function useConcepts(conceptUuids: Array<string>) {
