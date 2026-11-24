@@ -1,14 +1,26 @@
 /** @vitest-environment jsdom */
 import React from 'react';
-import { vi, describe, it, expect } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
 import { useTranslation } from 'react-i18next';
-import { type FetchResponse, openmrsFetch, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
+import {
+  type FetchResponse,
+  OpenmrsDatePicker,
+  openmrsFetch,
+  showSnackbar,
+  useLayoutType,
+} from '@openmrs/esm-framework';
 import { mockFhirConditionsResponse, searchedCondition } from '__mocks__';
 import { getByTextWithMarkup, mockPatient } from 'tools';
-import { createCondition, useConditions, useConditionsSearch } from './conditions.resource';
+import {
+  type Condition,
+  createCondition,
+  updateCondition,
+  useConditions,
+  useConditionsSearch,
+} from './conditions.resource';
 import ConditionsForm, { type ConditionFormProps } from './conditions-form.workspace';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 
@@ -47,6 +59,7 @@ function renderConditionsForm(workspaceProps?: ConditionFormProps) {
 }
 
 const mockCreateCondition = vi.mocked(createCondition);
+const mockUpdateCondition = vi.mocked(updateCondition);
 const mockUseConditionsSearch = vi.mocked(useConditionsSearch);
 const mockUseConditions = vi.mocked(useConditions);
 const mockShowSnackbar = vi.mocked(showSnackbar);
@@ -55,7 +68,7 @@ const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 vi.mock('./conditions.resource', async () => ({
   ...((await vi.importActual('./conditions.resource')) as object),
   createCondition: vi.fn(),
-  editCondition: vi.fn(),
+  updateCondition: vi.fn(),
   useConditions: vi.fn(),
   useConditionsSearch: vi.fn(),
 }));
@@ -305,6 +318,98 @@ describe('Conditions form', () => {
 
     await user.click(inactiveStatusInput);
     await user.click(submitButton);
+  });
+});
+
+describe('Editing a condition with an end date', () => {
+  const mockDatePicker = vi.mocked(OpenmrsDatePicker);
+  const originalDatePicker = mockDatePicker.getMockImplementation();
+  const conditionToEdit: Condition = {
+    clinicalStatus: 'Inactive',
+    conceptId: '117399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    display: 'Hypertension',
+    abatementDateTime: '2020-09-19T00:00:00+00:00',
+    onsetDateTime: '2020-08-19T00:00:00+00:00',
+    recordedDate: '2020-08-19T18:34:48+00:00',
+    id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
+  };
+
+  beforeEach(() => {
+    // The framework mock returns Invalid Date for empty input; the real picker emits null.
+    mockDatePicker.mockImplementation(({ id, labelText, value, onChange }) => (
+      <>
+        <label htmlFor={id}>{labelText}</label>
+        <input
+          id={id}
+          type="text"
+          value={value instanceof Date ? dayjs(value).format('DD/MM/YYYY') : ''}
+          onChange={(event) => onChange(event.target.value ? dayjs(event.target.value).toDate() : null)}
+        />
+      </>
+    ));
+    mockUseConditions.mockReturnValue({
+      conditions: [conditionToEdit],
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn().mockResolvedValue(undefined),
+    });
+    mockUpdateCondition.mockResolvedValue({ status: 200 } as FetchResponse);
+  });
+
+  afterEach(() => {
+    mockDatePicker.mockImplementation(originalDatePicker);
+  });
+
+  it('saves a cleared end date as null instead of restoring the original date', async () => {
+    const user = userEvent.setup();
+    renderConditionsForm({ condition: conditionToEdit, formContext: 'editing' });
+
+    const endDateInput = screen.getByRole('textbox', { name: /end date/i });
+    expect(endDateInput).toHaveDisplayValue('19/09/2020');
+    await user.clear(endDateInput);
+    await user.tab();
+    expect(endDateInput).toHaveValue('');
+    await user.click(screen.getByRole('button', { name: /save & close/i }));
+
+    await waitFor(() =>
+      expect(mockUpdateCondition).toHaveBeenCalledWith(
+        conditionToEdit.id,
+        expect.objectContaining({ clinicalStatus: 'inactive', abatementDateTime: null }),
+      ),
+    );
+  });
+
+  it('clears the end date when changing the condition to active', async () => {
+    const user = userEvent.setup();
+    renderConditionsForm({ condition: conditionToEdit, formContext: 'editing' });
+
+    await user.click(screen.getByRole('radio', { name: 'Active' }));
+    await user.click(screen.getByRole('button', { name: /save & close/i }));
+
+    await waitFor(() =>
+      expect(mockUpdateCondition).toHaveBeenCalledWith(
+        conditionToEdit.id,
+        expect.objectContaining({ clinicalStatus: 'active', abatementDateTime: null }),
+      ),
+    );
+  });
+
+  it('preserves the formatted end date when the inactive condition still has one', async () => {
+    const user = userEvent.setup();
+    renderConditionsForm({ condition: conditionToEdit, formContext: 'editing' });
+
+    await user.click(screen.getByRole('button', { name: /save & close/i }));
+
+    await waitFor(() =>
+      expect(mockUpdateCondition).toHaveBeenCalledWith(
+        conditionToEdit.id,
+        expect.objectContaining({
+          clinicalStatus: 'inactive',
+          abatementDateTime: dayjs(conditionToEdit.abatementDateTime).format(),
+        }),
+      ),
+    );
   });
 });
 

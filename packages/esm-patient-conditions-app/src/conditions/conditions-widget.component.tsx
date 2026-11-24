@@ -92,7 +92,6 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
 
   const displayName = conditionToEdit?.display;
   const editableClinicalStatus = conditionToEdit?.clinicalStatus;
-  const editableAbatementDateTime = conditionToEdit?.abatementDateTime;
   const [selectedCondition, setSelectedCondition] = useState<CodedCondition>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
@@ -165,15 +164,15 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   ]);
 
   const handleUpdate = useCallback(async () => {
+    const { clinicalStatus, abatementDateTime } = getValues();
     const payload: FormFields = {
-      clinicalStatus: isEditing ? getValues('clinicalStatus') : editableClinicalStatus,
+      clinicalStatus: isEditing ? clinicalStatus : editableClinicalStatus,
       conceptId: matchingCondition?.conceptId,
       display: displayName,
-      abatementDateTime: isEditing
-        ? getValues('abatementDateTime')
-          ? dayjs(getValues('abatementDateTime')).format()
-          : editableAbatementDateTime
-        : null,
+      abatementDateTime:
+        isEditing && clinicalStatus?.toLowerCase() !== 'active' && abatementDateTime
+          ? dayjs(abatementDateTime).format()
+          : null,
       onsetDateTime: getValues('onsetDateTime') ? dayjs(getValues('onsetDateTime')).format() : null,
       patientId: patientUuid,
       userId: session?.user?.uuid,
@@ -208,7 +207,6 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     setErrorUpdating,
     setIsSubmittingForm,
     t,
-    editableAbatementDateTime,
   ]);
 
   const focusOnSearchInput = () => {
