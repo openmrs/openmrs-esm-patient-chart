@@ -7,21 +7,27 @@ The allergies widget provides a tabular overview of a patient's recorded allergi
 This module is a patient chart microfrontend that integrates into patient dashboards and workspaces. It includes:
 
 - **Allergies Detailed Summary**: Displays a table of the patient's recorded allergens, categories, reactions, severity levels, and comments, with actions to add, edit, or delete entries.
-- **Allergies Overview Extensions**: Provides compact summary views (`allergiesTile` and `allergiesList`) for use on summary dashboards or patient banners.
-- **Allergy Form Workspace**: A workspace form (`allergyFormWorkspace`) for recording new allergies or editing existing ones. It also exports `exportedAllergyFormWorkspace` so external apps (such as the ward app) can launch the allergy form within their own workspace window.
+- **Allergies Overview Extensions**: Provides compact summary views (`allergy-tile` and `allergies-list`) for use on summary dashboards or patient banners.
+- **Allergy Form Workspace**: A workspace form (`patient-allergy-form-workspace`) for recording new allergies or editing existing ones. It also exports `exportedAllergyFormWorkspace` in `src/index.ts` so external apps (such as the ward app) can launch the allergy form within their own workspace window.
 
 ## Configuration
 
-### Registered Extensions
+### Registered Extensions, Workspaces, and Modals
 
-This module registers the following extensions in `src/index.ts`:
+This module registers the following items in `src/routes.json` (mapped to their component exports in `src/index.ts`):
 
-- `allergiesDashboardLink`: Adds the "Allergies" navigation link to the patient chart side menu.
-- `allergiesDetailedSummary`: Main detailed table view for managing patient allergies.
-- `allergiesTile`: Compact tile extension for displaying allergy summaries in patient headers or banners.
-- `allergiesList`: Compact list extension for displaying active allergies on overview dashboards.
-- `allergyFormWorkspace` / `exportedAllergyFormWorkspace`: Form workspace for creating and editing allergy records.
-- `deleteAllergyModal`: Confirmation dialog for deleting an allergy record.
+#### Extensions
+- **`allergies-summary-dashboard`** (export: `allergiesDashboardLink`, slot: `patient-chart-dashboard-slot`): Adds the "Allergies" navigation link to the patient chart side menu.
+- **`allergies-details-widget`** (export: `allergiesDetailedSummary`, slot: `patient-chart-allergies-dashboard-slot`): Main detailed table view for managing patient allergies.
+- **`allergy-tile`** (export: `allergiesTile`, slot: `patient-details-header-slot`): Compact tile extension for displaying allergy summaries in patient headers or banners.
+- **`allergies-list`** (export: `allergiesList`, slot: `allergy-list-pills-slot`): Compact list extension for displaying active allergies on overview dashboards.
+
+#### Workspaces
+- **`patient-allergy-form-workspace`** (export: `allergyFormWorkspace`, window: `patient-allergy-form-window`): Form workspace for creating and editing allergy records.
+- **`exportedAllergyFormWorkspace`** (export in `src/index.ts`): Exported workspace lifecycle allowing external microfrontends to render the allergy form inside their own workspace windows.
+
+#### Modals
+- **`delete-allergy-modal`** (export: `deleteAllergyModal`): Confirmation dialog for deleting an allergy record.
 
 ### Configuration Schema
 
