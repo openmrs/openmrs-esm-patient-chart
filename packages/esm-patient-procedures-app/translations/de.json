@@ -21,7 +21,6 @@
   "durationUnitRequired": "Die Zeiteinheit ist erforderlich, wenn eine Dauer angegeben wird",
   "durationValue": "Dauer",
   "edit": "Bearbeiten",
-  "editOrDeleteProcedure": "Edit or delete procedure",
   "editProcedure": "Prozedur bearbeiten",
   "endDate": "Enddatum",
   "endDateAfterStart": "Das Enddatum muss nach dem Startdatum liegen",

@@ -1,26 +1,17 @@
 {
   "activeFirst": "Active primele",
   "alphabetically": "A - Z",
-  "assigned": "Assigned",
   "clearSearch": "Sterge cautarea",
-  "clinical": "Clinical",
-  "closeFlagsList": "Close flags list",
   "discard": "Renunta",
   "editFlags": "Editeaza avertizari",
   "editPatientFlags": "Editeaza avertizari pacient",
   "flagCount_one": "{{count}} avertizare de risc",
   "flagCount_other": "{{count}} avertizari de risc",
-  "flagsUpdated": "Flags updated",
-  "flagsUpdatedSuccessfully": "Flags updated successfully",
-  "flagsUpdateError": "Some flags failed to update",
   "loading": "Se incarca",
   "matchesForSearchTerm_one": "{{count}} avertizare",
   "matchesForSearchTerm_other": "{{count}} avertizari",
   "noFlagsFound": "Ne pare rau, nu s-au gasit avertizari care sa corespunda cautarii",
   "retiredFirst": "Inactive primele",
   "saveAndClose": "Salveaza si inchide",
-  "saving": "Saving...",
-  "searchForAFlag": "Cauta o avertizare",
-  "sortBy": "Sort by",
-  "updateError": "Update error"
+  "searchForAFlag": "Cauta o avertizare"
 }

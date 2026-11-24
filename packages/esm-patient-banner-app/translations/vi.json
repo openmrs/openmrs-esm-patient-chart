@@ -1,17 +1,12 @@
 {
-  "activeVisit": "Active Visit",
   "address1": "Địa chỉ 1",
   "address2": "Địa chỉ 2",
   "city": "Thành phố",
   "cityVillage": "thành phố",
   "country": "Đất nước",
   "countyDistrict": "Huyện",
-  "deceased": "Deceased",
   "district": "Huyện",
-  "from_lower": "from",
-  "pastVisitWithDate": "Past visit: {{date}}",
   "postalCode": "Mã bưu chính",
-  "started": "Started",
   "state": "State",
   "stateProvince": "State"
 }
