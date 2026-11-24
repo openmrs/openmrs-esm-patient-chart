@@ -1,26 +1,17 @@
 {
   "activeFirst": "Aktif pertama",
   "alphabetically": "A - Z",
-  "assigned": "Assigned",
   "clearSearch": "Bersihkan pencarian",
-  "clinical": "Clinical",
-  "closeFlagsList": "Close flags list",
   "discard": "Buang",
   "editFlags": "Edit bendera",
   "editPatientFlags": "Edit bendera pasien",
   "flagCount_one": "{{count}} bendera risiko",
   "flagCount_other": "{{count}} bendera risiko",
-  "flagsUpdated": "Flags updated",
-  "flagsUpdatedSuccessfully": "Flags updated successfully",
-  "flagsUpdateError": "Some flags failed to update",
   "loading": "Memuat",
   "matchesForSearchTerm_one": "{{count}} bendera",
   "matchesForSearchTerm_other": "{{count}} bendera",
   "noFlagsFound": "Maaf, tidak ada bendera yang cocok dengan pencarian Anda",
   "retiredFirst": "Pensiun pertama",
   "saveAndClose": "Simpan & tutup",
-  "saving": "Saving...",
-  "searchForAFlag": "Cari bendera",
-  "sortBy": "Sort by",
-  "updateError": "Update error"
+  "searchForAFlag": "Cari bendera"
 }

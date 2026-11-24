@@ -1,17 +1,12 @@
 {
-  "activeVisit": "Active Visit",
   "address1": "العنوان سطر 1",
   "address2": "العنوان سطر 2",
   "city": "المدينة",
   "cityVillage": "المدينة",
   "country": "الدولة",
   "countyDistrict": "المنطقة",
-  "deceased": "Deceased",
   "district": "المنطقة",
-  "from_lower": "from",
-  "pastVisitWithDate": "Past visit: {{date}}",
   "postalCode": "الرمز البريدي",
-  "started": "Started",
   "state": "الولاية",
   "stateProvince": "الولاية"
 }
