@@ -150,6 +150,7 @@ describe('MedicationsDetailsTable - As needed', () => {
 
   test.each([
     ['pain', 'as needed for pain'],
+    ['pain & fever', 'as needed for pain & fever'],
     [null, 'as needed'],
     ['', 'as needed'],
   ])('shows PRN instructions with condition %s', (asNeededCondition, expectedText) => {

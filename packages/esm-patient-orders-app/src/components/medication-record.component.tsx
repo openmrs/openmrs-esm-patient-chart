@@ -84,7 +84,10 @@ export default function MedicationRecord({ medication }: MedicationRecordProps) 
                 (order.numRefills != null && order.numRefills !== 0) ||
                 order.dosingInstructions) && <> &mdash; </>}
               {order.asNeededCondition
-                ? t('asNeededFor', 'as needed for {{condition}}', { condition: order.asNeededCondition })
+                ? t('asNeededFor', 'as needed for {{condition}}', {
+                    condition: order.asNeededCondition,
+                    interpolation: { escapeValue: false },
+                  })
                 : t('asNeeded', 'as needed')}
             </span>
           )}

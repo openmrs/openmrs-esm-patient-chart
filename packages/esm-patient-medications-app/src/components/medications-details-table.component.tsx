@@ -183,7 +183,10 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
                     (medication.numRefills != null && medication.numRefills !== 0) ||
                     medication.dosingInstructions) && <> &mdash; </>}
                   {medication.asNeededCondition
-                    ? t('asNeededFor', 'as needed for {{condition}}', { condition: medication.asNeededCondition })
+                    ? t('asNeededFor', 'as needed for {{condition}}', {
+                        condition: medication.asNeededCondition,
+                        interpolation: { escapeValue: false },
+                      })
                     : t('asNeeded', 'as needed')}
                 </span>
               )}
