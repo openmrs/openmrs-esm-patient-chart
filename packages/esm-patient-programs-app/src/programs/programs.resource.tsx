@@ -37,9 +37,15 @@ export function useAvailablePrograms(enrollments?: Array<PatientProgram>) {
 
   const availablePrograms = data?.data?.results ?? null;
 
+  // A patient can be enrolled again in a program they have completed, so only active enrollments make a
+  // program ineligible. This matches the programs form, which offers completed programs for enrollment.
+  const activelyEnrolledProgramUuids = map(
+    filter(enrollments, (enrollment) => !enrollment.dateCompleted),
+    'program.uuid',
+  );
   const eligiblePrograms = filter(
     availablePrograms,
-    (program) => !includes(map(enrollments, 'program.uuid'), program.uuid),
+    (program) => !includes(activelyEnrolledProgramUuids, program.uuid),
   );
 
   return {
