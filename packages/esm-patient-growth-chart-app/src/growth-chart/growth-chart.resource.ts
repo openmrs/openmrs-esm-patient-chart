@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { openmrsFetch, useConfig, fhirBaseUrl, type FetchResponse } from '@openmrs/esm-framework';
+import { useConfig, fhirBaseUrl, useFhirFetchAll } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
 import type { ConfigObject } from '../config-schema';
 import { type ChartDatum, getPatientSeries } from './growth-chart.utils';
@@ -23,18 +23,16 @@ const isFhirObservation = (resource: fhir.Resource | undefined): resource is fhi
   resource?.resourceType === 'Observation';
 
 export function useObservations(patientUuid?: string, conceptUuid?: string) {
-  // Use a high _count (500) to avoid pagination for now.
-  // This should cover most patients, but we can add pagination if needed later.
   const apiUrl =
     patientUuid && conceptUuid
       ? `${fhirBaseUrl}/Observation?patient=${patientUuid}&code=${conceptUuid}&_sort=-date&_count=500`
       : null;
 
-  const { data, error, isLoading } = useSWRImmutable<FetchResponse<fhir.Bundle>, Error>(apiUrl, openmrsFetch);
+  const { data, error, isLoading } = useFhirFetchAll<fhir.Resource>(apiUrl, { immutable: true });
 
   const observations = useMemo(
     () =>
-      data?.data?.entry?.flatMap(({ resource }) => {
+      data?.flatMap((resource) => {
         if (!isFhirObservation(resource)) {
           return [];
         }
