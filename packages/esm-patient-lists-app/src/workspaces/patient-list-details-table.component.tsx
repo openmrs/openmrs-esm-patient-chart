@@ -16,16 +16,17 @@ import {
   Tile,
 } from '@carbon/react';
 import { useLayoutType, isDesktop, ConfigurableLink } from '@openmrs/esm-framework';
-import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
+import { EmptyDataIllustration, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { type MappedListMembers } from '../patient-lists.resource';
 import styles from './patient-list-details-table.scss';
 
 interface PatientListDetailsTableProps {
+  error?: Error;
   isLoading: boolean;
   listMembers: Array<MappedListMembers>;
 }
 
-const PatientListDetailsTable: React.FC<PatientListDetailsTableProps> = ({ listMembers, isLoading }) => {
+const PatientListDetailsTable: React.FC<PatientListDetailsTableProps> = ({ error, listMembers, isLoading }) => {
   const { t } = useTranslation();
   const id = useId();
   const layout = useLayoutType();
@@ -84,6 +85,10 @@ const PatientListDetailsTable: React.FC<PatientListDetailsTableProps> = ({ listM
         <DataTableSkeleton className={styles.dataTableSkeleton} rowCount={5} columnCount={5} zebra />
       </div>
     );
+  }
+
+  if (error) {
+    return <ErrorState error={error} headerTitle={t('patientListDetailWorkspaceTitle', 'Patient List Details')} />;
   }
 
   if (listMembers?.length > 0) {

@@ -15,7 +15,7 @@ const PatientListDetailsWorkspace: React.FC<
   PatientWorkspace2DefinitionProps<PatientListDetailsWorkspaceProps, object>
 > = ({ workspaceProps: { list }, closeWorkspace }) => {
   const { t } = useTranslation();
-  const { listMembers, isLoading } = usePatientListMembers(list.id);
+  const { listMembers, isLoading, error } = usePatientListMembers(list.id);
 
   const closeListDetailsWorkspace = useCallback(() => closeWorkspace(), [closeWorkspace]);
 
@@ -45,7 +45,7 @@ const PatientListDetailsWorkspace: React.FC<
           </Button>
         </div>
         <section className={styles.tableContainer}>
-          <PatientListDetailsTable isLoading={isLoading} listMembers={listMembers} />
+          <PatientListDetailsTable error={error} isLoading={isLoading} listMembers={listMembers} />
         </section>
       </main>
     </Workspace2>
