@@ -1,7 +1,13 @@
 import { useEffect } from 'react';
-import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { type FetchResponse, formatDate, openmrsFetch, parseDate, restBaseUrl } from '@openmrs/esm-framework';
+import {
+  type FetchResponse,
+  formatDate,
+  openmrsFetch,
+  parseDate,
+  restBaseUrl,
+  useOpenmrsFetchAll,
+} from '@openmrs/esm-framework';
 
 /**
  * Represents a cohort object returned by the OpenMRS Cohort resource https://github.com/openmrs/openmrs-module-cohort#readme.
@@ -177,27 +183,23 @@ export function usePatientLists() {
 }
 
 /**
- * Fetches members of a patient list from the OpenMRS Cohort resource.
+ * Fetches every member of a patient list from the OpenMRS Cohort resource, following the server's pagination
+ * so that lists larger than one page (`webservices.rest.maxResultsDefault`, 50 by default) are returned in full.
  * @param listUuid - The UUID of the patient list to fetch members for.
  * @param searchQuery - The search query to filter the members by.
- * @param startIndex - The index of the first member to fetch.
- * @param pageSize - The number of members to fetch.
  * @returns An object containing the members of the patient list, loading state, and error state.
  */
-export function usePatientListMembers(listUuid: string, searchQuery = '', startIndex = '', pageSize = '') {
+export function usePatientListMembers(listUuid: string, searchQuery = '') {
   const listMembersUrl = `${restBaseUrl}/cohortm/cohortmember?`;
 
   const urlSearchParams = new URLSearchParams({
     cohort: listUuid,
-    startIndex,
-    limit: pageSize,
     q: searchQuery,
     v: 'full',
   });
 
-  const { data, error, isLoading } = useSWR<{ data: { results: Array<CohortMember> } }, Error>(
+  const { data, error, isLoading } = useOpenmrsFetchAll<CohortMember>(
     listUuid ? listMembersUrl + urlSearchParams : null,
-    openmrsFetch,
   );
 
   // Map the properties of the fetched members to a simpler object.
@@ -210,11 +212,13 @@ export function usePatientListMembers(listUuid: string, searchQuery = '', startI
     patientUuid: `${listMember?.patient?.uuid}`,
   });
 
-  const listMembers: Array<MappedListMembers> = data?.data?.results ? data.data.results.map(mapProperties) : [];
+  const listMembers: Array<MappedListMembers> = data ? data.map(mapProperties) : [];
 
   return {
     listMembers,
-    isLoading,
+    // useOpenmrsFetchAll keeps reporting that it is loading when a page after the first one fails,
+    // because it still has a page left to fetch.
+    isLoading: isLoading && !error,
     error,
   };
 }
