@@ -6,12 +6,7 @@
   "cityVillage": "শহর",
   "country": "দেশ",
   "countyDistrict": "জেলা",
-  "deceased": "Deceased",
   "district": "জেলা",
-  "from_lower": "from",
-  "pastVisitWithDate": "Past visit: {{date}}",
   "postalCode": "পোস্টাল কোড",
-  "started": "শুরু হয়েছে",
-  "state": "State",
-  "stateProvince": "State"
+  "started": "শুরু হয়েছে"
 }

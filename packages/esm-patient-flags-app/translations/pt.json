@@ -1,26 +1,17 @@
 {
   "activeFirst": "Activo primeiro",
   "alphabetically": "A - Z",
-  "assigned": "Assigned",
   "clearSearch": "Limpar pesquisa",
-  "clinical": "Clinical",
-  "closeFlagsList": "Close flags list",
   "discard": "Descartar",
   "editFlags": "Editar alertas",
   "editPatientFlags": "Editar alertas de utente",
   "flagCount_one": "{{count}} alerta de risco",
   "flagCount_other": "{{count}} alertas de risco",
-  "flagsUpdated": "Flags updated",
-  "flagsUpdatedSuccessfully": "Flags updated successfully",
-  "flagsUpdateError": "Some flags failed to update",
   "loading": "Carregando",
   "matchesForSearchTerm_one": "{{count}} alerta",
   "matchesForSearchTerm_other": "{{count}} alertas",
   "noFlagsFound": "Desculpe, não foram encontradas alertas que correspondam à sua pesquisa",
   "retiredFirst": "Anulados primeiro",
   "saveAndClose": "Salvar & fechar",
-  "saving": "Saving...",
-  "searchForAFlag": "Pesquise um alerta",
-  "sortBy": "Sort by",
-  "updateError": "Update error"
+  "searchForAFlag": "Pesquise um alerta"
 }
