@@ -103,4 +103,36 @@ describe('ProgramsOverview', () => {
     expect(screen.getByText(/enrolled in all programs/i)).toBeInTheDocument();
     expect(screen.getByText(/there are no more programs left to enroll this patient in/i)).toBeInTheDocument();
   });
+
+  it('lets the user enroll the patient again in a program they have completed', async () => {
+    const enrollmentsWithACompletedProgram = mockEnrolledInAllProgramsResponse.map((enrollment) =>
+      enrollment.display === 'Oncology Screening and Diagnosis'
+        ? { ...enrollment, dateCompleted: '2026-01-15T00:00:00.000+0000' }
+        : { ...enrollment },
+    );
+    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: enrollmentsWithACompletedProgram } });
+    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockCareProgramsResponse } });
+
+    renderWithSwr(<ProgramsOverview {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    expect(screen.getByRole('row', { name: /oncology screening and diagnosis/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /add/i })).toBeEnabled();
+    expect(screen.queryByText(/enrolled in all programs/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/there are no more programs left to enroll this patient in/i)).not.toBeInTheDocument();
+  });
+
+  it('does not render a stray 0 when no programs are configured', async () => {
+    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockEnrolledProgramsResponse.map((e) => ({ ...e })) } });
+    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
+
+    renderWithSwr(<ProgramsOverview {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    expect(screen.getByRole('row', { name: /hiv care and treatment/i })).toBeInTheDocument();
+    expect(screen.queryByText('0')).not.toBeInTheDocument();
+    expect(screen.queryByText(/enrolled in all programs/i)).not.toBeInTheDocument();
+  });
 });
