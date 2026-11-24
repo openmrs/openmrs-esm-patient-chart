@@ -8,6 +8,8 @@
   "add": "Add",
   "addDrugOrderWorkspaceTitle": "Add drug order",
   "applyCalculatedQuantity": "Apply calculated quantity ({{quantity}})",
+  "asNeeded": "as needed",
+  "asNeededFor": "as needed for {{condition}}",
   "backToOrderBasket": "Back to order basket",
   "browse": "Browse",
   "browseDrugsByCategory": "Browse drugs by category",

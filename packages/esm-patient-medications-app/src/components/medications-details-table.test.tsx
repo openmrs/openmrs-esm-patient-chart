@@ -72,11 +72,11 @@ const medicationFixture = {
   orderReasonNonCoded: 'Heart',
 } as unknown as Order;
 
-function renderMedicationsDetailsTable() {
+function renderMedicationsDetailsTable(medication: Order = medicationFixture) {
   renderWithSwr(
     <MedicationsDetailsTable
       title="Active Medications"
-      medications={[medicationFixture]}
+      medications={[medication]}
       showAddButton={false}
       showDiscontinueButton
       showModifyButton
@@ -139,6 +139,25 @@ function seedBasketWithUnrelatedMedication() {
 
   return unrelatedItem;
 }
+
+describe('MedicationsDetailsTable - As needed', () => {
+  test('does not show PRN instructions for a scheduled order, even if it has a stale condition', () => {
+    renderMedicationsDetailsTable({ ...medicationFixture, asNeeded: false, asNeededCondition: 'pain' });
+
+    expect(screen.queryByText(/as needed/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/pain/i)).not.toBeInTheDocument();
+  });
+
+  test.each([
+    ['pain', 'as needed for pain'],
+    [null, 'as needed'],
+    ['', 'as needed'],
+  ])('shows PRN instructions with condition %s', (asNeededCondition, expectedText) => {
+    renderMedicationsDetailsTable({ ...medicationFixture, asNeeded: true, asNeededCondition });
+
+    expect(screen.getByText(new RegExp(`— ${expectedText}$`))).toBeInTheDocument();
+  });
+});
 
 describe('MedicationsDetailsTable - Renew', () => {
   beforeEach(() => {
@@ -275,7 +294,7 @@ describe('MedicationsDetailsTable - Print', () => {
   test('prints the medications without the row actions, then restores them', async () => {
     const user = userEvent.setup();
     const printJobs = capturePrintJobs();
-    renderMedicationsDetailsTable();
+    renderMedicationsDetailsTable({ ...medicationFixture, asNeeded: true, asNeededCondition: 'pain' });
 
     expect(getActionsMenuButton()).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Admin User' })).toBeInTheDocument();
@@ -288,6 +307,7 @@ describe('MedicationsDetailsTable - Print', () => {
     expect(content).toHaveTextContent('John Wilson');
     expect(within(content).getAllByRole('heading', { name: 'Active Medications' })).toHaveLength(1);
     expect(content).toHaveTextContent(/Aspirin 162.5mg/i);
+    expect(content).toHaveTextContent('— as needed for pain');
     expect(within(content).queryByRole('button', { name: /actions menu/i })).not.toBeInTheDocument();
     expect(content).not.toHaveTextContent('Admin User');
 
