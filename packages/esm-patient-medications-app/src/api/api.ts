@@ -70,19 +70,9 @@ export function useMedicationOrders(patientUuid: string) {
     [patientUuid, drugOrderTypeUUID],
   );
 
-  // `partialData` keeps the loaded orders when a background refresh fails. Without it they would be
-  // dropped, and the drug search would stop flagging drugs that are already prescribed. Orders are still
-  // held back until every page has loaded.
-  const {
-    data,
-    error,
-    hasMore,
-    isLoading: isLoadingPage,
-    isValidating,
-  } = useOpenmrsFetchAll<Order>(ordersUrl, { partialData: true });
-  const isLoading = isLoadingPage || (hasMore && !error);
+  const { data, error, isLoading, isValidating } = useOpenmrsFetchAll<Order>(ordersUrl);
 
-  const drugOrders = useMemo(() => (hasMore ? null : data ?? null), [data, hasMore]);
+  const drugOrders = useMemo(() => data ?? null, [data]);
 
   // Re-evaluate buckets once a minute so an order whose scheduledDate or
   // dateStopped has just crossed "now" moves between buckets without waiting
