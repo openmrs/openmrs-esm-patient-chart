@@ -1,6 +1,6 @@
 import React from 'react';
 import { vi, describe, it, expect, test, type Mock } from 'vitest';
-import { launchWorkspace2, openmrsFetch, useSession } from '@openmrs/esm-framework';
+import { launchWorkspace2, openmrsFetch, useOpenmrsFetchAll, useSession } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -15,6 +15,13 @@ const mockUseLaunchWorkspaceRequiringVisit = vi.fn().mockImplementation((_, name
   return () => mockLaunchWorkspace2(name);
 });
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
+
+// The framework mock wraps the real hook, which would otherwise call the real `openmrsFetch`.
+const mockUseOpenmrsFetchAll = vi.mocked(useOpenmrsFetchAll);
+const realUseOpenmrsFetchAll = mockUseOpenmrsFetchAll.getMockImplementation();
+mockUseOpenmrsFetchAll.mockImplementation((url, options) =>
+  realUseOpenmrsFetchAll(url, { ...options, fetcher: mockOpenmrsFetch }),
+);
 
 vi.mock('@openmrs/esm-patient-common-lib', async () => {
   const originalModule = (await vi.importActual('@openmrs/esm-patient-common-lib')) as object;

@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import { openmrsFetch, restBaseUrl, toOmrsIsoString, useConfig } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, toOmrsIsoString, useConfig, useOpenmrsFetchAll } from '@openmrs/esm-framework';
 import {
   type DrugOrderBasketItem,
   type DrugOrderPost,
@@ -56,44 +55,8 @@ export function bucketMedicationOrders(drugOrders: Order[] | null | undefined, n
   return { futureOrders, activeOrders, pastOrders };
 }
 
-interface PaginatedOrdersResponse {
-  results: Array<Order>;
-  links?: Array<{ rel: string; uri: string }>;
-}
-
 /**
- * Fetches every page of a paginated order query by following the `next` links returned by the server.
- * The REST API returns 50 orders per page by default, newest first.
- */
-export async function fetchAllOrders(url: string): Promise<Array<Order>> {
-  const orders: Array<Order> = [];
-  let nextUrl: string | null = url;
-
-  while (nextUrl) {
-    const response = await openmrsFetch<PaginatedOrdersResponse>(nextUrl);
-    orders.push(...(response.data?.results ?? []));
-    nextUrl = getNextPageUrl(response.data?.links);
-  }
-
-  return orders;
-}
-
-function getNextPageUrl(links: PaginatedOrdersResponse['links']): string | null {
-  const uri = links?.find((link) => link.rel === 'next')?.uri;
-  if (!uri) {
-    return null;
-  }
-
-  // The server returns an absolute URL built from its own host. Keep only its path and query, and
-  // request it from the current origin so frontend proxies keep working. Replacing only the host
-  // would keep the link's port, so a link to http://backend:8080 would go to the chart's host on 8080.
-  const { pathname, search } = new URL(uri);
-  return `${window.location.origin}${pathname}${search}`;
-}
-
-/**
- * SWR-based data fetcher for patient orders. Fetches every page of the patient's drug orders, and
- * keeps a regular useSWR key so useMutatePatientOrders, which matches order keys by URL, refreshes it.
+ * SWR-based data fetcher for patient orders. Fetches every page of the patient's drug orders.
  *
  * @param patientUuid The UUID of the patient whose orders should be fetched.
  */
@@ -107,9 +70,19 @@ export function useMedicationOrders(patientUuid: string) {
     [patientUuid, drugOrderTypeUUID],
   );
 
-  const { data, error, isLoading, isValidating } = useSWR<Array<Order>, Error>(ordersUrl, fetchAllOrders);
+  // `partialData` keeps the loaded orders when a background refresh fails. Without it they would be
+  // dropped, and the drug search would stop flagging drugs that are already prescribed. Orders are still
+  // held back until every page has loaded.
+  const {
+    data,
+    error,
+    hasMore,
+    isLoading: isLoadingPage,
+    isValidating,
+  } = useOpenmrsFetchAll<Order>(ordersUrl, { partialData: true });
+  const isLoading = isLoadingPage || (hasMore && !error);
 
-  const drugOrders = useMemo(() => data ?? null, [data]);
+  const drugOrders = useMemo(() => (hasMore ? null : data ?? null), [data, hasMore]);
 
   // Re-evaluate buckets once a minute so an order whose scheduledDate or
   // dateStopped has just crossed "now" moves between buckets without waiting
