@@ -172,6 +172,9 @@ export function deletePatientDiagnosis(abortController: AbortController, diagnos
 }
 
 /** Void only the image obs. The attachment DELETE endpoint can also void its encounter. */
-export function removeVisitNoteImage(imageUuid: string) {
-  return openmrsFetch(`${restBaseUrl}/obs/${imageUuid}?reason=Removed%20from%20visit%20note`, { method: 'DELETE' });
+export function removeVisitNoteImage(imageUuid: string, signal?: AbortSignal) {
+  return openmrsFetch(`${restBaseUrl}/obs/${imageUuid}?reason=Removed%20from%20visit%20note`, {
+    method: 'DELETE',
+    ...(signal && { signal }),
+  });
 }

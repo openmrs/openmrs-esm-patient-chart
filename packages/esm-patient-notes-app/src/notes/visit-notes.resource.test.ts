@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { openmrsFetch, restBaseUrl, useAttachments } from '@openmrs/esm-framework';
-import { useDiagnosisConceptClasses, useVisitNoteImages } from './visit-notes.resource';
+import { removeVisitNoteImage, useDiagnosisConceptClasses, useVisitNoteImages } from './visit-notes.resource';
 
 const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 const mockUseAttachments = vi.mocked(useAttachments);
@@ -89,5 +89,32 @@ describe('useDiagnosisConceptClasses', () => {
 
     expect(mockOpenmrsFetch).not.toHaveBeenCalled();
     expect(result.current.conceptClassByUuid).toEqual({});
+  });
+});
+
+// R6
+describe('removeVisitNoteImage', () => {
+  const imageObsUrl = `${restBaseUrl}/obs/image-obs?reason=Removed%20from%20visit%20note`;
+
+  beforeEach(() => {
+    mockOpenmrsFetch.mockReset();
+    mockOpenmrsFetch.mockResolvedValue({} as Awaited<ReturnType<typeof openmrsFetch>>);
+  });
+
+  it('voids only the image obs when called without a signal', async () => {
+    await removeVisitNoteImage('image-obs');
+
+    expect(mockOpenmrsFetch).toHaveBeenCalledExactlyOnceWith(imageObsUrl, { method: 'DELETE' });
+  });
+
+  it('passes an abort signal to the request', async () => {
+    const controller = new AbortController();
+
+    await removeVisitNoteImage('image-obs', controller.signal);
+
+    expect(mockOpenmrsFetch).toHaveBeenCalledExactlyOnceWith(imageObsUrl, {
+      method: 'DELETE',
+      signal: controller.signal,
+    });
   });
 });
