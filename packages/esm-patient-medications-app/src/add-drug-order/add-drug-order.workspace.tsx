@@ -21,6 +21,12 @@ export interface AddDrugOrderWorkspaceProps {
    * This field should only be supplied for an existing order saved to the backend
    */
   orderToEditOrdererUuid?: string;
+
+  /**
+   * Optional. Pre-fills the drug search with this term, so the results show as soon as the
+   * workspace opens. Ignored when `order` is provided, since the form opens directly.
+   */
+  initialSearchTerm?: string;
 }
 
 /**
@@ -36,7 +42,7 @@ export interface AddDrugOrderWorkspaceProps {
  * both inside and outside the patient chart.
  */
 export default function AddDrugOrderWorkspace({
-  workspaceProps: { order, orderToEditOrdererUuid },
+  workspaceProps: { order, orderToEditOrdererUuid, initialSearchTerm },
   windowProps,
   closeWorkspace,
   launchChildWorkspace,
@@ -58,6 +64,7 @@ export default function AddDrugOrderWorkspace({
     <AddDrugOrder
       initialOrder={order}
       orderToEditOrdererUuid={orderToEditOrdererUuid}
+      initialSearchTerm={initialSearchTerm}
       patient={patient}
       patientUuid={patientUuid}
       visitContext={visitContext}

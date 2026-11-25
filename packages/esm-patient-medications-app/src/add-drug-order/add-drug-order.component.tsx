@@ -44,6 +44,11 @@ export interface AddDrugOrderProps {
    */
   orderToEditOrdererUuid?: string;
 
+  /**
+   * Optional starting value for the drug search term.
+   */
+  initialSearchTerm?: string;
+
   patient: fhir.Patient;
   patientUuid: string;
   visitContext: Visit;
@@ -67,6 +72,7 @@ export interface AddDrugOrderProps {
 const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
   initialOrder,
   orderToEditOrdererUuid,
+  initialSearchTerm,
   patient,
   patientUuid,
   visitContext,
@@ -83,7 +89,7 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
     prepMedicationOrderPostData,
   );
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(initialSearchTerm ?? '');
   const isEditingExistingOrder = currentOrder?.action === 'REVISE' || initialOrder != null;
   const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
 
