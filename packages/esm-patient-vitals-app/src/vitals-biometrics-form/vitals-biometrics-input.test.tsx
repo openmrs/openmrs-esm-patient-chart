@@ -1,6 +1,8 @@
 import React from 'react';
 import { vi, describe, it, expect, test } from 'vitest';
 import { screen, render } from '@testing-library/react';
+import i18next from 'i18next';
+import { useTranslation } from 'react-i18next';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { assessValue, getReferenceRangesForConcept } from '../common';
 import { configSchema, type ConfigObject } from '../config-schema';
@@ -181,6 +183,60 @@ describe('VitalsAndBiometricsInput', () => {
     const abnormalValueFlag = screen.getByTitle(/abnormal value/i);
     expect(abnormalValueFlag).toBeInTheDocument();
     expect(abnormalValueFlag).toHaveClass('critically-high');
+  });
+
+  it('shows the normal range of each field under the input', () => {
+    renderVitalsBiometricsInput({
+      fieldProperties: [
+        { id: 'systolicBloodPressure', name: 'systolic', separator: '/', type: 'number' },
+        { id: 'diastolicBloodPressure', name: 'diastolic', type: 'number' },
+      ],
+      label: 'Blood pressure',
+      normalRanges: [
+        getReferenceRangesForConcept('5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', overridenMetadata),
+        { lowNormal: 60, hiNormal: null },
+      ],
+      unitSymbol: 'mmHg',
+    });
+
+    expect(screen.getByText('Normal: 100–140 / ≥ 60')).toBeInTheDocument();
+  });
+
+  it('shows no normal range when the concept has none', () => {
+    renderVitalsBiometricsInput({
+      fieldProperties: [{ id: 'weight', name: 'Weight', type: 'number' }],
+      label: 'Weight',
+      normalRanges: [{ lowNormal: null, hiNormal: null }],
+      unitSymbol: 'kg',
+    });
+
+    expect(screen.queryByText(/normal:/i)).not.toBeInTheDocument();
+  });
+
+  it('shows the blood pressure normal range with a plain slash once translated', async () => {
+    // The shared react-i18next mock never escapes; i18next does, unless the call turns it off.
+    const i18n = i18next.createInstance();
+    await i18n.init({ lng: 'fr', resources: { fr: { translation: { normalRangeHint: 'Normale : {{range}}' } } } });
+    const tSpy = vi
+      .spyOn(useTranslation(), 't')
+      .mockImplementation(((key: string, defaultValue?: string, options?: object) =>
+        i18n.t(key, { defaultValue, ...options })) as ReturnType<typeof useTranslation>['t']);
+
+    renderVitalsBiometricsInput({
+      fieldProperties: [
+        { id: 'systolicBloodPressure', name: 'systolic', separator: '/', type: 'number' },
+        { id: 'diastolicBloodPressure', name: 'diastolic', type: 'number' },
+      ],
+      label: 'Blood pressure',
+      normalRanges: [
+        { lowNormal: 100, hiNormal: 140 },
+        { lowNormal: 60, hiNormal: 90 },
+      ],
+      unitSymbol: 'mmHg',
+    });
+
+    expect(screen.getByText('Normale : 100–140 / 60–90')).toBeInTheDocument();
+    tSpy.mockRestore();
   });
 });
 

@@ -24,6 +24,20 @@ type fieldId =
 
 type AbnormalValue = 'critically_low' | 'critically_high' | 'high' | 'low';
 type FieldTypes = 'number' | 'textarea';
+type NormalRange = { lowNormal?: number | null; hiNormal?: number | null };
+
+function formatNormalRange(range?: NormalRange | null) {
+  if (range?.lowNormal != null && range?.hiNormal != null) {
+    return `${range.lowNormal}–${range.hiNormal}`;
+  }
+  if (range?.lowNormal != null) {
+    return `≥ ${range.lowNormal}`;
+  }
+  if (range?.hiNormal != null) {
+    return `≤ ${range.hiNormal}`;
+  }
+  return null;
+}
 
 interface VitalsAndBiometricsInputProps {
   control: Control<VitalsBiometricsFormData>;
@@ -43,6 +57,8 @@ interface VitalsAndBiometricsInputProps {
   isValueWithinReferenceRange?: boolean;
   label: string;
   muacColorCode?: string;
+  /** The normal range of each field, in the order of `fieldProperties`; shown under the input. */
+  normalRanges?: Array<NormalRange | null | undefined>;
   placeholder?: string;
   readOnly?: boolean;
   showErrorMessage?: boolean;
@@ -59,6 +75,7 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
   isValueWithinReferenceRange = true,
   label,
   muacColorCode,
+  normalRanges,
   placeholder,
   readOnly,
   showErrorMessage,
@@ -85,6 +102,11 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
   function handleFocusChange(isFocused: boolean) {
     setIsFocused(isFocused);
   }
+
+  const formattedNormalRanges = (normalRanges ?? []).map(formatNormalRange);
+  const normalRange = formattedNormalRanges.some(Boolean)
+    ? formattedNormalRanges.map((range) => range ?? '–').join(' / ')
+    : null;
 
   const isInvalidInput = !isValueWithinReferenceRange || invalid;
   const showInvalidInputError = Boolean(showErrorMessage && isInvalidInput);
@@ -201,6 +223,15 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
           </div>
           {Boolean(unitSymbol) && <p className={styles.unitName}>{unitSymbol}</p>}
         </section>
+        {normalRange ? (
+          <p className={styles.normalRange}>
+            {t('normalRangeHint', 'Normal: {{range}}', {
+              range: normalRange,
+              // The range is built from numbers here; escaping would turn its " / " into "&#x2F;"
+              interpolation: { escapeValue: false },
+            })}
+          </p>
+        ) : null}
       </div>
 
       {showInvalidInputError && (

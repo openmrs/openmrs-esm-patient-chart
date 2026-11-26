@@ -10,7 +10,12 @@ import {
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { type PatientWorkspaceWindowProps } from '@openmrs/esm-patient-common-lib';
-import { createOrUpdateVitalsAndBiometrics, useEncounterVitalsAndBiometrics } from '../common';
+import {
+  assessValue,
+  createOrUpdateVitalsAndBiometrics,
+  getReferenceRangesForConcept,
+  useEncounterVitalsAndBiometrics,
+} from '../common';
 import { type ConfigObject, configSchema } from '../config-schema';
 import { mockConceptUnits, mockVitalsConceptMetadata, mockVitalsConfig } from '__mocks__';
 import { mockPatient } from 'tools';
@@ -72,6 +77,11 @@ vi.mock('../common', () => ({
     vitalsAndBiometrics: null,
     mutate: vi.fn(),
   })),
+  useVitalsConceptMetadata: vi.fn().mockImplementation(() => mockVitalsConceptMetadata),
+}));
+
+vi.mock('../common/data.resource', async () => ({
+  ...((await vi.importActual('../common/data.resource')) as object),
   useVitalsConceptMetadata: vi.fn().mockImplementation(() => mockVitalsConceptMetadata),
 }));
 
@@ -304,6 +314,45 @@ describe('VitalsBiometricsForm', () => {
         title: 'Vitals and Biometrics saved',
       }),
     );
+  });
+
+  it('shows the normal ranges, flags an out-of-range value and still saves it', async () => {
+    const user = userEvent.setup();
+    const actualCommon = (await vi.importActual('../common')) as {
+      assessValue: typeof assessValue;
+      getReferenceRangesForConcept: typeof getReferenceRangesForConcept;
+    };
+    vi.mocked(assessValue).mockImplementation(actualCommon.assessValue);
+    vi.mocked(getReferenceRangesForConcept).mockImplementation(actualCommon.getReferenceRangesForConcept);
+    mockCreateOrUpdateVitalsAndBiometrics.mockResolvedValue({ status: 201 } as Awaited<
+      ReturnType<typeof createOrUpdateVitalsAndBiometrics>
+    >);
+
+    renderVitalsAndBiometricsForm();
+
+    // Pulse is 60–100 normal, 0–230 absolute in the mock concept metadata.
+    expect(screen.getByText('Normal: 60–100')).toBeInTheDocument();
+
+    const pulse = screen.getByRole('spinbutton', { name: /pulse/i });
+    await user.type(pulse, '130');
+    await user.tab();
+
+    expect(screen.getByTitle(/abnormal value/i)).toHaveClass('high');
+
+    await user.click(screen.getByRole('button', { name: /Save and close/i }));
+
+    expect(mockCreateOrUpdateVitalsAndBiometrics).toHaveBeenCalledTimes(1);
+    expect(mockCreateOrUpdateVitalsAndBiometrics).toHaveBeenCalledWith(
+      mockPatient.id,
+      mockVitalsConfig.vitals.encounterTypeUuid,
+      undefined,
+      undefined,
+      [{ concept: '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 130 }],
+      expect.anything(),
+    );
+
+    vi.mocked(assessValue).mockReset();
+    vi.mocked(getReferenceRangesForConcept).mockReset();
   });
 
   it('saves only once when Save and close is double-clicked while the request is pending', async () => {
