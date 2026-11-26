@@ -62,6 +62,7 @@ vi.mock('./useTestTypes', () => ({
 vi.mock('@openmrs/esm-patient-common-lib', async () => ({
   ...((await vi.importActual('@openmrs/esm-patient-common-lib')) as object),
   useOrderType: vi.fn(),
+  usePatientOrders: vi.fn().mockReturnValue({ data: [], error: undefined, isLoading: false, isValidating: false }),
 }));
 
 function renderAddLabOrderWorkspace() {

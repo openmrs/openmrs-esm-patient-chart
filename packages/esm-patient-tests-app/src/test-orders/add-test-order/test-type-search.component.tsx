@@ -1,7 +1,7 @@
-import React, { type ComponentProps, useCallback, useMemo, useRef } from 'react';
+import React, { type ComponentProps, useCallback, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonSkeleton, Search, SkeletonText, Tile } from '@carbon/react';
+import { Button, ButtonSkeleton, Checkbox, Search, SkeletonText, Tag, Tile } from '@carbon/react';
 import { ShoppingCartArrowUp } from '@carbon/react/icons';
 import {
   ArrowRightIcon,
@@ -16,6 +16,7 @@ import {
 import { useOrderBasket, type TestOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { prepTestOrderPostData } from '../api';
 import { createEmptyLabOrder } from './test-order';
+import { useActiveTestOrders } from './useActiveTestOrders';
 import { useTestTypes, type TestType } from './useTestTypes';
 import styles from './test-type-search.scss';
 
@@ -44,6 +45,8 @@ interface TestTypeSearchResultsProps {
 interface TestTypeSearchResultItemProps {
   orderTypeUuid: string;
   testType: TestType;
+  isAlreadyActive: boolean;
+  isLoadingActiveOrders: boolean;
   openOrderForm: (searchResult: TestOrderBasketItem) => void;
   patient: fhir.Patient;
   visit: Visit;
@@ -116,6 +119,7 @@ function TestTypeSearchResults({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { testTypes, isLoading, error } = useTestTypes(searchTerm, orderableConceptSets);
+  const { activeTestConceptUuids, isLoading: isLoadingActiveOrders } = useActiveTestOrders(patient?.id, orderTypeUuid);
 
   if (isLoading) {
     return <TestTypeSearchSkeleton />;
@@ -162,6 +166,8 @@ function TestTypeSearchResults({
                 orderTypeUuid={orderTypeUuid}
                 openOrderForm={openLabForm}
                 testType={testType}
+                isAlreadyActive={activeTestConceptUuids.has(testType.conceptUuid)}
+                isLoadingActiveOrders={isLoadingActiveOrders}
                 closeWorkspace={closeWorkspace}
                 patient={patient}
                 visit={visit}
@@ -207,6 +213,8 @@ function TestTypeSearchResults({
 
 const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
   testType,
+  isAlreadyActive,
+  isLoadingActiveOrders,
   openOrderForm,
   orderTypeUuid,
   closeWorkspace,
@@ -222,6 +230,10 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
     () => orders?.some((order) => order.testType.conceptUuid === testType.conceptUuid),
     [orders, testType],
   );
+  // A test that is already active is only ordered again once the repeat is explicitly confirmed
+  const [isRepeatConfirmed, setIsRepeatConfirmed] = useState(false);
+  const isOrderingBlocked =
+    isLoadingActiveOrders || (isAlreadyActive && !isRepeatConfirmed && !testTypeAlreadyInBasket);
 
   const createLabOrder = useCallback(
     (orderableConcept: TestType) => {
@@ -250,6 +262,21 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
         <p>
           <span className={styles.heading}>{testType.label}</span>{' '}
         </p>
+        {isAlreadyActive && (
+          <>
+            <Tag type="red" size="sm">
+              {t('testAlreadyActive', 'Already active')}
+            </Tag>
+            {!testTypeAlreadyInBasket && (
+              <Checkbox
+                id={`confirm-repeat-${testType.conceptUuid}`}
+                checked={isRepeatConfirmed}
+                labelText={t('confirmRepeatTestOrder', 'This test is already active. Order it again')}
+                onChange={(_, { checked }) => setIsRepeatConfirmed(checked)}
+              />
+            )}
+          </>
+        )}
       </div>
       <div className={styles.searchResultActions}>
         {testTypeAlreadyInBasket ? (
@@ -267,6 +294,7 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
               <ShoppingCartArrowDownIcon size={16} {...props} />
             )}
             onClick={addToBasket}
+            disabled={isOrderingBlocked}
           >
             {t('directlyAddToBasket', 'Add to basket')}
           </Button>
@@ -275,6 +303,7 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
           kind="ghost"
           renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => <ArrowRightIcon size={16} {...props} />}
           onClick={() => openOrderForm(createLabOrder(testType))}
+          disabled={isOrderingBlocked}
         >
           {t('goToDrugOrderForm', 'Order form')}
         </Button>
