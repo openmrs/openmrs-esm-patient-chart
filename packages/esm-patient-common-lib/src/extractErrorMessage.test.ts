@@ -6,7 +6,7 @@ function restError(responseBody: unknown) {
 }
 
 describe('extractErrorMessage', () => {
-  it('returns global and field validation messages, joined with line breaks', () => {
+  it('returns global and field validation messages, joined with commas', () => {
     const error = restError({
       error: {
         message: 'Invalid Submission',
@@ -19,7 +19,7 @@ describe('extractErrorMessage', () => {
     });
 
     expect(extractErrorMessage(error)).toBe(
-      'The patient has died\nDate enrolled cannot be in the future\nLocation is required',
+      'The patient has died, Date enrolled cannot be in the future, Location is required',
     );
   });
 
@@ -34,8 +34,8 @@ describe('extractErrorMessage', () => {
       },
     });
 
-    expect(extractErrorMessage(error, undefined, ', ')).toBe(
-      'Date enrolled cannot be in the future, Location is required',
+    expect(extractErrorMessage(error, undefined, '; ')).toBe(
+      'Date enrolled cannot be in the future; Location is required',
     );
   });
 
@@ -43,6 +43,27 @@ describe('extractErrorMessage', () => {
     const error = restError({ error: { message: 'Patient is already enrolled in this program', globalErrors: [] } });
 
     expect(extractErrorMessage(error)).toBe('Patient is already enrolled in this program');
+  });
+
+  it('removes the brackets the server wraps around its error message', () => {
+    expect(
+      extractErrorMessage(restError({ error: { message: '[Patient is already enrolled in this program]' } })),
+    ).toBe('Patient is already enrolled in this program');
+    expect(extractErrorMessage(restError({ error: { message: 'Unable to save visit [Visit is invalid]' } }))).toBe(
+      'Unable to save visit [Visit is invalid]',
+    );
+    expect(extractErrorMessage(restError({ error: { message: 'Unable to save visit [null]' } }))).toBe(
+      'Unable to save visit [null]',
+    );
+  });
+
+  it('falls back when the server error message is only "[null]"', () => {
+    expect(extractErrorMessage(restError({ error: { message: '[null]' } }), 'Please try again')).toBe(
+      'Please try again',
+    );
+    expect(extractErrorMessage(restError({ error: { message: '[null]' } }))).toBe(
+      'Server responded with 400 () for url /openmrs/ws/rest/v1/visit',
+    );
   });
 
   it('returns a plain-text response body as is', () => {

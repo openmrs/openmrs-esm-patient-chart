@@ -11,12 +11,12 @@ type RestErrorBody = {
 /**
  * Returns a message to show the user for an error thrown by an OpenMRS REST call.
  *
- * Validation errors from the server are joined with `separator` (a line break by default), global errors first,
- * then field errors.
- * If there are none, the server's top-level error message is used, then a plain-text response body.
- * If the server gives no reason, `fallback` is returned when given, else the error's own message.
+ * Plain-text response bodies are returned unless they look like HTML.
+ * For structured REST errors, global and field validation messages are joined with `separator` (", " by default).
+ * Without validation messages, the server's error message is used.
+ * If the server gives no reason, `fallback` is returned when given, otherwise the error's own message.
  */
-export function extractErrorMessage(error: unknown, fallback?: string, separator = '\n'): string | undefined {
+export function extractErrorMessage(error: unknown, fallback?: string, separator = ', '): string | undefined {
   const responseBody = (error as { responseBody?: RestErrorBody | string })?.responseBody;
 
   if (typeof responseBody === 'string' && responseBody.trim() && !responseBody.trimStart().startsWith('<')) {
@@ -32,8 +32,10 @@ export function extractErrorMessage(error: unknown, fallback?: string, separator
     return validationMessages.join(separator);
   }
 
-  if (message) {
-    return message;
+  // RestUtil.wrapErrorResponse wraps the exception message in brackets, which gives "[null]" when there isn't one
+  const serverMessage = message?.replace(/^\[null\]$/, '').replace(/^\[([\s\S]*)\]$/, '$1');
+  if (serverMessage) {
+    return serverMessage;
   }
 
   if (fallback !== undefined) {
