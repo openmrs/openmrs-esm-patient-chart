@@ -1,6 +1,6 @@
 import React from 'react';
 import { vi, describe, it, expect, test, type Mock } from 'vitest';
-import { openmrsFetch, useSession } from '@openmrs/esm-framework';
+import { openmrsFetch, useOpenmrsFetchAll, useSession } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { screen, within } from '@testing-library/react';
 import type { Order } from '@openmrs/esm-patient-common-lib';
@@ -23,6 +23,13 @@ vi.mock('@openmrs/esm-patient-common-lib', async () => {
 });
 
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
+
+// The framework mock wraps the real hook, which would otherwise call the real `openmrsFetch`.
+const mockUseOpenmrsFetchAll = vi.mocked(useOpenmrsFetchAll);
+const realUseOpenmrsFetchAll = mockUseOpenmrsFetchAll.getMockImplementation();
+mockUseOpenmrsFetchAll.mockImplementation((url, options) =>
+  realUseOpenmrsFetchAll(url, { ...options, fetcher: mockOpenmrsFetch }),
+);
 
 describe('PastMedications', () => {
   test('renders an empty state view when there are no past medications to display', async () => {

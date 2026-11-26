@@ -1,17 +1,12 @@
 {
-  "activeVisit": "Active Visit",
   "address1": "Endereço linha 1",
   "address2": "Endereço linha 2",
   "city": "Cidade",
   "cityVillage": "cidade",
   "country": "País",
   "countyDistrict": "Distrito",
-  "deceased": "Deceased",
   "district": "Distrito",
-  "from_lower": "from",
-  "pastVisitWithDate": "Past visit: {{date}}",
   "postalCode": "Caixa postal",
-  "started": "Started",
   "state": "Estado",
   "stateProvince": "Estado"
 }
