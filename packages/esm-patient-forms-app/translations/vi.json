@@ -1,11 +1,4 @@
 {
-  "backToClinicalForms": "Back to clinical forms",
-  "clinicalForm": "Clinical Form",
-  "clinicalForms": "Clinical forms",
-  "formName": "Form Name (A-Z)",
   "forms": "Biểu mẫu",
-  "lastCompleted": "Last completed",
-  "never": "Không bao giờ",
-  "noFormsToDisplay": "There are no forms to display.",
-  "searchThisList": "Search this list"
+  "never": "Không bao giờ"
 }

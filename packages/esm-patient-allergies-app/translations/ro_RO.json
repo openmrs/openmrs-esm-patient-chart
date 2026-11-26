@@ -47,6 +47,5 @@
   "severityRequired": "Severity is required",
   "typeAdditionalComments": "Type any additional comments here",
   "typeAllergenName": "Please type in the name of the allergen",
-  "typeAllergicReactionName": "Please type in the name of the allergic reaction",
-  "unknown": "Unknown"
+  "typeAllergicReactionName": "Please type in the name of the allergic reaction"
 }

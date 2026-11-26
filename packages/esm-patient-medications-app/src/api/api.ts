@@ -1,11 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import { openmrsFetch, restBaseUrl, toOmrsIsoString, useConfig, type FetchResponse } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, toOmrsIsoString, useConfig, useOpenmrsFetchAll } from '@openmrs/esm-framework';
 import {
   type DrugOrderBasketItem,
   type DrugOrderPost,
-  type PatientOrderFetchResponse,
   type Order,
   type PostDataPrepFunction,
   careSettingUuid,
@@ -58,7 +56,7 @@ export function bucketMedicationOrders(drugOrders: Order[] | null | undefined, n
 }
 
 /**
- * SWR-based data fetcher for patient orders.
+ * SWR-based data fetcher for patient orders. Fetches every page of the patient's drug orders.
  *
  * @param patientUuid The UUID of the patient whose orders should be fetched.
  */
@@ -72,12 +70,9 @@ export function useMedicationOrders(patientUuid: string) {
     [patientUuid, drugOrderTypeUUID],
   );
 
-  const { data, error, isLoading, isValidating } = useSWR<FetchResponse<PatientOrderFetchResponse>, Error>(
-    ordersUrl,
-    openmrsFetch,
-  );
+  const { data, error, isLoading, isValidating } = useOpenmrsFetchAll<Order>(ordersUrl);
 
-  const drugOrders = useMemo(() => data?.data?.results ?? null, [data]);
+  const drugOrders = useMemo(() => data ?? null, [data]);
 
   // Re-evaluate buckets once a minute so an order whose scheduledDate or
   // dateStopped has just crossed "now" moves between buckets without waiting

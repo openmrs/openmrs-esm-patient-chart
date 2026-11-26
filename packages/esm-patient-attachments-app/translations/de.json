@@ -44,10 +44,8 @@
   "nameIsRequired": "Der Name ist erforderlich",
   "noAttachmentsToDisplay": "Es gibt keine Anhänge für diesen Patienten",
   "noImageToDisplay": "Kein Bild anzuzeigen",
-  "noPreviewAvailable": "No preview is available for this file.",
-  "openFile": "Open file",
-  "retry": "Retry",
-  "retryUploadLimit": "Try again before choosing a file.",
+  "openFile": "Datei öffnen",
+  "retry": "Erneut versuchen",
   "successfullyDeleted": "erfolgreich gelöscht",
   "supportedFiletypes": "Unterstützte Dateien sind {{supportedFiles}}",
   "tableView": "Tabellenansicht",
@@ -60,7 +58,6 @@
   "uploadError": "Fehler beim Hochladen der Datei",
   "uploadFiles": "Dateien hochladen",
   "uploading": "Hochladen",
-  "uploadLimitUnavailable": "Could not load the upload size limit",
   "uploadWillContinueInTheBackground": "Die Dateien werden im Hintergrund hochgeladen. Sie können dieses Fenster schließen.",
   "webcam": "Webcam"
 }
