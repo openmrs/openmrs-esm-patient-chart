@@ -47,7 +47,6 @@
   "errorTitle": "Произошла ошибка при работе с этой формой",
   "expandAll": "Развернуть всё",
   "fieldErrorDescriptionTitle": "Ошибки валидации",
-  "fileUploadDescription": "",
   "fileUploadDescriptionAny": "Загрузить файл любого типа",
   "formActionFailed": "Действие формы не выполнено",
   "invalidWorkspaceName": "Неверное название рабочей области.",
