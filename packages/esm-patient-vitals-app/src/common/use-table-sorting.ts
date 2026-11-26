@@ -1,15 +1,44 @@
 import { useCallback, useMemo, useState } from 'react';
 import { type DataTableSortState } from '@carbon/react';
 
+export type SortValue = number | null | undefined;
+
 interface SortableTableHeader<TableRow> {
   key: string;
-  sortFunc: (rowA: TableRow, rowB: TableRow) => number;
+  /**
+   * The values a row is sorted by, compared in order, so that later values break
+   * ties between earlier ones (e.g. `[systolic, diastolic]`).
+   */
+  sortValues: (row: TableRow) => Array<SortValue>;
 }
 
 /**
- * Carbon only ever sorts the rows it was handed, which is a single page. Pass this
- * as the table's `sortRow` to keep its comparator inert so that the hook can sort
- * the full dataset instead.
+ * Compares two rows' sort values in the given direction. A missing value always sorts
+ * after a present one, whichever the direction, so readings that weren't recorded
+ * stay at the bottom of the table instead of breaking up the sorted ones.
+ */
+function compareSortValues(valuesA: Array<SortValue>, valuesB: Array<SortValue>, direction: 1 | -1) {
+  for (let i = 0; i < Math.max(valuesA.length, valuesB.length); i++) {
+    const a = valuesA[i];
+    const b = valuesB[i];
+    const isMissingA = a == null;
+    const isMissingB = b == null;
+
+    if (isMissingA !== isMissingB) {
+      return isMissingA ? 1 : -1;
+    }
+
+    if (!isMissingA && a !== b) {
+      return (a - b) * direction;
+    }
+  }
+
+  return 0;
+}
+
+/**
+ * Keeps Carbon's comparator inert so that `useTableSorting` sorts the full dataset
+ * and Carbon does not sort the rows again. Pass this as the table's `sortRow`.
  */
 export const noopSortRow = () => 0;
 
@@ -53,12 +82,10 @@ export function useTableSorting<TableRow>(
       return tableRows;
     }
 
-    // `sortFunc` compares in ascending order, so it maps directly onto the ASC
-    // sort direction and needs inverting for DESC.
-    return tableRows.slice().sort((rowA, rowB) => {
-      const sortingNum = header.sortFunc(rowA, rowB);
-      return sortParams.sortDirection === 'DESC' ? -sortingNum : sortingNum;
-    });
+    const direction = sortParams.sortDirection === 'DESC' ? -1 : 1;
+    return tableRows
+      .slice()
+      .sort((rowA, rowB) => compareSortValues(header.sortValues(rowA), header.sortValues(rowB), direction));
   }, [tableHeaders, tableRows, sortParams]);
 
   return { handleSortHeaderClick, sortedData };

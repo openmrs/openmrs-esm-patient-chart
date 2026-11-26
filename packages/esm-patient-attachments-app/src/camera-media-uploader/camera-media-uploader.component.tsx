@@ -140,7 +140,7 @@ const CameraMediaUploadTabs: React.FC<CameraMediaUploadTabsProps> = ({ title }) 
       <ModalBody className={styles.modalBody}>
         <div className={styles.tabs}>
           <Tabs defaultSelectedIndex={1}>
-            <TabList aria-label="Attachments-upload-section" className={styles.tabList}>
+            <TabList aria-label={t('attachmentUploadMethod', 'Attachment upload method')} className={styles.tabList}>
               <Tab onClick={() => setView('camera')}>{t('webcam', 'Webcam')}</Tab>
               <Tab onClick={() => setView('upload')}>{t('uploadFiles', 'Upload files')}</Tab>
             </TabList>

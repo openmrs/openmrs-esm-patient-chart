@@ -66,7 +66,7 @@ function PrintModal({
   ];
 
   const handlePrint = useReactToPrint({
-    content: () => printContainerRef.current,
+    contentRef: printContainerRef,
   });
 
   const patientDetails = useMemo(() => {

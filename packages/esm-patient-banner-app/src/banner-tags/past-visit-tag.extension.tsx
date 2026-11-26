@@ -12,10 +12,10 @@ interface PastVisitTagProps {
 function PastVisitTag({ patientUuid }: PastVisitTagProps) {
   const { systemVisitEnabled } = useSystemVisitSetting();
   const isRdeEnabled = useFeatureFlag('rde');
-  const { visitContext } = usePatientChartStore(patientUuid);
-  const isPastVisit = Boolean(visitContext && visitContext.stopDatetime);
+  const { activeVisit } = usePatientChartStore(patientUuid);
+  const isPastVisit = Boolean(activeVisit && activeVisit.stopDatetime);
 
-  return systemVisitEnabled && isRdeEnabled && isPastVisit ? <PastVisitTagContent visitContext={visitContext} /> : null;
+  return systemVisitEnabled && isRdeEnabled && isPastVisit ? <PastVisitTagContent visitContext={activeVisit} /> : null;
 }
 
 interface PastVisitTagContentProps {

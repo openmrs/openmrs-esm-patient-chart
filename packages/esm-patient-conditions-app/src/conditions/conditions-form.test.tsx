@@ -21,7 +21,7 @@ const defaultProps: PatientWorkspace2DefinitionProps<ConditionFormProps, object>
     showPatientBanner: 'tabletOnly',
     patientUuid: mockPatient.id,
     patient: mockPatient,
-    visitContext: null,
+    activeVisit: null,
   },
   workspaceName: '',
   launchChildWorkspace: vi.fn(),

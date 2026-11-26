@@ -1,6 +1,5 @@
 {
   "abnormalValue": "Valor anormal",
-  "actions": "Actions",
   "add": "Agregar",
   "additionalNoteText": "Escriba aquí cualquier nota adicional",
   "biometricDisplayed": "Datos biométricos mostrados",
@@ -33,13 +32,10 @@
   "goToSummary": "Ir al Resumen",
   "heartRate": "Frecuencia cardíaca",
   "height": "Altura",
-  "hoursOldVitals_one": "<0>These vitals are <1>{{count}} hour old</1></0>",
-  "hoursOldVitals_other": "<0>These vitals are <1>{{count}} hours old</1></0>",
   "loading": "Cargando",
   "male": "Masculino",
   "muac": "MUAC",
   "noDataRecorded": "No se han registrado datos para este paciente",
-  "normalRanges": "Normal ranges",
   "notes": "Notas",
   "other": "Otro",
   "outOfDateVitals": "<0>Estos signos vitales están <1>desactualizados</1></0>",
@@ -64,7 +60,6 @@
   "temperatureAbbreviated": "Temp",
   "unknown": "Desconocido",
   "validationInputError": "El valor debe estar entre {{min}} y {{max}}",
-  "viewNormalRanges": "View normal ranges",
   "vitals": "Signos Vitales",
   "Vitals & Biometrics": "Signos Vitales y Datos Biométricos",
   "vitalsAndBiometrics": "Signos vitales y datos biométricos",
@@ -76,6 +71,5 @@
   "vitalsAndBiometricsUpdateError": "Error al actualizar signos vitales y biométricos",
   "vitalsHistory": "Historial de signos vitales",
   "vitalSignDisplayed": "Signo vital mostrado",
-  "vitalSigns": "vital signs",
   "weight": "Peso"
 }

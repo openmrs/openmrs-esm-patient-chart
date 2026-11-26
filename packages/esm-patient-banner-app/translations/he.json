@@ -1,17 +1,12 @@
 {
-  "activeVisit": "Active Visit",
   "address1": "כתובת רשומה 1",
   "address2": "כתובת רשומה 2",
   "city": "עיר",
   "cityVillage": "עיר",
   "country": "מדינה",
   "countyDistrict": "מחוז",
-  "deceased": "Deceased",
   "district": "מחוז",
-  "from_lower": "from",
-  "pastVisitWithDate": "Past visit: {{date}}",
   "postalCode": "מיקוד",
-  "started": "Started",
   "state": "מדינה",
   "stateProvince": "מדינה"
 }

@@ -1,7 +1,6 @@
 import React from 'react';
-import { vi, describe, it, expect, test, beforeEach } from 'vitest';
-import { useReactToPrint } from 'react-to-print';
-import { screen, render } from '@testing-library/react';
+import { vi, describe, it, expect, test, beforeEach, onTestFinished } from 'vitest';
+import { screen, render, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
   type ConfigObject,
@@ -20,7 +19,7 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from '../config-schema';
 import { mockOrders, mockSessionDataResponse } from '__mocks__';
-import { mockPatient } from 'tools';
+import { capturePrintJobs, mockPatient } from 'tools';
 import OrderDetailsTable from './order-details-table.component';
 
 const mockUsePatientOrders = vi.mocked(usePatientOrders);
@@ -29,16 +28,10 @@ const mockUseOrderBasket = vi.mocked(useOrderBasket);
 const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 const mockSession = vi.mocked(useSession);
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
-const mockUseReactToPrint = vi.mocked(useReactToPrint);
 const mockLaunchWorkspace2 = vi.mocked(launchWorkspace2);
 
 mockSession.mockReturnValue(mockSessionDataResponse.data);
 mockOpenmrsFetch.mockImplementation(vi.fn());
-
-vi.mock('react-to-print', async () => ({
-  ...((await vi.importActual('react-to-print')) as object),
-  useReactToPrint: vi.fn(),
-}));
 
 vi.mock('@openmrs/esm-patient-common-lib', async () => {
   const originalModule = (await vi.importActual('@openmrs/esm-patient-common-lib')) as object;
@@ -247,22 +240,145 @@ describe('OrderDetailsTable', () => {
     expect(screen.getByText(/check the filters above/i)).toBeInTheDocument();
   });
 
-  it('prints the orders in the list when the print button is clicked', async () => {
-    const mockHandlePrint = vi.fn();
-    mockUseReactToPrint.mockReturnValue(mockHandlePrint);
+  it('shows an empty state when the search only matches an order on another page', async () => {
+    const manyOrders = Array.from({ length: 12 }, (_, index) => ({
+      ...mockOrders[0],
+      uuid: `print-order-${index}`,
+      orderNumber: `ORD-PRINT-${index + 1}`,
+    }));
+    mockUsePatientOrders.mockReturnValue({
+      data: manyOrders as unknown as Array<Order>,
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+
+    renderOrderDetailsTable();
+    await screen.findByRole('table');
+
+    expect(screen.getAllByRole('cell', { name: /^ORD-PRINT-\d+$/ })).toHaveLength(10);
+    expect(screen.getByRole('button', { name: /previous page/i })).toBeDisabled();
+    expect(screen.queryByRole('cell', { name: 'ORD-PRINT-12' })).not.toBeInTheDocument();
+
+    const searchbox = screen.getByRole('searchbox');
+    await user.type(searchbox, 'ORD-PRINT-12');
+
+    expect(screen.getByText(/no matching orders to display/i)).toBeInTheDocument();
+    expect(screen.getByText(/check the filters above/i)).toBeInTheDocument();
+    expect(screen.queryAllByRole('cell', { name: /^ORD-PRINT-\d+$/ })).toHaveLength(0);
+
+    await user.click(screen.getByRole('button', { name: /next page/i }));
+
+    expect(screen.getByRole('cell', { name: 'ORD-PRINT-12' })).toBeInTheDocument();
+    expect(screen.queryByText(/no matching orders to display/i)).not.toBeInTheDocument();
+  });
+
+  it('prints the orders in the list without the table controls, then restores them', async () => {
+    const printJobs = capturePrintJobs();
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
       showPrintButton: true,
     });
 
     renderOrderDetailsTable();
+    await screen.findByRole('table');
+
+    expect(screen.getByRole('searchbox')).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /actions menu/i }).length).toBeGreaterThan(0);
+    expect(screen.getByText(`${mockOrders.length} / ${mockOrders.length} items`)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /print/i }));
+    await waitFor(() => expect(printJobs).toHaveLength(1));
+
+    const [{ content, documentTitle, styles }] = printJobs;
+    expect(documentTitle).toBe('OpenMRS - John Wilson - Patient Orders');
+    expect(content).toHaveTextContent('John Wilson');
+    expect(within(content).getAllByRole('heading', { name: 'Patient Orders' })).toHaveLength(1);
+    expect(content).toHaveTextContent(/Permethrin: 1\.0 Ampule\(s\) Oral Once daily 1 Days take after eating/i);
+    expect(content).toHaveTextContent(/ORD-321/);
+    expect(within(content).queryByRole('searchbox')).not.toBeInTheDocument();
+    expect(within(content).queryAllByRole('button', { name: /actions menu/i })).toHaveLength(0);
+    expect(content).not.toHaveTextContent(/items/i);
+    expect(styles.join('\n')).toMatch(/@page\s*{[^}]*margin: 0;/);
+
+    expect(await screen.findByRole('searchbox')).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /actions menu/i }).length).toBeGreaterThan(0);
+    expect(screen.getByText(`${mockOrders.length} / ${mockOrders.length} items`)).toBeInTheDocument();
+  });
+
+  it('prints every order across pages, then restores the current page', async () => {
+    const printJobs = capturePrintJobs();
+    const manyOrders = Array.from({ length: 12 }, (_, index) => ({
+      ...mockOrders[0],
+      uuid: `print-order-${index}`,
+      orderNumber: `ORD-PRINT-${index + 1}`,
+    }));
+    mockUsePatientOrders.mockReturnValue({
+      data: manyOrders as unknown as Array<Order>,
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+
+    renderOrderDetailsTable();
+    await screen.findByRole('table');
+
+    expect(screen.getAllByRole('cell', { name: /^ORD-PRINT-\d+$/ })).toHaveLength(10);
+    await user.click(screen.getByRole('button', { name: /next page/i }));
+    expect(screen.getAllByRole('cell', { name: /^ORD-PRINT-\d+$/ })).toHaveLength(2);
+    await user.click(screen.getAllByRole('button', { name: /expand current row/i })[0]);
+
+    // Clicks outside act() so that React schedules the updates as a browser would. act() renders every update
+    // before react-to-print copies the content, so a table that is a render behind would still print in full.
+    vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', false);
+    onTestFinished(() => {
+      vi.unstubAllGlobals();
+    });
+    // eslint-disable-next-line testing-library/no-node-access
+    screen.getByRole('button', { name: /print/i }).click();
+    await waitFor(() => expect(printJobs).toHaveLength(1));
+
+    const [{ content }] = printJobs;
+    expect(within(content).getAllByRole('cell', { name: /^ORD-PRINT-\d+$/ })).toHaveLength(manyOrders.length);
+    manyOrders.forEach(({ orderNumber }) => {
+      expect(within(content).getByRole('cell', { name: orderNumber })).toHaveTextContent(orderNumber);
+    });
+    expect(within(content).queryByRole('searchbox')).not.toBeInTheDocument();
+    expect(within(content).queryAllByRole('button', { name: /actions menu/i })).toHaveLength(0);
+    expect(content).not.toHaveTextContent(/items/i);
+    const printedColumns = within(content).getAllByRole('columnheader').length;
+    expect(within(content).getByRole('cell', { name: 'Medication details' })).toHaveAttribute(
+      'colspan',
+      String(printedColumns),
+    );
+
+    await waitFor(() => expect(screen.getAllByRole('cell', { name: /^ORD-PRINT-\d+$/ })).toHaveLength(2));
+    expect(screen.getByRole('cell', { name: 'ORD-PRINT-11' })).toBeInTheDocument();
+    expect(screen.getByRole('cell', { name: 'ORD-PRINT-12' })).toBeInTheDocument();
+    expect(screen.getByRole('searchbox')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /previous page/i })).toBeEnabled();
+    expect(screen.getByRole('button', { name: /next page/i })).toBeDisabled();
+  });
+
+  it('prints once and restores the table controls when Print is double-clicked', async () => {
+    const printJobs = capturePrintJobs();
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      showPrintButton: true,
+    });
+
+    renderOrderDetailsTable();
+    await screen.findByRole('table');
 
     const printButton = screen.getByRole('button', { name: /print/i });
-    expect(printButton).toBeInTheDocument();
+    await user.dblClick(printButton);
 
-    await user.click(printButton);
-
-    expect(mockHandlePrint).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(printJobs).toHaveLength(1));
+    await waitFor(() => expect(printButton).toBeEnabled());
+    expect(screen.getByRole('searchbox')).toBeInTheDocument();
+    expect(screen.getByText(`${mockOrders.length} / ${mockOrders.length} items`)).toBeInTheDocument();
   });
 
   it('renders a date range picker with a default value of today', async () => {
@@ -608,7 +724,7 @@ describe('OrderDetailsTable', () => {
       {},
       expect.objectContaining({ visitContext: mockOrders[1].encounter.visit }),
       expect.objectContaining({
-        visitContext: mockOrders[1].encounter.visit,
+        activeVisit: mockOrders[1].encounter.visit,
         // Without it the group is relaunched with the default 'always' and a second patient banner shows up
         showPatientBanner: 'tabletOnly',
       }),

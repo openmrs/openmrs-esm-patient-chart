@@ -167,7 +167,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
           <div className={styles.conceptPickerTabs}>
             <div className={styles.verticalTabs}>
               <TabsVertical>
-                <TabListVertical aria-label="Obs tabs">
+                <TabListVertical aria-label={t('obsTabs', 'Obs tabs')}>
                   {groupedConfigData.map(({ groupLabel }, index) => {
                     const tabClasses = classNames(styles.tab, styles.bodyLong01, {
                       [styles.selectedTab]: selectedMenuItem.groupLabel === groupLabel,

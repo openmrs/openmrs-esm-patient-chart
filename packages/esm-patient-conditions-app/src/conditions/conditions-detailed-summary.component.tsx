@@ -19,7 +19,14 @@ import {
 import { AddIcon, formatDate, launchWorkspace2, parseDate, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { ConditionsActionMenu } from './conditions-action-menu.component';
-import { type Condition, type ConditionTableHeader, useConditions, useConditionsSorting } from './conditions.resource';
+import {
+  type Condition,
+  type ConditionTableHeader,
+  getOnsetSortValue,
+  noopSortRow,
+  useConditions,
+  useConditionsSorting,
+} from './conditions.resource';
 import styles from './conditions-detailed-summary.scss';
 
 function ConditionsDetailedSummary({ patient }) {
@@ -51,22 +58,19 @@ function ConditionsDetailedSummary({ patient }) {
         key: 'display',
         header: t('condition', 'Condition'),
         isSortable: true,
-        sortFunc: (valueA, valueB) => valueA.display?.localeCompare(valueB.display),
+        sortValue: (row) => row.display,
       },
       {
         key: 'onsetDateTimeRender',
         header: t('dateOfOnset', 'Date of onset'),
         isSortable: true,
-        sortFunc: (valueA, valueB) =>
-          valueA.onsetDateTime && valueB.onsetDateTime
-            ? new Date(valueA.onsetDateTime).getTime() - new Date(valueB.onsetDateTime).getTime()
-            : 0,
+        sortValue: (row) => getOnsetSortValue(row.onsetDateTime),
       },
       {
         key: 'status',
         header: t('status', 'Status'),
         isSortable: true,
-        sortFunc: (valueA, valueB) => valueA.clinicalStatus?.localeCompare(valueB.clinicalStatus),
+        sortValue: (row) => row.clinicalStatus,
       },
     ],
     [t],
@@ -87,7 +91,7 @@ function ConditionsDetailedSummary({ patient }) {
     });
   }, [filteredConditions]);
 
-  const { sortedRows, sortRow } = useConditionsSorting(headers, tableRows);
+  const { sortedRows, handleSortHeaderClick } = useConditionsSorting(headers, tableRows);
 
   const launchConditionsForm = useCallback(
     () =>
@@ -143,7 +147,7 @@ function ConditionsDetailedSummary({ patient }) {
         </CardHeader>
         <DataTable
           rows={sortedRows}
-          sortRow={sortRow}
+          sortRow={noopSortRow}
           headers={headers}
           isSortable
           size={isTablet ? 'lg' : 'sm'}
@@ -161,6 +165,7 @@ function ConditionsDetailedSummary({ patient }) {
                           className={classNames(styles.productiveHeading01, styles.text02)}
                           {...getHeaderProps({
                             header,
+                            onClick: handleSortHeaderClick,
                           })}
                         >
                           {header.header}

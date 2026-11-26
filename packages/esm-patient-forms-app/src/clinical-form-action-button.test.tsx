@@ -33,7 +33,7 @@ describe('<ClinicalFormActionButton>', () => {
           showPatientBanner: 'tabletOnly',
           patientUuid: mockPatient.id,
           patient: mockPatient,
-          visitContext: null,
+          activeVisit: null,
         }}
       />,
     );
@@ -49,7 +49,7 @@ describe('<ClinicalFormActionButton>', () => {
           showPatientBanner: 'tabletOnly',
           patientUuid: mockPatient.id,
           patient: mockPatient,
-          visitContext: null,
+          activeVisit: null,
         }}
       />,
     );

@@ -1,10 +1,4 @@
 {
-  "addEncounter": "Add encounter",
-  "date": "Date",
   "dateAndTime": "Data e hora",
-  "editabilityNote": "Tap an observation to edit",
-  "encounterType": "Tipo de consulta",
-  "errorSavingObservation": "Error saving observation",
-  "noValue": "No value",
-  "observationSaved": "Observation saved successfully"
+  "encounterType": "Tipo de consulta"
 }

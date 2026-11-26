@@ -115,6 +115,14 @@ describe('AddDrugOrderWorkspace drug search', () => {
     expect(asprin162.closest('[role="listitem"]')).toHaveTextContent(/Aspirin.*162.5mg.*tablet/i);
   });
 
+  test('pre-fills the search and shows results when an initial search term is provided', async () => {
+    renderAddDrugOrderWorkspace('Aspirin');
+
+    expect(screen.getByRole('searchbox')).toHaveValue('Aspirin');
+    expect(await screen.findAllByRole('listitem')).toHaveLength(3);
+    expect(mockUseDrugSearch).toHaveBeenCalledWith('Aspirin');
+  });
+
   test('shows a visual cue and disables actions if the medication is already prescribed', async () => {
     mockUseMedicationOrders.mockReturnValue({
       futureOrders: [],
@@ -287,12 +295,13 @@ describe('AddDrugOrderWorkspace drug search', () => {
   });
 });
 
-function renderAddDrugOrderWorkspace() {
+function renderAddDrugOrderWorkspace(initialSearchTerm?: string) {
   render(
     <AddDrugOrderWorkspace
       workspaceProps={{
         order: null,
         orderToEditOrdererUuid: null,
+        initialSearchTerm,
       }}
       groupProps={{}}
       workspaceName={''}

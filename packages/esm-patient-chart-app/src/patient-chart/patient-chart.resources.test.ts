@@ -23,12 +23,12 @@ const mockUsePatientChartStore = vi.mocked(usePatientChartStore);
 
 const mutateVisit = vi.fn();
 const setPatient = vi.fn();
-const setVisitContext = vi.fn();
+const setActiveVisit = vi.fn();
 const setWorkspaceGroupVisitUuid = vi.mocked(setPatientChartWorkspaceGroupVisitUuid);
 
 // The group props the workspace group was launched with are recorded alongside its visit uuid
 const groupPropsFor = (visit: Visit) =>
-  expect.objectContaining({ visitContext: expect.objectContaining({ uuid: visit.uuid }) });
+  expect.objectContaining({ activeVisit: expect.objectContaining({ uuid: visit.uuid }) });
 
 const visitA = { uuid: 'visit-a', patient: { uuid: mockFhirPatient.id } } as Visit;
 const visitB = { uuid: 'visit-b', patient: { uuid: mockFhirPatient.id } } as Visit;
@@ -53,9 +53,9 @@ function mockNoActiveVisitForPatientSwitch() {
   mockUsePatientChartStore.mockImplementation((patientUuid) => ({
     patientUuid,
     patient: patientUuid === patientB.id ? patientB : mockFhirPatient,
-    visitContext: null,
+    activeVisit: null,
     setPatient,
-    setVisitContext,
+    setActiveVisit,
   }));
 }
 
@@ -72,9 +72,9 @@ describe('usePatientChartPatientAndVisit', () => {
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: mockFhirPatient.id,
       patient: mockFhirPatient,
-      visitContext: null,
+      activeVisit: null,
       setPatient,
-      setVisitContext,
+      setActiveVisit,
     });
   });
 
@@ -98,7 +98,7 @@ describe('usePatientChartPatientAndVisit', () => {
       expect.objectContaining({
         patient: mockFhirPatient,
         patientUuid: mockFhirPatient.id,
-        visitContext: visitA,
+        activeVisit: visitA,
       }),
     );
 
@@ -111,7 +111,7 @@ describe('usePatientChartPatientAndVisit', () => {
       expect.objectContaining({
         patient: mockFhirPatient,
         patientUuid: mockFhirPatient.id,
-        visitContext: visitB,
+        activeVisit: visitB,
       }),
     );
   });
@@ -192,7 +192,7 @@ describe('usePatientChartPatientAndVisit', () => {
     rerender();
 
     // Wait for the effect to fire before asserting the launch count didn't increase
-    await waitFor(() => expect(setVisitContext).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(setActiveVisit).toHaveBeenCalledTimes(2));
     expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(1);
   });
 
@@ -206,16 +206,16 @@ describe('usePatientChartPatientAndVisit', () => {
     await waitFor(() => expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(1));
     expect(mockLaunchWorkspaceGroup).toHaveBeenLastCalledWith(
       'patient-chart',
-      expect.objectContaining({ patientUuid: mockFhirPatient.id, visitContext: null }),
+      expect.objectContaining({ patientUuid: mockFhirPatient.id, activeVisit: null }),
     );
 
     rerender({ patientUuid: patientB.id });
 
-    await waitFor(() => expect(setVisitContext).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(setActiveVisit).toHaveBeenCalledTimes(2));
     await waitFor(() => expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(2));
     expect(mockLaunchWorkspaceGroup).toHaveBeenLastCalledWith(
       'patient-chart',
-      expect.objectContaining({ patientUuid: patientB.id, visitContext: null }),
+      expect.objectContaining({ patientUuid: patientB.id, activeVisit: null }),
     );
   });
 
@@ -234,13 +234,13 @@ describe('usePatientChartPatientAndVisit', () => {
     await waitFor(() => expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(1));
     expect(mockLaunchWorkspaceGroup).toHaveBeenLastCalledWith(
       'patient-chart',
-      expect.objectContaining({ patientUuid: mockFhirPatient.id, visitContext: null }),
+      expect.objectContaining({ patientUuid: mockFhirPatient.id, activeVisit: null }),
     );
 
     patientUuid = patientB.id;
     rerender();
 
-    await waitFor(() => expect(setVisitContext).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(setActiveVisit).toHaveBeenCalledTimes(2));
     expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(1);
 
     resolveFirstLaunch(true);
@@ -248,7 +248,7 @@ describe('usePatientChartPatientAndVisit', () => {
     await waitFor(() => expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(2));
     expect(mockLaunchWorkspaceGroup).toHaveBeenLastCalledWith(
       'patient-chart',
-      expect.objectContaining({ patientUuid: patientB.id, visitContext: null }),
+      expect.objectContaining({ patientUuid: patientB.id, activeVisit: null }),
     );
   });
 
@@ -275,13 +275,13 @@ describe('usePatientChartPatientAndVisit', () => {
     await waitFor(() => expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(1));
     expect(mockLaunchWorkspaceGroup).toHaveBeenLastCalledWith(
       'patient-chart',
-      expect.objectContaining({ visitContext: visitA }),
+      expect.objectContaining({ activeVisit: visitA }),
     );
 
     activeVisit = visitB;
     rerender();
 
-    await waitFor(() => expect(setVisitContext).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(setActiveVisit).toHaveBeenCalledTimes(2));
     expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(1);
 
     resolveFirstLaunch(true);
@@ -289,7 +289,7 @@ describe('usePatientChartPatientAndVisit', () => {
     await waitFor(() => expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(2));
     expect(mockLaunchWorkspaceGroup).toHaveBeenLastCalledWith(
       'patient-chart',
-      expect.objectContaining({ visitContext: visitB }),
+      expect.objectContaining({ activeVisit: visitB }),
     );
   });
 });
