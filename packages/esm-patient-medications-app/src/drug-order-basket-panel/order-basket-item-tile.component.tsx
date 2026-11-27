@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { ClickableTile, IconButton, Tile } from '@carbon/react';
 import { ExtensionSlot, TrashCanIcon, useLayoutType, WarningIcon } from '@openmrs/esm-framework';
-import { type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import { extractErrorMessage, type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import styles from './order-basket-item-tile.scss';
 
 export interface OrderBasketItemTileProps {
@@ -90,7 +90,7 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
                 <span className={styles.orderErrorText}>
                   <WarningIcon size={16} /> &nbsp;{' '}
                   <span className={styles.label01}>{t('error', 'Error').toUpperCase()}</span> &nbsp;
-                  {orderBasketItem.orderError.responseBody?.error?.message ?? orderBasketItem.orderError.message}
+                  {extractErrorMessage(orderBasketItem.orderError)}
                 </span>
               </>
             )}

@@ -9,7 +9,7 @@ import {
   type Visit,
 } from '@openmrs/esm-framework';
 import { type OrderBasketStore, orderBasketStore } from './store';
-import type { ExtractedOrderErrorObject, Order, OrderBasketItem, OrderErrorObject, OrderPost } from './types';
+import type { Order, OrderBasketItem, OrderPost } from './types';
 
 function getOrdersPayloadFromOrderBasket(patientUuid: string, ordererUuid: string): Array<OrderPost> {
   const { items, postDataPrepFunctions }: OrderBasketStore = orderBasketStore.getState();
@@ -187,7 +187,6 @@ export async function postOrders(
           erroredItems.push({
             ...order,
             orderError: error,
-            extractedOrderError: extractErrorDetails(error),
           });
         });
 
@@ -206,23 +205,4 @@ export function postOrder(body: OrderPost, abortController?: AbortController) {
     headers: { 'Content-Type': 'application/json' },
     body,
   });
-}
-
-function extractErrorDetails(errorObject: OrderErrorObject): ExtractedOrderErrorObject {
-  const errorDetails = {
-    message: errorObject.responseBody?.error?.message,
-    fieldErrors: [],
-    globalErrors: errorObject.responseBody?.error?.globalErrors,
-  };
-
-  if (errorObject.responseBody?.error?.fieldErrors) {
-    const fieldErrors = errorObject.responseBody?.error?.fieldErrors;
-    for (const fieldName in fieldErrors) {
-      fieldErrors[fieldName].forEach((error) => {
-        errorDetails.fieldErrors.push(error.message);
-      });
-    }
-  }
-
-  return errorDetails;
 }

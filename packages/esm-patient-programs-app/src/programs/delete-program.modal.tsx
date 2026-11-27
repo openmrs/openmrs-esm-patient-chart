@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { showSnackbar, getCoreTranslation } from '@openmrs/esm-framework';
+import { extractErrorMessage } from '@openmrs/esm-patient-common-lib';
 import { deleteProgramEnrollment, useEnrollments } from './programs.resource';
 import styles from './delete-program.scss';
 
@@ -32,7 +33,7 @@ const DeleteProgramModal: React.FC<DeleteProgramProps> = ({ closeDeleteModal, pr
         isLowContrast: false,
         kind: 'error',
         title: t('errorDeletingProgram', 'Error deleting program enrollment'),
-        subtitle: error?.responseBody?.message ?? error?.message,
+        subtitle: extractErrorMessage(error),
       });
     } finally {
       setIsDeleting(false);
