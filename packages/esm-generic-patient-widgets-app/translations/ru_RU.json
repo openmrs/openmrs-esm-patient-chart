@@ -6,5 +6,6 @@
   "encounterType": "Тип события",
   "errorSavingObservation": "Ошибка при сохранении значения",
   "noValue": "Нет значения",
-  "observationSaved": "Значение сохранено"
+  "observationSaved": "Значение сохранено",
+  "obsTabs": "Наблюдения"
 }
