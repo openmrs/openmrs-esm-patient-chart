@@ -1,11 +1,9 @@
 {
-  "backToClinicalForms": "Back to clinical forms",
   "clinicalForm": "კლინიკური ფორმა",
   "clinicalForms": "კლინიკური ფორმები",
   "formName": "ფორმის სახელი (A-Z)",
   "forms": "ფორმები",
   "lastCompleted": "ბოლოს დსარულდა",
   "never": "არასდროს",
-  "noFormsToDisplay": "There are no forms to display.",
   "searchThisList": "ამ სიაში ძებნა"
 }

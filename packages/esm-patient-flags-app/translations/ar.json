@@ -1,26 +1,17 @@
 {
   "activeFirst": "الأولوية للنشط",
   "alphabetically": "أ - ي",
-  "assigned": "Assigned",
   "clearSearch": "مسح البحث",
-  "clinical": "Clinical",
-  "closeFlagsList": "Close flags list",
   "discard": "تجاهل",
   "editFlags": "تعديل العلامات",
   "editPatientFlags": "Edit patient flags",
   "flagCount_one": "{{count}} علامة خطر",
   "flagCount_other": "{{count}} علامة خطر",
-  "flagsUpdated": "Flags updated",
-  "flagsUpdatedSuccessfully": "Flags updated successfully",
-  "flagsUpdateError": "Some flags failed to update",
   "loading": "جار التحميل",
   "matchesForSearchTerm_one": "{{count}} علامة",
   "matchesForSearchTerm_other": "{{count}} علامة",
   "noFlagsFound": "عذرًا، لم يتم العثور على علامات تطابق بحثك",
   "retiredFirst": "الأولوية للمحذوف",
   "saveAndClose": "حفظ وإغلاق",
-  "saving": "Saving...",
-  "searchForAFlag": "ابحث عن علامة",
-  "sortBy": "Sort by",
-  "updateError": "Update error"
+  "searchForAFlag": "ابحث عن علامة"
 }
