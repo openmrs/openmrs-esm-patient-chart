@@ -42,23 +42,14 @@ export function isValueWithinReferenceRange(
     : true;
 }
 
-// Convert age into an integer (whole number)
-export function extractNumbers(str: string) {
-  const regex = /\d+/g;
-  const match = str.match(regex);
-  if (!match) {
-    return null;
-  }
-  return parseInt(match[0], 10);
-}
-
 export function getMuacColorCode(age: number, muac: number, setColorCode: (color) => void) {
   // Age brackets and MUAC cut-offs follow the Uganda Ministry of Health IMAM Guidelines
   // (Jan 2016), Table 2: Summary of Classification of Acute Malnutrition.
   // https://platform.who.int/docs/default-source/mca-documents/policy-documents/guideline/UGA-CH-38-03-GUIDELINE-2016-eng-IMAM-Guidelines-for-Uganda-Jan-2016.pdf
-  // `age` is the whole number of years extracted from the patient's birth date, so the
-  // lower bound of each bracket is inclusive (e.g. a patient turning exactly 5 falls
-  // into the "5 to <10 years" bracket per the guideline, not the "6-59 months" bracket).
+  // `age` is the number of completed years (see `getPatientAge` in common/helpers.ts), so
+  // infants under 1 year have an age of 0 and fall into the "under 5" bracket. The lower
+  // bound of each bracket is inclusive (e.g. a patient turning exactly 5 falls into the
+  // "5 to <10 years" bracket per the guideline, not the "6-59 months" bracket).
   switch (true) {
     // 6-59 months (approximated here as under 5 whole years)
     case age < 5 && muac < 11.5 && muac > 0:

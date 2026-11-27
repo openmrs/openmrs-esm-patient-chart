@@ -1,5 +1,5 @@
-import { assessValue, interpretBloodPressure, prepareObsForSubmission } from './helpers';
-import { vi, describe, it, expect } from 'vitest';
+import { assessValue, getPatientAge, interpretBloodPressure, prepareObsForSubmission } from './helpers';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import type { ObsReferenceRanges } from './types';
 import type { VitalsAndBiometricsFieldValuesMap } from './data.resource';
 
@@ -180,5 +180,34 @@ describe('prepareObsForSubmission', () => {
 
     expect(result.toBeVoided).toEqual([{ uuid: 'old-note-uuid', voided: true }]);
     expect(result.newObs).toEqual([]);
+  });
+});
+
+describe('getPatientAge', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-11-06T12:00:00Z'));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it.each([
+    ['50-week-old infant', '2025-11-21', 0],
+    ['11-month-old infant', '2025-12-06', 0],
+    ['8-month-old infant', '2026-03-06', 0],
+    ['4-year-old child', '2022-06-01', 4],
+    ['20-year-old adult', '2006-01-01', 20],
+  ])('returns completed years for a %s', (_label, birthDate, expected) => {
+    expect(getPatientAge({ birthDate } as fhir.Patient)).toBe(expected);
+  });
+
+  it('returns null when birthDate is missing', () => {
+    expect(getPatientAge({} as fhir.Patient)).toBeNull();
+  });
+
+  it('returns null when birthDate is invalid', () => {
+    expect(getPatientAge({ birthDate: 'not-a-date' } as fhir.Patient)).toBeNull();
   });
 });
