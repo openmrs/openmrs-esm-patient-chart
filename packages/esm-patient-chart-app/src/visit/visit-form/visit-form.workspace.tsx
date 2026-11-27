@@ -21,7 +21,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Extension,
   ExtensionSlot,
-  OpenmrsFetchError,
   saveVisit,
   showSnackbar,
   updateVisit,
@@ -38,6 +37,7 @@ import {
 } from '@openmrs/esm-framework';
 import {
   type DeprecatedPatientWorkspaceProps,
+  extractErrorMessage,
   getPatientAndVisitProps,
   hasPatientBannerData,
   invalidateVisitAndEncounterData,
@@ -54,14 +54,12 @@ import {
   convertToDate,
   createVisitAttribute,
   deleteVisitAttribute,
-  extractErrorMessagesFromResponse,
   updateVisitAttribute,
   useAllowOverlappingVisits,
   useEarliestAllowedVisitStartDate,
   useVisitFormCallbacks,
   useVisitFormSchemaAndDefaultValues,
   visitStatuses,
-  type ErrorObject,
   type VisitFormCallbacks,
   type VisitFormData,
 } from './visit-form.resource';
@@ -211,18 +209,6 @@ const VisitForm: React.FC<Workspace2DefinitionProps<VisitFormProps, VisitFormWin
     });
   }, [defaultValues, reset]);
 
-  const getErrorDescription = useCallback(
-    (error: unknown) => {
-      if (OpenmrsFetchError && error instanceof OpenmrsFetchError) {
-        return typeof error.responseBody === 'string'
-          ? error.responseBody
-          : extractErrorMessagesFromResponse(error.responseBody as ErrorObject, t);
-      }
-      return (error as Error)?.message;
-    },
-    [t],
-  );
-
   const handleVisitAttributes = useCallback(
     (visitAttributes: { [p: string]: string }, visitUuid: string) => {
       const existingVisitAttributeTypes =
@@ -255,7 +241,7 @@ const VisitForm: React.FC<Workspace2DefinitionProps<VisitFormProps, VisitFormWin
                     }),
                     kind: 'error',
                     isLowContrast: false,
-                    subtitle: getErrorDescription(error),
+                    subtitle: extractErrorMessage(error),
                   });
                   return Promise.reject(error); // short-circuit promise chain
                 }),
@@ -270,7 +256,7 @@ const VisitForm: React.FC<Workspace2DefinitionProps<VisitFormProps, VisitFormWin
                     }),
                     kind: 'error',
                     isLowContrast: false,
-                    subtitle: getErrorDescription(error),
+                    subtitle: extractErrorMessage(error),
                   });
                   return Promise.reject(error); // short-circuit promise chain
                 }),
@@ -287,7 +273,7 @@ const VisitForm: React.FC<Workspace2DefinitionProps<VisitFormProps, VisitFormWin
                   }),
                   kind: 'error',
                   isLowContrast: false,
-                  subtitle: getErrorDescription(error),
+                  subtitle: extractErrorMessage(error),
                 });
                 return Promise.reject(error); // short-circuit promise chain
               }),
@@ -298,7 +284,7 @@ const VisitForm: React.FC<Workspace2DefinitionProps<VisitFormProps, VisitFormWin
 
       return Promise.all(promises);
     },
-    [getErrorDescription, visitToEdit, t, visitAttributeTypes],
+    [visitToEdit, t, visitAttributeTypes],
   );
 
   const onSubmit = useCallback(
@@ -382,7 +368,7 @@ const VisitForm: React.FC<Workspace2DefinitionProps<VisitFormProps, VisitFormWin
               : t('errorUpdatingVisitDetails', 'Error updating visit details'),
             kind: 'error',
             isLowContrast: false,
-            subtitle: getErrorDescription(error),
+            subtitle: extractErrorMessage(error),
           });
           return Promise.reject(error); // short-circuit promise chain
         })
@@ -427,7 +413,6 @@ const VisitForm: React.FC<Workspace2DefinitionProps<VisitFormProps, VisitFormWin
     [
       closeWorkspace,
       extraVisitInfo,
-      getErrorDescription,
       globalMutate,
       handleVisitAttributes,
       onVisitStarted,

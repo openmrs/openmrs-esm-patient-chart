@@ -96,4 +96,24 @@ describe('DeleteProgramModal', () => {
       subtitle: 'Internal server error',
     });
   });
+
+  it("shows the server's reason when the delete request fails with a REST error", async () => {
+    const user = userEvent.setup();
+    mockDeleteProgramEnrollment.mockRejectedValue(
+      Object.assign(new Error('Server responded with 400'), {
+        responseBody: { error: { message: '[Patient program enrollment cannot be deleted]' } },
+      }),
+    );
+
+    renderDeleteProgramModal();
+
+    await user.click(screen.getByRole('button', { name: /confirm/i }));
+
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'error',
+        subtitle: 'Patient program enrollment cannot be deleted',
+      }),
+    );
+  });
 });
