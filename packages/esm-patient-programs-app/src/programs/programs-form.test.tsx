@@ -200,7 +200,7 @@ describe('ProgramsForm', () => {
     },
     {
       reason: 'an exception outside validation',
-      error: { message: 'Patient is already enrolled in this program' },
+      error: { message: '[Patient is already enrolled in this program]' },
       expected: 'Patient is already enrolled in this program',
     },
   ])('shows the reason the server gives when it refuses an enrollment for $reason', async ({ error, expected }) => {
