@@ -33,7 +33,7 @@ export function extractErrorMessage(error: unknown, fallback?: string, separator
   }
 
   // RestUtil.wrapErrorResponse formats this as "reason [message]" or "[message]", and a missing message becomes "[null]"
-  const serverMessage = message?.replace(/\s*\[null\]$/, '').replace(/^\[([\s\S]*)\]$/, '$1');
+  const serverMessage = message?.replace(/ ?\[null\]$/, '').replace(/^\[([\s\S]*)\]$/, '$1');
   if (serverMessage) {
     return serverMessage;
   }
