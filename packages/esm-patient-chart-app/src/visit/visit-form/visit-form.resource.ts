@@ -29,6 +29,7 @@ export type VisitFormData = {
   visitStopDate: Date; // Date object that only contains info for year, month, day
   visitStopTime: string; // hh:mm (note that hh is from 01 to 12, NOT 00 to 23)
   visitStopTimeFormat: amPm;
+  isFullDayVisit: boolean;
   programType: string;
   visitType: string;
   visitLocation: {
@@ -219,6 +220,20 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit, earliestA
     const visitStatus: VisitStatus =
       visitToEdit == null ? 'new' : visitToEdit.stopDatetime === null ? 'ongoing' : 'past';
 
+    // Only default the checkbox to checked when the visit being edited genuinely spans a full
+    // calendar day (00:00 to 23:59). Compared at 'minute' precision (not the default millisecond
+    // precision) because the backend doesn't necessarily preserve the exact 23:59:59.999 the
+    // frontend computes via dayjs(...).endOf('day') on round-trip through the REST API. Visits
+    // with specific manual times must not be misrepresented as full-day. New visits are handled
+    // separately by a useEffect in visit-form.workspace.tsx that defaults this to true
+    // when the user switches a brand new visit's status to "past" via the content switcher.
+    const isVisitToEditFullDay =
+      Boolean(visitToEdit?.startDatetime) &&
+      Boolean(visitToEdit?.stopDatetime) &&
+      dayjs(visitToEdit.startDatetime).isSame(dayjs(visitToEdit.stopDatetime), 'day') &&
+      dayjs(visitToEdit.startDatetime).isSame(dayjs(visitToEdit.startDatetime).startOf('day'), 'minute') &&
+      dayjs(visitToEdit.stopDatetime).isSame(dayjs(visitToEdit.stopDatetime).endOf('day'), 'minute');
+
     const defaultValues: Partial<VisitFormData> = {
       visitStatus,
       visitStartDate: startDateTime.date,
@@ -227,6 +242,7 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit, earliestA
       visitStopDate: stopDateTime.date,
       visitStopTime: stopDateTime.time,
       visitStopTimeFormat: stopDateTime.timeFormat,
+      isFullDayVisit: visitStatus === 'past' && isVisitToEditFullDay,
       visitType: visitToEdit?.visitType?.uuid ?? emrConfiguration?.atFacilityVisitType?.uuid,
       visitLocation: visitToEdit?.location ?? defaultVisitLocation ?? {},
       visitAttributes:
@@ -259,6 +275,7 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit, earliestA
         visitStopDate: z.date().optional(),
         visitStopTime: z.string().regex(time12HourFormatRegex).optional(),
         visitStopTimeFormat: z.enum(['PM', 'AM']).optional(),
+        isFullDayVisit: z.boolean().optional(),
         programType: z.string().optional(),
         visitType: z.string({ required_error: t('visitTypeRequired', 'Visit type is required') }),
         visitLocation: z.object({
@@ -276,10 +293,20 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit, earliestA
           visitStopDate,
           visitStopTime,
           visitStopTimeFormat,
+          isFullDayVisit,
         } = data;
 
-        const visitStartDateTime = convertToDate(visitStartDate, visitStartTime, visitStartTimeFormat);
-        const visitStopDateTime = convertToDate(visitStopDate, visitStopTime, visitStopTimeFormat);
+        const isFullDay = visitStatus === 'past' && isFullDayVisit;
+        const visitStartDateTime = isFullDay
+          ? visitStartDate
+            ? dayjs(visitStartDate).startOf('day').toDate()
+            : null
+          : convertToDate(visitStartDate, visitStartTime, visitStartTimeFormat);
+        const visitStopDateTime = isFullDay
+          ? visitStartDate
+            ? dayjs(visitStartDate).endOf('day').toDate()
+            : null
+          : convertToDate(visitStopDate, visitStopTime, visitStopTimeFormat);
 
         if (visitStatus === 'ongoing' || visitStatus === 'past') {
           if (visitStartDateTime === null) {
@@ -298,7 +325,7 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit, earliestA
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: t('futureStartTime', 'Start time cannot be in the future'),
-              path: ['visitStartTime'],
+              path: [isFullDay ? 'visitStartDate' : 'visitStartTime'],
             });
           } else if (visitStartDateTime.getTime() > firstEncounterDateTime) {
             ctx.addIssue({
@@ -313,7 +340,7 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit, earliestA
                   },
                 },
               ),
-              path: ['visitStartTime'],
+              path: [isFullDay ? 'visitStartDate' : 'visitStartTime'],
             });
           }
         }
@@ -323,13 +350,13 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit, earliestA
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: t('endDateTimeRequired', 'End date and time are required'),
-              path: ['visitStopDate'],
+              path: [isFullDay ? 'visitStartDate' : 'visitStopDate'],
             });
           } else if (visitStopDateTime > now) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: t('futureEndTime', 'End time cannot be in the future'),
-              path: ['visitStopTime'],
+              path: [isFullDay ? 'visitStartDate' : 'visitStopTime'],
             });
           } else if (visitStartDateTime !== null && visitStopDateTime < visitStartDateTime) {
             // When both fall on the same day it is the time, not the date, that is out of
@@ -338,7 +365,7 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit, earliestA
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: t('endTimeMustBeAfterStartTime', 'End time must be after start time'),
-              path: [isSameDay ? 'visitStopTime' : 'visitStopDate'],
+              path: [isFullDay ? 'visitStartDate' : isSameDay ? 'visitStopTime' : 'visitStopDate'],
             });
           } else if (visitStopDateTime.getTime() < lastEncounterDateTime) {
             ctx.addIssue({
@@ -353,7 +380,7 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit, earliestA
                   },
                 },
               ),
-              path: ['visitStopTime'],
+              path: [isFullDay ? 'visitStartDate' : 'visitStopTime'],
             });
           }
         }

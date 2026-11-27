@@ -9,6 +9,12 @@ export const esmPatientChartSchema = {
     _default: '',
     _description: 'Custom URL to load default facility if it is not in the session',
   },
+  defaultToFullDayVisit: {
+    _type: Type.Boolean,
+    _description:
+      'Whether the "Full day visit" checkbox on the Start Visit form should default to checked when a new visit is switched to the "In the past" status.',
+    _default: true,
+  },
   disableChangingVisitLocation: {
     _type: Type.Boolean,
     _description: 'Whether the visit location field in the Start Visit form should be view-only.',
@@ -199,6 +205,7 @@ export const esmPatientChartSchema = {
 
 export interface ChartConfig {
   defaultFacilityUrl: string;
+  defaultToFullDayVisit: boolean;
   disableChangingVisitLocation: boolean;
   disableEmptyTabs: boolean;
   encounterEditableDuration: number;
