@@ -52,8 +52,11 @@ describe('extractErrorMessage', () => {
     expect(extractErrorMessage(restError({ error: { message: 'Unable to save visit [Visit is invalid]' } }))).toBe(
       'Unable to save visit [Visit is invalid]',
     );
-    expect(extractErrorMessage(restError({ error: { message: 'Unable to save visit [null]' } }))).toBe(
-      'Unable to save visit [null]',
+  });
+
+  it('removes a trailing "[null]" from the server error message', () => {
+    expect(extractErrorMessage(restError({ error: { message: "Object with given uuid doesn't exist [null]" } }))).toBe(
+      "Object with given uuid doesn't exist",
     );
   });
 

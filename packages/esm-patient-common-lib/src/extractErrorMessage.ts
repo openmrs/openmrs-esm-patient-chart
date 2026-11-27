@@ -32,8 +32,8 @@ export function extractErrorMessage(error: unknown, fallback?: string, separator
     return validationMessages.join(separator);
   }
 
-  // RestUtil.wrapErrorResponse wraps the exception message in brackets, which gives "[null]" when there isn't one
-  const serverMessage = message?.replace(/^\[null\]$/, '').replace(/^\[([\s\S]*)\]$/, '$1');
+  // RestUtil.wrapErrorResponse formats this as "reason [message]" or "[message]", and a missing message becomes "[null]"
+  const serverMessage = message?.replace(/\s*\[null\]$/, '').replace(/^\[([\s\S]*)\]$/, '$1');
   if (serverMessage) {
     return serverMessage;
   }
