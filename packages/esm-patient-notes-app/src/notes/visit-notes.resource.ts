@@ -1,18 +1,17 @@
 import { useMemo } from 'react';
-import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import useSWRInfinite from 'swr/infinite';
-import { openmrsFetch, restBaseUrl, useAttachments, useConfig, type FetchResponse } from '@openmrs/esm-framework';
+import {
+  openmrsFetch,
+  restBaseUrl,
+  useAttachments,
+  useConfig,
+  useOpenmrsFetchAll,
+  type FetchResponse,
+} from '@openmrs/esm-framework';
 import { getAttachmentBytesUrl } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
-import type {
-  Concept,
-  DiagnosisPayload,
-  EncountersFetchResponse,
-  PatientNote,
-  RESTPatientNote,
-  VisitNotePayload,
-} from '../types';
+import type { Concept, DiagnosisPayload, PatientNote, RESTPatientNote, VisitNotePayload } from '../types';
 
 export interface SavedVisitNoteImage {
   id: string;
@@ -54,7 +53,7 @@ interface UseVisitNotes {
 
 export function useVisitNotes(patientUuid: string): UseVisitNotes {
   const {
-    visitNoteConfig: { encounterNoteTextConceptUuid, visitDiagnosesConceptUuid },
+    visitNoteConfig: { encounterNoteTextConceptUuid, encounterTypeUuid },
   } = useConfig<ConfigObject>();
 
   const customRepresentation =
@@ -63,12 +62,9 @@ export function useVisitNotes(patientUuid: string): UseVisitNotes {
     'encounterRole:(uuid,display),' +
     'provider:(uuid,person:(uuid,display))),' +
     'diagnoses';
-  const encountersApiUrl = `${restBaseUrl}/encounter?patient=${patientUuid}&obs=${visitDiagnosesConceptUuid}&v=${customRepresentation}`;
+  const encountersApiUrl = `${restBaseUrl}/encounter?patient=${patientUuid}&encounterType=${encounterTypeUuid}&v=${customRepresentation}`;
 
-  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: EncountersFetchResponse }, Error>(
-    encountersApiUrl,
-    openmrsFetch,
-  );
+  const { data, error, isLoading, isValidating, mutate } = useOpenmrsFetchAll<RESTPatientNote>(encountersApiUrl);
 
   const mapNoteProperties = (note: RESTPatientNote, index: number): PatientNote => ({
     id: `${index}`,
@@ -85,7 +81,7 @@ export function useVisitNotes(patientUuid: string): UseVisitNotes {
     encounterProviderRole: note?.encounterProviders[0]?.encounterRole?.display,
   });
 
-  const formattedVisitNotes = data?.data?.results
+  const formattedVisitNotes = data
     ?.map(mapNoteProperties)
     ?.sort((noteA, noteB) => new Date(noteB.encounterDate).getTime() - new Date(noteA.encounterDate).getTime());
 

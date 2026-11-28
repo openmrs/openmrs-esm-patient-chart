@@ -1,7 +1,3 @@
-export interface EncountersFetchResponse {
-  results: Array<RESTPatientNote>;
-}
-
 export interface RESTPatientNote {
   uuid: string;
   display: string;
