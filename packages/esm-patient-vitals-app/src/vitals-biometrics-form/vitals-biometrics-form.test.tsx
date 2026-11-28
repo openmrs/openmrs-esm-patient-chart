@@ -6,7 +6,10 @@ import {
   type FetchResponse,
   showSnackbar,
   useConfig,
+  useSession,
   getDefaultsFromConfigSchema,
+  type Session,
+  type Visit,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { type PatientWorkspaceWindowProps } from '@openmrs/esm-patient-common-lib';
@@ -293,6 +296,10 @@ describe('VitalsBiometricsForm', () => {
         },
         abort: expect.any(Function),
       }),
+      expect.objectContaining({
+        visit: null,
+        encounterRoleUuid: mockVitalsConfig.vitals.clinicianEncounterRole,
+      }),
     );
 
     expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
@@ -304,6 +311,47 @@ describe('VitalsBiometricsForm', () => {
         title: 'Vitals and Biometrics saved',
       }),
     );
+  });
+
+  it('saves a new encounter in the visit in context, by the logged-in provider', async () => {
+    const user = userEvent.setup();
+    const visitContext = {
+      uuid: 'past-visit-uuid',
+      startDatetime: '2026-09-20T08:00:00.000+0000',
+      stopDatetime: '2026-09-20T17:00:00.000+0000',
+    } as Visit;
+    const defaultUseSession = vi.mocked(useSession).getMockImplementation();
+    vi.mocked(useSession).mockReturnValue({
+      authenticated: true,
+      sessionId: 'session-id',
+      currentProvider: { uuid: 'provider-uuid', identifier: 'provider' },
+      sessionLocation: { uuid: 'opd-location-uuid', display: 'OPD', links: [] },
+    } as Session);
+    mockCreateOrUpdateVitalsAndBiometrics.mockResolvedValue({
+      status: 201,
+      statusText: 'Created',
+      data: [],
+    } as Awaited<ReturnType<typeof createOrUpdateVitalsAndBiometrics>>);
+
+    render(<VitalsAndBiometricsForm {...defaultProps} windowProps={{ ...defaultProps.windowProps, visitContext }} />);
+
+    await user.type(screen.getByRole('spinbutton', { name: /temperature/i }), '37');
+    await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+    expect(mockCreateOrUpdateVitalsAndBiometrics).toHaveBeenCalledWith(
+      mockPatient.id,
+      mockVitalsConfig.vitals.encounterTypeUuid,
+      undefined,
+      'opd-location-uuid',
+      expect.any(Array),
+      expect.anything(),
+      {
+        visit: visitContext,
+        providerUuid: 'provider-uuid',
+        encounterRoleUuid: mockVitalsConfig.vitals.clinicianEncounterRole,
+      },
+    );
+    vi.mocked(useSession).mockImplementation(defaultUseSession);
   });
 
   it('saves only once when Save and close is double-clicked while the request is pending', async () => {
@@ -450,6 +498,8 @@ describe('VitalsBiometricsForm', () => {
         },
         abort: expect.any(Function),
       }),
+      // ignored for an existing encounter
+      expect.anything(),
     );
 
     expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
