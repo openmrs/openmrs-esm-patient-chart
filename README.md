@@ -212,7 +212,7 @@ For documentation about our design patterns, please visit our [design system](ht
 
 ## Configuration
 
-Please see the [Implementer Documentation](https://wiki.openmrs.org/pages/viewpage.action?pageId=224527013) for information about configuring modules.
+Please see the [Implementer Documentation](https://openmrs.atlassian.net/wiki/search?text=O3%20Implementer%20Documentation%3A%20Set%20Up%2C%20Configure%20%26%20Deploy) for information about configuring modules.
 
 ## Deployment
 
