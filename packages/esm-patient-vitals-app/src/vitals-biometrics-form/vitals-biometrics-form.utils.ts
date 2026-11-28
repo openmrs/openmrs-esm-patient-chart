@@ -43,7 +43,13 @@ export function isValueWithinReferenceRange(
 }
 
 // Convert age into an integer (whole number)
-export function extractNumbers(str: string) {
+/**
+ * @deprecated Use getPatientAge(patient) instead to calculate completed years from birthDate.
+ */
+export function extractNumbers(str?: string | null) {
+  if (!str) {
+    return null;
+  }
   const regex = /\d+/g;
   const match = str.match(regex);
   if (!match) {
@@ -52,7 +58,26 @@ export function extractNumbers(str: string) {
   return parseInt(match[0], 10);
 }
 
-export function getMuacColorCode(age: number, muac: number, setColorCode: (color) => void) {
+export function getMuacColorCode(
+  age: number | null | undefined,
+  muac: number | null | undefined,
+  setColorCode: (color: string) => void,
+  ageInMonths?: number | null,
+) {
+  if (age == null || isNaN(age) || age < 0 || muac == null || isNaN(muac) || muac <= 0) {
+    setColorCode('');
+    return;
+  }
+
+  // Per Uganda Ministry of Health IMAM Guidelines (Jan 2016), Table 2 & Chapter 7:
+  // MUAC cut-offs are only standardized for children from 6 to 59 months.
+  // Infants less than 6 months are assessed using Weight-for-Length and bilateral edema,
+  // so MUAC malnutrition color-coding is not applicable to infants under 6 months.
+  if (ageInMonths != null && ageInMonths < 6) {
+    setColorCode('');
+    return;
+  }
+
   // Age brackets and MUAC cut-offs follow the Uganda Ministry of Health IMAM Guidelines
   // (Jan 2016), Table 2: Summary of Classification of Acute Malnutrition.
   // https://platform.who.int/docs/default-source/mca-documents/policy-documents/guideline/UGA-CH-38-03-GUIDELINE-2016-eng-IMAM-Guidelines-for-Uganda-Jan-2016.pdf
@@ -61,7 +86,7 @@ export function getMuacColorCode(age: number, muac: number, setColorCode: (color
   // into the "5 to <10 years" bracket per the guideline, not the "6-59 months" bracket).
   switch (true) {
     // 6-59 months (approximated here as under 5 whole years)
-    case age < 5 && muac < 11.5 && muac > 0:
+    case age < 5 && muac < 11.5:
       setColorCode('red');
       break;
     case age < 5 && muac >= 11.5 && muac < 12.5:
@@ -71,7 +96,7 @@ export function getMuacColorCode(age: number, muac: number, setColorCode: (color
       setColorCode('green');
       break;
     // 5 to <10 years
-    case age >= 5 && age < 10 && muac < 13.5 && muac > 0:
+    case age >= 5 && age < 10 && muac < 13.5:
       setColorCode('red');
       break;
     case age >= 5 && age < 10 && muac >= 13.5 && muac < 14.5:
@@ -81,7 +106,7 @@ export function getMuacColorCode(age: number, muac: number, setColorCode: (color
       setColorCode('green');
       break;
     // 10 to <15 years
-    case age >= 10 && age < 15 && muac < 16.0 && muac > 0:
+    case age >= 10 && age < 15 && muac < 16.0:
       setColorCode('red');
       break;
     case age >= 10 && age < 15 && muac >= 16.0 && muac < 18.5:
@@ -91,7 +116,7 @@ export function getMuacColorCode(age: number, muac: number, setColorCode: (color
       setColorCode('green');
       break;
     // 15 to <18 years
-    case age >= 15 && age < 18 && muac < 18.5 && muac > 0:
+    case age >= 15 && age < 18 && muac < 18.5:
       setColorCode('red');
       break;
     case age >= 15 && age < 18 && muac >= 18.5 && muac < 21.0:
@@ -101,7 +126,7 @@ export function getMuacColorCode(age: number, muac: number, setColorCode: (color
       setColorCode('green');
       break;
     // 18 years and above (adults)
-    case age >= 18 && muac < 19.0 && muac > 0:
+    case age >= 18 && muac < 19.0:
       setColorCode('red');
       break;
     case age >= 18 && muac >= 19.0 && muac < 22.0:
@@ -109,6 +134,9 @@ export function getMuacColorCode(age: number, muac: number, setColorCode: (color
       break;
     case age >= 18 && muac >= 22.0:
       setColorCode('green');
+      break;
+    default:
+      setColorCode('');
       break;
   }
 }
