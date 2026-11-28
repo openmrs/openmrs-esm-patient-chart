@@ -117,7 +117,7 @@ const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view, s
 
   useEffect(() => {
     const activeDashboard = dashboard ?? defaultDashboard;
-    if (setDashboardLayoutMode) {
+    if (setDashboardLayoutMode && activeDashboard) {
       setDashboardLayoutMode(activeDashboard.layoutMode ?? 'contained');
     }
   }, [dashboard, defaultDashboard, setDashboardLayoutMode]);

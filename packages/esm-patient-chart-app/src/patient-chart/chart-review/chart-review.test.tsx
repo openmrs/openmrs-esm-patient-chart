@@ -61,4 +61,34 @@ describe('ChartReview', () => {
 
     expect(screen.getByRole('heading')).toHaveTextContent(/Patient summary/i);
   });
+  test('renders without throwing and does not call setDashboardLayoutMode when no dashboards are assigned', () => {
+    const mockStore = {
+      slots: {
+        'patient-chart-dashboard-slot': {
+          candidateExtensions: [],
+        },
+      },
+    };
+
+    mockUseExtensionStore.mockReturnValue(mockStore as unknown as ReturnType<typeof useExtensionStore>);
+    mockUseAssignedExtensions.mockImplementation((slotName) => mockStore.slots[slotName]?.candidateExtensions ?? []);
+
+    const setDashboardLayoutMode = vi.fn();
+
+    expect(() =>
+      render(
+        <BrowserRouter>
+          <ChartReview
+            patient={mockPatient}
+            patientUuid={mockPatient.id}
+            view="patient-summary"
+            setDashboardLayoutMode={setDashboardLayoutMode}
+          />
+        </BrowserRouter>,
+      ),
+    ).not.toThrow();
+
+    expect(setDashboardLayoutMode).not.toHaveBeenCalled();
+  });
+
 });
