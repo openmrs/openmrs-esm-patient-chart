@@ -66,11 +66,35 @@ describe('DrugFavoritesListExtension', () => {
     );
   });
 
-  it('shows a section skeleton while order status is loading', () => {
-    render(<DrugFavoritesListExtension {...defaultProps} isLoadingOrders />);
+  it('waits for shared order data before opening a favorite with the mapped duration unit', async () => {
+    const user = userEvent.setup();
+    const daysDurationUnit = { uuid: 'days-uuid', display: 'Days' };
+    const { rerender } = render(
+      <DrugFavoritesListExtension {...defaultProps} daysDurationUnit={daysDurationUnit} isLoadingOrders />,
+    );
 
     expect(screen.queryByText(/my pinned drug orders/i)).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /aspirin 81mg/i })).not.toBeInTheDocument();
+
+    rerender(
+      <DrugFavoritesListExtension
+        {...defaultProps}
+        daysDurationUnit={daysDurationUnit}
+        isLoadingOrders={false}
+      />,
+    );
+
+    const favoriteButton = screen.getByRole('button', { name: /aspirin 81mg/i });
+    await user.click(favoriteButton);
+
+    expect(defaultProps.openOrderForm).toHaveBeenCalledWith(
+      expect.objectContaining({
+        durationUnit: {
+          valueCoded: daysDurationUnit.uuid,
+          value: daysDurationUnit.display,
+        },
+      }),
+    );
   });
 
   it('shows the favorites and keeps unpinning available when the shared order lookup fails', async () => {

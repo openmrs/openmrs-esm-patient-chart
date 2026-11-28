@@ -12,6 +12,7 @@ import {
 } from '@openmrs/esm-framework';
 import { type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../../config-schema';
+import { useOrderConfig } from '../../api/order-config';
 import OrderBasketSearchResults from './order-basket-search-results.component';
 import styles from './order-basket-search.scss';
 
@@ -42,7 +43,9 @@ export default function DrugSearch({
 }: DrugSearchProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { debounceDelayInMs, daysDurationUnit, minimumCharacterLengthForDrugSearch } = useConfig<ConfigObject>();
+  const { debounceDelayInMs, minimumCharacterLengthForDrugSearch } = useConfig<ConfigObject>();
+  const { orderConfigObject, isLoading: isLoadingOrderConfig } = useOrderConfig();
+  const daysDurationUnit = orderConfigObject?.daysDurationUnit;
   const debouncedSearchTerm = useDebounce(
     searchTerm?.length >= minimumCharacterLengthForDrugSearch ? searchTerm : '',
     debounceDelayInMs ?? 300,
@@ -84,7 +87,7 @@ export default function DrugSearch({
           visit,
           daysDurationUnit,
           prescribedDrugUuids,
-          isLoadingOrders,
+          isLoadingOrders: isLoadingOrders || isLoadingOrderConfig,
           ordersError,
         }}
       />

@@ -170,7 +170,7 @@ export function DrugOrderForm({
   launchAllergyForm,
 }: DrugOrderFormProps) {
   const { t } = useTranslation();
-  const { daysDurationUnit, durationUnitsDaysMap } = useConfig<ConfigObject>();
+  const { durationUnitsDaysMap } = useConfig<ConfigObject>();
   const isTablet = useLayoutType() === 'tablet';
   const showPatientBanner = showPatientBannerProp ?? isTablet;
   const bannerPatientUuid = patientUuid ?? patient?.id;
@@ -396,14 +396,8 @@ export function DrugOrderForm({
   );
 
   const durationUnits: Array<DurationUnit> = useMemo(
-    () =>
-      orderConfigObject?.durationUnits ?? [
-        {
-          valueCoded: daysDurationUnit?.uuid,
-          value: daysDurationUnit?.display,
-        },
-      ],
-    [orderConfigObject, daysDurationUnit],
+    () => orderConfigObject?.durationUnits ?? [],
+    [orderConfigObject?.durationUnits],
   );
 
   const orderFrequencies: Array<MedicationFrequency> = useMemo(() => {
