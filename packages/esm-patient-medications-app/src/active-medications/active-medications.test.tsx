@@ -4,8 +4,10 @@ import { launchWorkspace2, openmrsFetch, useOpenmrsFetchAll, useSession } from '
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { Order } from '@openmrs/esm-patient-common-lib';
 import { mockPatientDrugOrdersApiData, mockSessionDataResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
+import { bucketMedicationOrders } from '../api';
 import ActiveMedications from './active-medications.component';
 
 const mockUseSession = vi.mocked(useSession);
@@ -65,11 +67,7 @@ describe('ActiveMedications', () => {
     expect(ErrorState).toHaveBeenCalledWith(expect.objectContaining({ error, headerTitle: 'Active medications' }), {});
   });
 
-  // TODO: Re-enable. Carbon DataTable renders columns differently under jsdom +
-  // @testing-library/react@16, so the row/column assertions below no longer find
-  // the expected cells. Needs the query to switch from cell-text matching to
-  // role-based DataTable column queries.
-  test.skip('renders a tabular overview of the active medications recorded for a patient', async () => {
+  test('renders a tabular overview of the active medications recorded for a patient', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockPatientDrugOrdersApiData } });
 
     renderWithSwr(<ActiveMedications patient={mockPatient} />);
@@ -83,22 +81,26 @@ describe('ActiveMedications', () => {
     });
     expect(screen.getByRole('button', { name: /add/i })).toBeInTheDocument();
 
-    const table = screen.getByRole('table');
-    expect(screen.getByRole('table')).toBeInTheDocument();
+    // Carbon's DataTable renders both a primary table and a sticky-header table;
+    // grab the primary one, which carries the data rows.
+    const [table] = await screen.findAllByRole('table');
+    expect(table).toBeInTheDocument();
 
-    const expectedColumnHeaders = [/start date/, /details/];
+    const expectedColumnHeaders = [/start date/i, /details/i];
     expectedColumnHeaders.forEach((header) => {
-      expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
+      expect(within(table).getByRole('columnheader', { name: header })).toBeInTheDocument();
     });
 
+    const { activeOrders } = bucketMedicationOrders(mockPatientDrugOrdersApiData as unknown as Order[]);
+    expect(activeOrders.length).toBeGreaterThan(0);
+    expect(within(table).getAllByRole('row')).toHaveLength(activeOrders.length + 1);
+
     const expectedTableRows = [
-      /14-Aug-2023 Admin User Acetaminophen 325 mg — 325mg — tablet DOSE 2 tablet — oral — twice daily — indefinite duration — take it sometimes INDICATION Bad boo-boo/,
-      /14-Aug-2023 Admin User Aspirin 162.5mg — 162.5mg — tablet DOSE 1 tablet — oral — once daily — for 30 days INDICATION Heart — QUANTITY 30 Tablet/,
+      /14-Aug-2023.*Acetaminophen 325 mg.*325mg.*tablet.*DOSE 2 tablet.*oral.*twice daily.*indefinite duration.*take it sometimes.*INDICATION Bad boo-boo/i,
+      /14-Aug-2023.*Aspirin 162\.5mg.*162\.5mg.*tablet.*DOSE 1 tablet.*oral.*once daily.*for 30 days.*INDICATION Heart.*QUANTITY 30 Tablet/i,
     ];
 
-    expectedTableRows.forEach((row) =>
-      expect(within(table).getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument(),
-    );
+    expectedTableRows.forEach((row) => expect(within(table).getByRole('row', { name: row })).toBeInTheDocument());
   });
 });
 
