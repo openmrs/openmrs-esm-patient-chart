@@ -31,7 +31,11 @@ import {
   useSession,
   Workspace2,
 } from '@openmrs/esm-framework';
-import { type PatientWorkspace2DefinitionProps, useShowPatientBanner } from '@openmrs/esm-patient-common-lib';
+import {
+  extractErrorMessage,
+  type PatientWorkspace2DefinitionProps,
+  useShowPatientBanner,
+} from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 import {
   createProgramEnrollment,
@@ -182,7 +186,7 @@ const ProgramsForm: React.FC<PatientWorkspace2DefinitionProps<ProgramsFormProps,
         showSnackbar({
           kind: 'error',
           title: t('programEnrollmentSaveError', 'Error saving program enrollment'),
-          subtitle: error instanceof Error ? error.message : 'An unknown error occurred',
+          subtitle: extractErrorMessage(error) ?? 'An unknown error occurred',
         });
       }
     },
