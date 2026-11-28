@@ -8,6 +8,8 @@
   "addResults": "Add results",
   "addToPinnedOrders": "Add to my pinned orders",
   "allOrders": "All orders",
+  "asNeeded": "as needed",
+  "asNeededFor": "as needed for {{condition}}",
   "backToOrderBasket": "Back to order basket",
   "cancel": "Cancel",
   "cancelOrder": "Cancel order",

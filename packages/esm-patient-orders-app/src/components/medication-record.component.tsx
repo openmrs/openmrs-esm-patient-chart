@@ -75,6 +75,22 @@ export default function MedicationRecord({ medication }: MedicationRecordProps) 
               {order.dosingInstructions.toLowerCase()}
             </span>
           )}
+          {order.asNeeded && (
+            <span>
+              {(order.dose != null ||
+                order.route?.display ||
+                order.frequency?.display ||
+                order.duration != null ||
+                (order.numRefills != null && order.numRefills !== 0) ||
+                order.dosingInstructions) && <> &mdash; </>}
+              {order.asNeededCondition
+                ? t('asNeededFor', 'as needed for {{condition}}', {
+                    condition: order.asNeededCondition,
+                    interpolation: { escapeValue: false },
+                  })
+                : t('asNeeded', 'as needed')}
+            </span>
+          )}
         </p>
         <p className={styles.bodyLong01}>
           {order.orderReasonNonCoded ? (

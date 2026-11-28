@@ -174,6 +174,22 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
                   {medication.dosingInstructions.toLocaleLowerCase()}
                 </span>
               )}
+              {medication.asNeeded && (
+                <span>
+                  {(medication.dose != null ||
+                    medication.route?.display ||
+                    medication.frequency?.display ||
+                    medication.duration != null ||
+                    (medication.numRefills != null && medication.numRefills !== 0) ||
+                    medication.dosingInstructions) && <> &mdash; </>}
+                  {medication.asNeededCondition
+                    ? t('asNeededFor', 'as needed for {{condition}}', {
+                        condition: medication.asNeededCondition,
+                        interpolation: { escapeValue: false },
+                      })
+                    : t('asNeeded', 'as needed')}
+                </span>
+              )}
             </p>
           </div>
           <p className={styles.bodyLong01}>

@@ -57,6 +57,36 @@ const fullDrugOrder: Order = {
 } as Order;
 
 describe('MedicationRecord', () => {
+  it('does not show PRN instructions for a scheduled order, even if it has a stale condition', () => {
+    mockUseDrugOrderByUuid.mockReturnValue({
+      data: { ...fullDrugOrder, asNeeded: false, asNeededCondition: 'pain' },
+      error: undefined,
+      isLoading: false,
+    });
+
+    renderWithSwr(<MedicationRecord medication={baseMedication} />);
+
+    expect(screen.queryByText(/as needed/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/pain/i)).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ['pain', 'as needed for pain'],
+    ['pain & fever', 'as needed for pain & fever'],
+    [null, 'as needed'],
+    ['', 'as needed'],
+  ])('shows PRN instructions with condition %s', (asNeededCondition, expectedText) => {
+    mockUseDrugOrderByUuid.mockReturnValue({
+      data: { ...fullDrugOrder, asNeeded: true, asNeededCondition },
+      error: undefined,
+      isLoading: false,
+    });
+
+    renderWithSwr(<MedicationRecord medication={baseMedication} />);
+
+    expect(screen.getByText(new RegExp(`— ${expectedText}$`))).toBeInTheDocument();
+  });
+
   it('renders a loading state while fetching the drug order', () => {
     mockUseDrugOrderByUuid.mockReturnValue({
       data: null,
