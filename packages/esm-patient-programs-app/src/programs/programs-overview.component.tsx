@@ -52,6 +52,8 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
   const { activeEnrollments, availablePrograms, eligiblePrograms, enrollments, error, isLoading, isValidating } =
     usePrograms(patientUuid);
 
+  const isEnrolledInAllPrograms = availablePrograms?.length > 0 && eligiblePrograms?.length === 0;
+
   const { results: paginatedEnrollments, goTo, currentPage } = usePagination(enrollments ?? [], programsCount);
 
   const enrollmentsByUuid = useMemo(
@@ -123,13 +125,13 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
               renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
               iconDescription="Add programs"
               onClick={launchProgramsForm}
-              disabled={availablePrograms?.length && eligiblePrograms?.length === 0}
+              disabled={isEnrolledInAllPrograms}
             >
               {t('add', 'Add')}
             </Button>
           )}
         </CardHeader>
-        {availablePrograms?.length && eligiblePrograms?.length === 0 && (
+        {isEnrolledInAllPrograms && (
           <InlineNotification
             style={{ minWidth: '100%', margin: '0', padding: '0' }}
             kind={'info'}
