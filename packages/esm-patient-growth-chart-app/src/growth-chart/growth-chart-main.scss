@@ -50,9 +50,17 @@
         font-weight: 400;
       }
 
-      // The first child of the ticks group is the domain path, so the
-      // 12-month tick marks land on 6n + 2
-      g.tick:nth-child(6n + 2) text {
+      // Carbon sets each tick's aria-label to its age in months, so the
+      // year labels stay bold whatever the tick step
+      g.tick:is(
+          [aria-label='0'],
+          [aria-label='12'],
+          [aria-label='24'],
+          [aria-label='36'],
+          [aria-label='48'],
+          [aria-label='60']
+        )
+        text {
         font-weight: 600;
       }
     }
