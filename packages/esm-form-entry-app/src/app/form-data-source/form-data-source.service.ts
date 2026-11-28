@@ -295,7 +295,7 @@ export class FormDataSourceService {
   public getConceptSetMembers(uuid: string) {
     return this.conceptResourceService
       .getConceptByUuid(uuid)
-      .pipe(map((concept) => concept.setMembers.map(this.mapConcept).sort((a, b) => (a.label > b.label ? 1 : 0))));
+      .pipe(map((concept) => concept.setMembers.map(this.mapConcept).sort((a, b) => a.label.localeCompare(b.label))));
   }
 
   public findDrug(searchText) {

@@ -170,6 +170,21 @@ describe('Service: FormDataSourceService', () => {
     expect(resultData).toBeTruthy();
   }));
 
+  it('should sort concept set members by label', (done) => {
+    const service: FormDataSourceService = TestBed.inject(FormDataSourceService);
+    const conceptResourceService = TestBed.inject(ConceptResourceService);
+    const setMembers = ['Typhoid', 'Cholera', 'Malaria', 'Anaemia'].map((display) => ({
+      uuid: `${display}-uuid`,
+      name: { display },
+    }));
+    spyOn(conceptResourceService, 'getConceptByUuid').and.returnValue(of({ uuid: 'set-uuid', setMembers } as any));
+
+    service.getConceptSetMembers('set-uuid').subscribe((results) => {
+      expect(results.map((result) => result.label)).toEqual(['Anaemia', 'Cholera', 'Malaria', 'Typhoid']);
+      done();
+    });
+  });
+
   describe('diagnosis concept codes', () => {
     const diagnosisClassUuid = '8d4918b0-c2cc-11de-8d13-0010c6dffd0f';
     const icd11SourceUuid = '43aaca5f-d623-43fd-993b-673b5d927cdd';
