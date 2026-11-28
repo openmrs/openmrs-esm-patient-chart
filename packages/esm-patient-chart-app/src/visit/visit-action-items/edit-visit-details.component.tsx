@@ -10,7 +10,6 @@ import {
   useLayoutType,
 } from '@openmrs/esm-framework';
 import { type VisitFormProps, type VisitFormWindowProps } from '../visit-form/visit-form.workspace';
-import { type PatientWorkspaceGroupProps } from '@openmrs/esm-patient-common-lib';
 
 interface EditVisitDetailsActionItemProps {
   visit: Visit;
@@ -35,11 +34,10 @@ const EditVisitDetailsActionItem: React.FC<EditVisitDetailsActionItemProps> = ({
   const editVisitDetails = () => {
     // For this workspace, the visit context is the visit to edit
     const windowProps = { patient, patientUuid, visitContext: visit };
-    launchWorkspace2<VisitFormProps, VisitFormWindowProps, PatientWorkspaceGroupProps>(
+    launchWorkspace2<VisitFormProps, VisitFormWindowProps, {}>(
       'start-visit-workspace-form',
       { openedFrom: 'patient-chart-edit-visit' },
       windowProps,
-      { patient, patientUuid, activeVisit: visit, showPatientBanner: 'tabletOnly' },
     );
   };
 

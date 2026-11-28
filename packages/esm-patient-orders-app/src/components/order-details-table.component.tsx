@@ -39,7 +39,6 @@ import {
   type OrderBasketItem,
   type OrderType,
   type OrderUrgency,
-  type PatientWorkspaceGroupProps,
   useLaunchWorkspaceRequiringVisit,
   useOrderBasket,
   useOrderTypes,
@@ -646,16 +645,8 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
   const { orders, setOrders } = useOrderBasket<OrderBasketItem>(patient, grouping, postDataPrepFn);
   const alreadyInBasket = orders.some((x) => x.uuid === orderItem.uuid);
 
-  const groupProps: PatientWorkspaceGroupProps = useMemo(
-    () => ({
-      showPatientBanner: 'tabletOnly',
-      patient,
-      patientUuid: patient.id,
-      activeVisit: orderItem.encounter.visit,
-    }),
-    [patient, orderItem.encounter.visit],
-  );
-  // The workspaces read the patient / visit from their window props, not from the group props
+  // The workspaces read the patient / visit from their window props. No group props are passed: the chart's
+  // workspace group only changes when the patient's active visit does, and this order's visit may be a past one.
   const windowProps = useMemo(
     () => ({ patient, patientUuid: patient.id, visitContext: orderItem.encounter.visit }),
     [patient, orderItem.encounter.visit],
@@ -668,7 +659,7 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
           const medicationOrder = res.data;
           const discontinueItem = buildMedicationOrder(medicationOrder, 'DISCONTINUE');
           setOrders([...orders, discontinueItem]);
-          launchWorkspace2('order-basket', {}, windowProps, groupProps);
+          launchWorkspace2('order-basket', {}, windowProps);
         })
         .catch((e) => {
           console.error('Error cancelling drug order: ', e);
@@ -676,13 +667,13 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
     } else if (orderItem.type === ORDER_TYPES.TEST_ORDER) {
       const labItem = buildLabOrder(orderItem, 'DISCONTINUE');
       setOrders([...orders, labItem]);
-      launchWorkspace2('order-basket', {}, windowProps, groupProps);
+      launchWorkspace2('order-basket', {}, windowProps);
     } else {
       const order = buildGeneralOrder(orderItem, 'DISCONTINUE');
       setOrders([...orders, order]);
-      launchWorkspace2('order-basket', {}, windowProps, groupProps);
+      launchWorkspace2('order-basket', {}, windowProps);
     }
-  }, [orderItem, setOrders, orders, windowProps, groupProps]);
+  }, [orderItem, setOrders, orders, windowProps]);
 
   const handleModifyOrder = useCallback(() => {
     if (orderItem.type === ORDER_TYPES.DRUG_ORDER) {
@@ -698,7 +689,6 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
             'add-drug-order',
             { order: buildMedicationOrder(medicationOrder, 'REVISE'), orderToEditOrdererUuid: orderItem.orderer.uuid },
             windowProps,
-            groupProps,
           );
         })
         .catch((e) => {
@@ -710,7 +700,6 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
         'add-lab-order',
         { order: labItem, orderTypeUuid: orderItem.orderType.uuid, orderToEditOrdererUuid: orderItem.orderer.uuid },
         windowProps,
-        groupProps,
       );
     } else if (orderItem.type === ORDER_TYPES.GENERAL_ORDER) {
       const generalItem = buildGeneralOrder(orderItem, 'REVISE');
@@ -718,10 +707,9 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
         'orderable-concept-workspace',
         { order: generalItem, orderTypeUuid: orderItem.orderType.uuid, orderToEditOrdererUuid: orderItem.orderer.uuid },
         windowProps,
-        groupProps,
       );
     }
-  }, [orderItem, windowProps, groupProps]);
+  }, [orderItem, windowProps]);
 
   const handleAddOrEditTestResults = useCallback(() => {
     launchWorkspace2(
