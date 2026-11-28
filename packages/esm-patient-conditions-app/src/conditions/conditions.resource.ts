@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { type DataTableSortState } from '@carbon/react';
-import { fhirBaseUrl, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
+import { fhirBaseUrl, type OpenmrsFetchError, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 
 export interface FHIRConditionResponse {
   entry: Array<{
@@ -282,6 +282,54 @@ export async function deleteCondition(conditionId: string) {
   });
 
   return res;
+}
+
+// HAPI's error code, e.g. "HAPI-0389: "
+const hapiCodePrefix = /^HAPI-\d+:\s*/;
+// HAPI's wrapper around exceptions thrown from a resource provider method
+const accessMethodPrefix = /^Failed to call access method:\s*/;
+// A fully qualified Java exception class name, e.g. "org.openmrs.api.APIAuthenticationException: "
+const javaExceptionPrefix = /^(?:[a-z_$][\w$]*\.)+[A-Z][\w$]*(?:Exception|Error):\s*/;
+
+function nonBlankString(value: unknown): string | undefined {
+  return typeof value === 'string' && value.trim() ? value.trim() : undefined;
+}
+
+function stripDiagnosticsPrefixes(diagnostics: string): string {
+  return diagnostics
+    .replace(hapiCodePrefix, '')
+    .replace(accessMethodPrefix, '')
+    .replace(javaExceptionPrefix, '')
+    .trim();
+}
+
+/**
+ * Returns the reason the server gave in the response body of a failed condition request, or `undefined` when it
+ * gave none.
+ *
+ * Condition requests go through the FHIR API, whose errors are OperationOutcomes with the reason in
+ * `issue[].diagnostics`. The first issue with a reason is used, without its HAPI error code and Java exception
+ * prefixes. REST-style `error.message` bodies are read too.
+ */
+export function getConditionErrorReason(responseBody: OpenmrsFetchError['responseBody']): string | undefined {
+  // On the FHIR endpoint, string bodies are the server's HTML error pages, which are not fit to show
+  if (!responseBody || typeof responseBody !== 'object') {
+    return undefined;
+  }
+
+  // fhir2's own error OperationOutcomes contain a single issue; if there are more, only the first with a reason is used
+  const issues = (responseBody as { issue?: unknown }).issue;
+  if (Array.isArray(issues)) {
+    for (const issue of issues) {
+      const diagnostics = nonBlankString(issue?.diagnostics);
+      const reason = diagnostics && stripDiagnosticsPrefixes(diagnostics);
+      if (reason) {
+        return reason;
+      }
+    }
+  }
+
+  return nonBlankString((responseBody as { error?: { message?: unknown } }).error?.message);
 }
 
 export interface ConditionTableRow extends Condition {
