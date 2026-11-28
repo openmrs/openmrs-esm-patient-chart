@@ -29,7 +29,7 @@
   "enrollmentDiscontinued": "The patient's program enrollment has been successfully discontinued.",
   "enrollmentNotAllowed": "Enrollment not allowed",
   "errorDescription": "{{errors}}",
-  "errorDescriptionTitle": "errorDescriptionTitle",
+  "errorDescriptionTitle": "Error description",
   "errorLaunchingWorkspace": "Error launching workspace",
   "errorLaunchingWorkspaceSubtitle": "An unexpected error occurred while launching the workspace.",
   "errorLoadingFormDependencies": "Unable to load form data",

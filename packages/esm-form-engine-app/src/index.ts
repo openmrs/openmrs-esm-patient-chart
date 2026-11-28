@@ -89,7 +89,7 @@ export const deleteQuestionModal = getAsyncLifecycle(
  * t("enrollmentDiscontinued", "The patient's program enrollment has been successfully discontinued.")
  * t("enrollmentNotAllowed", "Enrollment not allowed")
  * t("errorDescription", "{{errors}}")
- * t("errorDescriptionTitle", "")
+ * t("errorDescriptionTitle", "Error description")
  * t("errorLaunchingWorkspace", "Error launching workspace")
  * t("errorLaunchingWorkspaceSubtitle", "An unexpected error occurred while launching the workspace.")
  * t("errorLoadingFormDependencies", "Unable to load form data")
